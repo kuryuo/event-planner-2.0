@@ -1,7 +1,11 @@
+@import '@/typography';
+
 .wrapper {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+
+  @include font(body-m, regular);
 
   &.disabled {
     cursor: not-allowed;

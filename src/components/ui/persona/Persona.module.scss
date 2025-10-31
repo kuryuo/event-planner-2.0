@@ -1,0 +1,85 @@
+@import '@/typography';
+
+.wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  &.M {
+    .avatar {
+      width: 48px;
+      height: 48px;
+    }
+
+    .button {
+      width: 24px;
+      height: 24px;
+    }
+
+    .comment {
+      @include font(caption-m, regular);
+      color: var(--content-secondary);
+    }
+  }
+
+  &.S {
+    .avatar {
+      width: 32px;
+      height: 32px;
+    }
+
+    .button {
+      width: 16px;
+      height: 16px;
+    }
+
+    .comment {
+      @include font(caption-m, regular);
+      color: var(--content-secondary);
+    }
+  }
+
+  .avatar {
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+
+    .textBlock {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .name {
+        @include font(body-m, semibold);
+      }
+    }
+
+    .button {
+      border-radius: 50%;
+      border: none;
+      background-color: var(--bg-brand-purple);
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: var(--bg-brand-purple-hover);
+      }
+
+      &:active {
+        background-color: var(--bg-brand-purple-press);
+      }
+
+      &:disabled {
+        background-color: var(--bg-disabled);
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+    }
+  }
+}

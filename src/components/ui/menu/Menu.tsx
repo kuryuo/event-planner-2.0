@@ -23,9 +23,10 @@ export function Menu({options, isOpen, disabled, className}: MenuProps) {
                 <li key={idx} className={styles.option} onClick={option.onClick}>
                     {option.leftIcon && <span className={styles.iconLeft}>{option.leftIcon}</span>}
                     <div className={styles.optionContent}>
-                        <div className={`${styles.optionLabel} body-m`}>{option.label}</div>
-                        {option.description &&
-                            <div className={`${styles.optionDescription} caption-m`}>{option.description}</div>}
+                        <div className={styles.optionLabel}>{option.label}</div>
+                        {option.description && (
+                            <div className={styles.optionDescription}>{option.description}</div>
+                        )}
                     </div>
                     {option.rightIcon && <span className={styles.iconRight}>{option.rightIcon}</span>}
                 </li>

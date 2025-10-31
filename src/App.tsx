@@ -6,6 +6,7 @@ import Select from "@/components/ui/form-controls/Select.tsx";
 import {Checkbox} from "@/components/ui/checkbox/Checkbox.tsx";
 import Switch from "@/components/ui/switch/Switch.tsx";
 import {useState} from "react";
+import Persona from "@/components/ui/persona/Persona.tsx";
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
                 justifyContent: 'center',
                 alignItems: 'center',
             }}>
+            <Persona name={'Имя Фамилия'} comment={'создатель'} hasButton={true}/>
             <Switch
                 checked={checked}
                 onCheckedChange={setChecked}
@@ -26,10 +28,11 @@ function App() {
                 labelPosition="right"
                 size="M"
             />
-            {/*<Checkbox/>*/}
-            {/*<Select label='Поле' helperText='ddd'/>*/}
-            {/*<TextArea label='Поле' helperText='ddd'/>*/}
-            {/*<TextField label='пример' helperText='ddd' error={true}/>*/}
+            <Checkbox/>
+            <Select label='Поле' helperText='ddd'/>
+            <TextArea label='Поле' helperText='ddd'/>
+            <TextField label='пример' helperText='ddd' error={true}/>
+            <Button size="M">Нажми</Button>
         </div>
         // <Router>
         //     <Routes>

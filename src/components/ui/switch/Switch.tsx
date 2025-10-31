@@ -27,7 +27,7 @@ export default function Switch({
     };
 
     return (
-        <label className={clsx(styles.wrapper, disabled && styles.disabled, 'body-m')}>
+        <label className={clsx(styles.wrapper, disabled && styles.disabled)}>
             {label && labelPosition === 'left' && (
                 <span className={styles.label}>{label}</span>
             )}
@@ -47,6 +47,5 @@ export default function Switch({
                 <span className={styles.label}>{label}</span>
             )}
         </label>
-
     );
 }

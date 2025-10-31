@@ -18,20 +18,19 @@ export default function TextField({
                                       disabled,
                                       ...props
                                   }: TextFieldProps) {
-
     return (
         <div className={`${styles.container} ${disabled ? styles.disabled : ''}`}>
             {label && (
-                <label className={`${styles.label} subtitle-m`}>
+                <label className={styles.label}>
                     {label}
                 </label>
             )}
 
-            <div className={`${styles.wrapper} ${error ? styles.error : ''}`}>
+            <div className={`${styles.wrapper} ${error ? styles.error : ''} ${disabled ? styles.disabled : ''}`}>
                 {leftIcon && <span className={styles.iconLeft}>{leftIcon}</span>}
                 <input
-                    placeholder={'placeholder'}
-                    className={`${styles.inpu} body-m`}
+                    placeholder='placeholder'
+                    className={styles.input}
                     disabled={disabled}
                     {...props}
                 />
@@ -39,11 +38,9 @@ export default function TextField({
             </div>
 
             {helperText && (
-                <span
-                    className={`${styles.helperText} ${error ? styles.helperTextError : ''} caption-m`}
-                >
-          {helperText}
-        </span>
+                <span className={`${styles.helperText} ${error ? styles.helperTextError : ''}`}>
+                    {helperText}
+                </span>
             )}
         </div>
     );

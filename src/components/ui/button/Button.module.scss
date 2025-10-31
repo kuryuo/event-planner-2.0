@@ -1,10 +1,11 @@
+@import '@/typography';
+
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border: none;
   border-radius: 8px;
-  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   padding: 8px 24px;
@@ -24,23 +25,22 @@
     align-items: center;
   }
 
-
   &.M {
+    @include font(button-m, semibold);
     width: 101px;
     height: 40px;
-    font-size: 16px;
   }
 
   &.S {
+    @include font(button-s, semibold);
     width: 70px;
     height: 30px;
-    font-size: 14px;
   }
 
   &.XS {
+    @include font(caption-s, semibold);
     width: 55px;
     height: 20px;
-    font-size: 12px;
   }
 
   &.Filled {

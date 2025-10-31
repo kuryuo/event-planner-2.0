@@ -19,7 +19,6 @@ export default function TextArea({
                                      ...props
                                  }: TextAreaProps) {
     const MAX_LENGTH = 800;
-
     const [value, setValue] = useState(props.value || '');
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -40,17 +39,17 @@ export default function TextArea({
         <div className={`${styles.container} ${disabled ? styles.disabled : ''}`}>
             {label && (
                 <div className={styles.labelWrapper}>
-                    <label className={`${styles.label} subtitle-m`}>
+                    <label className={styles.label}>
                         {label}
                         {!value && !disabled && <span className={styles.requiredDot}/>}
                     </label>
-                    <span className={`${styles.charCounter} caption-m`}>
-      {String(value).length}/{MAX_LENGTH}
-    </span>
+                    <span className={styles.charCounter}>
+                        {String(value).length}/{MAX_LENGTH}
+                    </span>
                 </div>
             )}
 
-            <div className={`${styles.wrapper} ${error ? styles.error : ''}`}>
+            <div className={`${styles.wrapper} ${error ? styles.error : ''} ${disabled ? styles.disabled : ''}`}>
                 {leftIcon && <span className={styles.iconLeft}>{leftIcon}</span>}
                 <textarea
                     ref={textareaRef}
@@ -65,7 +64,7 @@ export default function TextArea({
             </div>
 
             {helperText && (
-                <span className={`${styles.helperText} ${error ? styles.helperTextError : ''} caption-m`}>
+                <span className={`${styles.helperText} ${error ? styles.helperTextError : ''}`}>
                     {helperText}
                 </span>
             )}

@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import type {ButtonHTMLAttributes, ReactNode} from 'react';
 import styles from './Button.module.scss';
 import clsx from 'clsx';
 

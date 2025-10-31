@@ -1,0 +1,41 @@
+@import './typography-variables';
+
+.title-m {
+  @include font(title-m, semibold);
+}
+
+.title-s {
+  @include font(title-s, semibold);
+}
+
+.subtitle-m {
+  @include font(subtitle-m, semibold);
+}
+
+.subtitle-s {
+  @include font(subtitle-s, semibold);
+}
+
+.body-m {
+  @include font(body-m, regular);
+}
+
+.body-s {
+  @include font(body-s, regular);
+}
+
+.caption-m {
+  @include font(caption-m, regular);
+}
+
+.caption-s {
+  @include font(caption-s, semibold);
+}
+
+.button-m {
+  @include font(button-m, semibold);
+}
+
+.button-s {
+  @include font(button-s, semibold);
+}

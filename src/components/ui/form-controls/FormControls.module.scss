@@ -1,3 +1,5 @@
+@import '@/typography';
+
 .container {
   display: flex;
   flex-direction: column;
@@ -8,6 +10,7 @@
 .label {
   color: var(--content-primary);
   margin-bottom: 16px;
+  @include font(subtitle-m, semibold);
 }
 
 .labelWrapper {
@@ -16,7 +19,7 @@
 }
 
 .charCounter {
-  font-size: 12px;
+  @include font(caption-m, regular);
   color: var(--content-secondary);
   padding: 4px;
 }
@@ -43,8 +46,27 @@
     border-color: var(--border-primary-hover);
   }
 
-  &:has(input:focus) {
+  &:has(input:focus),
+  &:has(textarea:focus) {
     border-color: var(--border-primary-press);
+  }
+
+  &.error {
+    border-color: var(--border-negative);
+
+    &:hover {
+      border-color: var(--border-negative);
+    }
+
+    &:has(input:focus),
+    &:has(textarea:focus) {
+      border-color: var(--border-negative);
+    }
+  }
+
+  &.disabled {
+    border-color: var(--content-disabled);
+    cursor: not-allowed;
   }
 }
 
@@ -55,6 +77,7 @@
   background: transparent;
   padding: 10px 8px;
   color: var(--content-primary);
+  @include font(body-m, regular);
 
   &::placeholder {
     color: var(--content-placeholder);
@@ -62,8 +85,42 @@
     transition: color 0.2s ease;
   }
 
-  &:disabled::placeholder {
+  &:disabled {
     color: var(--content-disabled);
+    cursor: not-allowed;
+
+    &::placeholder {
+      color: var(--content-disabled);
+    }
+  }
+}
+
+.textarea {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 10px 8px;
+  color: var(--content-primary);
+  font-family: inherit;
+  resize: none;
+  min-height: 120px;
+  line-height: 1.4;
+  @include font(body-m, regular);
+
+  &::placeholder {
+    color: var(--content-placeholder);
+    opacity: 1;
+    transition: color 0.2s ease;
+  }
+
+  &:disabled {
+    color: var(--content-disabled);
+    cursor: not-allowed;
+
+    &::placeholder {
+      color: var(--content-disabled);
+    }
   }
 }
 
@@ -82,80 +139,13 @@
   margin-left: 8px;
 }
 
-.disabled {
-  .wrapper {
-    border-color: var(--content-disabled);;
-    cursor: not-allowed;
-  }
-
-  .input {
-    color: var(--content-disabled);;
-    cursor: not-allowed;
-  }
-
-  .label {
-    color: var(--content-disabled);
-    cursor: not-allowed;
-  }
-}
-
-.error {
-  border-color: var(--border-negative);
-
-  &:hover {
-    border-color: var(--border-negative);
-  }
-
-  &:has(input:focus) {
-    border-color: var(--border-negative);
-  }
-}
-
+// Текст помощи
 .helperText {
   color: var(--content-secondary);
+  @include font(caption-m, regular);
 }
 
 .helperTextError {
   color: var(--content-negative);
-}
-
-.textarea {
-  flex: 1;
-  border: none;
-  outline: none;
-  background: transparent;
-  padding: 10px 8px;
-  color: var(--content-primary);
-  font-family: inherit;
-  resize: none;
-  min-height: 120px;
-  line-height: 1.4;
-
-  &::placeholder {
-    color: var(--content-placeholder);
-    opacity: 1;
-    transition: color 0.2s ease;
-  }
-
-  &:disabled {
-    color: var(--content-disabled);
-    cursor: not-allowed;
-
-    &::placeholder {
-      color: var(--content-disabled);
-    }
-  }
-}
-
-.wrapper:has(textarea:focus) {
-  border-color: var(--border-primary-press);
-}
-
-.wrapper.error:has(textarea) {
-  border-color: var(--border-negative);
-}
-
-.disabled .textarea {
-  color: var(--content-disabled);
-  cursor: not-allowed;
+  @include font(caption-m, semibold);
 }
