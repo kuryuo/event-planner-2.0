@@ -1,0 +1,44 @@
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: var(--white);
+  list-style: none;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.option {
+  display: flex;
+  align-items: flex-start;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background-color: var(--hover-bg);
+  }
+
+  .iconLeft,
+  .iconRight {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 8px;
+  }
+
+  .optionContent {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .optionLabel {
+    color: var(--content-primary);
+  }
+
+  .optionDescription {
+    color: var(--content-secondary);
+  }
+}
