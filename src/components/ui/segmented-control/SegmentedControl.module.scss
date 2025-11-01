@@ -1,0 +1,46 @@
+@import "@/typography";
+
+.segmentedControl {
+  position: relative;
+  display: flex;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  width: max-content;
+  height: 40px;
+  background-color: var(--bg-secondary);
+}
+
+.segment {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  width: 140px;
+  height: 36px;
+  z-index: 1;
+  @include font(body-s, regular);
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--bg-brand-purple);
+  }
+
+  &.active {
+    color: var(--white);
+  }
+}
+
+.slider {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 0;
+  width: calc(100% / 2);
+  border-radius: 8px;
+  background-color: var(--bg-brand-purple);
+  transition: left 0.3s;
+  z-index: 0;
+}

@@ -1,0 +1,61 @@
+@import "@/typography";
+
+.tabsContainer {
+  width: 40%;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tabs {
+  display: flex;
+  position: relative;
+}
+
+.tabItem {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--brand-color);
+  }
+
+  .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .label {
+    @include font(subtitle-m, semibold);
+    white-space: nowrap;
+  }
+}
+
+.active {
+  color: var(--brand-color);
+}
+
+.indicator {
+  position: absolute;
+  bottom: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background-color: var(--bg-brand-green);
+  transition: left 0.3s;
+}
+
+.hoverIndicator {
+  position: absolute;
+  bottom: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background-color: var(--bg-brand-green-bold);
+  transition: left 0.2s;
+  z-index: 1;
+}

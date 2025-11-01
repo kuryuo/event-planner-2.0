@@ -1,0 +1,22 @@
+@import "@/typography";
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 50%;
+  @include font(caption-s, regular);
+}
+
+.color-primary {
+  color: var(--white);
+  background-color: var(--bg-brand-purple);
+}
+
+.color-secondary {
+  color: var(--content-primary);
+  background-color: var(--bg-brand-green);
+}

@@ -7,19 +7,40 @@ import {Checkbox} from "@/components/ui/checkbox/Checkbox.tsx";
 import Switch from "@/components/ui/switch/Switch.tsx";
 import {useState} from "react";
 import Persona from "@/components/ui/persona/Persona.tsx";
+import SegmentedControl from "@/components/ui/segmented-control/SegmentedControl.tsx";
+import Chip from "@/components/ui/chip/Chip.tsx";
+import Badge from "@/components/ui/badge/Badge.tsx";
+import Tabs from "@/components/ui/tabs/Tabs.tsx";
 
 
 function App() {
     const [checked, setChecked] = useState(false);
+    const [selectedOption, setSelectedOption] = useState('Option 1');
     return (
         <div
             style={{
-                width: '100vw',
-                height: '100vh',
                 display: 'flex',
+                flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
+                gap: '5rem',
+                paddingTop: '5rem',
+                paddingBottom: '5rem',
             }}>
+            <Tabs
+                items={[
+                    {label: "Tab Item", badgeCount: 3},
+                    {label: "Profile"},
+                    {label: "Messages", badgeCount: 12},
+                ]}
+            />
+            <Chip text={'Label'} closable={true}/>
+            <Badge count={3}/>
+            <SegmentedControl
+                options={['Label1', 'Label2', 'Label3']}
+                selected={selectedOption}
+                onChange={setSelectedOption}
+            />
             <Persona name={'Имя Фамилия'} comment={'создатель'} hasButton={true}/>
             <Switch
                 checked={checked}

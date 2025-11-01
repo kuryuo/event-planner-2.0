@@ -1,0 +1,102 @@
+@import "@/typography";
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 16px;
+  background-color: var(--pink-100);
+  color: var(--text-default);
+  font-weight: 500;
+  cursor: default;
+
+  .text {
+    white-space: nowrap;
+  }
+
+  .closeButton {
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    padding: 0;
+    cursor: pointer;
+
+    svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+}
+
+.size-S {
+  @include font(body-s, regular);
+  padding: 2px 8px;
+}
+
+.size-M {
+  @include font(caption-m, regular);
+  padding: 4px 12px;
+}
+
+.color-pink {
+  background-color: var(--bg-pink);
+  color: var(--content-pink);
+}
+
+.color-blue {
+  background-color: var(--bg-blue);
+  color: var(--content-blue);
+}
+
+.color-orange {
+  background-color: var(--bg-orange);
+  color: var(--content-orange);
+}
+
+.color-purple {
+  background-color: var(--bg-purple);
+  color: var(--content-purple);
+}
+
+.color-cyan {
+  background-color: var(--bg-cyan);
+  color: var(--content-cyan);
+}
+
+.color-deep-orange {
+  background-color: var(--bg-deep-orange);
+  color: var(--content-deep-orange);
+}
+
+.color-deep-purple {
+  background-color: var(--bg-deep-purple);
+  color: var(--content-deep-purple);
+}
+
+.color-teal {
+  background-color: var(--bg-teal);
+  color: var(--content-teal);
+}
+
+.color-brown {
+  background-color: var(--bg-brown);
+  color: var(--content-brown);
+}
+
+.color-indigo {
+  background-color: var(--bg-indigo);
+  color: var(--content-indigo);
+}
+
+.color-green {
+  background-color: var(--bg-green);
+  color: var(--content-green);
+}
+
+.color-plum {
+  background-color: var(--bg-plum);
+  color: var(--content-plum);
+}
