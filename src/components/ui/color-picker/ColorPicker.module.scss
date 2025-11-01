@@ -1,0 +1,57 @@
+.colorPicker {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border-primary);
+
+  &:hover {
+    border-bottom: 1px solid var(--border-primary-hover);
+  }
+
+  .selected {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .colorCircle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+  }
+
+  .icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .dropdown {
+    position: absolute;
+    top: 100%;
+    margin-top: 8px;
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px;
+    display: grid;
+    grid-template-columns: repeat(6, 24px);
+    grid-template-rows: repeat(2, 24px);
+    gap: 8px;
+    z-index: 10;
+  }
+
+  .colorOption {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+}

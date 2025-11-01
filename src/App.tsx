@@ -11,6 +11,7 @@ import SegmentedControl from "@/components/ui/segmented-control/SegmentedControl
 import Chip from "@/components/ui/chip/Chip.tsx";
 import Badge from "@/components/ui/badge/Badge.tsx";
 import Tabs from "@/components/ui/tabs/Tabs.tsx";
+import ColorPicker from "@/components/ui/color-picker/ColorPicker.tsx";
 
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
                 paddingTop: '5rem',
                 paddingBottom: '5rem',
             }}>
+            <ColorPicker onChange={(color) => console.log("Selected color:", color)}/>
             <Tabs
                 items={[
                     {label: "Tab Item", badgeCount: 3},

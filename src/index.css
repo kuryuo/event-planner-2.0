@@ -195,7 +195,7 @@
     --bg-brown: var(--brown-10);
 
     --border-primary: var(--gray-20);
-] --border-primary-hover: var(--gray-100);
+    --border-primary-hover: var(--gray-100);
     --border-primary-focus: var(--gray-100);
     --border-inverse: var(--gray-80);
     --border-disabled: var(--gray-10);
