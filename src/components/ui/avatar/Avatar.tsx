@@ -1,0 +1,55 @@
+import clsx from 'clsx';
+import styles from './Avatar.module.scss';
+import PlusIcon from '@/assets/img/icon-l/plus-lg.svg';
+
+type AvatarVariant = 'default' | 'update';
+type AvatarSize = 'XS' | 'S' | 'M' | 'L';
+
+interface AvatarProps {
+    size?: AvatarSize;
+    variant?: AvatarVariant;
+    avatarUrl?: string;
+    name?: string;
+    onClick?: () => void;
+}
+
+const SIZE_MAP: Record<AvatarSize, number> = {
+    L: 64,
+    M: 48,
+    S: 36,
+    XS: 24,
+};
+
+export default function Avatar({
+                                   size = 'M',
+                                   variant = 'default',
+                                   avatarUrl,
+                                   name = '',
+                                   onClick,
+                               }: AvatarProps) {
+    const pixelSize = SIZE_MAP[size];
+
+    const avatarSrc =
+        avatarUrl ||
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(
+            name
+        )}&size=${pixelSize}&background=DDDDDD&color=555555`;
+
+    return (
+        <div
+            className={clsx(
+                styles.avatarWrapper,
+                styles[size],
+                variant === 'update' && styles.update
+            )}
+            onClick={variant === 'update' ? onClick : undefined}
+        >
+            <img src={avatarSrc} alt={name} className={styles.avatar}/>
+            {variant === 'update' && (
+                <div className={styles.overlay}>
+                    <img src={PlusIcon} className={styles.icon}/>
+                </div>
+            )}
+        </div>
+    );
+}

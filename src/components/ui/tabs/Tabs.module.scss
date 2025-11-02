@@ -8,17 +8,17 @@
 .tabs {
   display: flex;
   position: relative;
+  justify-content: center;
+  gap: 24px;
 }
 
 .tabItem {
-  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   padding: 8px 16px;
   cursor: pointer;
-  position: relative;
   transition: color 0.2s;
 
   &:hover {

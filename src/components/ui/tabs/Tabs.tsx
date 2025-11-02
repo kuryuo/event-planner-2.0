@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useRef, useEffect} from "react";
 import clsx from "clsx";
 import styles from "./Tabs.module.scss";
 import Badge from "../badge/Badge";
@@ -15,13 +15,40 @@ interface TabsProps {
     onChange?: (index: number) => void;
 }
 
+const WIDTH_PERCENT = 0.7;
+const OFFSET_PERCENT = (1 - WIDTH_PERCENT) / 2;
+
 const Tabs = ({items, initialIndex = 0, onChange}: TabsProps) => {
     const [activeIndex, setActiveIndex] = useState(initialIndex);
-    const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+    const [indicatorStyle, setIndicatorStyle] = useState({left: 0, width: 0});
+    const [hoverStyle, setHoverStyle] = useState<{ left: number; width: number } | null>(null);
+    const tabRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+    const calculateStyle = (index: number) => {
+        const el = tabRefs.current[index];
+        if (!el) return null;
+        return {
+            left: el.offsetLeft + el.offsetWidth * OFFSET_PERCENT,
+            width: el.offsetWidth * WIDTH_PERCENT,
+        };
+    };
+
+    useEffect(() => {
+        const style = calculateStyle(activeIndex);
+        if (style) setIndicatorStyle(style);
+
+        const handleResize = () => {
+            const style = calculateStyle(activeIndex);
+            if (style) setIndicatorStyle(style);
+        };
+
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, [activeIndex]);
 
     const handleClick = (index: number) => {
         setActiveIndex(index);
-        if (onChange) onChange(index);
+        onChange?.(index);
     };
 
     return (
@@ -30,10 +57,14 @@ const Tabs = ({items, initialIndex = 0, onChange}: TabsProps) => {
                 {items.map((item, index) => (
                     <div
                         key={index}
+                        ref={el => void (tabRefs.current[index] = el)}
                         className={clsx(styles.tabItem, {[styles.active]: activeIndex === index})}
                         onClick={() => handleClick(index)}
-                        onMouseEnter={() => setHoverIndex(index)}
-                        onMouseLeave={() => setHoverIndex(null)}
+                        onMouseEnter={() => {
+                            const style = calculateStyle(index);
+                            if (style) setHoverStyle(style);
+                        }}
+                        onMouseLeave={() => setHoverStyle(null)}
                     >
                         {item.icon && <span className={styles.icon}>{item.icon}</span>}
                         <span className={styles.label}>{item.label}</span>
@@ -41,12 +72,12 @@ const Tabs = ({items, initialIndex = 0, onChange}: TabsProps) => {
                     </div>
                 ))}
 
-                {hoverIndex !== null && (
+                {hoverStyle && (
                     <div
                         className={styles.hoverIndicator}
                         style={{
-                            width: `${100 / items.length}%`,
-                            left: `${(100 / items.length) * hoverIndex}%`,
+                            left: `${hoverStyle.left}px`,
+                            width: `${hoverStyle.width}px`,
                         }}
                     />
                 )}
@@ -54,8 +85,8 @@ const Tabs = ({items, initialIndex = 0, onChange}: TabsProps) => {
                 <div
                     className={styles.indicator}
                     style={{
-                        width: `${100 / items.length}%`,
-                        left: `${(100 / items.length) * activeIndex}%`,
+                        left: `${indicatorStyle.left}px`,
+                        width: `${indicatorStyle.width}px`,
                     }}
                 />
             </div>

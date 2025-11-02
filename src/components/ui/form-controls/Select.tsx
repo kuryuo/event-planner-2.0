@@ -73,12 +73,15 @@ export default function Select({
                     isOpen={isOpen}
                     disabled={disabled}
                     options={[
-                        {
-                            label: 'Текст',
-                            description: 'Описание под текстом',
-                            leftIcon,
-                            onClick: () => setIsOpen(false)
-                        },
+                        {label: 'Текст', description: 'Описание под текстом', onClick: () => setIsOpen(false)},
+                        {label: 'Текст', description: 'Описание под текстом', onClick: () => setIsOpen(false)},
+                        {label: 'Текст', description: 'Описание под текстом', onClick: () => setIsOpen(false)},
+                        {label: 'Текст', description: 'Описание под текстом', onClick: () => setIsOpen(false)},
+                        {label: 'Текст', description: 'Описание под текстом', onClick: () => setIsOpen(false)},
+                        {label: 'Текст', description: 'Описание под текстом', onClick: () => setIsOpen(false)},
+                        {label: 'Текст', description: 'Описание под текстом', onClick: () => setIsOpen(false)},
+                        {label: 'Текст', description: 'Описание под текстом', onClick: () => setIsOpen(false)},
+                        {label: 'Текст', description: 'Описание под текстом', onClick: () => setIsOpen(false)},
                         {label: 'Текст', description: 'Описание под текстом', onClick: () => setIsOpen(false)},
                     ]}
                 />

@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import styles from './Persona.module.scss';
+import Avatar from '../avatar/Avatar';
 
 type PersonaSize = 'M' | 'S';
 
@@ -10,6 +11,7 @@ interface PersonaProps {
     comment?: string;
     hasButton?: boolean;
     onButtonClick?: () => void;
+    avatarVariant?: 'default' | 'update';
 }
 
 export default function Persona({
@@ -19,19 +21,18 @@ export default function Persona({
                                     comment,
                                     hasButton,
                                     onButtonClick,
+                                    avatarVariant = 'default',
                                 }: PersonaProps) {
-
-    const avatarSize = size === 'S' ? 32 : 48;
-
-    const avatarSrc =
-        avatarUrl ||
-        `https://ui-avatars.com/api/?name=${encodeURIComponent(
-            name
-        )}&size=${avatarSize}&background=DDDDDD&color=555555`;
 
     return (
         <div className={clsx(styles.wrapper, styles[size])}>
-            <img src={avatarSrc} alt={name} className={styles.avatar}/>
+            <Avatar
+                size={size}
+                variant={avatarVariant}
+                avatarUrl={avatarUrl}
+                name={name}
+                onClick={hasButton ? onButtonClick : undefined}
+            />
 
             <div className={styles.content}>
                 <div className={styles.textBlock}>
@@ -39,7 +40,7 @@ export default function Persona({
                     {comment && <div className={styles.comment}>{comment}</div>}
                 </div>
 
-                {hasButton && (
+                {hasButton && avatarVariant === 'default' && (
                     <button
                         className={styles.button}
                         onClick={onButtonClick}

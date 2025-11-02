@@ -19,7 +19,6 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    border: 1px solid var(--border-color);
   }
 
   .icon {
@@ -29,10 +28,9 @@
 
   .dropdown {
     position: absolute;
-    top: 100%;
     margin-top: 8px;
-    background-color: var(--bg-light);
-    border: 1px solid var(--border-color);
+    box-shadow: 0px 10px 16px 0px var(--surface-primary),
+    0px 6px 8px 0px var(--surface-primary);
     border-radius: 8px;
     padding: 8px;
     display: grid;

@@ -1,0 +1,23 @@
+@import "@/typography";
+
+.circleButton {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  @include font(button-m, semibold);
+
+  &.purple {
+    background-color: var(--bg-brand-purple);
+  }
+
+  &.primary {
+    background-color: var(--bg-primary);
+  }
+}

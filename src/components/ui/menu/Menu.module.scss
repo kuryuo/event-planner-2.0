@@ -7,9 +7,17 @@
   width: 100%;
   background-color: var(--white);
   list-style: none;
+  border-radius: 0 0 4px 4px;
   z-index: 1000;
-  overflow: hidden;
+  overflow-y: auto;
+  max-height: 200px;
+  box-shadow: 0 10px 16px 0 var(--surface-primary),
+  0 6px 8px 0 var(--surface-primary);
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-tertiary) var(--white);
 }
+
 
 .option {
   display: flex;
