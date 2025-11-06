@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './menu.module.scss';
+import styles from './Menu.module.scss';
 
 interface MenuProps {
     options: {

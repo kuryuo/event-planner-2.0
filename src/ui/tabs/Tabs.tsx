@@ -1,7 +1,7 @@
 import React, {useState, useRef, useEffect} from "react";
 import clsx from "clsx";
 import styles from "./Tabs.module.scss";
-import Badge from "../badge/Badge";
+import Badge from "../badge/Badge.tsx";
 
 export interface TabItem {
     label: string;

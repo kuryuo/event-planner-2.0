@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import styles from './FormControls.module.scss';
-import ChevronDownImg from '../../../assets/img/icon-m/chevron-down.svg';
-import ChevronUpImg from '../../../assets/img/icon-m/chevron-up.svg';
-import {Menu} from "@/components/ui/menu/Menu.tsx";
+import ChevronDownImg from '../../assets/img/icon-m/chevron-down.svg';
+import ChevronUpImg from '../../assets/img/icon-m/chevron-up.svg';
+import {Menu} from "@/ui/menu/Menu.tsx";
 
 interface SelectProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;

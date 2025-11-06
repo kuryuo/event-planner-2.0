@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import styles from "./ColorPicker.module.scss";
-import ChevronDownImg from "../../../assets/img/icon-m/chevron-down.svg";
-import ChevronUpImg from "../../../assets/img/icon-m/chevron-up.svg";
+import ChevronDownImg from "../../assets/img/icon-m/chevron-down.svg";
+import ChevronUpImg from "../../assets/img/icon-m/chevron-up.svg";
 
 const PREDEFINED_COLORS = [
     "var(--pink-100)",

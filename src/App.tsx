@@ -1,19 +1,19 @@
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
-import TextField from "@/components/ui/form-controls/TextField.tsx";
-import Button from "@/components/ui/button/Button.tsx";
-import TextArea from "@/components/ui/form-controls/TextArea.tsx";
-import Select from "@/components/ui/form-controls/Select.tsx";
-import {Checkbox} from "@/components/ui/checkbox/Checkbox.tsx";
-import Switch from "@/components/ui/switch/Switch.tsx";
+import TextField from "@/ui/form-controls/TextField.tsx";
+import Button from "@/ui/button/Button.tsx";
+import TextArea from "@/ui/form-controls/TextArea.tsx";
+import Select from "@/ui/form-controls/Select.tsx";
+import {Checkbox} from "@/ui/checkbox/Checkbox.tsx";
+import Switch from "@/ui/switch/Switch.tsx";
 import {useState} from "react";
-import Persona from "@/components/ui/persona/Persona.tsx";
-import SegmentedControl from "@/components/ui/segmented-control/SegmentedControl.tsx";
-import Chip from "@/components/ui/chip/Chip.tsx";
-import Badge from "@/components/ui/badge/Badge.tsx";
-import Tabs from "@/components/ui/tabs/Tabs.tsx";
-import ColorPicker from "@/components/ui/color-picker/ColorPicker.tsx";
-import Avatar from "@/components/ui/avatar/Avatar.tsx";
-import ButtonCircle from "@/components/ui/button-circle/ButtonCircle.tsx";
+import Persona from "@/ui/persona/Persona.tsx";
+import SegmentedControl from "@/ui/segmented-control/SegmentedControl.tsx";
+import Chip from "@/ui/chip/Chip.tsx";
+import Badge from "@/ui/badge/Badge.tsx";
+import Tabs from "@/ui/tabs/Tabs.tsx";
+import ColorPicker from "@/ui/color-picker/ColorPicker.tsx";
+import Avatar from "@/ui/avatar/Avatar.tsx";
+import ButtonCircle from "@/ui/button-circle/ButtonCircle.tsx";
 
 
 function App() {

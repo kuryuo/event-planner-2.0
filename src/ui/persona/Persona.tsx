@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import styles from './Persona.module.scss';
-import Avatar from '../avatar/Avatar';
+import Avatar from '../avatar/Avatar.tsx';
 
 type PersonaSize = 'M' | 'S';
 
