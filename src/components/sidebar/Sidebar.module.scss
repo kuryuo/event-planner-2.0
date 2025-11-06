@@ -1,18 +1,21 @@
 @import "@/typography";
 
+.block{
+  padding: var(--spacing-6) var(--spacing-4);
+}
+
 .sidebar {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--spacing-2);
   width: 345px;
-  padding: 16px;
 }
 
 .createEventWrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: var(--spacing-4);
 }
 
 .createEventText {

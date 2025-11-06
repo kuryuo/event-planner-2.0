@@ -3,10 +3,10 @@
 .wrapper {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: var(--spacing-3);
+  padding: var(--spacing-2);
 
   &.M {
-
     .content {
       .title {
         @include font(body-m, semibold);
@@ -20,11 +20,6 @@
   }
 
   &.S {
-    .avatar {
-      width: 32px;
-      height: 32px;
-    }
-
     .content {
       .title {
         @include font(body-s, semibold);
@@ -51,7 +46,7 @@
     .textBlock {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: var(--spacing-1);
     }
   }
 }

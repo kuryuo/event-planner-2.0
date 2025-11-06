@@ -6,6 +6,7 @@ import bell from '@/assets/img/icon-l/bell.svg';
 import styles from './Sidebar.module.scss';
 import type { CardBaseProps } from '@/ui/card/CardBase';
 import NextEvent from "@/components/next-event/NextEvent.tsx";
+import clsx from "clsx";
 
 interface SidebarProps {
     subscriptions: CardBaseProps[];
@@ -16,32 +17,35 @@ interface SidebarProps {
 export function Sidebar({ subscriptions, onCreateEvent, notificationCount = 3 }: SidebarProps) {
     return (
         <div className={styles.sidebar}>
-            {/* CardExtra с кликабельной иконкой */}
-            <CardExtra
-                title="Уведомления"
-                subtitle="Все уведомления"
-                avatarUrl='https://randomuser.me/api/portraits/men/56.jpg'
-                addon={
-                    <NotificationBadge icon={<img src={bell} alt="Уведомления" />} count={notificationCount} />
-                }
-                onAddonClick={() => console.log('Открыть уведомления')}
-            />
+            <div className={styles.block}>
+                <CardExtra
+                    title="Уведомления"
+                    subtitle="Все уведомления"
+                    avatarUrl='https://randomuser.me/api/portraits/men/56.jpg'
+                    addon={
+                        <NotificationBadge icon={<img src={bell} alt="Уведомления" />} count={notificationCount} />
+                    }
+                    onAddonClick={() => console.log('Открыть уведомления')}
+                />
+            </div>
 
-            {/* CircleButton с текстом */}
-            <div className={styles.createEventWrapper}>
-                <CircleButton onClick={onCreateEvent} variant={"green"}/>
+            <div className={clsx(styles.block, styles.createEventWrapper)}>
+                <CircleButton onClick={onCreateEvent} variant={"green"} />
                 <span className={styles.createEventText}>Создайте мероприятие</span>
             </div>
 
-            <NextEvent
-                title="Вечеринка у друзей"
-                date="10 ноября, 19:00"
-                onAttend={() => console.log("Пойду")}
-                onDetails={() => console.log("Подробнее")}
-            />
+            <div className={styles.block}>
+                <NextEvent
+                    title="Вечеринка у друзей"
+                    date="10 ноября, 19:00"
+                    onAttend={() => console.log("Пойду")}
+                    onDetails={() => console.log("Подробнее")}
+                />
+            </div>
 
-            {/* Sublist */}
-            <Sublist items={subscriptions} />
+            <div className={styles.block}>
+                <Sublist items={subscriptions} />
+            </div>
         </div>
     );
 }

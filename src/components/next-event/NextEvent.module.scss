@@ -28,5 +28,9 @@
 
 .actions {
   display: flex;
-  gap: 8px;
+  gap: var(--spacing-2);
+
+  button {
+    flex: 1;
+  }
 }

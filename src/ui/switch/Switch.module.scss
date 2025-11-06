@@ -3,7 +3,7 @@
 .wrapper {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--spacing-2);
 
   @include font(body-m, regular);
 
