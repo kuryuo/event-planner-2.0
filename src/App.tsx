@@ -1,6 +1,9 @@
 
 import {Sublist} from "@/components/sub-list/SubList.tsx";
 import type {CardBaseProps} from "@/ui/card/CardBase.tsx";
+import {NotificationBadge} from "@/ui/notification-badge/NotificationBadge.tsx";
+import bell from "@/assets/img/icon-l/bell.svg"
+import {Sidebar} from "@/components/sidebar/Sidebar.tsx";
 
 
 function App() {
@@ -35,17 +38,8 @@ function App() {
                 paddingTop: '5rem',
                 paddingBottom: '5rem',
             }}>
-            <Sublist
-                items={subscriptions}
-            />
+            <Sidebar subscriptions={subscriptions}></Sidebar>
 
-
-            {/*<NextEvent*/}
-            {/*    title="Вечеринка у друзей"*/}
-            {/*    date="10 ноября, 19:00"*/}
-            {/*    onAttend={() => console.log("Пойду")}*/}
-            {/*    onDetails={() => console.log("Подробнее")}*/}
-            {/*/>*/}
         </div>
         // <Router>
         //     <Routes>

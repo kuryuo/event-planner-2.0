@@ -1,16 +1,15 @@
 import clsx from 'clsx';
 import styles from './ButtonCircle.module.scss';
+import PlusIcon from '@/assets/img/icon-l/plus-lg.svg';
 
-type CircleButtonVariant = 'purple' | 'primary';
+type CircleButtonVariant = 'purple' | 'primary' | 'green';
 
 interface CircleButtonProps {
-    number: number;
     variant?: CircleButtonVariant;
     onClick?: () => void;
 }
 
 export default function CircleButton({
-                                         number,
                                          variant = 'purple',
                                          onClick,
                                      }: CircleButtonProps) {
@@ -19,11 +18,12 @@ export default function CircleButton({
             className={clsx(styles.button, {
                 [styles.purple]: variant === 'purple',
                 [styles.primary]: variant === 'primary',
+                [styles.green]: variant === 'green',
             })}
             onClick={onClick}
-            aria-label={`+${number}`}
+            aria-label="Создать"
         >
-            +{number}
+            <img src={PlusIcon} alt="+" className={styles.icon} />
         </button>
     );
 }

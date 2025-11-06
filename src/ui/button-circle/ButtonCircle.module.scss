@@ -20,4 +20,13 @@
   &.primary {
     background-color: var(--bg-primary);
   }
+
+  &.green {
+    background-color: var(--bg-brand-green);
+  }
+
+  .icon {
+    width: 24px;
+    height: 24px;
+  }
 }
