@@ -30,36 +30,38 @@ function App() {
                 paddingTop: '5rem',
                 paddingBottom: '5rem',
             }}>
+            <Avatar/>
+
+
             <ButtonCircle number={7}/>
-            {/*<Avatar/>*/}
-            {/*<ColorPicker onChange={(color) => console.log("Selected color:", color)}/>*/}
-            {/*<Tabs*/}
-            {/*    items={[*/}
-            {/*        {label: "Tab Item", badgeCount: 3},*/}
-            {/*        {label: "Profile"},*/}
-            {/*        {label: "Messages", badgeCount: 12},*/}
-            {/*    ]}*/}
-            {/*/>*/}
-            {/*<Chip text={'Label'} closable={true}/>*/}
-            {/*<Badge count={3}/>*/}
-            {/*<SegmentedControl*/}
-            {/*    options={['Label1', 'Label2', 'Label3']}*/}
-            {/*    selected={selectedOption}*/}
-            {/*    onChange={setSelectedOption}*/}
-            {/*/>*/}
-            {/*<Persona name={'Имя Фамилия'} comment={'создатель'} hasButton={true}/>*/}
-            {/*<Switch*/}
-            {/*    checked={checked}*/}
-            {/*    onCheckedChange={setChecked}*/}
-            {/*    label="Пример"*/}
-            {/*    labelPosition="right"*/}
-            {/*    size="M"*/}
-            {/*/>*/}
-            {/*<Checkbox/>*/}
-            {/*<Select label='Поле' helperText='ddd'/>*/}
-            {/*<TextArea label='Поле' helperText='ddd'/>*/}
-            {/*<TextField label='пример' helperText='ddd' error={true}/>*/}
-            {/*<Button size="M">Нажми</Button>*/}
+            <ColorPicker onChange={(color) => console.log("Selected color:", color)}/>
+            <Tabs
+                items={[
+                    {label: "Tab Item", badgeCount: 3},
+                    {label: "Profile"},
+                    {label: "Messages", badgeCount: 12},
+                ]}
+            />
+            <Chip text={'Label'} closable={true}/>
+            <Badge count={3}/>
+            <SegmentedControl
+                options={['Label1', 'Label2', 'Label3']}
+                selected={selectedOption}
+                onChange={setSelectedOption}
+            />
+            <Persona name={'Имя Фамилия'} comment={'создатель'} hasButton={true}/>
+            <Switch
+                checked={checked}
+                onCheckedChange={setChecked}
+                label="Пример"
+                labelPosition="right"
+                size="M"
+            />
+            <Checkbox/>
+            <Select label='Поле' helperText='ddd'/>
+            <TextArea label='Поле' helperText='ddd'/>
+            <TextField label='пример' helperText='ddd' error={true}/>
+            <Button size="M">Нажми</Button>
         </div>
         // <Router>
         //     <Routes>

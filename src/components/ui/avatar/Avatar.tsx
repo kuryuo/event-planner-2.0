@@ -22,7 +22,7 @@ const SIZE_MAP: Record<AvatarSize, number> = {
 
 export default function Avatar({
                                    size = 'M',
-                                   variant = 'default',
+                                   variant = 'update',
                                    avatarUrl,
                                    name = '',
                                    onClick,
@@ -38,7 +38,7 @@ export default function Avatar({
     return (
         <div
             className={clsx(
-                styles.avatarWrapper,
+                styles.wrapper,
                 styles[size],
                 variant === 'update' && styles.update
             )}

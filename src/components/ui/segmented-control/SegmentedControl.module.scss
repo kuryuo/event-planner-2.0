@@ -4,10 +4,10 @@
   position: relative;
   display: flex;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: var(--radius-2);
   overflow: hidden;
   width: max-content;
-  height: 40px;
+  height: 44px;
   background-color: var(--bg-secondary);
 }
 
@@ -39,7 +39,7 @@
   bottom: 2px;
   left: 0;
   width: calc(100% / 2);
-  border-radius: 8px;
+  border-radius: var(--radius-2);
   background-color: var(--bg-brand-purple);
   transition: left 0.3s;
   z-index: 0;

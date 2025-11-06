@@ -2,12 +2,9 @@
   position: relative;
   display: inline-block;
   cursor: pointer;
-  padding-bottom: 4px;
-  border-bottom: 1px solid var(--border-primary);
-
-  &:hover {
-    border-bottom: 1px solid var(--border-primary-hover);
-  }
+  padding: var(--spacing-2);
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-2);
 
   .selected {
     display: flex;
@@ -15,7 +12,7 @@
     gap: 8px;
   }
 
-  .colorCircle {
+  .color {
     width: 24px;
     height: 24px;
     border-radius: 50%;
@@ -29,18 +26,27 @@
   .dropdown {
     position: absolute;
     margin-top: 8px;
-    box-shadow: 0px 10px 16px 0px var(--surface-primary),
-    0px 6px 8px 0px var(--surface-primary);
+    box-shadow:
+            0px 10px 16px 0px var(--surface-primary),
+            0px 6px 8px 0px var(--surface-primary);
     border-radius: 8px;
-    padding: 8px;
+    padding: var(--spacing-1);
     display: grid;
-    grid-template-columns: repeat(6, 24px);
-    grid-template-rows: repeat(2, 24px);
-    gap: 8px;
+    grid-template-columns: repeat(6, 40px);
+    grid-template-rows: repeat(2, 40px);
+    gap: var(--spacing-1);
     z-index: 10;
   }
 
-  .colorOption {
+  .wrapper {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .option {
     width: 24px;
     height: 24px;
     border-radius: 50%;

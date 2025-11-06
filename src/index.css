@@ -25,6 +25,7 @@
     --black-alpha-9: #00000017;
     --black-alpha-12: #0000001F;
     --black-alpha-24: #0000003D;
+    --black-alpha-36: #0000005C;
     --black-alpha-50: #00000080;
 
     --white-alpha-6: #FFFFFF0F;
@@ -34,6 +35,7 @@
     --white-alpha-50: #FFFFFF80;
 
     --gray-3: #F7F8F8;
+    --gray-5: #F3F4F4;
     --gray-10: #E7E9EA;
     --gray-20: #CED2D4;
     --gray-30: #B6BDBF;
@@ -127,6 +129,7 @@
     --content-primary-inverse-subtle: var(--white);
     --content-primary-inverse-mono: var(--white);
     --content-secondary: var(--gray-60);
+    --content-secondary-inverse-mono: var(--gray-20);
     --content-secondary-subtle: var(--gray-30);
     --content-placeholder: var(--gray-60);
     --content-disabled: var(--gray-30);
@@ -207,7 +210,25 @@
 
     --surface-primary: var(--black-alpha-3);
 
-    --overlay: var(--black-alpha-24);
+    --overlay-primary: var(--black-alpha-24);
+    --overlay-secondary: var(--black-alpha-36);
+
+    --radius-1: 4px;
+    --radius-2: 8px;
+    --radius-4: 16px;
+    --radius-6: 24px;
+    --radius-100: 400px;
+
+    --spacing-05: 2px;
+    --spacing-1: 4px;
+    --spacing-2: 8px;
+    --spacing-3: 12px;
+    --spacing-4: 16px;
+    --spacing-6: 24px;
+    --spacing-8: 32px;
+    --spacing-10: 40px;
+    --spacing-12: 48px;
+    --spacing-16: 64px;
 }
 
 *,

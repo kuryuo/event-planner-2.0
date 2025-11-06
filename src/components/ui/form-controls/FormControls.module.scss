@@ -3,8 +3,31 @@
 .container {
   display: flex;
   flex-direction: column;
-  width: 280px;
   position: relative;
+}
+
+.sizeM {
+  height: 44px;
+  width: 300px;
+
+  .input {
+    @include font(body-m, regular);
+    padding: var(--spacing-2) var(--spacing-4);
+  }
+}
+
+.sizeL {
+  height: 56px;
+  width: 300px;
+
+  .input {
+    @include font(title-m, semibold);
+    padding: var(--spacing-3) var(--spacing-4);
+
+    &::placeholder {
+      @include font(title-m, semibold);
+    }
+  }
 }
 
 .label {
@@ -21,7 +44,7 @@
 .charCounter {
   @include font(caption-m, regular);
   color: var(--content-secondary);
-  padding: 4px;
+  padding: var(--spacing-1);
 }
 
 .requiredDot {
@@ -38,7 +61,8 @@
   display: flex;
   align-items: center;
   position: relative;
-  border-bottom: 1px solid var(--border-primary);
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-2);
   transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
   margin-bottom: 8px;
 
@@ -52,11 +76,7 @@
   }
 
   &.error {
-    border-color: var(--border-negative);
-
-    &:hover {
-      border-color: var(--border-negative);
-    }
+    border: 1px solid var(--border-negative);
 
     &:has(input:focus),
     &:has(textarea:focus) {
@@ -75,7 +95,6 @@
   border: none;
   outline: none;
   background: transparent;
-  padding: 10px 8px;
   color: var(--content-primary);
   @include font(body-m, regular);
 
@@ -97,15 +116,14 @@
 
 .textarea {
   flex: 1;
+  width: 300px;
   border: none;
   outline: none;
   background: transparent;
-  padding: 10px 8px;
+  padding: var(--spacing-2) var(--spacing-4);
   color: var(--content-primary);
   font-family: inherit;
   resize: none;
-  min-height: 80px;
-  line-height: 1.4;
   @include font(body-m, regular);
 
   &::placeholder {
@@ -139,7 +157,6 @@
   margin-left: 8px;
 }
 
-// Текст помощи
 .helperText {
   color: var(--content-secondary);
   @include font(caption-m, regular);

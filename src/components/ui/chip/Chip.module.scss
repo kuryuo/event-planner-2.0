@@ -3,8 +3,7 @@
 .chip {
   display: inline-flex;
   align-items: center;
-  padding: 4px 12px;
-  border-radius: 16px;
+  border-radius: var(--radius-4);
   background-color: var(--pink-100);
   color: var(--text-default);
   font-weight: 500;
@@ -21,7 +20,6 @@
     align-items: center;
     justify-content: center;
     margin-left: 8px;
-    padding: 0;
     cursor: pointer;
 
     svg {
@@ -33,12 +31,12 @@
 
 .size-S {
   @include font(body-s, regular);
-  padding: 2px 8px;
+  padding: var(--spacing-1) var(--spacing-3);
 }
 
 .size-M {
   @include font(caption-m, regular);
-  padding: 4px 12px;
+  padding: var(--spacing-1) var(--spacing-4);
 }
 
 .color-pink {

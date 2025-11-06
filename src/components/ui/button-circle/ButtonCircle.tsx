@@ -16,7 +16,7 @@ export default function CircleButton({
                                      }: CircleButtonProps) {
     return (
         <button
-            className={clsx(styles.circleButton, {
+            className={clsx(styles.button, {
                 [styles.purple]: variant === 'purple',
                 [styles.primary]: variant === 'primary',
             })}

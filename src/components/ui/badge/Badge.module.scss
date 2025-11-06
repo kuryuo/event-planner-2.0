@@ -6,7 +6,7 @@
   justify-content: center;
   min-width: 20px;
   height: 20px;
-  padding: 0 6px;
+  padding: var(--spacing-1) var(--spacing-05);
   border-radius: 50%;
   @include font(caption-s, regular);
 }
