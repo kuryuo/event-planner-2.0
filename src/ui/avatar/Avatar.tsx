@@ -21,8 +21,8 @@ const SIZE_MAP: Record<AvatarSize, number> = {
 };
 
 export default function Avatar({
-                                   size = 'M',
-                                   variant = 'update',
+                                   size = 'S',
+                                   variant = 'default',
                                    avatarUrl,
                                    name = '',
                                    onClick,

@@ -1,0 +1,28 @@
+@import '@/typography';
+
+.sublist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  @include font(subtitle-m, semibold);
+}
+
+.count {
+  @include font(caption-m, regular);
+  color: var(--content-secondary);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}

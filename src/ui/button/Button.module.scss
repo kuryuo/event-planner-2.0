@@ -27,19 +27,16 @@
 
   &.M {
     @include font(button-m, semibold);
-    width: 101px;
     height: 44px;
   }
 
   &.S {
     @include font(button-s, semibold);
-    width: 70px;
     height: 32px;
   }
 
   &.XS {
     @include font(caption-s, semibold);
-    width: 55px;
     height: 20px;
   }
 

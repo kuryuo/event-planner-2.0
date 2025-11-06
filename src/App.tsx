@@ -1,24 +1,29 @@
-import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
-import TextField from "@/ui/form-controls/TextField.tsx";
-import Button from "@/ui/button/Button.tsx";
-import TextArea from "@/ui/form-controls/TextArea.tsx";
-import Select from "@/ui/form-controls/Select.tsx";
-import {Checkbox} from "@/ui/checkbox/Checkbox.tsx";
-import Switch from "@/ui/switch/Switch.tsx";
-import {useState} from "react";
-import Persona from "@/ui/persona/Persona.tsx";
-import SegmentedControl from "@/ui/segmented-control/SegmentedControl.tsx";
-import Chip from "@/ui/chip/Chip.tsx";
-import Badge from "@/ui/badge/Badge.tsx";
-import Tabs from "@/ui/tabs/Tabs.tsx";
-import ColorPicker from "@/ui/color-picker/ColorPicker.tsx";
-import Avatar from "@/ui/avatar/Avatar.tsx";
-import ButtonCircle from "@/ui/button-circle/ButtonCircle.tsx";
+
+import {Sublist} from "@/components/sub-list/SubList.tsx";
+import type {CardBaseProps} from "@/ui/card/CardBase.tsx";
 
 
 function App() {
-    const [checked, setChecked] = useState(false);
-    const [selectedOption, setSelectedOption] = useState('Option 1');
+
+    const subscriptions: CardBaseProps[] = [
+        {
+            title: 'Подписка 1',
+            subtitle: 'Описание подписки 1',
+            avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
+        },
+        {
+            title: 'Подписка 2',
+            subtitle: 'Описание подписки 2',
+            avatarUrl: 'https://randomuser.me/api/portraits/women/44.jpg',
+        },
+        {
+            title: 'Подписка 3',
+            subtitle: 'Описание подписки 3',
+            avatarUrl: 'https://randomuser.me/api/portraits/men/56.jpg',
+        },
+    ];
+
+
     return (
         <div
             style={{
@@ -30,38 +35,17 @@ function App() {
                 paddingTop: '5rem',
                 paddingBottom: '5rem',
             }}>
-            <Avatar/>
+            <Sublist
+                items={subscriptions}
+            />
 
 
-            <ButtonCircle number={7}/>
-            <ColorPicker onChange={(color) => console.log("Selected color:", color)}/>
-            <Tabs
-                items={[
-                    {label: "Tab Item", badgeCount: 3},
-                    {label: "Profile"},
-                    {label: "Messages", badgeCount: 12},
-                ]}
-            />
-            <Chip text={'Label'} closable={true}/>
-            <Badge count={3}/>
-            <SegmentedControl
-                options={['Label1', 'Label2', 'Label3']}
-                selected={selectedOption}
-                onChange={setSelectedOption}
-            />
-            <Persona name={'Имя Фамилия'} comment={'создатель'} hasButton={true}/>
-            <Switch
-                checked={checked}
-                onCheckedChange={setChecked}
-                label="Пример"
-                labelPosition="right"
-                size="M"
-            />
-            <Checkbox/>
-            <Select label='Поле' helperText='ddd'/>
-            <TextArea label='Поле' helperText='ddd'/>
-            <TextField label='пример' helperText='ddd' error={true}/>
-            <Button size="M">Нажми</Button>
+            {/*<NextEvent*/}
+            {/*    title="Вечеринка у друзей"*/}
+            {/*    date="10 ноября, 19:00"*/}
+            {/*    onAttend={() => console.log("Пойду")}*/}
+            {/*    onDetails={() => console.log("Подробнее")}*/}
+            {/*/>*/}
         </div>
         // <Router>
         //     <Routes>

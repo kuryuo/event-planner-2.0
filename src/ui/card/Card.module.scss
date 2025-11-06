@@ -1,0 +1,57 @@
+@import '@/typography';
+
+.wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  &.M {
+
+    .content {
+      .title {
+        @include font(body-m, semibold);
+      }
+
+      .subtitle {
+        @include font(caption-m, regular);
+        color: var(--content-secondary);
+      }
+    }
+  }
+
+  &.S {
+    .avatar {
+      width: 32px;
+      height: 32px;
+    }
+
+    .content {
+      .title {
+        @include font(body-s, semibold);
+      }
+
+      .subtitle {
+        @include font(caption-m, regular);
+        color: var(--content-secondary);
+      }
+    }
+  }
+
+  .avatar {
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+
+    .textBlock {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+  }
+}

@@ -4,11 +4,28 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  border-radius: 50%;
+}
+
+.variant-text {
   min-width: 20px;
   height: 20px;
   padding: var(--spacing-1) var(--spacing-05);
-  border-radius: 50%;
   @include font(caption-s, regular);
+}
+
+.variant-dot {
+  display: inline-block;
+}
+
+.size-S {
+  width: 6px;
+  height: 6px;
+}
+
+.size-M {
+  width: 8px;
+  height: 8px;
 }
 
 .color-primary {
@@ -19,4 +36,12 @@
 .color-secondary {
   color: var(--content-primary);
   background-color: var(--bg-brand-green);
+}
+
+.color-green {
+  background-color: var(--bg-brand-green);
+}
+
+.color-negative {
+  background-color: var(--content-negative);
 }
