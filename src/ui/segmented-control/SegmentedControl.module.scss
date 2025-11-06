@@ -1,4 +1,4 @@
-@import "../../typography";
+@use '@/typography-variables' as ty;
 
 .segmentedControl {
   position: relative;
@@ -21,7 +21,7 @@
   width: 140px;
   height: 36px;
   z-index: 1;
-  @include font(body-s, regular);
+  @include ty.font(body-s, regular);
   transition: color 0.2s;
 
   &:hover {
@@ -35,10 +35,9 @@
 
 .slider {
   position: absolute;
-  top: 2px;
-  bottom: 2px;
+  top: 4px;
+  bottom: 4px;
   left: 0;
-  width: calc(100% / 2);
   border-radius: var(--radius-2);
   background-color: var(--bg-brand-purple);
   transition: left 0.3s;

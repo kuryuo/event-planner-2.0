@@ -1,4 +1,4 @@
-@import '@/typography';
+@use '@/typography-variables' as ty;
 
 .nextEvent {
   display: flex;
@@ -9,19 +9,19 @@
 }
 
 .label {
-  @include font(subtitle-m, semibold);
+  @include ty.font(subtitle-m, semibold);
   color: var(--content-primary);
   margin-bottom: var(--spacing-4);
 }
 
 .title {
-  @include font(title-s, semibold);
+  @include ty.font(title-s, semibold);
   color: var(--content-primary);
   margin-bottom: var(--spacing-1);
 }
 
 .date {
-  @include font(body-s, regular);
+  @include ty.font(body-s, regular);
   color: var(--content-secondary);
   margin-bottom: var(--spacing-6);
 }

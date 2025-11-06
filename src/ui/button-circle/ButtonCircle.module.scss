@@ -1,4 +1,4 @@
-@import "../../typography";
+@use "@/typography-variables" as ty;
 
 .button {
   width: 48px;
@@ -11,7 +11,7 @@
   align-items: center;
   justify-content: center;
   transition: background 0.2s;
-  @include font(button-m, semibold);
+  @include ty.font(button-m, semibold);
 
   &.purple {
     background-color: var(--bg-brand-purple);

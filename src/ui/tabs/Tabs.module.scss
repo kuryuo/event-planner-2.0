@@ -1,4 +1,4 @@
-@import "../../typography";
+@use '@/typography-variables' as ty;
 
 .tabsContainer {
   width: 40%;
@@ -32,7 +32,7 @@
   }
 
   .label {
-    @include font(subtitle-m, semibold);
+    @include ty.font(subtitle-m, semibold);
     white-space: nowrap;
   }
 }

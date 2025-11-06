@@ -1,41 +1,12 @@
-@import './typography-variables';
+@use './typography-variables' as ty;
 
-.title-m {
-  @include font(title-m, semibold);
-}
-
-.title-s {
-  @include font(title-s, semibold);
-}
-
-.subtitle-m {
-  @include font(subtitle-m, semibold);
-}
-
-.subtitle-s {
-  @include font(subtitle-s, semibold);
-}
-
-.body-m {
-  @include font(body-m, regular);
-}
-
-.body-s {
-  @include font(body-s, regular);
-}
-
-.caption-m {
-  @include font(caption-m, regular);
-}
-
-.caption-s {
-  @include font(caption-s, semibold);
-}
-
-.button-m {
-  @include font(button-m, semibold);
-}
-
-.button-s {
-  @include font(button-s, semibold);
-}
+.title-m      { @include ty.font(title-m, semibold); }
+.title-s      { @include ty.font(title-s, semibold); }
+.subtitle-m   { @include ty.font(subtitle-m, semibold); }
+.subtitle-s   { @include ty.font(subtitle-s, semibold); }
+.body-m       { @include ty.font(body-m, regular); }
+.body-s       { @include ty.font(body-s, regular); }
+.caption-m    { @include ty.font(caption-m, regular); }
+.caption-s    { @include ty.font(caption-s, semibold); }
+.button-m     { @include ty.font(button-m, semibold); }
+.button-s     { @include ty.font(button-s, semibold); }

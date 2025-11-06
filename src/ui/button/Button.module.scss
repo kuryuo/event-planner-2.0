@@ -1,4 +1,4 @@
-@import '../../typography';
+@use '@/typography-variables' as ty;
 
 .button {
   display: inline-flex;
@@ -26,17 +26,17 @@
   }
 
   &.M {
-    @include font(button-m, semibold);
+    @include ty.font(button-m, semibold);
     height: 44px;
   }
 
   &.S {
-    @include font(button-s, semibold);
+    @include ty.font(button-s, semibold);
     height: 32px;
   }
 
   &.XS {
-    @include font(caption-s, semibold);
+    @include ty.font(caption-s, semibold);
     height: 20px;
   }
 

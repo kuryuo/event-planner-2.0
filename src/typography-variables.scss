@@ -1,7 +1,7 @@
-// Шрифты (семейство)
+@use "sass:map";
+
 $font-family-base: 'Manrope', sans-serif;
 
-// Размеры шрифтов
 $font-sizes: (
         title-m: 24px,
         title-s: 20px,
@@ -15,13 +15,11 @@ $font-sizes: (
         button-s: 14px
 );
 
-// Вес шрифта
 $font-weights: (
         regular: 450,
         semibold: 650
 );
 
-// Line-height
 $line-heights: (
         title-m: 32px,
         title-s: 28px,
@@ -35,10 +33,9 @@ $line-heights: (
         button-s: 22px
 );
 
-// Миксин для шрифта
 @mixin font($key, $weight: regular) {
   font-family: $font-family-base;
-  font-size: map-get($font-sizes, $key);
-  font-weight: map-get($font-weights, $weight);
-  line-height: map-get($line-heights, $key);
+  font-size: map.get($font-sizes, $key);
+  font-weight: map.get($font-weights, $weight);
+  line-height: map.get($line-heights, $key);
 }

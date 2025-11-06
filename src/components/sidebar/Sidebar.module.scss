@@ -1,7 +1,9 @@
-@import "@/typography";
+@use '@/typography-variables' as ty;
 
 .block{
   padding: var(--spacing-6) var(--spacing-4);
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-6);
 }
 
 .sidebar {
@@ -19,7 +21,7 @@
 }
 
 .createEventText {
-  @include font(subtitle-m, semibold);
+  @include ty.font(subtitle-m, semibold);
   color: var(--text-primary);
   text-align: center;
 }

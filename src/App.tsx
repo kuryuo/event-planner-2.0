@@ -1,44 +1,48 @@
-
-import {Sublist} from "@/components/sub-list/SubList.tsx";
-import type {CardBaseProps} from "@/ui/card/CardBase.tsx";
-import {NotificationBadge} from "@/ui/notification-badge/NotificationBadge.tsx";
-import bell from "@/assets/img/icon-l/bell.svg"
-import {Sidebar} from "@/components/sidebar/Sidebar.tsx";
+import MyCalendar from "@/components/calendar/MyFullCalendar.module.scss";
+import SegmentedControl from "@/ui/segmented-control/SegmentedControl.tsx";
+import {useState} from "react";
+import MyFullCalendar from "@/components/calendar/MyFullCalendar.tsx";
 
 
 function App() {
 
-    const subscriptions: CardBaseProps[] = [
-        {
-            title: 'Подписка 1',
-            subtitle: 'Описание подписки 1',
-            avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
-        },
-        {
-            title: 'Подписка 2',
-            subtitle: 'Описание подписки 2',
-            avatarUrl: 'https://randomuser.me/api/portraits/women/44.jpg',
-        },
-        {
-            title: 'Подписка 3',
-            subtitle: 'Описание подписки 3',
-            avatarUrl: 'https://randomuser.me/api/portraits/men/56.jpg',
-        },
-    ];
+    // const subscriptions: CardBaseProps[] = [
+    //     {
+    //         title: 'Подписка 1',
+    //         subtitle: 'Описание подписки 1',
+    //         avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
+    //     },
+    //     {
+    //         title: 'Подписка 2',
+    //         subtitle: 'Описание подписки 2',
+    //         avatarUrl: 'https://randomuser.me/api/portraits/women/44.jpg',
+    //     },
+    //     {
+    //         title: 'Подписка 3',
+    //         subtitle: 'Описание подписки 3',
+    //         avatarUrl: 'https://randomuser.me/api/portraits/men/56.jpg',
+    //     },
+    // ];
+    const [selectedOption, setSelectedOption] = useState("Option 1");
 
+    const handleChange = (value: string) => {
+        setSelectedOption(value);
+    };
 
     return (
         <div
             style={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: '5rem',
-                paddingTop: '5rem',
-                paddingBottom: '5rem',
+                // display: 'flex',
+                // flexDirection: 'column',
+                // justifyContent: 'center',
+                // alignItems: 'center',
             }}>
-            <Sidebar subscriptions={subscriptions}></Sidebar>
+            {/*<SegmentedControl*/}
+            {/*    options={["Option 1", "Option 2", "Option 3"]}*/}
+            {/*    selected={selectedOption}*/}
+            {/*    onChange={handleChange}*/}
+            {/*/>*/}
+            <MyFullCalendar/>
 
         </div>
         // <Router>

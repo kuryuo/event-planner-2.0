@@ -1,11 +1,11 @@
-@import '../../typography';
+@use '@/typography-variables' as ty;
 
 .wrapper {
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-2);
 
-  @include font(body-m, regular);
+  @include ty.font(body-m, regular);
 
   &.disabled {
     cursor: not-allowed;

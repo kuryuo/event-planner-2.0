@@ -1,4 +1,4 @@
-@import "../../typography";
+@use '@/typography-variables' as ty;
 
 .chip {
   display: inline-flex;
@@ -30,12 +30,12 @@
 }
 
 .size-S {
-  @include font(body-s, regular);
+  @include ty.font(body-s, regular);
   padding: var(--spacing-1) var(--spacing-3);
 }
 
 .size-M {
-  @include font(caption-m, regular);
+  @include ty.font(caption-m, regular);
   padding: var(--spacing-1) var(--spacing-4);
 }
 

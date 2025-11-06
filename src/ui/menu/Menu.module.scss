@@ -1,4 +1,4 @@
-@import '../../typography';
+@use '@/typography-variables' as ty;
 
 .dropdown {
   position: absolute;
@@ -45,12 +45,12 @@
   }
 
   .optionLabel {
-    @include font(body-m, semibold);
+    @include ty.font(body-m, semibold);
     color: var(--content-primary);
   }
 
   .optionDescription {
-    @include font(caption-m, regular);
+    @include ty.font(caption-m, regular);
     color: var(--content-secondary);
   }
 }

@@ -1,4 +1,4 @@
-@import '@/typography';
+@use '@/typography-variables' as ty;
 
 .sublist {
   display: flex;
@@ -13,11 +13,11 @@
 }
 
 .title {
-  @include font(subtitle-m, semibold);
+  @include ty.font(subtitle-m, semibold);
 }
 
 .count {
-  @include font(caption-m, regular);
+  @include ty.font(caption-m, regular);
   color: var(--content-secondary);
 }
 

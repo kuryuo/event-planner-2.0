@@ -1,4 +1,4 @@
-@import '../../typography';
+@use '@/typography-variables' as ty;
 
 .container {
   display: flex;
@@ -11,7 +11,7 @@
   width: 300px;
 
   .input {
-    @include font(body-m, regular);
+    @include ty.font(body-m, regular);
     padding: var(--spacing-2) var(--spacing-4);
   }
 }
@@ -21,11 +21,11 @@
   width: 300px;
 
   .input {
-    @include font(title-m, semibold);
+    @include ty.font(title-m, semibold);
     padding: var(--spacing-3) var(--spacing-4);
 
     &::placeholder {
-      @include font(title-m, semibold);
+      @include ty.font(title-m, semibold);
     }
   }
 }
@@ -33,7 +33,7 @@
 .label {
   color: var(--content-primary);
   margin-bottom: 16px;
-  @include font(subtitle-m, semibold);
+  @include ty.font(subtitle-m, semibold);
 }
 
 .labelWrapper {
@@ -42,7 +42,7 @@
 }
 
 .charCounter {
-  @include font(caption-m, regular);
+  @include ty.font(caption-m, regular);
   color: var(--content-secondary);
   padding: var(--spacing-1);
 }
@@ -96,7 +96,7 @@
   outline: none;
   background: transparent;
   color: var(--content-primary);
-  @include font(body-m, regular);
+  @include ty.font(body-m, regular);
 
   &::placeholder {
     color: var(--content-placeholder);
@@ -124,7 +124,7 @@
   color: var(--content-primary);
   font-family: inherit;
   resize: none;
-  @include font(body-m, regular);
+  @include ty.font(body-m, regular);
 
   &::placeholder {
     color: var(--content-placeholder);
@@ -159,10 +159,10 @@
 
 .helperText {
   color: var(--content-secondary);
-  @include font(caption-m, regular);
+  @include ty.font(caption-m, regular);
 }
 
 .helperTextError {
   color: var(--content-negative);
-  @include font(caption-m, semibold);
+  @include ty.font(caption-m, semibold);
 }

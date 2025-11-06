@@ -1,5 +1,4 @@
-@import '@/typography';
-
+@use '@/typography-variables' as ty;
 .wrapper {
   display: flex;
   align-items: flex-start;
@@ -9,11 +8,11 @@
   &.M {
     .content {
       .title {
-        @include font(body-m, semibold);
+        @include ty.font(body-m, semibold);
       }
 
       .subtitle {
-        @include font(caption-m, regular);
+        @include ty.font(caption-m, regular);
         color: var(--content-secondary);
       }
     }
@@ -22,11 +21,11 @@
   &.S {
     .content {
       .title {
-        @include font(body-s, semibold);
+        @include ty.font(body-s, semibold);
       }
 
       .subtitle {
-        @include font(caption-m, regular);
+        @include ty.font(caption-m, regular);
         color: var(--content-secondary);
       }
     }
