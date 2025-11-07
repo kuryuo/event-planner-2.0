@@ -1,61 +1,47 @@
 @use '@/typography-variables' as ty;
 
-/* === DAYGRID EVENTS (Month view) === */
-:global(.fc.fc-theme-standard .fc-daygrid-event) {
-  background-color: var(--event-bg, transparent);
-  color: var(--event-color, inherit);
-  border: none;
-  border-radius: 8px;
-  padding: 2px 6px;
-  font-weight: 500;
-  font-size: 0.85rem;
-  display: flex;
-  width: 100%;
-  align-items: center;
-  cursor: pointer;
-
-  .fc-daygrid-event-dot {
-    background-color: currentColor;
-    margin-right: 4px;
-  }
-
-  .fc-event-time {
-    font-size: 0.75rem;
-    margin-left: 4px;
-  }
-}
-
-/* === TIMEGRID EVENTS (Week/Day view) === */
-:global(.fc.fc-theme-standard .fc-event-main) {
-  background-color: var(--event-bg, transparent);
-  color: var(--event-color, inherit);
-  border: none;
-  border-radius: 6px;
-  padding: 2px;
-  font-size: 0.8rem;
-  cursor: pointer;
-
-  .fc-event-time {
-    font-weight: 600;
-  }
-
-  .fc-event-title {
-    font-weight: 500;
-  }
-}
-
-/* === HOVER EFFECT === */
-:global(.fc.fc-theme-standard .fc-event:hover) {
-  filter: brightness(1.1);
-}
-
-:global(.fc.fc-theme-standard .fc-daygrid-event .fc-daygrid-event-dot) {
-  display: none !important;
-}
-
-/* === ROOT VARIABLES === */
 :root {
   --fc-event-bg-color: transparent;
   --fc-event-text-color: inherit;
   --fc-event-border-color: transparent;
+}
+
+:global(.fc-timegrid-event) {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* === Стили для контента внутри события === */
+:global(.fc-event-main .fc-event-title) {
+  @include ty.font(caption-m, regular);
+}
+
+:global(.fc-event-main .fc-event-time) {
+  @include ty.font(caption-s, semibold);
+}
+
+/* === Общие стили для всех событий === */
+:global(.fc.fc-theme-standard .fc-daygrid-event),
+:global(.fc.fc-theme-standard .fc-timegrid-event) {
+  position: relative;
+  cursor: pointer;
+  background-color: var(--bg-pink);
+  color: var(--content-pink);
+  border-radius: var(--radius-1);
+  padding: var(--spacing-1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+  }
+}
+
+/* === Мелкие утилиты === */
+:global(.fc-daygrid-event .event-content) {
+  display: flex;
+  flex-direction: column;
 }

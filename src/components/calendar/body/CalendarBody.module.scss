@@ -75,3 +75,15 @@
 :global(.fc .fc-highlight) {
   background-color: transparent !important;
 }
+:global(.fc.fc-theme-standard .fc-daygrid-day-top) {
+  min-height: 30px;
+}
+
+:global(.fc.fc-theme-standard .fc-daygrid-day-events) {
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: var(--spacing-05);
+}
+
