@@ -66,3 +66,12 @@
 :global(.fc) {
   --fc-now-indicator-color: var(--border-brand-green) !important;
 }
+
+:global(.fc.fc-theme-standard .fc-timegrid-slot-label-cushion) {
+  @include ty.font(caption-s, semibold);
+  color: var(--content-secondary);
+}
+
+:global(.fc .fc-highlight) {
+  background-color: transparent !important;
+}

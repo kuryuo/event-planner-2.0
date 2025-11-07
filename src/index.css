@@ -77,7 +77,7 @@
     --pink-40: #E28DAE;
     --pink-100: #C2185B;
 
-    --plum-10: #CED2D4;
+    --plum-10: #FBEBFB;
     --plum-40: #DEADE3;
     --plum-100: #A1309D;
 
@@ -164,7 +164,9 @@
     --content-deep-orange: var(--deep-orange-100);
     --content-deep-orange-subtle: var(--deep-orange-40);
     --content-brown: var(--brown-100);
-    --content-brown-subtle: var(--brown-100);
+    --content-brown-subtle: var(--brown-40);
+    --content-plum: var(--plum-100);
+    --content-plum-subtle: var(--plum-40);
 
     --bg-primary: var(--white);
     --bg-primary-hover: var(--black-alpha-3);
@@ -196,6 +198,7 @@
     --bg-orange: var(--orange-10);
     --bg-deep-orange: var(--deep-orange-10);
     --bg-brown: var(--brown-10);
+    --bg-plum: var(--plum-10);
 
     --border-primary: var(--gray-20);
     --border-primary-hover: var(--gray-100);
