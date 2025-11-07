@@ -1,0 +1,68 @@
+@use '@/typography-variables' as ty;
+
+:global(.fc.fc-theme-standard .fc-daygrid-day-top) {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 4px;
+  min-height: 150px;
+}
+
+:global(.fc.fc-theme-standard .fc-daygrid-day-number) {
+  text-align: center;
+  width: 100%;
+  @include ty.font(caption-m, regular);
+}
+
+:global(.fc.fc-theme-standard .fc-timegrid-col-header-cell-cushion) {
+  display: block;
+  text-align: center;
+  width: 100%;
+}
+
+:global(.fc.fc-theme-standard .fc-daygrid-day.fc-day-today) {
+  background-color: transparent;
+}
+
+:global(.fc.fc-theme-standard .fc-daygrid-day.fc-day-today .fc-daygrid-day-number) {
+  position: relative;
+  z-index: 1;
+  color: var(--white);
+}
+
+:global(.fc.fc-theme-standard .fc-daygrid-day.fc-day-today .fc-daygrid-day-number::after) {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: var(--bg-brand-purple);
+  z-index: -1;
+}
+
+:global(.fc.fc-theme-standard .fc-timegrid-all-day) {
+  display: none;
+}
+
+:global(.fc.fc-theme-standard .fc-timegrid-slot) {
+  border-top: none;
+}
+
+:global(.fc.fc-theme-standard .fc-timegrid-slot-border) {
+  display: none;
+}
+
+:global(.fc.fc-theme-standard .fc-timegrid-col-border) {
+  border-left: 1px solid #e0e0e0;
+}
+
+:global(.fc.fc-theme-standard .fc-timegrid-col.fc-day-today) {
+  background-color: transparent;
+}
+
+:global(.fc) {
+  --fc-now-indicator-color: var(--border-brand-green) !important;
+}

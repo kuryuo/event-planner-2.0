@@ -1,12 +1,8 @@
 import { useRef, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import ruLocale from '@fullcalendar/core/locales/ru';
-import styles from './Calendar.module.scss';
 import CalendarToolbar from '../calendar/toolbar/CalendarToolbar.tsx';
-import CalendarHeader from "@/components/calendar/header/CalendarHeader.tsx";
+import CalendarBody from './body/CalendarBody.tsx';
+import styles from './Calendar.module.scss';
 
 export default function Calendar() {
     const calendarRef = useRef<FullCalendar | null>(null);
@@ -46,7 +42,6 @@ export default function Calendar() {
         calendarRef.current?.getApi().gotoDate(next);
     };
 
-
     return (
         <div className={styles.calendarWrapper}>
             <CalendarToolbar
@@ -56,23 +51,9 @@ export default function Calendar() {
                 onPrev={goToPrevious}
                 onNext={goToNext}
             />
-            <FullCalendar
-                ref={calendarRef}
-                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                initialView={currentView}
-                locale={ruLocale}
-                headerToolbar={false}
-                dayHeaderContent={(args) => (
-                    <CalendarHeader {...args} currentView={currentView} />
-                )}
-                events={[
-                    { title: 'Событие 1', start: '2025-11-06T10:00:00', end: '2025-11-06T12:00:00' },
-                    { title: 'Событие 2', start: '2025-11-07T14:00:00', end: '2025-11-07T16:00:00' },
-                ]}
-                height="auto"
-                nowIndicator
-                editable
-                selectable
+            <CalendarBody
+                calendarRef={calendarRef}
+                currentView={currentView}
             />
         </div>
     );
