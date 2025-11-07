@@ -17,7 +17,7 @@ interface CalendarToolbarProps {
     onFilterClick?: () => void;
 }
 
-export function CalendarToolbar({
+export default function CalendarToolbar({
                                     currentView,
                                     currentDate,
                                     onViewChange,
@@ -28,13 +28,21 @@ export function CalendarToolbar({
                                 }: CalendarToolbarProps) {
     const formatLabel = () => {
         if (currentView === 'dayGridMonth') {
-            return currentDate.toLocaleString('ru-RU', { month: 'long', year: 'numeric' });
+            return currentDate.toLocaleString('ru-RU', { month: 'long', year: 'numeric' })
+                .replace(/^./, str => str.toUpperCase());
         }
+
         const startOfWeek = new Date(currentDate);
         startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + 1);
         const endOfWeek = new Date(startOfWeek);
         endOfWeek.setDate(startOfWeek.getDate() + 6);
-        return `${startOfWeek.getDate()}.${startOfWeek.getMonth() + 1} – ${endOfWeek.getDate()}.${endOfWeek.getMonth() + 1}`;
+
+        const startDay = startOfWeek.getDate();
+        const endDay = endOfWeek.getDate();
+        const monthName = endOfWeek.toLocaleString('ru-RU', { month: 'long' })
+            .replace(/^./, str => str.toUpperCase());
+
+        return `${startDay} – ${endDay} ${monthName}`;
     };
 
     return (

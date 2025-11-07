@@ -1,7 +1,7 @@
-import MyCalendar from "@/components/calendar/MyFullCalendar.module.scss";
+import MyCalendar from "@/components/calendar/Calendar.module.scss";
 import SegmentedControl from "@/ui/segmented-control/SegmentedControl.tsx";
 import {useState} from "react";
-import MyFullCalendar from "@/components/calendar/MyFullCalendar.tsx";
+import Calendar from "@/components/calendar/Calendar.tsx";
 
 
 function App() {
@@ -42,7 +42,7 @@ function App() {
             {/*    selected={selectedOption}*/}
             {/*    onChange={handleChange}*/}
             {/*/>*/}
-            <MyFullCalendar/>
+            <Calendar/>
 
         </div>
         // <Router>

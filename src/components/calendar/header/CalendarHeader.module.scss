@@ -1,0 +1,42 @@
+@use '@/typography-variables' as ty;
+
+:global(.fc-col-header) {
+  background-color: var(--bg-secondary-subtle);
+  border: 1px solid var(--border-primary);
+}
+
+:global(.fc-col-header-cell .fc-scrollgrid-sync-inner) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+:global(.fc-col-header-cell) {
+  background-color: var(--bg-secondary);
+  color: var(--content-secondary);
+  @include ty.font(caption-m, regular);
+  height: 34px;
+  text-align: center;
+  transition: background-color 0.2s, color 0.2s;
+  text-transform: capitalize;
+}
+
+.dayHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+.dayName {
+  @include ty.font(caption-s, regular);
+  color: var(--content-secondary);
+}
+
+.dayNumber {
+  @include ty.font(body-m, regular);
+  color: var(--content-primary);
+}

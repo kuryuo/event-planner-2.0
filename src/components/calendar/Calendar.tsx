@@ -4,10 +4,11 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import ruLocale from '@fullcalendar/core/locales/ru';
-import styles from './MyFullCalendar.module.scss';
-import { CalendarToolbar } from '../calendar/toolbar/CalendarToolbar.tsx';
+import styles from './Calendar.module.scss';
+import CalendarToolbar from '../calendar/toolbar/CalendarToolbar.tsx';
+import CalendarHeader from "@/components/calendar/header/CalendarHeader.tsx";
 
-export default function MyFullCalendar() {
+export default function Calendar() {
     const calendarRef = useRef<FullCalendar | null>(null);
     const [currentView, setCurrentView] = useState<'dayGridMonth' | 'timeGridWeek'>('dayGridMonth');
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -23,9 +24,8 @@ export default function MyFullCalendar() {
         if (currentView === 'dayGridMonth') {
             prev.setMonth(prev.getMonth() - 1);
         } else if (currentView === 'timeGridWeek') {
-            // Перейти на предыдущую неделю (понедельник)
             prev.setDate(prev.getDate() - 7);
-            prev.setDate(prev.getDate() - prev.getDay() + 1); // сдвигаем к понедельнику
+            prev.setDate(prev.getDate() - prev.getDay() + 1);
         }
 
         setCurrentDate(prev);
@@ -38,9 +38,8 @@ export default function MyFullCalendar() {
         if (currentView === 'dayGridMonth') {
             next.setMonth(next.getMonth() + 1);
         } else if (currentView === 'timeGridWeek') {
-            // Перейти на следующую неделю (понедельник)
             next.setDate(next.getDate() + 7);
-            next.setDate(next.getDate() - next.getDay() + 1); // сдвигаем к понедельнику
+            next.setDate(next.getDate() - next.getDay() + 1);
         }
 
         setCurrentDate(next);
@@ -63,6 +62,9 @@ export default function MyFullCalendar() {
                 initialView={currentView}
                 locale={ruLocale}
                 headerToolbar={false}
+                dayHeaderContent={(args) => (
+                    <CalendarHeader {...args} currentView={currentView} />
+                )}
                 events={[
                     { title: 'Событие 1', start: '2025-11-06T10:00:00', end: '2025-11-06T12:00:00' },
                     { title: 'Событие 2', start: '2025-11-07T14:00:00', end: '2025-11-07T16:00:00' },
