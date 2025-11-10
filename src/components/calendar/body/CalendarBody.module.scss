@@ -1,5 +1,10 @@
 @use '@/typography-variables' as ty;
 
+:global(.fc) {
+  border-radius: inherit;
+  overflow: hidden;
+}
+
 :global(.fc.fc-theme-standard .fc-daygrid-day-top) {
   display: flex;
   justify-content: center;
@@ -75,6 +80,7 @@
 :global(.fc .fc-highlight) {
   background-color: transparent !important;
 }
+
 :global(.fc.fc-theme-standard .fc-daygrid-day-top) {
   min-height: 30px;
 }
@@ -86,4 +92,3 @@
   justify-content: flex-start;
   gap: var(--spacing-05);
 }
-

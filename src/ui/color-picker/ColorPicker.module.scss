@@ -26,9 +26,7 @@
   .dropdown {
     position: absolute;
     margin-top: 8px;
-    box-shadow:
-            0px 10px 16px 0px var(--surface-primary),
-            0px 6px 8px 0px var(--surface-primary);
+    box-shadow: var(--lvl2);
     border-radius: 8px;
     padding: var(--spacing-1);
     display: grid;

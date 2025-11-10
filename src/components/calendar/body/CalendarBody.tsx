@@ -33,8 +33,8 @@ export default function CalendarBody({calendarRef, currentView}: CalendarBodyPro
             )}
             eventContent={(arg) => <CalendarEvent arg={arg} viewType={currentView}/>}
             events={[
-                {title: 'Событие 1', start: '2025-11-06T10:00:00', end: '2025-11-06T16:40:00'},
-                {title: 'Событие 2', start: '2025-11-07T14:00:00', end: '2025-11-07T16:00:00'},
+                {title: 'Событие 1', start: '2025-11-10T10:00:00', end: '2025-11-10T16:40:00'},
+                {title: 'Событие 2', start: '2025-11-11T14:00:00', end: '2025-11-11T16:00:00'},
             ]}
             height="auto"
             nowIndicator

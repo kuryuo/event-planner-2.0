@@ -8,7 +8,7 @@ interface NotificationBadgeProps {
     className?: string;
 }
 
-export function NotificationBadge({ icon, count, className }: NotificationBadgeProps) {
+export function NotificationBadge({icon, count, className}: NotificationBadgeProps) {
     return (
         <div className={clsx(styles.wrapper, className)}>
             {icon}
@@ -16,7 +16,7 @@ export function NotificationBadge({ icon, count, className }: NotificationBadgeP
                 <Badge
                     count={count}
                     variant="text"
-                    color="green"
+                    color="brand-green"
                     className={styles.badge}
                 />
             )}

@@ -1,5 +1,5 @@
-import { CardExtra} from '@/ui/card/CardExtra';
-import type { CardBaseProps } from '@/ui/card/CardBase';
+import {CardExtra} from '@/ui/card/CardExtra';
+import type {CardBaseProps} from '@/ui/card/CardBase';
 import Badge from '@/ui/badge/Badge';
 import styles from './Sublist.module.scss';
 
@@ -8,7 +8,7 @@ interface SublistProps {
     items: CardBaseProps[];
 }
 
-export function Sublist({ title = 'Мои подписки', items }: SublistProps) {
+export function Sublist({title = 'Мои подписки', items}: SublistProps) {
     return (
         <div className={styles.sublist}>
             <div className={styles.header}>
@@ -21,7 +21,7 @@ export function Sublist({ title = 'Мои подписки', items }: SublistPro
                     <CardExtra
                         key={index}
                         {...item}
-                        addon={<Badge variant="dot" color="green" size="M" />}
+                        addon={<Badge variant="dot" color="brand-green" size="M"/>}
                     />
                 ))}
             </div>

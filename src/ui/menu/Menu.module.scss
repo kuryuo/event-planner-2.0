@@ -11,8 +11,7 @@
   z-index: 1000;
   overflow-y: auto;
   max-height: 200px;
-  box-shadow: 0 10px 16px 0 var(--surface-primary),
-  0 6px 8px 0 var(--surface-primary);
+  box-shadow: var(--lvl2);
 
   scrollbar-width: thin;
   scrollbar-color: var(--bg-tertiary) var(--white);

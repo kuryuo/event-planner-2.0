@@ -234,6 +234,11 @@
     --spacing-10: 40px;
     --spacing-12: 48px;
     --spacing-16: 64px;
+
+
+    --lvl1: 0px 4px 8px 0px var(--surface-primary);
+    --lvl2: 0px 10px 16px 0px var(--surface-primary), 0px 6px 8px 0px var(--surface-primary);
+    --lvl3: 0 20px 32px 0 var(--surface-primary), 0 12px 14px 0 var(--surface-primary), 0 8px 12px 0 var(--surface-primary);
 }
 
 *,

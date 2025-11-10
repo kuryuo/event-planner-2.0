@@ -1,0 +1,17 @@
+.pageWrapper {
+  display: flex;
+  background-color: var(--bg-tertiary);
+  padding: var(--spacing-3);
+  gap: var(--spacing-3);
+}
+
+.sidebarWrapper {
+  overflow: auto;
+  height: 100%;
+}
+
+.calendarWrapper {
+  flex: 1;
+  overflow: auto;
+}
+
