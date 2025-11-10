@@ -1,13 +1,13 @@
 import clsx from "clsx";
 import styles from "./Badge.module.scss";
+import type {AppColor} from "@/const";
 
-type BadgeColor = "primary" | "secondary" | "green" | "negative";
 type BadgeVariant = "text" | "dot";
 type BadgeSize = "S" | "M";
 
 interface BadgeProps {
     count?: number;
-    color?: BadgeColor;
+    color?: AppColor;
     variant?: BadgeVariant;
     size?: BadgeSize;
     className?: string;
@@ -15,7 +15,7 @@ interface BadgeProps {
 
 const Badge = ({
                    count,
-                   color = "primary",
+                   color = "brand-green",
                    variant = "text",
                    size = "S",
                    className,
@@ -25,11 +25,10 @@ const Badge = ({
             className={clsx(
                 styles.badge,
                 styles[`variant-${variant}`],
-                styles[`color-${color}`],
                 variant === "dot" && styles[`size-${size}`],
                 className
             )}
-        >
+            style={{"--badge-bg": `var(--bg-${color})`} as React.CSSProperties}>
             {variant === "text" && count}
         </div>
     );

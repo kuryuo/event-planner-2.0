@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import {useRef, useState} from 'react';
 import FullCalendar from '@fullcalendar/react';
 import CalendarToolbar from '../calendar/toolbar/CalendarToolbar.tsx';
 import CalendarBody from './body/CalendarBody.tsx';
@@ -6,40 +6,50 @@ import styles from './Calendar.module.scss';
 
 export default function Calendar() {
     const calendarRef = useRef<FullCalendar | null>(null);
+
     const [currentView, setCurrentView] = useState<'dayGridMonth' | 'timeGridWeek'>('dayGridMonth');
-    const [currentDate, setCurrentDate] = useState(new Date());
+
+    const [monthDate, setMonthDate] = useState(new Date());
+    const [weekDate, setWeekDate] = useState(new Date());
+
+    const currentDate = currentView === 'dayGridMonth' ? monthDate : weekDate;
 
     const handleViewChange = (view: 'dayGridMonth' | 'timeGridWeek') => {
         setCurrentView(view);
+
+        const dateToShow = view === 'dayGridMonth' ? monthDate : weekDate;
         calendarRef.current?.getApi().changeView(view);
+        calendarRef.current?.getApi().gotoDate(dateToShow);
     };
 
     const goToPrevious = () => {
-        const prev = new Date(currentDate);
-
         if (currentView === 'dayGridMonth') {
+            const prev = new Date(monthDate);
             prev.setMonth(prev.getMonth() - 1);
-        } else if (currentView === 'timeGridWeek') {
+            setMonthDate(prev);
+            calendarRef.current?.getApi().gotoDate(prev);
+        } else {
+            const prev = new Date(weekDate);
             prev.setDate(prev.getDate() - 7);
             prev.setDate(prev.getDate() - prev.getDay() + 1);
+            setWeekDate(prev);
+            calendarRef.current?.getApi().gotoDate(prev);
         }
-
-        setCurrentDate(prev);
-        calendarRef.current?.getApi().gotoDate(prev);
     };
 
     const goToNext = () => {
-        const next = new Date(currentDate);
-
         if (currentView === 'dayGridMonth') {
+            const next = new Date(monthDate);
             next.setMonth(next.getMonth() + 1);
-        } else if (currentView === 'timeGridWeek') {
+            setMonthDate(next);
+            calendarRef.current?.getApi().gotoDate(next);
+        } else {
+            const next = new Date(weekDate);
             next.setDate(next.getDate() + 7);
             next.setDate(next.getDate() - next.getDay() + 1);
+            setWeekDate(next);
+            calendarRef.current?.getApi().gotoDate(next);
         }
-
-        setCurrentDate(next);
-        calendarRef.current?.getApi().gotoDate(next);
     };
 
     return (

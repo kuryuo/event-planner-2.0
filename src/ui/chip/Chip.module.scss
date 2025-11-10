@@ -4,8 +4,8 @@
   display: inline-flex;
   align-items: center;
   border-radius: var(--radius-4);
-  background-color: var(--pink-100);
-  color: var(--text-default);
+  background-color: var(--chip-bg, var(--bg-pink));
+  color: var(--chip-color, var(--content-pink));
   font-weight: 500;
   cursor: default;
 
@@ -22,7 +22,7 @@
     margin-left: 8px;
     cursor: pointer;
 
-    svg {
+    img {
       width: 12px;
       height: 12px;
     }
@@ -37,64 +37,4 @@
 .size-M {
   @include ty.font(caption-m, regular);
   padding: var(--spacing-1) var(--spacing-4);
-}
-
-.color-pink {
-  background-color: var(--bg-pink);
-  color: var(--content-pink);
-}
-
-.color-blue {
-  background-color: var(--bg-blue);
-  color: var(--content-blue);
-}
-
-.color-orange {
-  background-color: var(--bg-orange);
-  color: var(--content-orange);
-}
-
-.color-purple {
-  background-color: var(--bg-purple);
-  color: var(--content-purple);
-}
-
-.color-cyan {
-  background-color: var(--bg-cyan);
-  color: var(--content-cyan);
-}
-
-.color-deep-orange {
-  background-color: var(--bg-deep-orange);
-  color: var(--content-deep-orange);
-}
-
-.color-deep-purple {
-  background-color: var(--bg-deep-purple);
-  color: var(--content-deep-purple);
-}
-
-.color-teal {
-  background-color: var(--bg-teal);
-  color: var(--content-teal);
-}
-
-.color-brown {
-  background-color: var(--bg-brown);
-  color: var(--content-brown);
-}
-
-.color-indigo {
-  background-color: var(--bg-indigo);
-  color: var(--content-indigo);
-}
-
-.color-green {
-  background-color: var(--bg-green);
-  color: var(--content-green);
-}
-
-.color-plum {
-  background-color: var(--bg-plum);
-  color: var(--content-plum);
 }

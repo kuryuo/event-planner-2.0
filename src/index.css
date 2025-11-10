@@ -129,6 +129,7 @@
     --content-primary-inverse-subtle: var(--white);
     --content-primary-inverse-mono: var(--white);
     --content-secondary: var(--gray-60);
+    --content-secondary-inverse: var(--gray-40);
     --content-secondary-inverse-mono: var(--gray-20);
     --content-secondary-subtle: var(--gray-30);
     --content-placeholder: var(--gray-60);
@@ -178,6 +179,7 @@
     --bg-secondary-press: var(--black-alpha-12);
     --bg-tertiary: var(--gray-10);
     --bg-disabled: var(--gray-3);
+    --bg-disabled-bold: var(--gray-10);
     --bg-disabled-subtle: var(--gray-10);
     --bg-brand-green: var(--brand-green-100);
     --bg-brand-green-hover: var(--brand-green-120);
@@ -200,11 +202,11 @@
     --bg-brown: var(--brown-10);
     --bg-plum: var(--plum-10);
 
-    --border-primary: var(--gray-20);
+    --border-primary: var(--gray-10);
     --border-primary-hover: var(--gray-100);
     --border-primary-focus: var(--gray-100);
     --border-inverse: var(--gray-80);
-    --border-disabled: var(--gray-10);
+    --border-disabled: var(--gray-5);
     --border-negative: var(--system-red-100);
     --border-notice: var(--system-orange-100);
     --border-positive: var(--system-green-100);

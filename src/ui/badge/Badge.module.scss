@@ -1,17 +1,16 @@
-@use '@/typography-variables' as ty;
-
 .badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
+  color: var(--white);
+  background-color: var(--badge-bg, var(--bg-brand-green));
 }
 
 .variant-text {
   min-width: 20px;
   height: 20px;
   padding: var(--spacing-1) var(--spacing-05);
-  @include ty.font(caption-s, regular);
 }
 
 .variant-dot {
@@ -24,24 +23,6 @@
 }
 
 .size-M {
-  width: 8px;
-  height: 8px;
-}
-
-.color-primary {
-  color: var(--white);
-  background-color: var(--bg-brand-purple);
-}
-
-.color-secondary {
-  color: var(--content-primary);
-  background-color: var(--bg-brand-green);
-}
-
-.color-green {
-  background-color: var(--bg-brand-green);
-}
-
-.color-negative {
-  background-color: var(--content-negative);
+  width: 10px;
+  height: 10px;
 }

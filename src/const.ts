@@ -1,0 +1,15 @@
+export type AppColor =
+    | "brand-green"
+    | "pink"
+    | "plum"
+    | "purple"
+    | "deep-purple"
+    | "indigo"
+    | "blue"
+    | "cyan"
+    | "teal"
+    | "green"
+    | "orange"
+    | "deep-orange"
+    | "brown"
+    | "brand-purple";
