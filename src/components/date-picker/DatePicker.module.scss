@@ -1,0 +1,40 @@
+@use '@/typography-variables' as ty;
+
+.wrapper {
+  display: inline-block;
+  border: 1px solid var(--gray-30);
+  border-radius: 8px;
+  padding: 8px;
+  background-color: var(--white);
+}
+
+:global(.rdp-root) {
+  --rdp-accent-color: var(--bg-brand-green);
+  --rdp-day-height: 37px;
+  --rdp-day-width: 37px;
+  --rdp-range_middle-background-color: var(--bg-brand-green-subtle);
+}
+
+:global(.rdp-day) {
+  @include ty.font(caption-m, regular);
+}
+
+//:global(.rdp-chevron) {
+//  display: inline-block;
+//  fill: var(--content-primary);
+//}
+
+:global(.rdp-day_button) {
+  width: 37px;
+  height: 37px;
+}
+
+:global(.rdp-caption_label) {
+  text-transform: capitalize;
+  @include ty.font(body-s, regular);
+}
+
+:global(.rdp-weekday) {
+  text-transform: capitalize;
+  @include ty.font(caption-m, regular);
+}
