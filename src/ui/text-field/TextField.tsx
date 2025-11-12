@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './FormControls.module.scss';
+import styles from './TextField.module.scss';
 
 type TextFieldSize = 'M' | 'L';
 

@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react';
-import styles from './FormControls.module.scss';
+import styles from './TextArea.module.scss';
 
 interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
     label?: string;

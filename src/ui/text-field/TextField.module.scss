@@ -1,0 +1,120 @@
+@use '@/typography-variables' as ty;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.sizeM {
+  height: 44px;
+  width: 300px;
+
+  .input {
+    @include ty.font(body-m, regular);
+    padding: var(--spacing-2) var(--spacing-4);
+  }
+}
+
+.sizeL {
+  height: 56px;
+  width: 300px;
+
+  .input {
+    @include ty.font(title-m, semibold);
+    padding: var(--spacing-3) var(--spacing-4);
+
+    &::placeholder {
+      @include ty.font(title-m, semibold);
+    }
+  }
+}
+
+.label {
+  color: var(--content-primary);
+  margin-bottom: 16px;
+  @include ty.font(subtitle-m, semibold);
+}
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-2);
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  margin-bottom: 8px;
+
+  &:hover {
+    border-color: var(--border-primary-hover);
+  }
+
+  &:has(input:focus),
+  &:has(textarea:focus) {
+    border-color: var(--border-primary-press);
+  }
+
+  &.error {
+    border: 1px solid var(--border-negative);
+
+    &:has(input:focus),
+    &:has(textarea:focus) {
+      border-color: var(--border-negative);
+    }
+  }
+
+  &.disabled {
+    border-color: var(--content-disabled);
+    cursor: not-allowed;
+  }
+}
+
+.input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--content-primary);
+  @include ty.font(body-m, regular);
+  padding: var(--spacing-2) var(--spacing-4);
+
+  &::placeholder {
+    color: var(--content-placeholder);
+    opacity: 1;
+    transition: color 0.2s ease;
+  }
+
+  &:disabled {
+    color: var(--content-disabled);
+    cursor: not-allowed;
+
+    &::placeholder {
+      color: var(--content-disabled);
+    }
+  }
+}
+
+.iconLeft,
+.iconRight {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconLeft {
+  margin-right: 8px;
+}
+
+.iconRight {
+  margin-left: 8px;
+}
+
+.helperText {
+  color: var(--content-secondary);
+  @include ty.font(caption-m, regular);
+}
+
+.helperTextError {
+  color: var(--content-negative);
+  @include ty.font(caption-m, semibold);
+}

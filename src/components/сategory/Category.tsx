@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import Select from "@/ui/form-controls/Select";
+import Select from "@/ui/select/Select.tsx";
 import Chip from "@/ui/chip/Chip";
 import styles from "./Category.module.scss";
 
@@ -41,6 +41,9 @@ export default function CategorySelect({
     return (
         <div>
             <Select
+                options={[
+                    {label: 'Просто текст'},
+                ]}
                 label="Категории"
                 error={error}
                 helperText={helperText}

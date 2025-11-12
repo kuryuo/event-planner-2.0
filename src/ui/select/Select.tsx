@@ -1,7 +1,13 @@
 import React, {useState} from 'react';
-import styles from './FormControls.module.scss';
+import styles from './Select.module.scss';
 import ChevronDownImg from '../../assets/img/icon-m/chevron-down.svg';
 import ChevronUpImg from '../../assets/img/icon-m/chevron-up.svg';
+
+interface Option {
+    label?: string;
+    description?: string;
+    content?: React.ReactNode;
+}
 
 interface SelectProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
@@ -9,6 +15,7 @@ interface SelectProps extends React.InputHTMLAttributes<HTMLInputElement> {
     rightIcon?: React.ReactNode;
     error?: boolean;
     helperText?: string;
+    options?: Option[];
 }
 
 export default function Select({
@@ -18,6 +25,10 @@ export default function Select({
                                    error,
                                    helperText,
                                    disabled,
+                                   options = [
+                                       {label: 'Текст', description: 'Описание под текстом'},
+                                       {label: 'Текст 2', description: 'Описание под текстом'},
+                                   ],
                                    ...props
                                }: SelectProps) {
     const [isOpen, setIsOpen] = useState(false);
@@ -55,7 +66,7 @@ export default function Select({
                     {rightIcon ?? (
                         <img
                             src={isOpen ? ChevronUpImg : ChevronDownImg}
-                            alt={isOpen ? "chevron-up" : "chevron-down"}
+                            alt={isOpen ? 'chevron-up' : 'chevron-down'}
                         />
                     )}
                 </span>
@@ -69,29 +80,29 @@ export default function Select({
 
             {isOpen && !disabled && (
                 <ul className={styles.dropdown}>
-                    {[
-                        {label: "Текст", description: "Описание под текстом"},
-                        {label: "Текст 2", description: "Описание под текстом"},
-                    ].map((option, idx) => (
+                    {options.map((option, idx) => (
                         <li
                             key={idx}
                             className={styles.option}
                             onClick={() => {
-                                setValue(option.label);
+                                setValue(option.label ?? '');
                                 setIsOpen(false);
                             }}
                         >
                             <div className={styles.optionContent}>
-                                <div className={styles.optionLabel}>{option.label}</div>
-                                {option.description && (
-                                    <div className={styles.optionDescription}>{option.description}</div>
+                                {option.content ?? (
+                                    <>
+                                        <div className={styles.optionLabel}>{option.label}</div>
+                                        {option.description && (
+                                            <div className={styles.optionDescription}>{option.description}</div>
+                                        )}
+                                    </>
                                 )}
                             </div>
                         </li>
                     ))}
                 </ul>
             )}
-
         </div>
     );
 }
