@@ -97,6 +97,7 @@
   background: transparent;
   color: var(--content-primary);
   @include ty.font(body-m, regular);
+  padding: var(--spacing-2) var(--spacing-4);
 
   &::placeholder {
     color: var(--content-placeholder);
@@ -165,4 +166,58 @@
 .helperTextError {
   color: var(--content-negative);
   @include ty.font(caption-m, semibold);
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: var(--white);
+  list-style: none;
+  border-radius: 0 0 var(--radius-1) var(--radius-1);
+  z-index: 1000;
+  overflow-y: auto;
+  max-height: 200px;
+  box-shadow: var(--lvl2);
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-tertiary) var(--white);
+}
+
+
+.option {
+  display: flex;
+  align-items: flex-start;
+  padding: var(--spacing-2) var(--spacing-3);
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background-color: var(--hover-bg);
+  }
+
+  .iconLeft,
+  .iconRight {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 8px;
+  }
+
+  .optionContent {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .optionLabel {
+    @include ty.font(body-m, semibold);
+    color: var(--content-primary);
+  }
+
+  .optionDescription {
+    @include ty.font(caption-m, regular);
+    color: var(--content-secondary);
+  }
 }

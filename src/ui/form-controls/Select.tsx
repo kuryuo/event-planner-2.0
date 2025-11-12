@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import styles from './FormControls.module.scss';
 import ChevronDownImg from '../../assets/img/icon-m/chevron-down.svg';
 import ChevronUpImg from '../../assets/img/icon-m/chevron-up.svg';
-import {Menu} from "@/ui/menu/Menu.tsx";
 
 interface SelectProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
@@ -69,23 +68,30 @@ export default function Select({
             )}
 
             {isOpen && !disabled && (
-                <Menu
-                    isOpen={isOpen}
-                    disabled={disabled}
-                    options={[
-                        {label: 'Текст', description: 'Описание под текстом', onClick: () => setIsOpen(false)},
-                        {label: 'Текст', description: 'Описание под текстом', onClick: () => setIsOpen(false)},
-                        {label: 'Текст', description: 'Описание под текстом', onClick: () => setIsOpen(false)},
-                        {label: 'Текст', description: 'Описание под текстом', onClick: () => setIsOpen(false)},
-                        {label: 'Текст', description: 'Описание под текстом', onClick: () => setIsOpen(false)},
-                        {label: 'Текст', description: 'Описание под текстом', onClick: () => setIsOpen(false)},
-                        {label: 'Текст', description: 'Описание под текстом', onClick: () => setIsOpen(false)},
-                        {label: 'Текст', description: 'Описание под текстом', onClick: () => setIsOpen(false)},
-                        {label: 'Текст', description: 'Описание под текстом', onClick: () => setIsOpen(false)},
-                        {label: 'Текст', description: 'Описание под текстом', onClick: () => setIsOpen(false)},
-                    ]}
-                />
+                <ul className={styles.dropdown}>
+                    {[
+                        {label: "Текст", description: "Описание под текстом"},
+                        {label: "Текст 2", description: "Описание под текстом"},
+                    ].map((option, idx) => (
+                        <li
+                            key={idx}
+                            className={styles.option}
+                            onClick={() => {
+                                setValue(option.label);
+                                setIsOpen(false);
+                            }}
+                        >
+                            <div className={styles.optionContent}>
+                                <div className={styles.optionLabel}>{option.label}</div>
+                                {option.description && (
+                                    <div className={styles.optionDescription}>{option.description}</div>
+                                )}
+                            </div>
+                        </li>
+                    ))}
+                </ul>
             )}
+
         </div>
     );
 }
