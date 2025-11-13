@@ -1,10 +1,10 @@
-import { CardExtra } from '@/ui/card/CardExtra';
-import { Sublist } from '@/components/sub-list/SubList';
-import { NotificationBadge } from '@/ui/notification-badge/NotificationBadge';
+import {CardExtra} from '@/ui/card/CardExtra';
+import {Sublist} from '@/components/sub-list/SubList';
+import {NotificationBadge} from '@/ui/notification-badge/NotificationBadge';
 import CircleButton from '@/ui/button-circle/ButtonCircle';
 import bell from '@/assets/img/icon-l/bell.svg';
 import styles from './Sidebar.module.scss';
-import type { CardBaseProps } from '@/ui/card/CardBase';
+import type {CardBaseProps} from '@/ui/card/CardBase';
 import NextEvent from "@/components/next-event/NextEvent.tsx";
 import clsx from "clsx";
 
@@ -14,7 +14,7 @@ interface SidebarProps {
     notificationCount?: number;
 }
 
-export function Sidebar({ subscriptions, onCreateEvent, notificationCount = 3 }: SidebarProps) {
+export default function Sidebar({subscriptions, onCreateEvent, notificationCount = 3}: SidebarProps) {
     return (
         <div className={styles.sidebar}>
             <div className={styles.block}>
@@ -23,14 +23,14 @@ export function Sidebar({ subscriptions, onCreateEvent, notificationCount = 3 }:
                     subtitle="Все уведомления"
                     avatarUrl='https://randomuser.me/api/portraits/men/56.jpg'
                     addon={
-                        <NotificationBadge icon={<img src={bell} alt="Уведомления" />} count={notificationCount} />
+                        <NotificationBadge icon={<img src={bell} alt="Уведомления"/>} count={notificationCount}/>
                     }
                     onAddonClick={() => console.log('Открыть уведомления')}
                 />
             </div>
 
             <div className={clsx(styles.block, styles.createEventWrapper)}>
-                <CircleButton onClick={onCreateEvent} variant={"green"} />
+                <CircleButton onClick={onCreateEvent} variant={"green"}/>
                 <span className={styles.createEventText}>Создайте мероприятие</span>
             </div>
 
@@ -44,7 +44,7 @@ export function Sidebar({ subscriptions, onCreateEvent, notificationCount = 3 }:
             </div>
 
             <div className={styles.block}>
-                <Sublist items={subscriptions} />
+                <Sublist items={subscriptions}/>
             </div>
         </div>
     );

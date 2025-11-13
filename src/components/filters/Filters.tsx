@@ -9,7 +9,11 @@ import Category from "@/components/сategory/Category";
 import Switch from "@/ui/switch/Switch.tsx";
 import Button from "@/ui/button/Button";
 
-export default function Filters() {
+interface FiltersProps {
+    onClose?: () => void;
+}
+
+export default function Filters({onClose}: FiltersProps) {
     const [formats, setFormats] = useState({
         inPerson: false,
         hybrid: false,
@@ -27,7 +31,7 @@ export default function Filters() {
         <div className={styles.filters}>
             <div className={styles.header}>
                 <span className={styles.title}>Фильтры</span>
-                <img src={CloseIcon} alt="Закрыть" className={styles.closeIcon}/>
+                <img src={CloseIcon} alt="Закрыть" onClick={onClose} className={styles.closeIcon}/>
             </div>
 
             <TextField

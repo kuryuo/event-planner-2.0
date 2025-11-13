@@ -21,8 +21,9 @@ export default function CalendarBody({calendarRef, currentView}: CalendarBodyPro
             locale={ruLocale}
             headerToolbar={false}
             allDaySlot={false}
+            fixedWeekCount={false}
             slotMinTime="09:00:00"
-            slotMaxTime="23:00:00"
+            slotMaxTime="22:00:00"
             slotLabelFormat={{
                 hour: '2-digit',
                 minute: '2-digit',

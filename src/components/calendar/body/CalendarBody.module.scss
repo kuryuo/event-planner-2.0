@@ -5,12 +5,15 @@
   overflow: hidden;
 }
 
+:global(.fc .fc-timegrid-slot) {
+  height: 32px;
+}
+
 :global(.fc.fc-theme-standard .fc-daygrid-day-top) {
   display: flex;
   justify-content: center;
   align-items: flex-start;
   padding-top: 4px;
-  min-height: 150px;
 }
 
 :global(.fc.fc-theme-standard .fc-daygrid-day-number) {
@@ -82,11 +85,11 @@
 }
 
 :global(.fc.fc-theme-standard .fc-daygrid-day-top) {
-  min-height: 30px;
+  min-height: 31px;
 }
 
 :global(.fc.fc-theme-standard .fc-daygrid-day-events) {
-  min-height: 150px;
+  min-height: 120px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;

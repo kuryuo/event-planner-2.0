@@ -4,11 +4,14 @@ import CalendarToolbar from '../calendar/toolbar/CalendarToolbar.tsx';
 import CalendarBody from './body/CalendarBody.tsx';
 import styles from './Calendar.module.scss';
 
-export default function Calendar() {
+interface CalendarProps {
+    onFilterClick?: () => void;
+}
+
+export default function Calendar({onFilterClick}: CalendarProps) {
     const calendarRef = useRef<FullCalendar | null>(null);
 
     const [currentView, setCurrentView] = useState<'dayGridMonth' | 'timeGridWeek'>('dayGridMonth');
-
     const [monthDate, setMonthDate] = useState(new Date());
     const [weekDate, setWeekDate] = useState(new Date());
 
@@ -60,6 +63,7 @@ export default function Calendar() {
                 onViewChange={handleViewChange}
                 onPrev={goToPrevious}
                 onNext={goToNext}
+                onFilterClick={onFilterClick}
             />
             <CalendarBody
                 calendarRef={calendarRef}
