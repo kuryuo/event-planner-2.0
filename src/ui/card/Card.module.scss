@@ -1,9 +1,8 @@
 @use '@/typography-variables' as ty;
+
 .wrapper {
   display: flex;
-  align-items: flex-start;
   gap: var(--spacing-3);
-  padding: var(--spacing-2);
 
   &.M {
     .content {
@@ -21,7 +20,7 @@
   &.S {
     .content {
       .title {
-        @include ty.font(body-s, semibold);
+        @include ty.font(body-s, regular);
       }
 
       .subtitle {

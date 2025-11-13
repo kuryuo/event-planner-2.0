@@ -11,12 +11,12 @@ interface CategorySelectProps {
     disabled?: boolean;
 }
 
-export default function CategorySelect({
-                                           error,
-                                           helperText,
-                                           options = [],
-                                           disabled
-                                       }: CategorySelectProps) {
+export default function Category({
+                                     error,
+                                     helperText,
+                                     options = [],
+                                     disabled
+                                 }: CategorySelectProps) {
     const [categories, setCategories] = useState<string[]>([]);
     const [inputValue, setInputValue] = useState("");
 
@@ -43,6 +43,8 @@ export default function CategorySelect({
             <Select
                 options={[
                     {label: 'Просто текст'},
+                    {label: 'Просто текст'},
+                    {label: 'Просто текст'}
                 ]}
                 label="Категории"
                 error={error}

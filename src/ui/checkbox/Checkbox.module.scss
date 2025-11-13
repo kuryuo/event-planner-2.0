@@ -19,10 +19,6 @@
       background-color: var(--bg-secondary-hover);
     }
 
-    &:focus {
-      outline: 4px solid var(--border-brand-green-subtle);
-    }
-
     &:active {
       transform: scale(0.95);
     }

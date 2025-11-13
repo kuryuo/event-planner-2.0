@@ -1,0 +1,59 @@
+@use '@/typography-variables' as ty;
+
+.filters {
+  display: flex;
+  width: 340px;
+  flex-direction: column;
+  gap: var(--spacing-8);
+  border-radius: 0 var(--spacing-8) var(--spacing-8) 0;
+  padding: var(--spacing-10) var(--spacing-3);
+  background-color: var(--bg-primary);
+  height: 100vh;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .title {
+      @include ty.font(title-s, semibold);
+    }
+
+    .closeIcon {
+      cursor: pointer;
+    }
+  }
+
+  .sectionTitle {
+    @include ty.font(subtitle-m, semibold);
+  }
+
+  .actions {
+    margin-top: auto;
+    display: flex;
+    gap: 12px;
+  }
+
+  .formatSection {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+
+    .formatTitle {
+      @include ty.font(subtitle-m, semibold);
+    }
+
+    .formatList {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .formatItem {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        @include ty.font(body-m, regular);
+      }
+    }
+  }
+}

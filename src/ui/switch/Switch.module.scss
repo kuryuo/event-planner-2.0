@@ -15,7 +15,6 @@
   .label {
     user-select: none;
     transition: color 0.2s ease;
-    color: var(--content-disabled);
   }
 
   .leftLabel {
@@ -37,11 +36,6 @@
 
   &.checked:hover:not(:disabled) {
     background-color: var(--bg-brand-green-hover);
-  }
-
-  &:focus {
-    outline: 2px solid var(--border-brand-green-subtle);
-    outline-offset: 2px;
   }
 
   &:disabled {
@@ -93,21 +87,5 @@
     &.checked .thumb {
       left: 16px;
     }
-  }
-}
-
-.label {
-  user-select: none;
-  transition: color 0.2s ease;
-
-  color: var(--content-disabled);
-
-  .switch.checked + &,
-  &.checked {
-    color: var(--content-primary);
-  }
-
-  .switch:disabled + & {
-    color: var(--content-disabled);
   }
 }

@@ -1,16 +1,14 @@
-import {useState} from "react";
 import styles from "./Checkbox.module.scss";
 
-export function Checkbox() {
-    const [checked, setChecked] = useState(false);
+interface CheckboxProps {
+    checked?: boolean;
+    onChange?: () => void;
+}
 
+export default function Checkbox({checked = false, onChange}: CheckboxProps) {
     return (
         <label className={styles.checkbox}>
-            <input
-                type="checkbox"
-                checked={checked}
-                onChange={() => setChecked(!checked)}
-            />
+            <input type="checkbox" checked={checked} onChange={onChange}/>
             <span className={styles.checkmark}></span>
         </label>
     );

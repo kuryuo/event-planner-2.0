@@ -23,13 +23,14 @@
 }
 
 .wrapper {
+  height: 44px;
   display: flex;
   align-items: center;
   position: relative;
   background-color: var(--bg-secondary);
   border-radius: var(--radius-2);
   transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-  margin-bottom: 8px;
+  padding: var(--spacing-2) var(--spacing-4);
 
   &:hover {
     border-color: var(--border-primary-hover);
@@ -60,7 +61,6 @@
   background: transparent;
   color: var(--content-primary);
   @include ty.font(body-m, regular);
-  padding: var(--spacing-2) var(--spacing-4);
 
   &::placeholder {
     color: var(--content-placeholder);
