@@ -13,16 +13,6 @@
   justify-content: center;
 }
 
-/* === Стили для контента внутри события === */
-:global(.fc-event-main .fc-event-title) {
-  @include ty.font(caption-m, regular);
-}
-
-:global(.fc-event-main .fc-event-time) {
-  @include ty.font(caption-s, semibold);
-}
-
-/* === Общие стили для всех событий === */
 :global(.fc.fc-theme-standard .fc-daygrid-event),
 :global(.fc.fc-theme-standard .fc-timegrid-event) {
   position: relative;
@@ -40,8 +30,15 @@
   }
 }
 
-/* === Мелкие утилиты === */
 :global(.fc-daygrid-event .event-content) {
   display: flex;
   flex-direction: column;
+}
+
+.title {
+  @include ty.font(caption-m, regular);
+}
+
+.time {
+  @include ty.font(caption-s, semibold);
 }

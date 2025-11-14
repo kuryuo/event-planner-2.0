@@ -3,9 +3,11 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import ruLocale from '@fullcalendar/core/locales/ru';
-import CalendarHeader from "@/components/calendar/header/CalendarHeader.tsx";
+import CalendarHeader from '@/components/calendar/header/CalendarHeader';
+import CalendarEvent from '@/components/calendar/event/CalendarEvent';
 import './CalendarBody.module.scss';
-import CalendarEvent from "@/components/calendar/event/CalendarEvent.tsx";
+
+import {SLOT_LABEL_FORMAT, EVENTS, CALENDAR_SLOT_TIMES, CALENDAR_OPTIONS} from '@/const';
 
 interface CalendarBodyProps {
     calendarRef: React.RefObject<FullCalendar | null>;
@@ -13,6 +15,18 @@ interface CalendarBodyProps {
 }
 
 export default function CalendarBody({calendarRef, currentView}: CalendarBodyProps) {
+
+    const handleDatesSet = () => {
+        const rows = document.querySelectorAll('.fc-daygrid-body tr');
+        const weeks = rows.length;
+
+        const calendar = document.querySelector('.fc');
+        if (!calendar) return;
+
+        calendar.classList.remove('weeks-4', 'weeks-5', 'weeks-6');
+        calendar.classList.add(`weeks-${weeks}`);
+    };
+
     return (
         <FullCalendar
             ref={calendarRef}
@@ -20,28 +34,14 @@ export default function CalendarBody({calendarRef, currentView}: CalendarBodyPro
             initialView={currentView}
             locale={ruLocale}
             headerToolbar={false}
-            allDaySlot={false}
-            fixedWeekCount={false}
-            slotMinTime="09:00:00"
-            slotMaxTime="22:00:00"
-            slotLabelFormat={{
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-            }}
-            dayHeaderContent={(args) => (
-                <CalendarHeader {...args} currentView={currentView}/>
-            )}
+            slotMinTime={CALENDAR_SLOT_TIMES.min}
+            slotMaxTime={CALENDAR_SLOT_TIMES.max}
+            slotLabelFormat={SLOT_LABEL_FORMAT}
+            dayHeaderContent={(args) => <CalendarHeader {...args} currentView={currentView}/>}
             eventContent={(arg) => <CalendarEvent arg={arg} viewType={currentView}/>}
-            events={[
-                {title: 'Событие 1', start: '2025-11-10T10:00:00', end: '2025-11-10T16:40:00'},
-                {title: 'Событие 2', start: '2025-11-11T14:00:00', end: '2025-11-11T16:00:00'},
-            ]}
-            height="auto"
-            nowIndicator
-            editable
-            selectable
+            events={EVENTS}
+            datesSet={handleDatesSet}
+            {...CALENDAR_OPTIONS}
         />
     );
 }
-

@@ -1,26 +1,23 @@
-import './CalendarEvent.module.scss';
+import type {EventContentArg as FullCalendarEventContentArg} from '@fullcalendar/core';
+import styles from './CalendarEvent.module.scss';
+import {formatTimeRange} from '@/utils';
 
 interface CalendarEventProps {
-    arg: any;
+    arg: FullCalendarEventContentArg;
     viewType: 'dayGridMonth' | 'timeGridWeek';
 }
 
 export default function CalendarEvent({arg, viewType}: CalendarEventProps) {
     const {event, timeText} = arg;
 
-    const start = event.start;
-    const end = event.end;
-    const timeRange =
-        start && end
-            ? `${start.getHours().toString().padStart(2, '0')}:${start.getMinutes().toString().padStart(2, '0')} - ${end.getHours().toString().padStart(2, '0')}:${end.getMinutes().toString().padStart(2, '0')}`
-            : '';
-
-    const displayTime = viewType === 'dayGridMonth' ? timeRange : timeText;
+    const displayTime = viewType === 'dayGridMonth'
+        ? formatTimeRange(event.start, event.end)
+        : timeText;
 
     return (
-        <div className="fc-event-main">
-            <div className="fc-event-title">{event.title}</div>
-            <div className="fc-event-time">{displayTime}</div>
+        <div className={styles.main}>
+            <div className={styles.title}>{event.title}</div>
+            <div className={styles.time}>{displayTime}</div>
         </div>
     );
 }

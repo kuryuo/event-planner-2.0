@@ -23,7 +23,7 @@ export default function MainPage() {
 
     return (
         <div className={styles.pageWrapper}>
-            <div className={styles.sidebarWrapper}>
+            <div className={styles.sidebar}>
                 <Sidebar
                     subscriptions={subscriptions}
                     onCreateEvent={handleCreateEvent}
@@ -31,16 +31,14 @@ export default function MainPage() {
                 />
             </div>
 
-            <div className={styles.calendarWrapper}>
+            <div className={styles.calendar}>
                 <Calendar onFilterClick={() => setShowFilters(prev => !prev)}/>
 
-                {showFilters && (
-                    <div className={styles.calendarOverlay}/>
-                )}
+                {showFilters && <div className={styles.overlay}/>}
             </div>
 
             {showFilters && (
-                <div className={styles.filtersOverlay}>
+                <div className={styles.filters}>
                     <Filters onClose={() => setShowFilters(false)}/>
                 </div>
             )}

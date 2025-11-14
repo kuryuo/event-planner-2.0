@@ -35,19 +35,18 @@ export default function Avatar({
             name
         )}&size=${pixelSize}&background=DDDDDD&color=555555`;
 
+    const handleClick = variant === 'update' ? onClick : undefined;
+
     return (
         <div
-            className={clsx(
-                styles.wrapper,
-                styles[size],
-                variant === 'update' && styles.update
-            )}
-            onClick={variant === 'update' ? onClick : undefined}
+            className={clsx(styles.wrapper, styles[size], variant === 'update' && styles.update)}
+            onClick={handleClick}
+            style={{width: pixelSize, height: pixelSize}}
         >
             <img src={avatarSrc} alt={name} className={styles.avatar}/>
             {variant === 'update' && (
                 <div className={styles.overlay}>
-                    <img src={PlusIcon} className={styles.icon}/>
+                    <img src={PlusIcon} alt="Add" className={styles.icon}/>
                 </div>
             )}
         </div>

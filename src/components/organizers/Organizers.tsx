@@ -9,7 +9,7 @@ export default function Organizers() {
         <div>
             <Select
                 label="Организаторы"
-                placeholder="Введите имя организатора"
+                placeholder="Выберите организатора"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 options={[
@@ -63,7 +63,6 @@ export default function Organizers() {
                         content: (
                             <CardBase
                                 title="Илья Кузнецов"
-                                subtitle="Дизайнер сцены"
                                 avatarUrl="https://randomuser.me/api/portraits/men/5.jpg"
                                 size="S"
                             />

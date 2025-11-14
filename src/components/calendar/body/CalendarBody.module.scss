@@ -5,15 +5,12 @@
   overflow: hidden;
 }
 
-:global(.fc .fc-timegrid-slot) {
-  height: 32px;
-}
-
 :global(.fc.fc-theme-standard .fc-daygrid-day-top) {
   display: flex;
   justify-content: center;
   align-items: flex-start;
   padding-top: 4px;
+  min-height: 31px;
 }
 
 :global(.fc.fc-theme-standard .fc-daygrid-day-number) {
@@ -56,6 +53,7 @@
 }
 
 :global(.fc.fc-theme-standard .fc-timegrid-slot) {
+  height: 32px;
   border-top: none;
 }
 
@@ -84,14 +82,23 @@
   background-color: transparent !important;
 }
 
-:global(.fc.fc-theme-standard .fc-daygrid-day-top) {
-  min-height: 31px;
-}
-
 :global(.fc.fc-theme-standard .fc-daygrid-day-events) {
-  min-height: 120px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   gap: var(--spacing-05);
+  max-height: 100%;
+  overflow: hidden;
+}
+
+:global(div.fc.fc-theme-standard.weeks-4 .fc-daygrid-day-events) {
+  height: 160px;
+}
+
+:global(div.fc.fc-theme-standard.weeks-5 .fc-daygrid-day-events) {
+  height: 120px;
+}
+
+:global(div.fc.fc-theme-standard.weeks-6 .fc-daygrid-day-events) {
+  height: 90px;
 }

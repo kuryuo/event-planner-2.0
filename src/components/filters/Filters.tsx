@@ -69,24 +69,29 @@ export default function Filters({onClose}: FiltersProps) {
                 <Category/>
             </div>
 
-            <span className={styles.sectionTitle}>Другое</span>
 
-            <div className={styles.subscriptionItem}>
-                <Switch
-                    checked={mySubscriptions}
-                    onCheckedChange={setMySubscriptions}
-                    label="Мои подписки"
-                    labelPosition="left"
-                />
-            </div>
+            <div className={styles.subscriptionList}>
+                <span className={styles.sectionTitle}>Другое</span>
 
-            <div className={styles.subscriptionItem}>
-                <Switch
-                    checked={availableSeats}
-                    onCheckedChange={setAvailableSeats}
-                    label="Есть места"
-                    labelPosition="left"
-                />
+                <div className={styles.switchGroup}>
+                    <div className={styles.subscriptionItem}>
+                        <Switch
+                            checked={mySubscriptions}
+                            onCheckedChange={setMySubscriptions}
+                            label="Мои подписки"
+                            labelPosition="left"
+                        />
+                    </div>
+
+                    <div className={styles.subscriptionItem}>
+                        <Switch
+                            checked={availableSeats}
+                            onCheckedChange={setAvailableSeats}
+                            label="Есть места"
+                            labelPosition="left"
+                        />
+                    </div>
+                </div>
             </div>
 
             <div className={styles.actions}>
