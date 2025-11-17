@@ -1,4 +1,5 @@
-import {useState} from "react";
+import {useState, useEffect} from "react";
+import {useNavigate} from "react-router-dom";
 import LoginForm from "@/components/auth/LoginForm";
 import RegistrationForm from "@/components/auth/RegistrationForm";
 import Button from "@/ui/button/Button";
@@ -11,6 +12,13 @@ export default function AuthPage() {
     const [error, setError] = useState<string | null>(null);
 
     const {login, register, isAuthenticated} = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate("/main");
+        }
+    }, [isAuthenticated, navigate]);
 
     const toggleMode = () => {
         setMode((prev) => (prev === "login" ? "register" : "login"));
@@ -30,18 +38,12 @@ export default function AuthPage() {
     const handleRegister = async (data: RegisterPayload) => {
         setLoading(true);
         setError(null);
-
         const result = await register(data);
         if (!result.success) {
             setError(result.error);
         }
-
         setLoading(false);
     };
-
-    if (isAuthenticated) {
-        return <div>Вы уже вошли в систему</div>;
-    }
 
     return (
         <div style={{

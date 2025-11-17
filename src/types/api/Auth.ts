@@ -6,26 +6,22 @@ export interface RegisterPayload {
 export interface LoginPayload {
     email: string;
     password: string;
-    // twoFactorCode: string;
-    // twoFactorRecoveryCode: string;
+    twoFactorCode?: string;
+    twoFactorRecoveryCode?: string;
 }
 
 export interface RefreshPayload {
     refreshToken: string;
 }
 
-export interface AuthResponse {
-    data: {
-        accessToken: string;
-        refreshToken: string;
-        refreshExpiresAt: string;
-    }
-}
-
-export interface RefreshResponse {
+export interface AuthTokens {
     accessToken: string;
     refreshToken: string;
     refreshExpiresAt: string;
+}
+
+export interface AuthResponse {
+    data: AuthTokens;
 }
 
 export interface RecoverPayload {

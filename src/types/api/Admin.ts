@@ -7,31 +7,26 @@ export interface AdminPayload {
     count: number;
 }
 
+export interface PersonBase {
+    firstName?: string | null;
+    middleName?: string | null;
+    lastName?: string | null;
+    phoneNumber?: string | null;
+    telegram?: string | null;
+    city?: string | null;
+}
+
+export interface AdminUser extends PersonBase {
+    id: string;
+    avatarUrl?: string | null;
+}
+
 export interface AdminResponse {
     result: AdminUser[];
 }
 
-export interface AdminUser {
-    id: string;
-    lastName: string | null;
-    firstName: string | null;
-    middleName: string | null;
-    phoneNumber: string | null;
-    telegram: string | null;
-    city: string | null;
-    educationalInstitution: string | null;
-    courseNumber: number | null;
-    avatarUrl: string | null;
-}
-
-export interface UpdateAdminUserFormData {
+export interface UpdateAdminUserFormData extends PersonBase {
     file?: File | null;
-    lastName?: string;
-    firstName?: string;
-    middleName?: string;
-    phoneNumber?: string;
-    telegram?: string;
-    city?: string;
 }
 
 export type UpdateAdminUserResponse = AdminUser;

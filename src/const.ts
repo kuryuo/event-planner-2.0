@@ -34,11 +34,3 @@ export const CALENDAR_OPTIONS = {
     nowIndicator: true,
     selectable: true,
 };
-
-export const EVENTS = [
-    {title: 'Событие 1', start: '2025-11-10T10:00:00', end: '2025-11-10T16:40:00'},
-    {title: 'Событие 2', start: '2025-11-11T14:00:00', end: '2025-11-11T16:00:00'},
-    {title: 'Событие 3', start: '2025-11-11T14:00:00', end: '2025-11-11T16:00:00'},
-    {title: 'Событие 4', start: '2025-11-11T14:00:00', end: '2025-11-11T16:00:00'},
-    {title: 'Событие 5', start: '2025-11-11T14:00:00', end: '2025-11-11T16:00:00'},
-];

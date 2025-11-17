@@ -4,6 +4,7 @@ import Sidebar from "@/components/sidebar/Sidebar";
 import Filters from "@/components/filters/Filters";
 import styles from "./MainPage.module.scss";
 import type {CardBaseProps} from "@/ui/card/CardBase";
+import {useEvents} from "@/hooks/useEvents.ts";
 
 const subscriptionsData: CardBaseProps[] = [
     {title: 'Подписка 1', subtitle: 'Описание подписки 1', avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg'},
@@ -19,6 +20,8 @@ export default function MainPage() {
     const [subscriptions] = useState<CardBaseProps[]>(subscriptionsData);
     const [showFilters, setShowFilters] = useState(false);
 
+    const {events, isLoading, error} = useEvents();
+
     const handleCreateEvent = () => console.log("Создать мероприятие");
 
     return (
@@ -32,7 +35,10 @@ export default function MainPage() {
             </div>
 
             <div className={styles.calendar}>
-                <Calendar onFilterClick={() => setShowFilters(prev => !prev)}/>
+                <Calendar
+                    events={events}
+                    onFilterClick={() => setShowFilters(prev => !prev)}
+                />
 
                 {showFilters && <div className={styles.overlay}/>}
             </div>

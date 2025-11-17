@@ -16,6 +16,7 @@ export const useAuth = () => {
     const login = async (payload: LoginPayload) => {
         try {
             const result = await loginMutation(payload).unwrap();
+            console.log('Login response:', result);
             dispatch(setTokens(result.data));
             return {success: true};
         } catch (err: any) {

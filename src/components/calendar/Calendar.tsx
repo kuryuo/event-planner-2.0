@@ -4,12 +4,14 @@ import CalendarToolbar from '../calendar/toolbar/CalendarToolbar';
 import CalendarBody from './body/CalendarBody';
 import styles from './Calendar.module.scss';
 import {shiftMonth, shiftWeek} from '@/utils';
+import type {CalendarEventProps} from "@/hooks/useEvents.ts";
 
 interface CalendarProps {
     onFilterClick?: () => void;
+    events: CalendarEventProps[];
 }
 
-export default function Calendar({onFilterClick}: CalendarProps) {
+export default function Calendar({onFilterClick, events}: CalendarProps) {
     const calendarRef = useRef<FullCalendar | null>(null);
 
     const [currentView, setCurrentView] = useState<'dayGridMonth' | 'timeGridWeek'>('dayGridMonth');
@@ -62,6 +64,7 @@ export default function Calendar({onFilterClick}: CalendarProps) {
             <CalendarBody
                 calendarRef={calendarRef}
                 currentView={currentView}
+                events={events}
             />
         </div>
     );

@@ -1,6 +1,5 @@
-import {createSlice} from '@reduxjs/toolkit';
-import type {PayloadAction} from '@reduxjs/toolkit';
-import type {RefreshResponse} from '@/types/api/Auth';
+import {createSlice, type PayloadAction} from '@reduxjs/toolkit';
+import type {AuthTokens} from '@/types/api/Auth';
 
 interface AuthState {
     accessToken: string | null;
@@ -8,21 +7,27 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-    accessToken: null,
-    refreshToken: null,
+    accessToken: localStorage.getItem('accessToken') || null,
+    refreshToken: localStorage.getItem('refreshToken') || null,
 };
 
 export const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        setTokens: (state, action: PayloadAction<RefreshResponse>) => {
+        setTokens: (state, action: PayloadAction<AuthTokens>) => {
             state.accessToken = action.payload.accessToken;
             state.refreshToken = action.payload.refreshToken;
+
+            localStorage.setItem('accessToken', action.payload.accessToken);
+            localStorage.setItem('refreshToken', action.payload.refreshToken);
         },
         clearTokens: (state) => {
             state.accessToken = null;
             state.refreshToken = null;
+
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
         },
     },
 });

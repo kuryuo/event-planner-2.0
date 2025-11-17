@@ -4,7 +4,6 @@ import type {
     LoginPayload,
     AuthResponse,
     RefreshPayload,
-    RefreshResponse,
     RecoverPayload
 } from '@/types/api/Auth';
 
@@ -26,7 +25,7 @@ export const authApi = baseApi.injectEndpoints({
             }),
         }),
 
-        refresh: builder.mutation<RefreshResponse, RefreshPayload>({
+        refresh: builder.mutation<AuthResponse, RefreshPayload>({
             query: (body) => ({
                 url: 'auth/refresh',
                 method: 'POST',
