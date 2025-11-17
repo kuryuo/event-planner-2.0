@@ -9,6 +9,9 @@ import type {
 
 export const authApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
+        /**
+         * Регистрация нового пользователя
+         */
         register: builder.mutation<AuthResponse, RegisterPayload>({
             query: (body) => ({
                 url: 'auth/register',
@@ -16,7 +19,9 @@ export const authApi = baseApi.injectEndpoints({
                 body,
             }),
         }),
-
+        /**
+         * Авторизация пользователя
+         */
         login: builder.mutation<AuthResponse, LoginPayload>({
             query: (body) => ({
                 url: 'auth/login',
@@ -24,7 +29,9 @@ export const authApi = baseApi.injectEndpoints({
                 body,
             }),
         }),
-
+        /**
+         * Обновление access/refresh токенов
+         */
         refresh: builder.mutation<AuthResponse, RefreshPayload>({
             query: (body) => ({
                 url: 'auth/refresh',
@@ -32,7 +39,9 @@ export const authApi = baseApi.injectEndpoints({
                 body,
             }),
         }),
-
+        /**
+         * Восстановление пароля (отправка письма)
+         */
         recoverPassword: builder.mutation<void, RecoverPayload>({
             query: (body) => ({
                 url: 'auth/recover-password',
@@ -44,4 +53,9 @@ export const authApi = baseApi.injectEndpoints({
     overrideExisting: false,
 });
 
-export const {useRegisterMutation, useLoginMutation, useRefreshMutation, useRecoverPasswordMutation} = authApi;
+export const {
+    useRegisterMutation,
+    useLoginMutation,
+    useRefreshMutation,
+    useRecoverPasswordMutation
+} = authApi;

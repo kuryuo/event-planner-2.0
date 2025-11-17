@@ -3,7 +3,9 @@ import type {GetEventsResponse, GetEventsPayload, GetEventByIdResponse} from "@/
 
 export const eventApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
-        //Поиск мероприятий по фильтрам
+        /**
+         * Поиск мероприятий по фильтрам
+         */
         getEvents: builder.query<GetEventsResponse, GetEventsPayload>({
             query: (params) => ({
                 url: '/events',
@@ -11,7 +13,9 @@ export const eventApi = baseApi.injectEndpoints({
                 params,
             }),
         }),
-        //Получить мероприятие по ID
+        /**
+         * Получить мероприятия по ID
+         */
         getEventById: builder.query<GetEventByIdResponse, string>({
             query: (eventId) => ({
                 url: `/events/${eventId}`,
