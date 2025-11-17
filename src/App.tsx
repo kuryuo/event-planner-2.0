@@ -1,5 +1,6 @@
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import MainPage from "@/pages/main/MainPage.tsx";
+import AuthPage from "@/pages/auth/AuthPage.tsx";
 
 function App() {
 
@@ -16,7 +17,8 @@ function App() {
         // </div>
         <Router>
             <Routes>
-                <Route path="/" element={<MainPage/>}/>
+                <Route path="/" element={<AuthPage/>}/>
+                <Route path="/main" element={<MainPage/>}/>
             </Routes>
         </Router>
     );
