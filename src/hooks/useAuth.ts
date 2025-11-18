@@ -1,3 +1,4 @@
+import {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import type {RootState, AppDispatch} from '@/store/store';
 import {setTokens, clearTokens} from '@/store/authSlice';
@@ -13,24 +14,38 @@ export const useAuth = () => {
     const [registerMutation] = useRegisterMutation();
     const [recoverPasswordMutation] = useRecoverPasswordMutation();
 
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
     const login = async (payload: LoginPayload) => {
+        setLoading(true);
+        setError(null);
         try {
             const result = await loginMutation(payload).unwrap();
-            console.log('Login response:', result);
             dispatch(setTokens(result.data));
+            setLoading(false);
             return {success: true};
         } catch (err: any) {
-            return {success: false, error: err.data?.message || err.message};
+            const message = err.data?.message || err.message;
+            setError(message);
+            setLoading(false);
+            return {success: false, error: message};
         }
     };
 
     const register = async (payload: RegisterPayload) => {
+        setLoading(true);
+        setError(null);
         try {
             const result = await registerMutation(payload).unwrap();
             dispatch(setTokens(result.data));
+            setLoading(false);
             return {success: true};
         } catch (err: any) {
-            return {success: false, error: err.data?.message || err.message};
+            const message = err.data?.message || err.message;
+            setError(message);
+            setLoading(false);
+            return {success: false, error: message};
         }
     };
 
@@ -55,5 +70,7 @@ export const useAuth = () => {
         logout,
         recoverPassword,
         isAuthenticated: !!auth.accessToken,
+        loading,
+        error,
     };
 };

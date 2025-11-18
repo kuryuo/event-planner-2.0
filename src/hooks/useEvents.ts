@@ -1,27 +1,22 @@
+import {useEffect} from 'react';
 import {useGetEventsQuery} from '@/services/api/eventApi';
-import type {GetEventsPayload} from "@/types/api/Event.ts";
+import {useDispatch, useSelector} from 'react-redux';
+import {setEvents} from '@/store/eventSlice';
+import type {EventData} from '@/types/api/Event';
+import type {RootState} from "@/store/store.ts";
 
-export interface CalendarEventProps {
-    id: string;
-    title: string;
-    start: Date;
-    end: Date;
-}
+export const useEvents = (filters?: any) => {
+    const dispatch = useDispatch();
+    const events = useSelector((state: RootState) => state.event.events) as EventData[];
 
-export const useEvents = (filters?: Partial<GetEventsPayload>) => {
-    const payload = {count: 10, ...filters};
+    const {data, isLoading, error} = useGetEventsQuery(filters || {count: 50});
 
-    const {data, isLoading, error} = useGetEventsQuery(payload);
+    useEffect(() => {
+        if (data?.result) {
+            dispatch(setEvents(data.result));
+        }
+    }, [data, dispatch]);
 
-    const events: CalendarEventProps[] = (data?.result.map(evt => ({
-        id: evt.id ?? 'no-id',
-        title: evt.name || 'Без названия',
-        start: new Date(evt.startDate ?? new Date().toISOString()),
-        end: new Date(evt.endDate ?? new Date().toISOString()),
-    })) ?? []);
-
-    console.log('API events:', data?.result);
-    console.log('Calendar events:', events);
-
+    // console.log('Events in state:', events);
     return {events, isLoading, error};
 };

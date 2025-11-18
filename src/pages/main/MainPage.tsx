@@ -20,7 +20,7 @@ export default function MainPage() {
     const [subscriptions] = useState<CardBaseProps[]>(subscriptionsData);
     const [showFilters, setShowFilters] = useState(false);
 
-    const {events, isLoading, error} = useEvents();
+    useEvents();
 
     const handleCreateEvent = () => console.log("Создать мероприятие");
 
@@ -36,7 +36,6 @@ export default function MainPage() {
 
             <div className={styles.calendar}>
                 <Calendar
-                    events={events}
                     onFilterClick={() => setShowFilters(prev => !prev)}
                 />
 
