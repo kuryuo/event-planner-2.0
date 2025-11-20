@@ -1,0 +1,46 @@
+@use '@/typography-variables' as ty;
+
+.eventItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-6);
+}
+
+.time {
+  width: 155px;
+  color: var(--content-primary);
+  @include ty.font(body-m, regular);
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  flex: 1;
+}
+
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  @include ty.font(subtitle-m, semibold);
+}
+
+.description {
+  @include ty.font(caption-m, regular);
+}
+
+.buttonWrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}

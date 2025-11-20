@@ -1,0 +1,20 @@
+@use '@/typography-variables' as ty;
+
+.eventsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+  padding: var(--spacing-6);
+}
+
+.dayGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+.dateHeader {
+  @include ty.font(title-s, semibold);
+  border-bottom: 1px solid var(--bg-tertiary);
+  padding-bottom: var(--spacing-1);
+}

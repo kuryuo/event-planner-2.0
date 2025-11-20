@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import ChevronLeft from '@/assets/img/icon-m/chevron-left.svg';
 import ChevronRight from '@/assets/img/icon-m/chevron-right.svg';
 import ViewStacked from '@/assets/img/icon-m/view-stacked.svg';
+import Calendar from '@/assets/img/icon-m/calendar.svg'
 import Filter from '@/assets/img/icon-m/filter.svg';
 import {formatCalendarLabel} from '@/utils';
 
@@ -16,6 +17,7 @@ interface CalendarToolbarProps {
     onNext: () => void;
     onViewStackedClick?: () => void;
     onFilterClick?: () => void;
+    showingList?: boolean;
 }
 
 export default function CalendarToolbar({
@@ -26,6 +28,7 @@ export default function CalendarToolbar({
                                             onNext,
                                             onViewStackedClick,
                                             onFilterClick,
+                                            showingList
                                         }: CalendarToolbarProps) {
 
     return (
@@ -41,30 +44,39 @@ export default function CalendarToolbar({
             </div>
 
             <div className={styles.rightPart}>
-                <div
-                    className={clsx(
-                        styles.buttonsWrapper,
-                        currentView === 'timeGridWeek' && styles.weekActive
-                    )}
-                >
-                    <div className={styles.slider}/>
-                    <div className={clsx(styles.toolbarBtn, currentView === 'dayGridMonth' && styles.active)}
-                         onClick={() => onViewChange('dayGridMonth')}>
-                        Месяц
+                {!showingList && (
+                    <div
+                        className={clsx(
+                            styles.buttonsWrapper,
+                            currentView === 'timeGridWeek' && styles.weekActive
+                        )}
+                    >
+                        <div className={styles.slider}/>
+                        <div className={clsx(styles.toolbarBtn, currentView === 'dayGridMonth' && styles.active)}
+                             onClick={() => onViewChange('dayGridMonth')}>
+                            Месяц
+                        </div>
+                        <div className={clsx(styles.toolbarBtn, currentView === 'timeGridWeek' && styles.active)}
+                             onClick={() => onViewChange('timeGridWeek')}>
+                            Неделя
+                        </div>
                     </div>
-                    <div className={clsx(styles.toolbarBtn, currentView === 'timeGridWeek' && styles.active)}
-                         onClick={() => onViewChange('timeGridWeek')}>
-                        Неделя
-                    </div>
-                </div>
+                )}
 
                 <div className={styles.iconButtons}>
-                    <button className={styles.iconBtn} onClick={onViewStackedClick}>
-                        <img src={ViewStacked} alt="Вид"/>
-                    </button>
-                    <button className={styles.iconBtn} onClick={onFilterClick}>
-                        <img src={Filter} alt="Фильтр"/>
-                    </button>
+                    {onViewStackedClick && (
+                        <button className={styles.iconBtn} onClick={onViewStackedClick}>
+                            <img
+                                src={showingList ? Calendar : ViewStacked}
+                                alt="Вид"
+                            />
+                        </button>
+                    )}
+                    {onFilterClick && (
+                        <button className={styles.iconBtn} onClick={onFilterClick}>
+                            <img src={Filter} alt="Фильтр"/>
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
