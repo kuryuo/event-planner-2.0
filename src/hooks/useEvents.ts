@@ -17,6 +17,5 @@ export const useEvents = (filters?: any) => {
         }
     }, [data, dispatch]);
 
-    // console.log('Events in state:', events);
     return {events, isLoading, error};
 };

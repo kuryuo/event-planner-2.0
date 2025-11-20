@@ -16,7 +16,5 @@ export const useProfile = () => {
         }
     }, [data, dispatch]);
 
-    console.log('Profile in state:', profile);
-
     return {profile, isLoading, error};
 }

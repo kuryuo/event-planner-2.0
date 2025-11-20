@@ -5,6 +5,7 @@ import Filters from "@/components/filters/Filters";
 import styles from "./MainPage.module.scss";
 import type {CardBaseProps} from "@/ui/card/CardBase";
 import {useEvents} from "@/hooks/useEvents.ts";
+import {useProfile} from "@/hooks/useProfile.ts";
 
 const subscriptionsData: CardBaseProps[] = [
     {title: 'Подписка 1', subtitle: 'Описание подписки 1', avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg'},
@@ -14,12 +15,14 @@ const subscriptionsData: CardBaseProps[] = [
         avatarUrl: 'https://randomuser.me/api/portraits/women/44.jpg'
     },
     {title: 'Подписка 3', subtitle: 'Описание подписки 3', avatarUrl: 'https://randomuser.me/api/portraits/men/56.jpg'},
+    {title: 'Подписка 3', subtitle: 'Описание подписки 3', avatarUrl: 'https://randomuser.me/api/portraits/men/56.jpg'},
 ];
 
 export default function MainPage() {
     const [subscriptions] = useState<CardBaseProps[]>(subscriptionsData);
     const [showFilters, setShowFilters] = useState(false);
 
+    useProfile();
     useEvents();
 
     const handleCreateEvent = () => console.log("Создать мероприятие");

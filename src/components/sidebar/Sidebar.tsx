@@ -7,6 +7,8 @@ import styles from './Sidebar.module.scss';
 import type {CardBaseProps} from '@/ui/card/CardBase';
 import NextEvent from "@/components/next-event/NextEvent.tsx";
 import clsx from "clsx";
+import {useProfile} from "@/hooks/useProfile.ts";
+import {buildImageUrl} from "@/utils/buildImageUrl.ts";
 
 interface SidebarProps {
     subscriptions: CardBaseProps[];
@@ -15,13 +17,20 @@ interface SidebarProps {
 }
 
 export default function Sidebar({subscriptions, onCreateEvent, notificationCount = 3}: SidebarProps) {
+    const {profile, isLoading} = useProfile();
+    const fallbackAvatar = 'https://api.dicebear.com/7.x/shapes/png?size=200&radius=50';
+
     return (
         <div className={styles.sidebar}>
             <div className={styles.block}>
                 <CardExtra
-                    title="Уведомления"
-                    subtitle="Все уведомления"
-                    avatarUrl='https://randomuser.me/api/portraits/men/56.jpg'
+                    title={`${profile?.lastName ?? ''} ${profile?.firstName ?? ''} ${profile?.middleName ?? ''}`.trim()}
+                    subtitle=""
+                    avatarUrl={
+                        profile?.avatarUrl
+                            ? buildImageUrl(profile.avatarUrl)!
+                            : fallbackAvatar
+                    }
                     addon={
                         <NotificationBadge icon={<img src={bell} alt="Уведомления"/>} count={notificationCount}/>
                     }

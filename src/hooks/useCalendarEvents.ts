@@ -13,8 +13,6 @@ export interface CalendarEventProps {
 export const useCalendarEvents = () => {
     const events = useSelector((state: RootState) => state.event.events) as EventData[];
 
-    // console.log('Events from Redux:', events);
-
     const calendarEvents: CalendarEventProps[] = useMemo(() => {
         const mapped = events.map(e => ({
             id: e.id!,
@@ -22,7 +20,6 @@ export const useCalendarEvents = () => {
             start: new Date(e.startDate ?? new Date().toISOString()),
             end: new Date(e.endDate ?? new Date().toISOString()),
         }));
-        // console.log('CalendarEvents mapped:', mapped);
         return mapped;
     }, [events]);
 
