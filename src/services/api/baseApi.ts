@@ -1,55 +1,58 @@
-import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import type {RootState} from '@/store/store';
-import {setTokens, clearTokens} from '@/store/authSlice';
-import type {AuthTokens} from '@/types/api/Auth';
+import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
+import type {RootState} from '@/store/store'
+import {setTokens, clearTokens} from '@/store/authSlice'
 
 const rawBaseQuery = fetchBaseQuery({
     baseUrl: 'http://95.82.231.190:5002/api/',
     prepareHeaders: (headers, {getState}) => {
-        const token = (getState() as RootState).auth.accessToken;
-        if (token) headers.set('Authorization', `Bearer ${token}`);
-        return headers;
+        const token = (getState() as RootState).auth.accessToken
+        if (token) {
+            headers.set('Authorization', `Bearer ${token}`)
+        } else {
+        }
+        return headers
     },
-});
+})
 
-export const baseApi = createApi({
-    baseQuery: async (args, api, extraOptions) => {
-        console.log('Выполняем запрос:', args);
+const baseQueryWithReauth: typeof rawBaseQuery = async (args, api, extraOptions) => {
 
-        let result = await rawBaseQuery(args, api, extraOptions);
+    let result: any = await rawBaseQuery(args, api, extraOptions)
 
-        if (result.error && result.error.status === 401) {
-            console.log('Получена 401, пытаемся обновить токен...');
-            const refreshToken = (api.getState() as RootState).auth.refreshToken;
+    if (result.error?.status === 401) {
 
-            if (refreshToken) {
-                const refreshResult = await rawBaseQuery(
-                    {url: 'auth/refresh', method: 'POST', body: {refreshToken}},
-                    api,
-                    extraOptions
-                );
-
-                if (refreshResult.data) {
-                    const tokens = refreshResult.data as AuthTokens;
-                    api.dispatch(setTokens(tokens));
-
-                    const retryArgs = typeof args === 'string' ? {url: args} : {...args};
-                    result = await rawBaseQuery(retryArgs, api, extraOptions);
-                } else {
-                    console.log('Не удалось обновить токен, выполняем logout');
-                    api.dispatch(clearTokens());
-                }
-            } else {
-                console.log('Нет refresh токена, выполняем logout');
-                api.dispatch(clearTokens());
-            }
+        const refreshToken = (api.getState() as RootState).auth.refreshToken
+        if (!refreshToken) {
+            api.dispatch(clearTokens())
+            return result
         }
 
-        console.log('Результат запроса:', result);
-        return result;
-    },
+        const refreshResult: any = await rawBaseQuery(
+            {url: 'auth/refresh', method: 'POST', body: {refreshToken}},
+            api,
+            extraOptions
+        )
 
+        if (!refreshResult.data?.data) {
+            api.dispatch(clearTokens())
+            return result
+        }
+
+        const newTokens = refreshResult.data.data
+
+        api.dispatch(setTokens(newTokens))
+
+        const newArgs =
+            typeof args === 'string'
+                ? {url: args, headers: {Authorization: `Bearer ${newTokens.accessToken}`}}
+                : {...args, headers: {...(args.headers || {}), Authorization: `Bearer ${newTokens.accessToken}`}}
+        result = await rawBaseQuery(newArgs, api, extraOptions)
+    }
+
+    return result
+}
+
+export const baseApi = createApi({
+    baseQuery: baseQueryWithReauth,
     tagTypes: [],
     endpoints: () => ({}),
-});
-
+})
