@@ -1,0 +1,18 @@
+.pageWrapper {
+  display: flex;
+  background-color: var(--bg-tertiary);
+  padding: var(--spacing-3);
+  height: 100vh;
+  gap: var(--spacing-3);
+}
+
+.sidebar {
+  overflow: auto;
+  height: 100%;
+}
+
+.form {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+}

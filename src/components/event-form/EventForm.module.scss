@@ -1,0 +1,34 @@
+@use '@/typography-variables' as ty;
+
+.formWrapper {
+  background-color: var(--bg-primary);
+  border-radius: var(--spacing-6);
+}
+
+.form {
+  padding: var(--spacing-10) var(--spacing-6);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-6);
+  box-shadow: var(--lvl1);
+}
+
+.input {
+  @include ty.font(title-m, semibold);
+  flex: 1;
+  outline: none;
+  border: none;
+}
+
+.closeButton {
+  background: transparent;
+  border: none;
+  padding: var(--spacing-2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}

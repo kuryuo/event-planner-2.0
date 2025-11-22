@@ -1,0 +1,84 @@
+@use '@/typography-variables' as ty;
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  @include ty.font(subtitle-m, semibold);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background-color: red;
+  border-radius: 50%;
+}
+
+.inputs {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: var(--border-disabled);
+  border-radius: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+}
+
+.icon {
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.date,
+.time {
+  @include ty.font(body-m, regular);
+  background-color: var(--border-disabled);
+  border: none;
+  outline: none;
+  border-radius: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-4);
+  color: var(--content-primary);
+
+  &::placeholder {
+    color: var(--content-placeholder);
+  }
+}
+
+.date {
+  width: 160px;
+}
+
+.time {
+  width: 90px;
+  text-align: center;
+
+  &::-webkit-calendar-picker-indicator,
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    display: none;
+    -webkit-appearance: none;
+  }
+
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.sep {
+  @include ty.font(body-m, regular);
+}
+
+.picker {
+  position: absolute;
+  padding: var(--spacing-2);
+  top: calc(100% + var(--spacing-2));
+  left: 0;
+  z-index: 1000;
+  background-color: var(--bg-primary);
+  border-radius: var(--spacing-2);
+  box-shadow: var(--lvl1);
+}

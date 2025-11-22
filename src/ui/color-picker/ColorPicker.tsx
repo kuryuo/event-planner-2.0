@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import {useState, useRef} from "react";
 import styles from "./ColorPicker.module.scss";
 import ChevronDownImg from "../../assets/img/icon-m/chevron-down.svg";
 import ChevronUpImg from "../../assets/img/icon-m/chevron-up.svg";
+import {useClickOutside} from "@/hooks/useClickOutside.ts";
 
 const PREDEFINED_COLORS = [
     "var(--pink-100)",
@@ -23,7 +24,7 @@ interface ColorPickerProps {
     onChange?: (color: string) => void;
 }
 
-const ColorPicker = ({ value, onChange }: ColorPickerProps) => {
+const ColorPicker = ({value, onChange}: ColorPickerProps) => {
     const [open, setOpen] = useState(false);
     const [selectedColor, setSelectedColor] = useState(value || PREDEFINED_COLORS[0]);
     const pickerRef = useRef<HTMLDivElement>(null);
@@ -36,20 +37,12 @@ const ColorPicker = ({ value, onChange }: ColorPickerProps) => {
         onChange?.(color);
     };
 
-    useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
-            if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
-                setOpen(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
+    useClickOutside(pickerRef, () => setOpen(false), open);
 
     return (
         <div className={styles.colorPicker} ref={pickerRef}>
             <div className={styles.selected} onClick={toggleOpen}>
-                <div className={styles.color} style={{ backgroundColor: selectedColor }} />
+                <div className={styles.color} style={{backgroundColor: selectedColor}}/>
                 <img
                     src={open ? ChevronUpImg : ChevronDownImg}
                     alt="Toggle"
@@ -67,7 +60,7 @@ const ColorPicker = ({ value, onChange }: ColorPickerProps) => {
                         >
                             <div
                                 className={styles.option}
-                                style={{ backgroundColor: color }}
+                                style={{backgroundColor: color}}
                             />
                         </div>
                     ))}
