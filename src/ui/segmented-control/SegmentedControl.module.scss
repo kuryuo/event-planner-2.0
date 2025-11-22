@@ -12,14 +12,12 @@
 }
 
 .segment {
-  flex: 1;
+  flex: 0 0 140px;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
   position: relative;
-  width: 140px;
-  height: 36px;
   z-index: 1;
   @include ty.font(body-s, regular);
   transition: color 0.2s;
@@ -35,11 +33,12 @@
 
 .slider {
   position: absolute;
-  top: 4px;
-  bottom: 4px;
+  top: 0;
+  bottom: 0;
+  width: 140px;
   left: 0;
   border-radius: var(--radius-2);
   background-color: var(--bg-brand-purple);
-  transition: left 0.3s;
+  transition: left 0.3s ease;
   z-index: 0;
 }

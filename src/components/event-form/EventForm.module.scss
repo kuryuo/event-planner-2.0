@@ -6,7 +6,21 @@
 }
 
 .form {
+  display: flex;
+  flex-direction: column;
   padding: var(--spacing-10) var(--spacing-6);
+  gap: var(--spacing-12);
+  width: 700px;
+}
+
+.date {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+
+  > *:nth-child(3) {
+    margin-top: var(--spacing-6);
+  }
 }
 
 .header {
@@ -31,4 +45,25 @@
   cursor: pointer;
   display: flex;
   align-items: center;
+}
+
+.avatar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.avatarRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.title {
+  @include ty.font(subtitle-m, semibold);
+}
+
+.hint {
+  @include ty.font(caption-m, regular);
+  color: var(--content-secondary);
 }

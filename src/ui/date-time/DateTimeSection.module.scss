@@ -1,10 +1,9 @@
 @use '@/typography-variables' as ty;
 
-.title {
+.section {
   display: flex;
-  align-items: center;
-  gap: var(--spacing-2);
-  @include ty.font(subtitle-m, semibold);
+  flex-direction: column;
+  gap: var(--spacing-4)
 }
 
 .dot {
@@ -21,6 +20,7 @@
 }
 
 .wrapper {
+  height: 44px;
   position: relative;
   display: flex;
   align-items: center;
@@ -50,7 +50,7 @@
 }
 
 .date {
-  width: 160px;
+  width: 120px;
 }
 
 .time {
@@ -82,3 +82,4 @@
   border-radius: var(--spacing-2);
   box-shadow: var(--lvl1);
 }
+

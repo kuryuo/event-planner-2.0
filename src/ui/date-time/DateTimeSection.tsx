@@ -31,10 +31,6 @@ export default function DateTimeSection() {
 
     return (
         <div className={styles.section}>
-            <div className={styles.title}>
-                <span>Дата и место</span>
-                <span className={styles.dot}></span>
-            </div>
             <div className={styles.inputs}>
                 <div className={styles.wrapper} ref={startDatePickerRef}>
                     <img

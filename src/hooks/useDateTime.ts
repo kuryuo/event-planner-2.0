@@ -1,6 +1,5 @@
 import {useDispatch, useSelector} from 'react-redux';
 import {format} from 'date-fns';
-import {ru} from 'date-fns/locale';
 import type {RootState, AppDispatch} from '@/store/store';
 import {
     setStartDate,
@@ -27,10 +26,10 @@ export const useDateTime = () => {
         showEndDatePicker: dateTime.showEndDatePicker,
 
         formattedStartDate: startDate
-            ? format(startDate, 'd MMM yyyy', {locale: ru})
+            ? format(startDate, 'd.MM.yyyy')
             : '',
         formattedEndDate: endDate
-            ? format(endDate, 'd MMM yyyy', {locale: ru})
+            ? format(endDate, 'd.MM.yyyy')
             : '',
 
         setStartTime: (time: string) => dispatch(setStartTime(time)),
