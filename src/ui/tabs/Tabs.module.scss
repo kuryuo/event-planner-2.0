@@ -1,15 +1,12 @@
 @use '@/typography-variables' as ty;
 
 .tabsContainer {
-  width: 40%;
   border-bottom: 1px solid var(--border-color);
 }
 
 .tabs {
   display: flex;
   position: relative;
-  justify-content: center;
-  gap: var(--spacing-6);
 }
 
 .tabItem {
@@ -17,7 +14,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-2);
-  padding: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-12);
   cursor: pointer;
   transition: color 0.2s;
 

@@ -1,4 +1,4 @@
-import EventItem from '@/ui/event-item/EventItem';
+import EventItem from '@/ui/event-item/EventItem.tsx';
 import styles from './EventsList.module.scss';
 import {format, parseISO} from 'date-fns';
 import {ru} from 'date-fns/locale';

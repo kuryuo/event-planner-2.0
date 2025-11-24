@@ -1,7 +1,7 @@
-import {CardExtra} from '@/ui/card/CardExtra';
-import type {CardBaseProps} from '@/ui/card/CardBase';
-import Badge from '@/ui/badge/Badge';
-import styles from './Sublist.module.scss';
+import {CardExtra} from '@/ui/card/CardExtra.tsx';
+import type {CardBaseProps} from '@/ui/card/CardBase.tsx';
+import Badge from '@/ui/badge/Badge.tsx';
+import styles from './SubList.module.scss';
 
 interface SublistProps {
     title?: string;

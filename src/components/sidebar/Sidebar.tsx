@@ -1,11 +1,11 @@
-import {CardExtra} from '@/ui/card/CardExtra';
-import {Sublist} from '@/components/sub-list/SubList';
-import {NotificationBadge} from '@/ui/notification-badge/NotificationBadge';
-import CircleButton from '@/ui/button-circle/ButtonCircle';
+import {CardExtra} from '@/ui/card/CardExtra.tsx';
+import {Sublist} from '@/components/sidebar/sub-list/SubList.tsx';
+import {NotificationBadge} from '@/ui/notification-badge/NotificationBadge.tsx';
+import CircleButton from '@/ui/button-circle/ButtonCircle.tsx';
 import bell from '@/assets/img/icon-l/bell.svg';
 import styles from './Sidebar.module.scss';
-import type {CardBaseProps} from '@/ui/card/CardBase';
-import NextEvent from "@/components/next-event/NextEvent.tsx";
+import type {CardBaseProps} from '@/ui/card/CardBase.tsx';
+import NextEvent from "@/components/sidebar/next-event/NextEvent.tsx";
 import clsx from "clsx";
 import {useProfile} from "@/hooks/useProfile.ts";
 import {buildImageUrl} from "@/utils/buildImageUrl.ts";

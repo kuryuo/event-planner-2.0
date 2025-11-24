@@ -4,8 +4,8 @@ import TextField from '@/ui/text-field/TextField.tsx';
 import Checkbox from '@/ui/checkbox/Checkbox';
 import CloseIcon from '@/assets/img/icon-m/x.svg';
 import TextFieldAdornmentIcon from '@/assets/img/icon-m/calendar.svg';
-import Organizers from "@/components/organizers/Organizers";
-import Category from "@/components/сategory/Category";
+import Organizers from "@/components/filters/organizers/Organizers";
+import Category from "@/components/filters/сategory/Category";
 import Switch from "@/ui/switch/Switch.tsx";
 import Button from "@/ui/button/Button";
 

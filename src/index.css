@@ -141,7 +141,7 @@
     --content-negative: var(--system-red-100);
     --content-notice: var(--system-orange-100);
     --content-positive: var(--system-green-100);
-    --content-link: var(--gray-100);
+    --content-link: var(--gray-60);
     --content-link-hover: var(--brand-green-100);
     --content-link-press: var(--brand-green-120);
     --content-pink: var(--pink-100);

@@ -1,5 +1,5 @@
 import styles from "./NextEvent.module.scss";
-import Button from "@/ui/button/Button";
+import Button from "@/ui/button/Button.tsx";
 
 interface NextEventProps {
     title: string;
@@ -9,11 +9,11 @@ interface NextEventProps {
 }
 
 export default function NextEvent({
-                              title,
-                              date,
-                              onAttend,
-                              onDetails,
-                          }: NextEventProps) {
+                                      title,
+                                      date,
+                                      onAttend,
+                                      onDetails,
+                                  }: NextEventProps) {
     return (
         <div className={styles.nextEvent}>
             <div className={styles.label}>Скоро</div>
