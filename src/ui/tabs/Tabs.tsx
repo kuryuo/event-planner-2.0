@@ -66,9 +66,18 @@ const Tabs = ({items, initialIndex = 0, onChange}: TabsProps) => {
                         }}
                         onMouseLeave={() => setHoverStyle(null)}
                     >
-                        {item.icon && <span className={styles.icon}>{item.icon}</span>}
+                        <span className={styles.icon}>
+                        {item.icon || <span className={styles.iconPlaceholder}/>}
+                    </span>
                         <span className={styles.label}>{item.label}</span>
-                        {item.badgeCount !== undefined && <Badge count={item.badgeCount}/>}
+
+                        <span className={styles.icon}>
+                        {item.badgeCount !== undefined ? (
+                            <Badge count={item.badgeCount}/>
+                        ) : (
+                            <span className={styles.iconPlaceholder}/>
+                        )}
+                    </span>
                     </div>
                 ))}
 

@@ -83,17 +83,15 @@
 
 .iconLeft,
 .iconRight {
-  display: flex;
-  align-items: center;
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
   justify-content: center;
+  align-items: center;
 }
 
-.iconLeft {
-  margin-right: 8px;
-}
-
-.iconRight {
-  margin-left: 8px;
+.iconPlaceholder {
+  visibility: hidden;
 }
 
 .helperText {

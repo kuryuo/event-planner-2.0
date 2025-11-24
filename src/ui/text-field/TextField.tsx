@@ -29,13 +29,15 @@ export default function TextField({
 
             <div
                 className={`
-                    ${styles.wrapper}
-                    ${styles[`size${fieldSize.toUpperCase()}`]}
-                    ${error ? styles.error : ''}
-                    ${disabled ? styles.disabled : ''}
-                `}
+        ${styles.wrapper}
+        ${styles[`size${fieldSize.toUpperCase()}`]}
+        ${error ? styles.error : ''}
+        ${disabled ? styles.disabled : ''}
+    `}
             >
-                {leftIcon && <span className={styles.iconLeft}>{leftIcon}</span>}
+                <span className={styles.iconLeft}>
+        {leftIcon || <span className={styles.iconPlaceholder}/>}
+    </span>
 
                 <input
                     placeholder={placeholder}
@@ -44,7 +46,9 @@ export default function TextField({
                     {...props}
                 />
 
-                {rightIcon && <span className={styles.iconRight}>{rightIcon}</span>}
+                <span className={styles.iconRight}>
+        {rightIcon || <span className={styles.iconPlaceholder}/>}
+    </span>
             </div>
 
             {helperText && (

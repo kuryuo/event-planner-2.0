@@ -23,9 +23,15 @@
   }
 
   .icon {
-    display: flex;
-    align-items: center;
+    display: inline-flex;
+    width: 24px;
+    height: 24px;
     justify-content: center;
+    align-items: center;
+  }
+
+  .iconPlaceholder {
+    visibility: hidden;
   }
 
   .label {

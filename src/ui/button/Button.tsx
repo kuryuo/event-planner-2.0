@@ -31,9 +31,13 @@ export default function Button({
 
     return (
         <button className={buttonClass} {...props}>
-            {leftIcon && <span className={styles.iconLeft}>{leftIcon}</span>}
+            <span className={styles.iconLeft}>
+        {leftIcon || <span className={styles.iconPlaceholder}/>}
+    </span>
             <span className={styles.content}>{children}</span>
-            {rightIcon && <span className={styles.iconRight}>{rightIcon}</span>}
+            <span className={styles.iconRight}>
+        {rightIcon || <span className={styles.iconPlaceholder}/>}
+    </span>
         </button>
     );
 }

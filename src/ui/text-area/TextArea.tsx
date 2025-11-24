@@ -49,17 +49,22 @@ export default function TextArea({
             )}
 
             <div className={`${styles.wrapper} ${error ? styles.error : ''} ${disabled ? styles.disabled : ''}`}>
-                {leftIcon && <span className={styles.iconLeft}>{leftIcon}</span>}
+                <span className={styles.iconLeft}>
+        {leftIcon || <span className={styles.iconPlaceholder}/>}
+    </span>
+
                 <textarea
                     ref={textareaRef}
                     className={styles.textarea}
                     disabled={disabled}
                     value={value}
                     onChange={handleChange}
-                    placeholder='placeholder'
+                    placeholder="placeholder"
                     {...props}
                 />
-                {rightIcon && <span className={styles.iconRight}>{rightIcon}</span>}
+                <span className={styles.iconRight}>
+        {rightIcon || <span className={styles.iconPlaceholder}/>}
+    </span>
             </div>
 
             {helperText && (

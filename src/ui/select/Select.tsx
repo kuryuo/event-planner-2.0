@@ -43,7 +43,9 @@ export default function Select({
             )}
 
             <div className={`${styles.wrapper} ${error ? styles.error : ''} ${disabled ? styles.disabled : ''}`}>
-                {leftIcon && <span className={styles.iconLeft}>{leftIcon}</span>}
+                <span className={styles.iconLeft}>
+        {leftIcon || <span className={styles.iconPlaceholder}/>}
+    </span>
 
                 <input
                     placeholder="placeholder"
@@ -53,7 +55,6 @@ export default function Select({
                     onChange={(e) => setValue(e.target.value)}
                     {...props}
                 />
-
                 <span
                     className={styles.iconRight}
                     onClick={(e) => {
@@ -62,13 +63,13 @@ export default function Select({
                     }}
                     style={{cursor: disabled ? 'not-allowed' : 'pointer'}}
                 >
-                    {rightIcon ?? (
-                        <img
-                            src={isOpen ? ChevronUpImg : ChevronDownImg}
-                            alt={isOpen ? 'chevron-up' : 'chevron-down'}
-                        />
-                    )}
-                </span>
+        {rightIcon ?? (
+            <img
+                src={isOpen ? ChevronUpImg : ChevronDownImg}
+                alt={isOpen ? 'chevron-up' : 'chevron-down'}
+            />
+        )}
+    </span>
             </div>
 
             {helperText && !isOpen && (

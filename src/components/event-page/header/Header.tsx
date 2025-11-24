@@ -6,7 +6,7 @@ import Tabs, {type TabItem} from '@/ui/tabs/Tabs';
 
 export default function Header() {
     const tabItems: TabItem[] = [
-        {label: 'О мероприятии'},
+        {label: 'О мероприятии', badgeCount: 3},
         {label: 'Чат'},
         {label: 'Фотографии'},
     ];
