@@ -41,7 +41,6 @@ export default function TextArea({
                 <div className={styles.labelWrapper}>
                     <label className={styles.label}>
                         {label}
-                        {!value && !disabled && <span className={styles.requiredDot}/>}
                     </label>
                     <span className={styles.charCounter}>
                         {String(value).length}/{MAX_LENGTH}

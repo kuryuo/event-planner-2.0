@@ -67,3 +67,51 @@
   @include ty.font(caption-m, regular);
   color: var(--content-secondary);
 }
+
+.categories {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.categoryButton {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-1);
+  background-color: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.participants {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.participantsRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.participantsToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  @include ty.font(body-m, semibold);
+  color: var(--content-secondary);
+}
+
+.participantsToggleLabel {
+  text-transform: lowercase;
+}
+
+.participantsRoles {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--spacing-4);
+}

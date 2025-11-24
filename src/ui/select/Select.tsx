@@ -39,7 +39,6 @@ export default function Select({
             {label && (
                 <label className={styles.label}>
                     {label}
-                    {!value && !disabled && <span className={styles.requiredDot}/>}
                 </label>
             )}
 

@@ -20,6 +20,7 @@ export default function TextField({
                                       helperText,
                                       disabled,
                                       fieldSize = 'M',
+                                      placeholder = 'placeholder',
                                       ...props
                                   }: TextFieldProps) {
     return (
@@ -37,7 +38,7 @@ export default function TextField({
                 {leftIcon && <span className={styles.iconLeft}>{leftIcon}</span>}
 
                 <input
-                    placeholder='placeholder'
+                    placeholder={placeholder}
                     className={`${styles.input} ${styles[`input${fieldSize.toUpperCase()}`]}`}
                     disabled={disabled}
                     {...props}

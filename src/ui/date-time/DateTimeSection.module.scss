@@ -6,13 +6,6 @@
   gap: var(--spacing-4)
 }
 
-.dot {
-  width: 8px;
-  height: 8px;
-  background-color: red;
-  border-radius: 50%;
-}
-
 .inputs {
   display: flex;
   align-items: center;
@@ -82,4 +75,5 @@
   border-radius: var(--spacing-2);
   box-shadow: var(--lvl1);
 }
+
 

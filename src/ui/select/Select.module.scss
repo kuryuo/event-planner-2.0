@@ -12,16 +12,6 @@
   @include ty.font(subtitle-m, semibold);
 }
 
-.requiredDot {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  background-color: var(--content-negative);
-  border-radius: 50%;
-  margin-left: 6px;
-  vertical-align: middle;
-}
-
 .wrapper {
   height: 44px;
   display: flex;
