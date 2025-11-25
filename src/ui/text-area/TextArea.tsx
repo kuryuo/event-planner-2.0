@@ -49,10 +49,7 @@ export default function TextArea({
             )}
 
             <div className={`${styles.wrapper} ${error ? styles.error : ''} ${disabled ? styles.disabled : ''}`}>
-                <span className={styles.iconLeft}>
-        {leftIcon || <span className={styles.iconPlaceholder}/>}
-    </span>
-
+                {leftIcon && <span className={styles.leftIcon}>{leftIcon}</span>}
                 <textarea
                     ref={textareaRef}
                     className={styles.textarea}
@@ -62,9 +59,7 @@ export default function TextArea({
                     placeholder="placeholder"
                     {...props}
                 />
-                <span className={styles.iconRight}>
-        {rightIcon || <span className={styles.iconPlaceholder}/>}
-    </span>
+                {rightIcon && <span className={styles.rightIcon}>{rightIcon}</span>}
             </div>
 
             {helperText && (

@@ -7,7 +7,7 @@
   &.M {
     .content {
       .title {
-        @include ty.font(body-m, semibold);
+        @include ty.font(body-m, regular);
       }
 
       .subtitle {

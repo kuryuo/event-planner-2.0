@@ -1,0 +1,71 @@
+@use '@/typography-variables' as ty;
+
+.posts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.title {
+  @include ty.font(subtitle-m, semibold);
+}
+
+.count {
+  @include ty.font(caption-m, regular);
+  color: var(--content-secondary);
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-10) var(--spacing-6);
+  gap: var(--spacing-4);
+}
+
+.emptyText {
+  @include ty.font(body-m, regular);
+  color: var(--content-secondary);
+  text-align: center;
+}
+
+.postsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+.post {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  padding: var(--spacing-4);
+  background-color: var(--bg-secondary-subtle);
+  border-radius: var(--radius-4);
+}
+
+.postTitle {
+  @include ty.font(subtitle-m, semibold);
+}
+
+.postText {
+  @include ty.font(body-m, regular);
+}
+
+.postFooter {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--spacing-3);
+}
+
+.postDate {
+  @include ty.font(caption-m, regular);
+  color: var(--content-secondary);
+}

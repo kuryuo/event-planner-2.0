@@ -35,20 +35,14 @@ export default function TextField({
         ${disabled ? styles.disabled : ''}
     `}
             >
-                <span className={styles.iconLeft}>
-        {leftIcon || <span className={styles.iconPlaceholder}/>}
-    </span>
-
+                {leftIcon && <span className={styles.leftIcon}>{leftIcon}</span>}
                 <input
                     placeholder={placeholder}
                     className={`${styles.input} ${styles[`input${fieldSize.toUpperCase()}`]}`}
                     disabled={disabled}
                     {...props}
                 />
-
-                <span className={styles.iconRight}>
-        {rightIcon || <span className={styles.iconPlaceholder}/>}
-    </span>
+                {rightIcon && <span className={styles.rightIcon}>{rightIcon}</span>}
             </div>
 
             {helperText && (

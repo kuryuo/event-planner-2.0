@@ -175,6 +175,7 @@
     --bg-primary-subtle: var(--white);
     --bg-primary-inverse: var(--gray-100);
     --bg-secondary: var(--black-alpha-6);
+    --bg-secondary-subtle: var(--gray-5);
     --bg-secondary-hover: var(--black-alpha-9);
     --bg-secondary-press: var(--black-alpha-12);
     --bg-tertiary: var(--gray-10);

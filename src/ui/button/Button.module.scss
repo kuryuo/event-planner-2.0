@@ -10,17 +10,13 @@
   transition: all 0.2s ease;
   padding: var(--spacing-2) var(--spacing-6);
 
-  .iconLeft,
-  .iconRight {
+  .leftIcon,
+  .rightIcon {
     display: inline-flex;
     width: 20px;
     height: 20px;
     justify-content: center;
     align-items: center;
-  }
-
-  .iconPlaceholder {
-    visibility: hidden;
   }
 
   &.M {

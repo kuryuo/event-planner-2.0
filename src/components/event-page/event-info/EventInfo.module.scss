@@ -1,0 +1,78 @@
+@use '@/typography-variables' as ty;
+
+.eventInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+}
+
+.infoBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.infoRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-2);
+
+  .icon {
+    opacity: 0.6;
+  }
+
+  .infoText {
+    @include ty.font(body-m, regular);
+    color: var(--content-primary);
+    flex: 1;
+  }
+
+  .link {
+    @include ty.font(body-m, regular);
+    text-decoration: none;
+    flex: 1;
+    word-break: break-all;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.description {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.descriptionText {
+  @include ty.font(body-m, regular);
+}
+
+.expandButton {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  background: none;
+  border: none;
+  cursor: pointer;
+  align-self: flex-start;
+  opacity: 0.6;
+
+  @include ty.font(caption-m, regular);
+  color: var(--content-link);
+
+  .chevronIcon {
+    transition: transform 0.2s ease;
+  }
+
+  .chevronIcon.expanded {
+    transform: rotate(180deg);
+  }
+}

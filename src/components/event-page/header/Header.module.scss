@@ -5,6 +5,10 @@
   flex-direction: column;
   gap: var(--spacing-8);
 
+  .icon {
+    opacity: 0.6;
+  }
+
   .backButton {
     gap: var(--spacing-2);
     display: flex;

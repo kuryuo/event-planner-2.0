@@ -1,0 +1,64 @@
+@use '@/typography-variables' as ty;
+
+.participants {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  @include ty.font(subtitle-m, semibold);
+  color: var(--content-primary);
+  margin: 0;
+}
+
+.count {
+  @include ty.font(caption-m, regular);
+  color: var(--content-secondary);
+}
+
+.avatarsContainer {
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: 48px;
+  width: 100%;
+  min-height: 48px;
+}
+
+.avatarWrapper {
+  position: relative;
+  margin-right: -12px;
+  flex-shrink: 0;
+
+  &:last-child {
+    margin-right: 0;
+  }
+}
+
+.remainingCount {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remainingText {
+  @include ty.font(caption-m, semibold);
+  color: var(--content-primary);
+}
+
+.addButton {
+  margin-left: var(--spacing-2);
+  z-index: 1000;
+  flex-shrink: 0;
+}

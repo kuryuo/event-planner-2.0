@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import styles from './Select.module.scss';
 import ChevronDownImg from '../../assets/img/icon-m/chevron-down.svg';
-import ChevronUpImg from '../../assets/img/icon-m/chevron-up.svg';
 
 interface Option {
     label?: string;
@@ -43,10 +42,7 @@ export default function Select({
             )}
 
             <div className={`${styles.wrapper} ${error ? styles.error : ''} ${disabled ? styles.disabled : ''}`}>
-                <span className={styles.iconLeft}>
-        {leftIcon || <span className={styles.iconPlaceholder}/>}
-    </span>
-
+                {leftIcon && <span className={styles.leftIcon}>{leftIcon}</span>}
                 <input
                     placeholder="placeholder"
                     className={styles.input}
@@ -56,20 +52,21 @@ export default function Select({
                     {...props}
                 />
                 <span
-                    className={styles.iconRight}
+                    className={styles.rightIcon}
                     onClick={(e) => {
                         e.stopPropagation();
                         if (!disabled) setIsOpen(!isOpen);
                     }}
                     style={{cursor: disabled ? 'not-allowed' : 'pointer'}}
                 >
-        {rightIcon ?? (
-            <img
-                src={isOpen ? ChevronUpImg : ChevronDownImg}
-                alt={isOpen ? 'chevron-up' : 'chevron-down'}
-            />
-        )}
-    </span>
+                    {rightIcon ?? (
+                        <img
+                            src={ChevronDownImg}
+                            alt={isOpen ? 'chevron-up' : 'chevron-down'}
+                            className={`${styles.chevronIcon} ${isOpen ? styles.expanded : ''}`}
+                        />
+                    )}
+                </span>
             </div>
 
             {helperText && !isOpen && (

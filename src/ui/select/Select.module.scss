@@ -68,8 +68,8 @@
   }
 }
 
-.iconLeft,
-.iconRight {
+.leftIcon,
+.rightIcon {
   display: inline-flex;
   width: 24px;
   height: 24px;
@@ -79,6 +79,14 @@
 
 .iconPlaceholder {
   visibility: hidden;
+}
+
+.chevronIcon {
+  transition: transform 0.2s ease;
+}
+
+.chevronIcon.expanded {
+  transform: rotate(180deg);
 }
 
 .helperText {
@@ -103,7 +111,6 @@
   overflow-y: auto;
   max-height: 200px;
   box-shadow: var(--lvl2);
-
   scrollbar-width: thin;
   scrollbar-color: var(--bg-tertiary) var(--white);
 }
@@ -124,7 +131,6 @@
     flex-direction: column;
     flex: 1;
   }
-
 
   .optionLabel {
     @include ty.font(body-m, regular);
