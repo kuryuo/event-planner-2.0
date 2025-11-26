@@ -15,7 +15,7 @@ interface TabsProps {
     onChange?: (index: number) => void;
 }
 
-const WIDTH_PERCENT = 0.7;
+const WIDTH_PERCENT = 0.5;
 const OFFSET_PERCENT = (1 - WIDTH_PERCENT) / 2;
 
 const Tabs = ({items, initialIndex = 0, onChange}: TabsProps) => {

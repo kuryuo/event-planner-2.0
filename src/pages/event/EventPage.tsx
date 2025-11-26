@@ -21,6 +21,7 @@ const subscriptionsData: CardBaseProps[] = [
 
 export default function EventPage() {
     const [subscriptions] = useState<CardBaseProps[]>(subscriptionsData);
+    const [isAdmin] = useState(true);
 
     const handleCreateEvent = () => console.log("Создать мероприятие");
 
@@ -31,19 +32,20 @@ export default function EventPage() {
                     subscriptions={subscriptions}
                     onCreateEvent={handleCreateEvent}
                     notificationCount={5}
+                    isAdmin={isAdmin}
                 />
             </div>
             <div className={styles.content}>
                 <div className={styles.headerWrapper}>
-                    <Header/>
+                    <Header isAdmin={isAdmin}/>
                 </div>
                 <div className={styles.mainContent}>
                     <div className={styles.eventContent}>
                         <EventInfo/>
-                        <Post/>
+                        <Post isAdmin={isAdmin}/>
                     </div>
                     <div className={styles.sideContent}>
-                        <Participants/>
+                        <Participants isAdmin={isAdmin}/>
                         <Contacts/>
                     </div>
                 </div>

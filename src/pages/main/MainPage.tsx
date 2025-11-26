@@ -21,6 +21,7 @@ const subscriptionsData: CardBaseProps[] = [
 export default function MainPage() {
     const [subscriptions] = useState<CardBaseProps[]>(subscriptionsData);
     const [showFilters, setShowFilters] = useState(false);
+    const [isAdmin] = useState(true);
 
     useProfile();
     useEvents();
@@ -31,6 +32,7 @@ export default function MainPage() {
         <div className={styles.pageWrapper}>
             <div className={styles.sidebar}>
                 <Sidebar
+                    isAdmin={isAdmin}
                     subscriptions={subscriptions}
                     onCreateEvent={handleCreateEvent}
                     notificationCount={5}

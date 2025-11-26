@@ -1,7 +1,10 @@
+import {useState} from "react";
 import styles from "./Post.module.scss";
 import OctopusImg from "@/assets/img/octopus.png";
 import {format} from "date-fns";
 import {ru} from "date-fns/locale";
+import Button from "@/ui/button/Button";
+import CreatePostForm from "./form/CreatePostForm";
 
 interface Post {
     id: string;
@@ -12,6 +15,7 @@ interface Post {
 
 interface PostsProps {
     posts?: Post[];
+    isAdmin?: boolean;
 }
 
 const mockPosts: Post[] = [
@@ -19,21 +23,34 @@ const mockPosts: Post[] = [
         id: "1",
         title: "Добро пожаловать на мероприятие!",
         text: "Мы рады приветствовать всех участников нашего события. Сегодня вас ждет увлекательная программа с выступлениями спикеров и интересными дискуссиями.",
-        date: new Date(2024, 8, 1), // 1 сентября 2024
+        date: new Date(2024, 8, 1),
     },
     {
         id: "2",
         title: "Обновление программы",
         text: "Хотим сообщить об изменениях в расписании. Второе выступление переносится на 15:00 вместо 14:30. Просим учесть это при планировании времени.",
-        date: new Date(2024, 8, 5), // 5 сентября 2024
+        date: new Date(2024, 8, 5),
     },
 ];
 
-// const emptyPosts: Post[] = [];
+export default function Post({posts = mockPosts, isAdmin = false}: PostsProps) {
+    const [isFormOpen, setIsFormOpen] = useState(false);
 
-export default function Post({posts = mockPosts}: PostsProps) {
     const formatDate = (date: Date): string => {
         return format(date, "d MMMM yyyy", {locale: ru});
+    };
+
+    const handleCreatePost = () => {
+        setIsFormOpen(true);
+    };
+
+    const handleCloseForm = () => {
+        setIsFormOpen(false);
+    };
+
+    const handleSubmit = (title: string, text: string) => {
+        console.log("Опубликовать пост:", {title, text});
+        setIsFormOpen(false);
     };
 
     return (
@@ -42,6 +59,19 @@ export default function Post({posts = mockPosts}: PostsProps) {
                 <h2 className={styles.title}>Посты</h2>
                 <span className={styles.count}>{posts.length}</span>
             </div>
+
+            {isAdmin && !isFormOpen && (
+                <Button variant="Filled" color="gray" onClick={handleCreatePost}>
+                    Создать пост
+                </Button>
+            )}
+
+            {isFormOpen && (
+                <CreatePostForm
+                    onClose={handleCloseForm}
+                    onSubmit={handleSubmit}
+                />
+            )}
 
             {posts.length === 0 ? (
                 <div className={styles.emptyState}>

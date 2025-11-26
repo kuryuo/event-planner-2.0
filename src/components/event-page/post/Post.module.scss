@@ -9,15 +9,17 @@
 .header {
   display: flex;
   align-items: center;
-  gap: var(--spacing-2);
+  gap: var(--spacing-3);
 }
 
 .title {
-  @include ty.font(subtitle-m, semibold);
+  @include ty.font(title-m, semibold);
+  color: var(--content-primary);
+  margin: 0;
 }
 
 .count {
-  @include ty.font(caption-m, regular);
+  @include ty.font(body-m, regular);
   color: var(--content-secondary);
 }
 
@@ -30,9 +32,15 @@
   gap: var(--spacing-4);
 }
 
+.octopusImage {
+  max-width: 200px;
+  height: auto;
+}
+
 .emptyText {
   @include ty.font(body-m, regular);
   color: var(--content-secondary);
+  margin: 0;
   text-align: center;
 }
 
@@ -45,24 +53,29 @@
 .post {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-6);
+  gap: var(--spacing-3);
   padding: var(--spacing-4);
   background-color: var(--bg-secondary-subtle);
-  border-radius: var(--radius-4);
+  border-radius: var(--radius-6);
 }
 
 .postTitle {
   @include ty.font(subtitle-m, semibold);
+  color: var(--content-primary);
+  margin: 0;
 }
 
 .postText {
   @include ty.font(body-m, regular);
+  color: var(--content-primary);
+  margin: 0;
+  line-height: 1.5;
 }
 
 .postFooter {
   display: flex;
   justify-content: flex-end;
-  margin-top: var(--spacing-3);
+  margin-top: var(--spacing-2);
 }
 
 .postDate {

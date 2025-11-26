@@ -1,10 +1,21 @@
+import {useState, useRef} from "react";
 import styles from './Header.module.scss';
 import ChevronLeftIcon from '@/assets/img/icon-s/chevron-left.svg?react';
+import ThreeDotsVerticalIcon from '@/assets/img/icon-m/three-dots-vertical.svg?react';
+import TrashIcon from '@/assets/img/icon-m/trash.svg?react';
 import Avatar from '@/ui/avatar/Avatar';
 import Button from '@/ui/button/Button';
 import Tabs, {type TabItem} from '@/ui/tabs/Tabs';
+import {useClickOutside} from '@/hooks/useClickOutside';
 
-export default function Header() {
+interface HeaderProps {
+    isAdmin?: boolean;
+}
+
+export default function Header({isAdmin = false}: HeaderProps) {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+
     const tabItems: TabItem[] = [
         {label: 'О мероприятии', badgeCount: 3},
         {label: 'Чат'},
@@ -14,6 +25,21 @@ export default function Header() {
     const handleTabChange = (index: number) => {
         console.log('Выбран таб:', index);
     };
+
+    const handleEdit = () => {
+        console.log('Редактировать мероприятие');
+    };
+
+    const handleMenuClick = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
+
+    const handleDelete = () => {
+        console.log('Удалить мероприятие');
+        setIsMenuOpen(false);
+    };
+
+    useClickOutside(menuRef, () => setIsMenuOpen(false), isMenuOpen);
 
     return (
         <header className={styles.header}>
@@ -28,7 +54,36 @@ export default function Header() {
                     <h2 className={styles.title}>Название мероприятия</h2>
                 </div>
                 <div className={styles.right}>
-                    <Button variant="Filled">Я пойду</Button>
+                    {isAdmin ? (
+                        <div className={styles.adminActions} ref={menuRef}>
+                            <Button variant="Filled" color="gray" onClick={handleEdit}>
+                                Редактировать
+                            </Button>
+                            <div className={styles.menuWrapper}>
+                                <button
+                                    className={styles.menuButton}
+                                    onClick={handleMenuClick}
+                                    aria-label="Меню"
+                                >
+                                    <ThreeDotsVerticalIcon className={styles.menuIcon}/>
+                                </button>
+                                {isMenuOpen && (
+                                    <div className={styles.dropdown}>
+                                        <Button
+                                            variant="Text"
+                                            color="red"
+                                            leftIcon={<TrashIcon className={styles.trashIcon}/>}
+                                            onClick={handleDelete}
+                                        >
+                                            Удалить мероприятие
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ) : (
+                        <Button variant="Filled" color="purple">Я пойду</Button>
+                    )}
                 </div>
             </div>
 

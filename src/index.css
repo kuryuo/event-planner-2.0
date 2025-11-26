@@ -139,6 +139,7 @@
     --content-brand-green-hover: var(--brand-green-120);
     --content-brand-green-press: var(--brand-green-140);
     --content-negative: var(--system-red-100);
+    --content-negative-hover: var(--system-red-80);
     --content-notice: var(--system-orange-100);
     --content-positive: var(--system-green-100);
     --content-link: var(--gray-60);
@@ -202,6 +203,8 @@
     --bg-deep-orange: var(--deep-orange-10);
     --bg-brown: var(--brown-10);
     --bg-plum: var(--plum-10);
+    --bg-negative: var(--system-red-100);
+    --bg-negative-hover: var(--system-red-80);
 
     --border-primary: var(--gray-10);
     --border-primary-hover: var(--gray-100);

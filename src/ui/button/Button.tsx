@@ -3,11 +3,13 @@ import styles from './Button.module.scss';
 import clsx from 'clsx';
 
 type ButtonSize = 'M' | 'S' | 'XS';
-type ButtonVariant = 'Filled' | 'Dense' | 'Text';
+type ButtonVariant = 'Filled' | 'Text';
+type ButtonColor = 'purple' | 'red' | 'gray' | 'default';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     size?: ButtonSize;
     variant?: ButtonVariant;
+    color?: ButtonColor;
     leftIcon?: ReactNode;
     rightIcon?: ReactNode;
     children: ReactNode;
@@ -16,6 +18,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export default function Button({
                                    size = 'M',
                                    variant = 'Filled',
+                                   color = 'purple',
                                    leftIcon,
                                    rightIcon,
                                    children,
@@ -26,6 +29,7 @@ export default function Button({
         styles.button,
         styles[size],
         styles[variant],
+        styles[`${variant}-${color}`],
         className
     );
 

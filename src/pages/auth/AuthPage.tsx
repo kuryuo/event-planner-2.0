@@ -30,7 +30,7 @@ export default function AuthPage() {
                 <RegistrationForm onSubmit={register} loading={loading} error={error || undefined}/>
             )}
 
-            <Button variant="Text" onClick={toggleMode} style={{marginTop: 10}}>
+            <Button variant="Text" color="red" onClick={toggleMode} style={{marginTop: 10}}>
                 {mode === "login"
                     ? "Нет аккаунта? Зарегистрироваться"
                     : "Уже есть аккаунт? Войти"}

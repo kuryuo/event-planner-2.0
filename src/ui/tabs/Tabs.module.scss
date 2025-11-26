@@ -1,7 +1,7 @@
 @use '@/typography-variables' as ty;
 
 .tabsContainer {
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-primary);
 }
 
 .tabs {

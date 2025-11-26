@@ -211,7 +211,7 @@ export default function EventForm() {
                 </div>
 
                 <div className={styles.actions}>
-                    <Button variant="Filled" size="M" type="submit">
+                    <Button variant="Filled" color="purple" type="submit">
                         Создать
                     </Button>
                 </div>

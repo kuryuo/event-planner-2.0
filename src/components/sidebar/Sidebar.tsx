@@ -14,9 +14,10 @@ interface SidebarProps {
     subscriptions: CardBaseProps[];
     onCreateEvent?: () => void;
     notificationCount?: number;
+    isAdmin?: boolean;
 }
 
-export default function Sidebar({subscriptions, onCreateEvent, notificationCount = 3}: SidebarProps) {
+export default function Sidebar({subscriptions, onCreateEvent, notificationCount = 3, isAdmin = false}: SidebarProps) {
     const {profile, isLoading} = useProfile();
     const fallbackAvatar = 'https://api.dicebear.com/7.x/shapes/png?size=200&radius=50';
 
@@ -38,10 +39,12 @@ export default function Sidebar({subscriptions, onCreateEvent, notificationCount
                 />
             </div>
 
-            <div className={clsx(styles.block, styles.createEventWrapper)}>
-                <CircleButton onClick={onCreateEvent} variant={"green"}/>
-                <span className={styles.createEventText}>Создайте мероприятие</span>
-            </div>
+            {isAdmin && (
+                <div className={clsx(styles.block, styles.createEventWrapper)}>
+                    <CircleButton onClick={onCreateEvent} variant={"green"}/>
+                    <span className={styles.createEventText}>Создайте мероприятие</span>
+                </div>
+            )}
 
             <div className={styles.block}>
                 <NextEvent

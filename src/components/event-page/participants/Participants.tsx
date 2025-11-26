@@ -1,6 +1,7 @@
 import {useState, useEffect, useRef} from "react";
 import styles from "./Participants.module.scss";
 import Avatar from "@/ui/avatar/Avatar";
+import Button from "@/ui/button/Button";
 
 interface Participant {
     id: string;
@@ -11,6 +12,7 @@ interface Participant {
 interface ParticipantsProps {
     participants?: Participant[];
     maxParticipants?: number;
+    isAdmin?: boolean;
 }
 
 const mockParticipants: Participant[] = [
@@ -29,13 +31,12 @@ const mockParticipants: Participant[] = [
 
 const AVATAR_SIZE = 48;
 const AVATAR_OVERLAP = 12;
-const ADD_BUTTON_WIDTH = 48;
-const ADD_BUTTON_MARGIN = 8;
 const REMAINING_BADGE_WIDTH = 48;
 
 export default function Participants({
                                          participants = mockParticipants,
                                          maxParticipants,
+                                         isAdmin = false,
                                      }: ParticipantsProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const [visibleCount, setVisibleCount] = useState(8);
@@ -51,32 +52,26 @@ export default function Participants({
             let availableWidth = containerWidth;
             let count = 0;
 
-            if (availableWidth >= AVATAR_SIZE) {
-                availableWidth -= AVATAR_SIZE;
-                count = 1;
-            } else {
+            if (availableWidth < AVATAR_SIZE) {
                 setVisibleCount(0);
                 return;
             }
 
+            availableWidth -= AVATAR_SIZE;
+            count = 1;
+
             const avatarWidthWithOverlap = AVATAR_SIZE - AVATAR_OVERLAP;
+
             while (availableWidth >= avatarWidthWithOverlap && count < totalCount) {
                 availableWidth -= avatarWidthWithOverlap;
                 count++;
             }
 
-            const hasRemaining = count < totalCount;
-            if (hasRemaining) {
-                const spaceForRemaining = REMAINING_BADGE_WIDTH - AVATAR_OVERLAP;
-                if (availableWidth < spaceForRemaining) {
+            if (count < totalCount) {
+                const spaceNeededForRemaining = REMAINING_BADGE_WIDTH - AVATAR_OVERLAP;
+                if (availableWidth < spaceNeededForRemaining && count > 1) {
                     count--;
-                }
-            }
-
-            const spaceForButton = ADD_BUTTON_WIDTH + ADD_BUTTON_MARGIN;
-            if (availableWidth < spaceForButton) {
-                if (count > 0) {
-                    count--;
+                    availableWidth += avatarWidthWithOverlap;
                 }
             }
 
@@ -106,6 +101,10 @@ export default function Participants({
             return `${totalCount} из ${maxParticipants}`;
         }
         return totalCount.toString();
+    };
+
+    const handleInvite = () => {
+        console.log("Пригласить участников");
     };
 
     return (
@@ -141,6 +140,12 @@ export default function Participants({
                     </div>
                 )}
             </div>
+
+            {isAdmin && (
+                <Button variant="Filled" color="gray" onClick={handleInvite}>
+                    Пригласить
+                </Button>
+            )}
         </div>
     );
 }

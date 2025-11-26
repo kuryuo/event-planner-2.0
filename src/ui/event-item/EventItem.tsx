@@ -24,7 +24,7 @@ export default function EventItem({time, title, description}: EventItemProps) {
                 </div>
             </div>
             <div className={styles.buttonWrapper}>
-                <Button variant="Filled" size="M">
+                <Button variant="Filled" color="purple">
                     Действие
                 </Button>
                 <img src={BoxArrowUpIcon} alt="icon" className={styles.buttonIcon}/>
