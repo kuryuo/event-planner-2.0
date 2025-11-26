@@ -1,5 +1,5 @@
 import styles from './Header.module.scss';
-import ChevronLeftIcon from '@/assets/img/icon-s/chevron-left.svg';
+import ChevronLeftIcon from '@/assets/img/icon-s/chevron-left.svg?react';
 import Avatar from '@/ui/avatar/Avatar';
 import Button from '@/ui/button/Button';
 import Tabs, {type TabItem} from '@/ui/tabs/Tabs';
@@ -18,7 +18,7 @@ export default function Header() {
     return (
         <header className={styles.header}>
             <button className={styles.backButton}>
-                <img src={ChevronLeftIcon} alt="Назад" className={styles.icon}/>
+                <ChevronLeftIcon className={styles.icon}/>
                 <span className={styles.text}>Назад</span>
             </button>
 

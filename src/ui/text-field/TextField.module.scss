@@ -92,10 +92,6 @@
   @include ty.font(subtitle-m, semibold);
 }
 
-.leftIcon {
-  opacity: 0.6;
-}
-
 .leftIcon,
 .rightIcon {
   display: flex;

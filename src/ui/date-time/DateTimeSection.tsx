@@ -1,5 +1,5 @@
 import {useRef} from "react";
-import CalendarIcon from "@/assets/img/icon-m/calendar.svg";
+import CalendarIcon from "@/assets/img/icon-m/calendar.svg?react";
 import {SingleDatePicker} from "../date-picker/SingleDatePicker";
 import {useDateTime} from "@/hooks/useDateTime";
 import {useClickOutside} from "@/hooks/useClickOutside";
@@ -33,9 +33,7 @@ export default function DateTimeSection() {
         <div className={styles.section}>
             <div className={styles.inputs}>
                 <div className={styles.wrapper} ref={startDatePickerRef}>
-                    <img
-                        src={CalendarIcon}
-                        alt="calendar"
+                    <CalendarIcon
                         className={styles.icon}
                         onClick={toggleStartDatePicker}
                     />
@@ -70,9 +68,7 @@ export default function DateTimeSection() {
                     onChange={(e) => setEndTime(e.target.value)}
                 />
                 <div className={styles.wrapper} ref={endDatePickerRef}>
-                    <img
-                        src={CalendarIcon}
-                        alt="calendar"
+                    <CalendarIcon
                         className={styles.icon}
                         onClick={toggleEndDatePicker}
                     />

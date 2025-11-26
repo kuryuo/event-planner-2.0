@@ -29,7 +29,7 @@ const mockPosts: Post[] = [
     },
 ];
 
-const emptyPosts: Post[] = [];
+// const emptyPosts: Post[] = [];
 
 export default function Post({posts = mockPosts}: PostsProps) {
     const formatDate = (date: Date): string => {

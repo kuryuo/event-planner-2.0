@@ -24,7 +24,7 @@
   gap: var(--spacing-2);
 
   .icon {
-    opacity: 0.6;
+    color: var(--content-secondary);
   }
 
   .infoText {
@@ -56,17 +56,7 @@
 }
 
 .expandButton {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-1);
-  background: none;
-  border: none;
-  cursor: pointer;
   align-self: flex-start;
-  opacity: 0.6;
-
-  @include ty.font(caption-m, regular);
-  color: var(--content-link);
 
   .chevronIcon {
     transition: transform 0.2s ease;

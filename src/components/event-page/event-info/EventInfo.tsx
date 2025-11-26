@@ -2,10 +2,11 @@ import {useState} from "react";
 import styles from "./EventInfo.module.scss";
 import Chip from "@/ui/chip/Chip";
 import type {AppColor} from "@/const";
-import CalendarIcon from "@/assets/img/icon-m/calendar.svg";
-import GeoAltIcon from "@/assets/img/icon-m/geo-alt.svg";
-import LinkIcon from "@/assets/img/icon-m/link-45deg.svg";
-import ChevronDownIcon from "@/assets/img/icon-s/chevron-down.svg";
+import CalendarIcon from "@/assets/img/icon-m/calendar.svg?react";
+import GeoAltIcon from "@/assets/img/icon-m/geo-alt.svg?react";
+import LinkIcon from "@/assets/img/icon-m/link-45deg.svg?react";
+import ChevronDownIcon from "@/assets/img/icon-s/chevron-down.svg?react";
+import Button from "@/ui/button/Button";
 
 interface EventInfoProps {
     categories?: Array<{ text: string; color?: AppColor }>;
@@ -49,17 +50,17 @@ export default function EventInfo({categories = mockCategories}: EventInfoProps)
 
             <div className={styles.infoBlock}>
                 <div className={styles.infoRow}>
-                    <img src={CalendarIcon} alt="Календарь" className={styles.icon}/>
+                    <CalendarIcon className={styles.icon}/>
                     <span className={styles.infoText}>{mockDate}</span>
                 </div>
 
                 <div className={styles.infoRow}>
-                    <img src={GeoAltIcon} alt="Местоположение" className={styles.icon}/>
+                    <GeoAltIcon className={styles.icon}/>
                     <span className={styles.infoText}>{mockLocation}</span>
                 </div>
 
                 <div className={styles.infoRow}>
-                    <img src={LinkIcon} alt="Ссылка" className={styles.icon}/>
+                    <LinkIcon className={styles.icon}/>
                     <a href={mockLink} target="_blank" rel="noopener noreferrer" className={styles.link}>
                         {mockLink}
                     </a>
@@ -69,17 +70,20 @@ export default function EventInfo({categories = mockCategories}: EventInfoProps)
             <div className={styles.description}>
                 <p className={styles.descriptionText}>{displayDescription}</p>
                 {shouldShowExpandButton && (
-                    <button
-                        className={styles.expandButton}
+                    <Button
+                        variant="Text"
+                        size="XS"
+                        leftIcon={
+                            <ChevronDownIcon
+                                aria-label={isDescriptionExpanded ? "Свернуть" : "Развернуть"}
+                                className={`${isDescriptionExpanded ? styles.expanded : ""}`}
+                            />
+                        }
                         onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                        className={styles.expandButton}
                     >
-                        <img
-                            src={ChevronDownIcon}
-                            alt={isDescriptionExpanded ? "Свернуть" : "Развернуть"}
-                            className={`${styles.chevronIcon} ${isDescriptionExpanded ? styles.expanded : ""}`}
-                        />
-                        <span>{isDescriptionExpanded ? "Свернуть" : "Показать всё"}</span>
-                    </button>
+                        {isDescriptionExpanded ? "Свернуть" : "Показать всё"}
+                    </Button>
                 )}
             </div>
         </div>
