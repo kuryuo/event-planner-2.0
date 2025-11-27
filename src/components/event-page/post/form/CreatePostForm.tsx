@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import styles from "./CreatePostForm.module.scss";
 import Button from "@/ui/button/Button";
 import TextField from "@/ui/text-field/TextField";
@@ -8,11 +8,25 @@ import CloseIcon from "@/assets/img/icon-m/x.svg?react";
 interface CreatePostFormProps {
     onClose: () => void;
     onSubmit: (title: string, text: string) => void;
+    initialTitle?: string;
+    initialText?: string;
+    isEdit?: boolean;
 }
 
-export default function CreatePostForm({onClose, onSubmit}: CreatePostFormProps) {
-    const [postTitle, setPostTitle] = useState("");
-    const [postText, setPostText] = useState("");
+export default function CreatePostForm({
+    onClose, 
+    onSubmit, 
+    initialTitle = "", 
+    initialText = "",
+    isEdit = false
+}: CreatePostFormProps) {
+    const [postTitle, setPostTitle] = useState(initialTitle);
+    const [postText, setPostText] = useState(initialText);
+
+    useEffect(() => {
+        setPostTitle(initialTitle);
+        setPostText(initialText);
+    }, [initialTitle, initialText]);
 
     const handlePublish = () => {
         onSubmit(postTitle, postText);
@@ -29,7 +43,9 @@ export default function CreatePostForm({onClose, onSubmit}: CreatePostFormProps)
     return (
         <div className={styles.createForm}>
             <div className={styles.formHeader}>
-                <h3 className={styles.formTitle}>Новый пост</h3>
+                <h3 className={styles.formTitle}>
+                    {isEdit ? "Редактирование поста" : "Новый пост"}
+                </h3>
                 <button
                     className={styles.closeButton}
                     onClick={handleClose}
@@ -57,7 +73,7 @@ export default function CreatePostForm({onClose, onSubmit}: CreatePostFormProps)
                 onClick={handlePublish}
                 className={styles.button}
             >
-                Опубликовать
+                {isEdit ? "Сохранить" : "Опубликовать"}
             </Button>
         </div>
     );

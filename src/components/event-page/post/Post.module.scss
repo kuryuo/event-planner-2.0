@@ -65,6 +65,42 @@
   margin: 0;
 }
 
+.postTitleWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.postActions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.postActionBtn {
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.deleteMenuWrapper {
+  position: relative;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-4);
+  box-shadow: var(--lvl2);
+  z-index: 1000;
+  white-space: nowrap;
+}
+
+.trashIcon {
+  color: var(--content-negative);
+}
+
 .postText {
   @include ty.font(body-m, regular);
   color: var(--content-primary);

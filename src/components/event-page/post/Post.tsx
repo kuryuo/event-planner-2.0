@@ -1,10 +1,13 @@
-import {useState} from "react";
+import {useState, useRef} from "react";
 import styles from "./Post.module.scss";
 import OctopusImg from "@/assets/img/octopus.png";
 import {format} from "date-fns";
 import {ru} from "date-fns/locale";
 import Button from "@/ui/button/Button";
 import CreatePostForm from "./form/CreatePostForm";
+import PenIcon from "@/assets/img/icon-s/pen.svg?react";
+import TrashIcon from "@/assets/img/icon-s/trash.svg?react";
+import {useClickOutside} from "@/hooks/useClickOutside";
 
 interface Post {
     id: string;
@@ -35,23 +38,52 @@ const mockPosts: Post[] = [
 
 export default function Post({posts = mockPosts, isAdmin = false}: PostsProps) {
     const [isFormOpen, setIsFormOpen] = useState(false);
+    const [editingPost, setEditingPost] = useState<Post | null>(null);
+    const [openDeleteMenuId, setOpenDeleteMenuId] = useState<string | null>(null);
+    const menuRef = useRef<HTMLDivElement>(null);
 
     const formatDate = (date: Date): string => {
         return format(date, "d MMMM yyyy", {locale: ru});
     };
 
     const handleCreatePost = () => {
+        setEditingPost(null);
         setIsFormOpen(true);
     };
 
     const handleCloseForm = () => {
         setIsFormOpen(false);
+        setEditingPost(null);
     };
 
     const handleSubmit = (title: string, text: string) => {
-        console.log("Опубликовать пост:", {title, text});
+        if (editingPost) {
+            console.log("Сохранить пост:", {id: editingPost.id, title, text});
+        } else {
+            console.log("Опубликовать пост:", {title, text});
+        }
         setIsFormOpen(false);
+        setEditingPost(null);
     };
+
+    const handleEditPost = (postId: string) => {
+        const post = posts.find(p => p.id === postId);
+        if (post) {
+            setEditingPost(post);
+            setIsFormOpen(true);
+        }
+    };
+
+    const handleDeleteMenuClick = (postId: string) => {
+        setOpenDeleteMenuId(openDeleteMenuId === postId ? null : postId);
+    };
+
+    const handleDeletePost = (postId: string) => {
+        console.log("Удалить пост:", postId);
+        setOpenDeleteMenuId(null);
+    };
+
+    useClickOutside(menuRef, () => setOpenDeleteMenuId(null), openDeleteMenuId !== null);
 
     return (
         <div className={styles.posts}>
@@ -70,6 +102,9 @@ export default function Post({posts = mockPosts, isAdmin = false}: PostsProps) {
                 <CreatePostForm
                     onClose={handleCloseForm}
                     onSubmit={handleSubmit}
+                    initialTitle={editingPost?.title || ""}
+                    initialText={editingPost?.text || ""}
+                    isEdit={!!editingPost}
                 />
             )}
 
@@ -82,7 +117,44 @@ export default function Post({posts = mockPosts, isAdmin = false}: PostsProps) {
                 <div className={styles.postsList}>
                     {posts.map((post) => (
                         <article key={post.id} className={styles.post}>
-                            <h3 className={styles.postTitle}>{post.title}</h3>
+                            <div className={styles.postTitleWrapper}>
+                                <h3 className={styles.postTitle}>{post.title}</h3>
+                                {isAdmin && (
+                                    <div className={styles.postActions}>
+                                        <button
+                                            className={styles.postActionBtn}
+                                            onClick={() => handleEditPost(post.id)}
+                                            aria-label="Редактировать пост"
+                                        >
+                                            <PenIcon/>
+                                        </button>
+                                        <div
+                                            className={styles.deleteMenuWrapper}
+                                            ref={openDeleteMenuId === post.id ? menuRef : null}
+                                        >
+                                            <button
+                                                className={styles.postActionBtn}
+                                                onClick={() => handleDeleteMenuClick(post.id)}
+                                                aria-label="Удалить пост"
+                                            >
+                                                <TrashIcon/>
+                                            </button>
+                                            {openDeleteMenuId === post.id && (
+                                                <div className={styles.dropdown}>
+                                                    <Button
+                                                        variant="Text"
+                                                        color="red"
+                                                        leftIcon={<TrashIcon className={styles.trashIcon}/>}
+                                                        onClick={() => handleDeletePost(post.id)}
+                                                    >
+                                                        Удалить пост
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                             <p className={styles.postText}>{post.text}</p>
                             <div className={styles.postFooter}>
                                 <time className={styles.postDate}>{formatDate(post.date)}</time>
