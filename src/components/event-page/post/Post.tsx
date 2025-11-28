@@ -1,8 +1,7 @@
 import {useRef, useState} from "react";
 import styles from "./Post.module.scss";
 import OctopusImg from "@/assets/img/octopus.png";
-import {format} from "date-fns";
-import {ru} from "date-fns/locale";
+import {formatDate} from "@/utils/date.ts";
 import Button from "@/ui/button/Button";
 import CreatePostForm from "./form/CreatePostForm";
 import PenIcon from "@/assets/img/icon-m/pen.svg?react";
@@ -42,10 +41,6 @@ export default function Post({posts = mockPosts, isAdmin = false}: PostsProps) {
     const [openDeleteMenuId, setOpenDeleteMenuId] = useState<string | null>(null);
     const menuRef = useRef<HTMLDivElement>(null);
     const isMenuOpen = openDeleteMenuId !== null;
-
-    const formatDate = (date: Date): string => {
-        return format(date, "d MMMM yyyy", {locale: ru});
-    };
 
     const handleCreatePost = () => {
         setEditingPostId(null);

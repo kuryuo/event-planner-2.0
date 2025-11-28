@@ -1,7 +1,8 @@
 import EventItem from '@/ui/event-item/EventItem.tsx';
 import styles from './EventsList.module.scss';
-import {format, parseISO} from 'date-fns';
-import {ru} from 'date-fns/locale';
+import {parseISO} from 'date-fns';
+import {formatDate} from '@/utils/date.ts';
+import {groupBy} from "@/utils/array.ts";
 
 interface Event {
     id: string;
@@ -16,17 +17,13 @@ interface EventsListProps {
 }
 
 export default function EventsList({events}: EventsListProps) {
-    const grouped: Record<string, Event[]> = {};
-    events.forEach(event => {
-        if (!grouped[event.date]) grouped[event.date] = [];
-        grouped[event.date].push(event);
-    });
+    const grouped = groupBy(events, (event) => event.date);
 
     return (
         <div className={styles.eventsList}>
             {Object.entries(grouped).map(([date, eventsForDay]) => {
                 const day = parseISO(date);
-                const formattedDate = format(day, 'd MMMM, EEEE', {locale: ru});
+                const formattedDate = formatDate(day);
 
                 return (
                     <div key={date} className={styles.dayGroup}>

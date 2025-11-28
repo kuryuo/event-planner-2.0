@@ -17,6 +17,7 @@ import TextArea from "@/ui/text-area/TextArea.tsx";
 import Button from "@/ui/button/Button.tsx";
 import {useEventForm} from "@/hooks/ui/useEventForm.ts";
 import type {CreateEventPayload} from "@/types/api/Event.ts";
+import {filterDigits} from "@/utils/string.ts";
 
 interface EventFormProps {
     onSubmit: (data: CreateEventPayload) => void;
@@ -47,10 +48,10 @@ export default function EventForm({
         isParticipantsUnlimited,
         setIsParticipantsUnlimited,
         roles,
-        roleInputValue,  // ← изменить
-        setRoleInputValue,  // ← изменить
-        removeRole,  // ← изменить
-        handleRoleKeyDown,  // ← добавить
+        roleInputValue,
+        setRoleInputValue,
+        removeRole,
+        handleRoleKeyDown,
         showRoleSelect,
         setShowRoleSelect,
         description,
@@ -61,7 +62,6 @@ export default function EventForm({
         removeChip,
         handleKeyDown,
         preparePayload,
-        // handleAddRole - убрать
     } = useEventForm();
 
     const handleSubmit = () => {
@@ -178,7 +178,7 @@ export default function EventForm({
                             inputMode="numeric"
                             pattern="\d*"
                             value={participants}
-                            onChange={(e) => setParticipants(e.target.value.replace(/\D/g, ""))}
+                            onChange={(e) => setParticipants(filterDigits(e.target.value))}
                             disabled={isParticipantsUnlimited}
                             fieldSize="M"
                         />
