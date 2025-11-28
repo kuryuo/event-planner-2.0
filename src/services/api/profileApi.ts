@@ -11,7 +11,8 @@ export const profileApi = baseApi.injectEndpoints({
             query: () => ({
                 url: 'users/me',
                 method: 'GET',
-            })
+            }),
+            providesTags: ['Profile'],
         }),
         /**
          * Обновить профиль пользователя
@@ -21,7 +22,8 @@ export const profileApi = baseApi.injectEndpoints({
                 url: 'users/me',
                 method: 'PUT',
                 body
-            })
+            }),
+            invalidatesTags: ['Profile'],
         }),
         /**
          * Загрузить новый аватар пользователя
@@ -36,7 +38,8 @@ export const profileApi = baseApi.injectEndpoints({
                     method: 'POST',
                     body: formData
                 };
-            }
+            },
+            invalidatesTags: ['Profile'],
         }),
         /**
          * Получить список мероприятий, на которые подписан пользователь
@@ -45,7 +48,8 @@ export const profileApi = baseApi.injectEndpoints({
             query: () => ({
                 url: 'users/me/events',
                 method: 'GET',
-            })
+            }),
+            providesTags: ['Profile'],
         }),
     })
 })

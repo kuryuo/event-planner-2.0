@@ -1,5 +1,5 @@
 import Select from "@/ui/select/Select.tsx";
-import {useChips} from "@/hooks/utils/useChips.ts";
+import {useChips} from "@/hooks/ui/useChips.ts";
 import styles from "./Category.module.scss";
 
 interface CategorySelectProps {

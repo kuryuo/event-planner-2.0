@@ -6,7 +6,9 @@ import ruLocale from '@fullcalendar/core/locales/ru';
 import CalendarHeader from '@/components/calendar/header/CalendarHeader';
 import CalendarEvent from '@/components/calendar/event/CalendarEvent';
 import './CalendarBody.module.scss';
-import {useEventsData} from '@/hooks/transform/useEventsData.ts';
+import {useEventsData} from '@/hooks/api/useEventsData.ts';
+import type {EventClickArg} from "@fullcalendar/core";
+import {useNavigate} from "react-router-dom";
 
 import {SLOT_LABEL_FORMAT, CALENDAR_SLOT_TIMES, CALENDAR_OPTIONS} from '@/const';
 
@@ -16,7 +18,12 @@ interface CalendarBodyProps {
 }
 
 export default function CalendarBody({calendarRef, currentView}: CalendarBodyProps) {
+    const navigate = useNavigate();
     const {calendarEvents} = useEventsData();
+
+    const handleClick = (event: EventClickArg) => {
+        navigate('/event?id=' + event.event.id)
+    }
 
     const handleDatesSet = () => {
         const rows = document.querySelectorAll('.fc-daygrid-body tr');
@@ -42,6 +49,7 @@ export default function CalendarBody({calendarRef, currentView}: CalendarBodyPro
             dayHeaderContent={(args) => <CalendarHeader {...args} currentView={currentView}/>}
             eventContent={(arg) => <CalendarEvent arg={arg} viewType={currentView}/>}
             events={calendarEvents}
+            eventClick={handleClick}
             datesSet={handleDatesSet}
             {...CALENDAR_OPTIONS}
         />

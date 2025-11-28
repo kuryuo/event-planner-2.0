@@ -7,6 +7,7 @@ import EventInfo from "@/components/event-page/event-info/EventInfo.tsx";
 import Post from "@/components/event-page/post/Post.tsx";
 import Participants from "@/components/event-page/participants/Participants.tsx";
 import Contacts from "@/components/event-page/contacts/Contacts.tsx";
+import {useEventPage} from '@/hooks/api/useEventPage.ts';
 
 const subscriptionsData: CardBaseProps[] = [
     {title: "Подписка 1", subtitle: "Описание подписки 1", avatarUrl: "https://randomuser.me/api/portraits/men/32.jpg"},
@@ -19,11 +20,21 @@ const subscriptionsData: CardBaseProps[] = [
     {title: "Подписка 3", subtitle: "Описание подписки 3", avatarUrl: "https://randomuser.me/api/portraits/men/56.jpg"},
 ];
 
+
 export default function EventPage() {
+    const {event, isLoading, error} = useEventPage();
     const [subscriptions] = useState<CardBaseProps[]>(subscriptionsData);
     const [isAdmin] = useState(true);
 
     const handleCreateEvent = () => console.log("Создать мероприятие");
+
+    if (isLoading) {
+        return <div>Загрузка...</div>;
+    }
+
+    if (error || !event) {
+        return <div>Событие не найдено</div>;
+    }
 
     return (
         <div className={styles.pageWrapper}>
@@ -37,11 +48,16 @@ export default function EventPage() {
             </div>
             <div className={styles.content}>
                 <div className={styles.headerWrapper}>
-                    <Header isAdmin={isAdmin}/>
+                    <Header isAdmin={isAdmin} name={event.name}/>
                 </div>
                 <div className={styles.mainContent}>
                     <div className={styles.eventContent}>
-                        <EventInfo/>
+                        <EventInfo
+                            date={event.formattedDate}
+                            location={event.location}
+                            description={event.description}
+                            categories={event.categories}
+                        />
                         <Post isAdmin={isAdmin}/>
                     </div>
                     <div className={styles.sideContent}>

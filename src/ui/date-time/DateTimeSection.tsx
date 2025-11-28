@@ -1,8 +1,8 @@
 import {useRef} from "react";
 import CalendarIcon from "@/assets/img/icon-m/calendar.svg?react";
 import {SingleDatePicker} from "../date-picker/SingleDatePicker";
-import {useDateTime} from "@/hooks/store/useDateTime.ts";
-import {useClickOutside} from "@/hooks/utils/useClickOutside.ts";
+import {useDateTime} from "@/hooks/api/useDateTime.ts";
+import {useClickOutside} from "@/hooks/ui/useClickOutside.ts";
 import styles from "./DateTimeSection.module.scss";
 
 export default function DateTimeSection() {

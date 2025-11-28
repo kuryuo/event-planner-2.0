@@ -1,13 +1,13 @@
 import {useState} from "react";
-import {useDateTime} from "@/hooks/store/useDateTime.ts";
-import {useProfile} from "@/hooks/api/useProfile.ts";
-import {useChips} from "@/hooks/utils/useChips.ts";
+import {useDateTime} from "@/hooks/api/useDateTime.ts";
+import {useChips} from "@/hooks/ui/useChips.ts";
 import type {CreateEventPayload} from "@/types/api/Event.ts";
 import {EVENT_FORMAT_MAP} from "@/const.ts";
 import {combineDateTime} from "@/utils/date";
+import {useGetProfileQuery} from "@/services/api/profileApi.ts";
 
 export const useEventForm = () => {
-    const {profile} = useProfile();
+    const {data: profile} = useGetProfileQuery();
     const {startDate, endDate, startTime, endTime} = useDateTime();
 
     const [title, setTitle] = useState("");

@@ -7,8 +7,8 @@ import styles from './Sidebar.module.scss';
 import type {CardBaseProps} from '@/ui/card/CardBase.tsx';
 import NextEvent from "@/components/sidebar/next-event/NextEvent.tsx";
 import clsx from "clsx";
-import {useProfile} from "@/hooks/api/useProfile.ts";
 import {buildImageUrl} from "@/utils/buildImageUrl.ts";
+import {useGetProfileQuery} from "@/services/api/profileApi.ts";
 
 interface SidebarProps {
     subscriptions: CardBaseProps[];
@@ -18,7 +18,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({subscriptions, onCreateEvent, notificationCount = 3, isAdmin = false}: SidebarProps) {
-    const {profile, isLoading} = useProfile();
+    const {data: profile, isLoading} = useGetProfileQuery();
     const fallbackAvatar = 'https://api.dicebear.com/7.x/shapes/png?size=200&radius=50';
 
     return (

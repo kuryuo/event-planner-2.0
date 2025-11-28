@@ -6,13 +6,14 @@ import TrashIcon from '@/assets/img/icon-m/trash.svg?react';
 import Avatar from '@/ui/avatar/Avatar';
 import Button from '@/ui/button/Button';
 import Tabs, {type TabItem} from '@/ui/tabs/Tabs';
-import {useClickOutside} from '@/hooks/utils/useClickOutside.ts';
+import {useClickOutside} from '@/hooks/ui/useClickOutside.ts';
 
 interface HeaderProps {
     isAdmin?: boolean;
+    name: string;
 }
 
-export default function Header({isAdmin = false}: HeaderProps) {
+export default function Header({isAdmin = false, name}: HeaderProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -51,7 +52,7 @@ export default function Header({isAdmin = false}: HeaderProps) {
             <div className={styles.main}>
                 <div className={styles.left}>
                     <Avatar size="L" name="Название мероприятия"/>
-                    <h2 className={styles.title}>Название мероприятия</h2>
+                    <h2 className={styles.title}>{name}</h2>
                 </div>
                 <div className={styles.right}>
                     {isAdmin ? (

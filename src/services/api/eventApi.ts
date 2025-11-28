@@ -18,9 +18,10 @@ export const eventApi = baseApi.injectEndpoints({
                 method: 'GET',
                 params,
             }),
+            providesTags: ['Event'],
         }),
         /**
-         * Получить мероприятия по ID
+         * Получить мероприятие по ID
          */
         getEventById: builder.query<GetEventByIdResponse, string>({
             query: (eventId) => ({
@@ -28,14 +29,20 @@ export const eventApi = baseApi.injectEndpoints({
                 method: 'GET',
                 eventId,
             }),
+            providesTags: (result, error, eventId) =>
+                result ? [{type: 'Event', id: eventId}] : ['Event'],
         }),
+        /**
+         * Создать мероприятие
+         */
         createEvent: builder.mutation<CreateEventResponse, CreateEventPayload>({
             query: (body) => ({
                 url: '/events',
                 method: 'POST',
                 body,
-            })
-        })
+            }),
+            invalidatesTags: ['Event'],
+        }),
     }),
     overrideExisting: false,
 });

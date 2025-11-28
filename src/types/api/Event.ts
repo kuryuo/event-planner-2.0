@@ -1,21 +1,21 @@
-// Универсальный тип события
-export interface EventData {
-    id?: string; // есть только в response
-    responsiblePersonId?: string; // нужен при создании
-    name?: string;
-    description?: string;
-    startDate?: string;
-    endDate?: string;
-    location?: string;
-    format?: string;
-    eventType?: string;
-    maxParticipants?: number;
-    categories?: string[];
-    roles?: string[]; // только при создании
-    previewPhotos?: string[]; // только в response
-    status?: string | null; // только в response
+// Тип события из API response (GET /events, GET /events/{id}, POST /events response)
+export interface EventResponse {
+    id: string;
+    name: string;
+    description: string;
+    startDate: string;
+    endDate: string;
+    location: string;
+    format: string;
+    eventType: string;
+    responsiblePersonId: string;
+    maxParticipants: number;
+    categories: string[];
+    previewPhotos: string[];
+    status: string | null;
 }
 
+// Payload для создания мероприятия (POST /events)
 export interface CreateEventPayload {
     name: string;
     description: string;
@@ -28,10 +28,6 @@ export interface CreateEventPayload {
     maxParticipants: number;
     categories: string[];
     roles: string[];
-}
-
-export interface CreateEventResponse {
-    result: EventData;
 }
 
 // Payload для GET /events (фильтры)
@@ -49,62 +45,15 @@ export interface GetEventsPayload {
 
 // Response для GET /events
 export interface GetEventsResponse {
-    result: EventData[];
+    result: EventResponse[];
 }
 
 // Response для GET /events/{id}
 export interface GetEventByIdResponse {
-    result: EventData;
+    result: EventResponse;
 }
 
-// Подписка / отписка
-export interface EventSubscribeResponse {
-    result: string; // eventId
-    userId: string;
-}
-
-// Общая структура Id+Name / Id+Url
-export interface IdName {
-    id: string;
-    name: string;
-}
-
-export interface IdUrl {
-    id: string;
-    url: string;
-}
-
-// Роли
-export type EventRole = IdName;
-
-export interface GetRolesResponse {
-    result: EventRole[];
-}
-
-// Подписчики
-export interface EventSubscriber extends IdName {
-    email?: string;
-}
-
-export interface GetSubscribersResponse {
-    result: EventSubscriber[];
-}
-
-// Фото
-export type EventPhoto = IdUrl;
-
-export interface GetPhotosResponse {
-    result: EventPhoto[];
-}
-
-// Контакты
-export type EventContact = IdName;
-
-export interface GetContactsResponse {
-    result: EventContact[];
-}
-
-// Завершение мероприятия
-export interface FinishEventResponse {
-    result: string;
+// Response для POST /events
+export interface CreateEventResponse {
+    result: EventResponse;
 }

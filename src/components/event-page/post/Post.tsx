@@ -6,7 +6,7 @@ import Button from "@/ui/button/Button";
 import CreatePostForm from "./form/CreatePostForm";
 import PenIcon from "@/assets/img/icon-m/pen.svg?react";
 import TrashIcon from "@/assets/img/icon-m/trash.svg?react";
-import {useClickOutside} from "@/hooks/utils/useClickOutside.ts";
+import {useClickOutside} from "@/hooks/ui/useClickOutside.ts";
 
 interface Post {
     id: string;

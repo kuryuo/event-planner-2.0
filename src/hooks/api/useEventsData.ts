@@ -1,7 +1,6 @@
 import {useMemo} from 'react';
-import {useSelector} from 'react-redux';
-import type {RootState} from '@/store/store.ts';
-import type {EventData} from '@/types/api/Event.ts';
+import {useGetEventsQuery} from '@/services/api/eventApi.ts';
+import type {EventResponse} from '@/types/api/Event.ts';
 
 export interface UseEventsOutput {
     calendarEvents: {
@@ -20,34 +19,35 @@ export interface UseEventsOutput {
 }
 
 export const useEventsData = (): UseEventsOutput => {
-    const events = useSelector((state: RootState) => state.event.events) as EventData[];
+    const {data} = useGetEventsQuery({count: 50});
 
     const {calendarEvents, listEvents} = useMemo(() => {
+        const events = (data?.result || []) as EventResponse[];
         const calendarEvents = events.map(e => ({
-            id: e.id!,
-            title: e.name!,
-            start: new Date(e.startDate ?? new Date().toISOString()),
-            end: new Date(e.endDate ?? new Date().toISOString()),
+            id: e.id,
+            title: e.name,
+            start: new Date(e.startDate),
+            end: new Date(e.endDate),
         }));
 
         const listEvents = events.map(e => {
-            const start = new Date(e.startDate ?? new Date().toISOString());
-            const end = new Date(e.endDate ?? new Date().toISOString());
+            const start = new Date(e.startDate);
+            const end = new Date(e.endDate);
 
             const date = start.toISOString().split('T')[0];
             const time = `${start.getHours()}:${start.getMinutes().toString().padStart(2, '0')} - ${end.getHours()}:${end.getMinutes().toString().padStart(2, '0')}`;
 
             return {
-                id: e.id!,
+                id: e.id,
                 date,
                 time,
-                title: e.name!,
+                title: e.name,
                 description: e.description ?? '',
             };
         });
 
         return {calendarEvents, listEvents};
-    }, [events]);
+    }, [data]);
 
     return {calendarEvents, listEvents};
 };
