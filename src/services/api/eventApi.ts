@@ -1,5 +1,11 @@
 import {baseApi} from "@/services/api/baseApi.ts";
-import type {GetEventsResponse, GetEventsPayload, GetEventByIdResponse} from "@/types/api/Event.ts";
+import type {
+    GetEventsResponse,
+    GetEventsPayload,
+    GetEventByIdResponse,
+    CreateEventPayload,
+    CreateEventResponse
+} from "@/types/api/Event.ts";
 
 export const eventApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
@@ -23,8 +29,15 @@ export const eventApi = baseApi.injectEndpoints({
                 eventId,
             }),
         }),
+        createEvent: builder.mutation<CreateEventResponse, CreateEventPayload>({
+            query: (body) => ({
+                url: '/events',
+                method: 'POST',
+                body,
+            })
+        })
     }),
     overrideExisting: false,
 });
 
-export const {useGetEventsQuery} = eventApi;
+export const {useGetEventsQuery, useGetEventByIdQuery, useCreateEventMutation} = eventApi;

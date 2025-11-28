@@ -7,7 +7,7 @@ import styles from './Sidebar.module.scss';
 import type {CardBaseProps} from '@/ui/card/CardBase.tsx';
 import NextEvent from "@/components/sidebar/next-event/NextEvent.tsx";
 import clsx from "clsx";
-import {useProfile} from "@/hooks/useProfile.ts";
+import {useProfile} from "@/hooks/api/useProfile.ts";
 import {buildImageUrl} from "@/utils/buildImageUrl.ts";
 
 interface SidebarProps {

@@ -101,12 +101,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-2);
-  @include ty.font(body-m, semibold);
-  color: var(--content-secondary);
-}
-
-.participantsToggleLabel {
-  text-transform: lowercase;
+  @include ty.font(body-m, regular);
 }
 
 .participantsRoles {

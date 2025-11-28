@@ -34,3 +34,9 @@ export const CALENDAR_OPTIONS = {
     nowIndicator: true,
     selectable: true,
 };
+
+export const EVENT_FORMAT_MAP: Record<string, string> = {
+    "Очно": "offline",
+    "Онлайн": "online",
+    "Гибрид": "hybrid"
+};

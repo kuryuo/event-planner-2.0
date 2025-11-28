@@ -1,6 +1,6 @@
 import {useDispatch, useSelector} from 'react-redux';
 import {format} from 'date-fns';
-import type {RootState, AppDispatch} from '@/store/store';
+import type {RootState, AppDispatch} from '@/store/store.ts';
 import {
     setStartDate,
     setEndDate,
@@ -8,7 +8,7 @@ import {
     setEndTime,
     toggleStartDatePicker,
     toggleEndDatePicker,
-} from '@/store/dateTimeSlice';
+} from '@/store/dateTimeSlice.ts';
 
 export const useDateTime = () => {
     const dispatch = useDispatch<AppDispatch>();

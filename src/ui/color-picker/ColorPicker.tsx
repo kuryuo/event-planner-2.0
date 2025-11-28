@@ -2,7 +2,7 @@ import {useState, useRef} from "react";
 import styles from "./ColorPicker.module.scss";
 import ChevronDownImg from "../../assets/img/icon-m/chevron-down.svg";
 import ChevronUpImg from "../../assets/img/icon-m/chevron-up.svg";
-import {useClickOutside} from "@/hooks/useClickOutside.ts";
+import {useClickOutside} from "@/hooks/utils/useClickOutside.ts";
 
 const PREDEFINED_COLORS = [
     "var(--pink-100)",

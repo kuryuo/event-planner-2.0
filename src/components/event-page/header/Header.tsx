@@ -6,7 +6,7 @@ import TrashIcon from '@/assets/img/icon-m/trash.svg?react';
 import Avatar from '@/ui/avatar/Avatar';
 import Button from '@/ui/button/Button';
 import Tabs, {type TabItem} from '@/ui/tabs/Tabs';
-import {useClickOutside} from '@/hooks/useClickOutside';
+import {useClickOutside} from '@/hooks/utils/useClickOutside.ts';
 
 interface HeaderProps {
     isAdmin?: boolean;

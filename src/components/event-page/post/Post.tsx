@@ -1,13 +1,13 @@
-import {useState, useRef} from "react";
+import {useRef, useState} from "react";
 import styles from "./Post.module.scss";
 import OctopusImg from "@/assets/img/octopus.png";
 import {format} from "date-fns";
 import {ru} from "date-fns/locale";
 import Button from "@/ui/button/Button";
 import CreatePostForm from "./form/CreatePostForm";
-import PenIcon from "@/assets/img/icon-s/pen.svg?react";
-import TrashIcon from "@/assets/img/icon-s/trash.svg?react";
-import {useClickOutside} from "@/hooks/useClickOutside";
+import PenIcon from "@/assets/img/icon-m/pen.svg?react";
+import TrashIcon from "@/assets/img/icon-m/trash.svg?react";
+import {useClickOutside} from "@/hooks/utils/useClickOutside.ts";
 
 interface Post {
     id: string;
@@ -38,40 +38,38 @@ const mockPosts: Post[] = [
 
 export default function Post({posts = mockPosts, isAdmin = false}: PostsProps) {
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [editingPost, setEditingPost] = useState<Post | null>(null);
+    const [editingPostId, setEditingPostId] = useState<string | null>(null);
     const [openDeleteMenuId, setOpenDeleteMenuId] = useState<string | null>(null);
     const menuRef = useRef<HTMLDivElement>(null);
+    const isMenuOpen = openDeleteMenuId !== null;
 
     const formatDate = (date: Date): string => {
         return format(date, "d MMMM yyyy", {locale: ru});
     };
 
     const handleCreatePost = () => {
-        setEditingPost(null);
+        setEditingPostId(null);
         setIsFormOpen(true);
     };
 
     const handleCloseForm = () => {
         setIsFormOpen(false);
-        setEditingPost(null);
+        setEditingPostId(null);
     };
 
     const handleSubmit = (title: string, text: string) => {
-        if (editingPost) {
-            console.log("Сохранить пост:", {id: editingPost.id, title, text});
+        if (editingPostId) {
+            console.log("Редактировать пост:", {id: editingPostId, title, text});
         } else {
             console.log("Опубликовать пост:", {title, text});
         }
         setIsFormOpen(false);
-        setEditingPost(null);
+        setEditingPostId(null);
     };
 
     const handleEditPost = (postId: string) => {
-        const post = posts.find(p => p.id === postId);
-        if (post) {
-            setEditingPost(post);
-            setIsFormOpen(true);
-        }
+        setEditingPostId(postId);
+        setIsFormOpen(true);
     };
 
     const handleDeleteMenuClick = (postId: string) => {
@@ -83,7 +81,7 @@ export default function Post({posts = mockPosts, isAdmin = false}: PostsProps) {
         setOpenDeleteMenuId(null);
     };
 
-    useClickOutside(menuRef, () => setOpenDeleteMenuId(null), openDeleteMenuId !== null);
+    useClickOutside(menuRef, () => setOpenDeleteMenuId(null), isMenuOpen);
 
     return (
         <div className={styles.posts}>
@@ -102,9 +100,9 @@ export default function Post({posts = mockPosts, isAdmin = false}: PostsProps) {
                 <CreatePostForm
                     onClose={handleCloseForm}
                     onSubmit={handleSubmit}
-                    initialTitle={editingPost?.title || ""}
-                    initialText={editingPost?.text || ""}
-                    isEdit={!!editingPost}
+                    initialTitle={editingPostId ? posts.find(p => p.id === editingPostId)?.title : undefined}
+                    initialText={editingPostId ? posts.find(p => p.id === editingPostId)?.text : undefined}
+                    isEditMode={editingPostId !== null}
                 />
             )}
 

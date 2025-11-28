@@ -3,7 +3,7 @@ import {useNavigate} from "react-router-dom";
 import LoginForm from "@/components/auth/LoginForm";
 import RegistrationForm from "@/components/auth/RegistrationForm";
 import Button from "@/ui/button/Button";
-import {useAuth} from "@/hooks/useAuth";
+import {useAuth} from "@/hooks/api/useAuth.ts";
 
 export default function AuthPage() {
     const [mode, setMode] = useState<"login" | "register">("login");

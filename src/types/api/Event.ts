@@ -16,6 +16,24 @@ export interface EventData {
     status?: string | null; // только в response
 }
 
+export interface CreateEventPayload {
+    name: string;
+    description: string;
+    startDate: string;
+    endDate: string;
+    location: string;
+    format: string;
+    eventType: string;
+    responsiblePersonId: string;
+    maxParticipants: number;
+    categories: string[];
+    roles: string[];
+}
+
+export interface CreateEventResponse {
+    result: EventData;
+}
+
 // Payload для GET /events (фильтры)
 export interface GetEventsPayload {
     start?: string;

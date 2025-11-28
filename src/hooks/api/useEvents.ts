@@ -1,8 +1,8 @@
 import {useEffect} from 'react';
-import {useGetEventsQuery} from '@/services/api/eventApi';
+import {useGetEventsQuery} from '@/services/api/eventApi.ts';
 import {useDispatch, useSelector} from 'react-redux';
-import {setEvents} from '@/store/eventSlice';
-import type {EventData} from '@/types/api/Event';
+import {setEvents} from '@/store/eventSlice.ts';
+import type {EventData} from '@/types/api/Event.ts';
 import type {RootState} from "@/store/store.ts";
 
 export const useEvents = (filters?: any) => {

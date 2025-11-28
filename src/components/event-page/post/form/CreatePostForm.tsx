@@ -10,22 +10,20 @@ interface CreatePostFormProps {
     onSubmit: (title: string, text: string) => void;
     initialTitle?: string;
     initialText?: string;
-    isEdit?: boolean;
+    isEditMode?: boolean;
 }
 
-export default function CreatePostForm({
-    onClose, 
-    onSubmit, 
-    initialTitle = "", 
-    initialText = "",
-    isEdit = false
-}: CreatePostFormProps) {
-    const [postTitle, setPostTitle] = useState(initialTitle);
-    const [postText, setPostText] = useState(initialText);
+export default function CreatePostForm({onClose, onSubmit, initialTitle, initialText, isEditMode = false}: CreatePostFormProps) {
+    const [postTitle, setPostTitle] = useState(initialTitle || "");
+    const [postText, setPostText] = useState(initialText || "");
 
     useEffect(() => {
-        setPostTitle(initialTitle);
-        setPostText(initialText);
+        if (initialTitle !== undefined) {
+            setPostTitle(initialTitle);
+        }
+        if (initialText !== undefined) {
+            setPostText(initialText);
+        }
     }, [initialTitle, initialText]);
 
     const handlePublish = () => {
@@ -43,9 +41,7 @@ export default function CreatePostForm({
     return (
         <div className={styles.createForm}>
             <div className={styles.formHeader}>
-                <h3 className={styles.formTitle}>
-                    {isEdit ? "Редактирование поста" : "Новый пост"}
-                </h3>
+                <h3 className={styles.formTitle}>{isEditMode ? "Редактировать пост" : "Новый пост"}</h3>
                 <button
                     className={styles.closeButton}
                     onClick={handleClose}
@@ -73,7 +69,7 @@ export default function CreatePostForm({
                 onClick={handlePublish}
                 className={styles.button}
             >
-                {isEdit ? "Сохранить" : "Опубликовать"}
+                {isEditMode ? "Сохранить" : "Опубликовать"}
             </Button>
         </div>
     );

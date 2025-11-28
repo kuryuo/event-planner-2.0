@@ -4,8 +4,8 @@ import Sidebar from "@/components/sidebar/Sidebar";
 import Filters from "@/components/filters/Filters";
 import styles from "./MainPage.module.scss";
 import type {CardBaseProps} from "@/ui/card/CardBase";
-import {useEvents} from "@/hooks/useEvents.ts";
-import {useProfile} from "@/hooks/useProfile.ts";
+import {useEvents} from "@/hooks/api/useEvents.ts";
+import {useProfile} from "@/hooks/api/useProfile.ts";
 
 const subscriptionsData: CardBaseProps[] = [
     {title: 'Подписка 1', subtitle: 'Описание подписки 1', avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg'},

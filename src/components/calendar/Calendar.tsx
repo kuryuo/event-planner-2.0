@@ -5,7 +5,7 @@ import CalendarBody from './body/CalendarBody';
 import styles from './Calendar.module.scss';
 import {shiftMonth, shiftWeek} from '@/utils';
 import EventsList from "@/components/events-list/EventsList.tsx";
-import {useEventsData} from '@/hooks/useEventsData';
+import {useEventsData} from '@/hooks/transform/useEventsData.ts';
 
 interface CalendarProps {
     onFilterClick?: () => void;

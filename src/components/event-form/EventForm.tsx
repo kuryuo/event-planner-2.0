@@ -1,4 +1,3 @@
-import {useState} from "react";
 import CloseIcon from "@/assets/img/icon-m/x.svg";
 import DateTimeSection from "../../ui/date-time/DateTimeSection.tsx";
 import SegmentedControl from "../../ui/segmented-control/SegmentedControl.tsx";
@@ -11,35 +10,66 @@ import Avatar from "@/ui/avatar/Avatar.tsx";
 import ColorPicker from "@/ui/color-picker/ColorPicker.tsx";
 import Switch from "@/ui/switch/Switch.tsx";
 import Select from "@/ui/select/Select.tsx";
-import {useChips} from "@/hooks/useChips.ts";
 import Chip from "@/ui/chip/Chip.tsx";
 import PeopleIcon from "@/assets/img/icon-m/people.svg";
 import Checkbox from "@/ui/checkbox/Checkbox.tsx";
 import TextArea from "@/ui/text-area/TextArea.tsx";
 import Button from "@/ui/button/Button.tsx";
+import {useEventForm} from "@/hooks/ui/useEventForm.ts";
+import type {CreateEventPayload} from "@/types/api/Event.ts";
 
+interface EventFormProps {
+    onSubmit: (data: CreateEventPayload) => void;
+    loading?: boolean;
+    error?: string | null;
+}
 
-export default function EventForm() {
-    const [title, setTitle] = useState("");
-    const [format, setFormat] = useState("Очно");
-    const [avatarColor, setAvatarColor] = useState("var(--pink-100)");
-    const [isPrivate, setIsPrivate] = useState(false);
-    const [showCategorySelect, setShowCategorySelect] = useState(false);
-    const [participants, setParticipants] = useState("");
-    const [isParticipantsUnlimited, setIsParticipantsUnlimited] = useState(true);
-    const [roles, setRoles] = useState<string[]>(["Организатор"]);
-    const [roleValue, setRoleValue] = useState("");
-    const [showRoleSelect, setShowRoleSelect] = useState(false);
-    const [description, setDescription] = useState("");
-
+export default function EventForm({
+                                      onSubmit,
+                                      loading = false,
+                                      error
+                                  }: EventFormProps) {
     const {
-        chips: categories,
+        title,
+        setTitle,
+        format,
+        setFormat,
+        location,
+        setLocation,
+        avatarColor,
+        setAvatarColor,
+        isPrivate,
+        setIsPrivate,
+        showCategorySelect,
+        setShowCategorySelect,
+        participants,
+        setParticipants,
+        isParticipantsUnlimited,
+        setIsParticipantsUnlimited,
+        roles,
+        roleInputValue,  // ← изменить
+        setRoleInputValue,  // ← изменить
+        removeRole,  // ← изменить
+        handleRoleKeyDown,  // ← добавить
+        showRoleSelect,
+        setShowRoleSelect,
+        description,
+        setDescription,
+        categories,
         inputValue,
         setInputValue,
         removeChip,
         handleKeyDown,
-    } = useChips();
+        preparePayload,
+        // handleAddRole - убрать
+    } = useEventForm();
 
+    const handleSubmit = () => {
+        const payload = preparePayload();
+        if (payload) {
+            onSubmit(payload);
+        }
+    };
 
     return (
         <div className={styles.formWrapper}>
@@ -66,6 +96,8 @@ export default function EventForm() {
                     />
                     <TextField
                         placeholder="Место"
+                        value={location}
+                        onChange={e => setLocation(e.target.value)}
                         leftIcon={<img src={GeoAltIcon} alt="location"/>}
                         rightIcon={<img src={Map} alt="adornment"/>}
                         fieldSize="M"
@@ -155,7 +187,7 @@ export default function EventForm() {
                                 checked={isParticipantsUnlimited}
                                 onChange={() => setIsParticipantsUnlimited(prev => !prev)}
                             />
-                            <span className={styles.participantsToggleLabel}>не ограничено</span>
+                            <span className={styles.participantsLabel}>Не ограничено</span>
                         </div>
                     </div>
 
@@ -166,9 +198,7 @@ export default function EventForm() {
                                     key={role}
                                     text={role}
                                     closable={role !== "Организатор"}
-                                    onClose={() =>
-                                        setRoles((prev) => prev.filter((item) => item !== role))
-                                    }
+                                    onClose={() => removeRole(role)}
                                 />
                             ))}
                         </div>
@@ -184,14 +214,9 @@ export default function EventForm() {
                     {showRoleSelect && (
                         <Select
                             placeholder="Выберите роль"
-                            value={roleValue}
-                            onChange={(e) => {
-                                const value = e.target.value;
-                                setRoleValue(value);
-                                if (value && !roles.includes(value)) {
-                                    setRoles((prev) => [...prev, value]);
-                                }
-                            }}
+                            value={roleInputValue}
+                            onChange={(e) => setRoleInputValue(e.target.value)}
+                            onKeyDown={handleRoleKeyDown}
                             options={[
                                 {label: "Организатор", description: "Отвечает за мероприятие"},
                                 {label: "Спикер", description: "Выступающий"},
@@ -211,7 +236,7 @@ export default function EventForm() {
                 </div>
 
                 <div className={styles.actions}>
-                    <Button variant="Filled" color="purple" type="submit">
+                    <Button variant="Filled" color="purple" type="button" onClick={handleSubmit}>
                         Создать
                     </Button>
                 </div>

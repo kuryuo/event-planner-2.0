@@ -6,7 +6,7 @@ import ruLocale from '@fullcalendar/core/locales/ru';
 import CalendarHeader from '@/components/calendar/header/CalendarHeader';
 import CalendarEvent from '@/components/calendar/event/CalendarEvent';
 import './CalendarBody.module.scss';
-import {useEventsData} from '@/hooks/useEventsData.ts';
+import {useEventsData} from '@/hooks/transform/useEventsData.ts';
 
 import {SLOT_LABEL_FORMAT, CALENDAR_SLOT_TIMES, CALENDAR_OPTIONS} from '@/const';
 
