@@ -1,0 +1,95 @@
+@use '@/typography-variables' as ty;
+
+.container {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.imageSection {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .image {
+    width: 100%;
+    height: 100%;
+    //object-fit: cover;
+  }
+}
+
+.formSection {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.title {
+  @include ty.font(title-m, semibold);
+}
+
+.nameRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-4);
+}
+
+.fieldsWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+.checkboxWrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.checkboxLabel {
+  @include ty.font(body-m, regular);
+  cursor: pointer;
+}
+
+.submitButton {
+  width: 100%;
+  margin-top: var(--spacing-10);
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  margin-top: var(--spacing-16);
+}
+
+.linkWrapper {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+.text {
+  @include ty.font(body-m, regular);
+}
+
+.link {
+  @include ty.font(body-m, regular);
+  color: var(--content-link);
+  background: none;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}

@@ -20,7 +20,7 @@ export default function TextField({
                                       helperText,
                                       disabled,
                                       fieldSize = 'M',
-                                      placeholder = 'placeholder',
+                                      placeholder,
                                       ...props
                                   }: TextFieldProps) {
     return (
