@@ -3,8 +3,7 @@ import EventForm from "@/components/event-form/EventForm";
 import styles from "./EventEditorPage.module.scss";
 import type {CardBaseProps} from "@/ui/card/CardBase.tsx";
 import {useState} from "react";
-import type {CreateEventPayload} from "@/types/api/Event.ts";
-import {useCreateEventMutation} from "@/services/api/eventApi.ts";
+import {useEventEditor} from "@/hooks/ui/useEventEditor.ts";
 
 const subscriptionsData: CardBaseProps[] = [
     {title: 'Подписка 1', subtitle: 'Описание подписки 1', avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg'},
@@ -19,25 +18,13 @@ const subscriptionsData: CardBaseProps[] = [
 
 export default function EventEditorPage() {
     const [subscriptions] = useState<CardBaseProps[]>(subscriptionsData);
-    const [createEventMutation, {isLoading, error}] = useCreateEventMutation();
-
-    const handleCreateEvent = () => console.log("Создать мероприятие");
-
-    const handleSubmit = async (payload: CreateEventPayload) => {
-        try {
-            await createEventMutation(payload);
-            console.log('Событие успешно создано');
-        } catch (err) {
-            console.error('Ошибка создания события:', err);
-        }
-    };
+    const {handleSubmit, isLoading, error} = useEventEditor();
 
     return (
         <div className={styles.pageWrapper}>
             <div className={styles.sidebar}>
                 <Sidebar
                     subscriptions={subscriptions}
-                    onCreateEvent={handleCreateEvent}
                     notificationCount={5}
                 />
             </div>

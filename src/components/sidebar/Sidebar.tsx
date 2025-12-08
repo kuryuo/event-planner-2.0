@@ -9,17 +9,22 @@ import NextEvent from "@/components/sidebar/next-event/NextEvent.tsx";
 import clsx from "clsx";
 import {buildImageUrl} from "@/utils/buildImageUrl.ts";
 import {useGetProfileQuery} from "@/services/api/profileApi.ts";
+import {useNavigate} from "react-router-dom";
 
 interface SidebarProps {
     subscriptions: CardBaseProps[];
-    onCreateEvent?: () => void;
     notificationCount?: number;
     isAdmin?: boolean;
 }
 
-export default function Sidebar({subscriptions, onCreateEvent, notificationCount = 3, isAdmin = false}: SidebarProps) {
+export default function Sidebar({subscriptions, notificationCount = 3, isAdmin = false}: SidebarProps) {
     const {data: profile, isLoading} = useGetProfileQuery();
+    const navigate = useNavigate();
     const fallbackAvatar = 'https://api.dicebear.com/7.x/shapes/png?size=200&radius=50';
+
+    const handleCreateEvent = () => {
+            navigate("/editor");
+    };
 
     return (
         <div className={styles.sidebar}>
@@ -41,7 +46,7 @@ export default function Sidebar({subscriptions, onCreateEvent, notificationCount
 
             {isAdmin && (
                 <div className={clsx(styles.block, styles.createEventWrapper)}>
-                    <CircleButton onClick={onCreateEvent} variant={"green"}/>
+                    <CircleButton onClick={handleCreateEvent} variant={"green"}/>
                     <span className={styles.createEventText}>Создайте мероприятие</span>
                 </div>
             )}

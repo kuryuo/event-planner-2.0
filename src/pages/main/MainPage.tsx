@@ -24,15 +24,12 @@ export default function MainPage() {
 
     useGetProfileQuery();
 
-    const handleCreateEvent = () => console.log("Создать мероприятие");
-
     return (
         <div className={styles.pageWrapper}>
             <div className={styles.sidebar}>
                 <Sidebar
                     isAdmin={isAdmin}
                     subscriptions={subscriptions}
-                    onCreateEvent={handleCreateEvent}
                     notificationCount={5}
                 />
             </div>
