@@ -26,8 +26,6 @@ export default function EventPage() {
     const [subscriptions] = useState<CardBaseProps[]>(subscriptionsData);
     const [isAdmin] = useState(true);
 
-    const handleCreateEvent = () => console.log("Создать мероприятие");
-
     if (isLoading) {
         return <div>Загрузка...</div>;
     }
@@ -41,14 +39,13 @@ export default function EventPage() {
             <div className={styles.sidebar}>
                 <Sidebar
                     subscriptions={subscriptions}
-                    onCreateEvent={handleCreateEvent}
                     notificationCount={5}
                     isAdmin={isAdmin}
                 />
             </div>
             <div className={styles.content}>
                 <div className={styles.headerWrapper}>
-                    <Header isAdmin={isAdmin} name={event.name}/>
+                    <Header isAdmin={isAdmin} name={event.name} eventId={event.id}/>
                 </div>
                 <div className={styles.mainContent}>
                     <div className={styles.eventContent}>

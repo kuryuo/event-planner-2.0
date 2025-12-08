@@ -53,7 +53,24 @@ export interface GetEventByIdResponse {
     result: EventResponse;
 }
 
+// Payload для PUT /events/{id} (обновление мероприятия)
+export interface UpdateEventPayload {
+    name: string;
+    description: string;
+    startDate: string;
+    endDate: string;
+    location: string;
+    format: string;
+    eventType: string;
+    maxParticipants: number;
+}
+
 // Response для POST /events
 export interface CreateEventResponse {
+    result: EventResponse;
+}
+
+// Response для PUT /events/{id}
+export interface UpdateEventResponse {
     result: EventResponse;
 }

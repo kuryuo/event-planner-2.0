@@ -3,7 +3,9 @@ import EventForm from "@/components/event-form/EventForm";
 import styles from "./EventEditorPage.module.scss";
 import type {CardBaseProps} from "@/ui/card/CardBase.tsx";
 import {useState} from "react";
+import {useSearchParams} from "react-router-dom";
 import {useEventEditor} from "@/hooks/ui/useEventEditor.ts";
+import {useGetEventByIdQuery} from "@/services/api/eventApi.ts";
 
 const subscriptionsData: CardBaseProps[] = [
     {title: 'Подписка 1', subtitle: 'Описание подписки 1', avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg'},
@@ -18,7 +20,19 @@ const subscriptionsData: CardBaseProps[] = [
 
 export default function EventEditorPage() {
     const [subscriptions] = useState<CardBaseProps[]>(subscriptionsData);
-    const {handleSubmit, isLoading, error} = useEventEditor();
+    const [searchParams] = useSearchParams();
+    const eventId = searchParams.get('id');
+    
+    const {data: eventData, isLoading: isLoadingEvent} = useGetEventByIdQuery(
+        eventId ?? '',
+        {skip: !eventId}
+    );
+    
+    const {handleSubmit, isLoading, error} = useEventEditor(eventId ?? undefined);
+
+    if (isLoadingEvent) {
+        return <div>Загрузка...</div>;
+    }
 
     return (
         <div className={styles.pageWrapper}>
@@ -30,9 +44,11 @@ export default function EventEditorPage() {
             </div>
             <div className={styles.form}>
                 <EventForm
+                    eventData={eventData?.result}
                     onSubmit={handleSubmit}
                     loading={isLoading}
                     error={error as string | null | undefined}
+                    isEditMode={!!eventId}
                 />
             </div>
         </div>

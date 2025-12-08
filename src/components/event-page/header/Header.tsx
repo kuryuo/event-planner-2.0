@@ -1,4 +1,5 @@
 import {useState, useRef} from "react";
+import {useNavigate} from "react-router-dom";
 import styles from './Header.module.scss';
 import ChevronLeftIcon from '@/assets/img/icon-s/chevron-left.svg?react';
 import ThreeDotsVerticalIcon from '@/assets/img/icon-m/three-dots-vertical.svg?react';
@@ -11,11 +12,13 @@ import {useClickOutside} from '@/hooks/ui/useClickOutside.ts';
 interface HeaderProps {
     isAdmin?: boolean;
     name: string;
+    eventId?: string;
 }
 
-export default function Header({isAdmin = false, name}: HeaderProps) {
+export default function Header({isAdmin = false, name, eventId}: HeaderProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
+    const navigate = useNavigate();
 
     const tabItems: TabItem[] = [
         {label: 'О мероприятии', badgeCount: 3},
@@ -28,7 +31,9 @@ export default function Header({isAdmin = false, name}: HeaderProps) {
     };
 
     const handleEdit = () => {
-        console.log('Редактировать мероприятие');
+        if (eventId) {
+            navigate(`/editor?id=${eventId}`);
+        }
     };
 
     const handleMenuClick = () => {

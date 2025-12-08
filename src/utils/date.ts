@@ -19,6 +19,25 @@ export const combineDateTime = (date: Date | undefined, time: string): string | 
 };
 
 /**
+ * Парсит ISO строку даты и времени в объект с датой и временем.
+ * 
+ * @param dateTimeString - строка даты и времени в формате ISO
+ * @returns объект с полями date (Date) и time (строка "HH:MM")
+ */
+export const parseDateTime = (dateTimeString: string): {date: Date | undefined; time: string} => {
+    const date = new Date(dateTimeString);
+    if (isNaN(date.getTime())) {
+        return {date: undefined, time: ''};
+    }
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return {
+        date,
+        time: `${hours}:${minutes}`
+    };
+};
+
+/**
  * Форматирует дату в читаемый формат на русском языке.
  * Возвращает строку вида "15 января 2024".
  *

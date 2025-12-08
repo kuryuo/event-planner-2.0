@@ -40,3 +40,9 @@ export const EVENT_FORMAT_MAP: Record<string, string> = {
     "Онлайн": "online",
     "Гибрид": "hybrid"
 };
+
+export const FORMAT_REVERSE_MAP: Record<string, string> = {
+    "offline": "Очно",
+    "online": "Онлайн",
+    "hybrid": "Гибрид"
+};

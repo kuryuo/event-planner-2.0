@@ -4,7 +4,9 @@ import type {
     GetEventsPayload,
     GetEventByIdResponse,
     CreateEventPayload,
-    CreateEventResponse
+    CreateEventResponse,
+    UpdateEventPayload,
+    UpdateEventResponse
 } from "@/types/api/Event.ts";
 
 export const eventApi = baseApi.injectEndpoints({
@@ -43,8 +45,25 @@ export const eventApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ['Event'],
         }),
+        /**
+         * Обновить мероприятие
+         */
+        updateEvent: builder.mutation<UpdateEventResponse, {eventId: string; body: UpdateEventPayload}>({
+            query: ({eventId, body}) => ({
+                url: `/events/${eventId}`,
+                method: 'PUT',
+                body,
+            }),
+            invalidatesTags: (result, error, {eventId}) =>
+                result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
+        }),
     }),
     overrideExisting: false,
 });
 
-export const {useGetEventsQuery, useGetEventByIdQuery, useCreateEventMutation} = eventApi;
+export const {
+    useGetEventsQuery,
+    useGetEventByIdQuery,
+    useCreateEventMutation,
+    useUpdateEventMutation
+} = eventApi;

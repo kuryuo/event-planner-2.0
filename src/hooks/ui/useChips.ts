@@ -24,6 +24,7 @@ export const useChips = (initial: string[] = []) => {
 
     return {
         chips,
+        setChips,
         inputValue,
         setInputValue,
         addChip,

@@ -1,21 +1,33 @@
-import {useCreateEventMutation} from '@/services/api/eventApi.ts';
-import type {CreateEventPayload} from '@/types/api/Event.ts';
+import {useNavigate} from 'react-router-dom';
+import {useCreateEventMutation, useUpdateEventMutation} from '@/services/api/eventApi.ts';
+import type {CreateEventPayload, UpdateEventPayload} from '@/types/api/Event.ts';
 
 export interface UseEventEditorOutput {
-    handleSubmit: (payload: CreateEventPayload) => Promise<void>;
+    handleSubmit: (payload: CreateEventPayload | UpdateEventPayload) => Promise<void>;
     isLoading: boolean;
     error: string | null | undefined;
 }
 
-export const useEventEditor = (): UseEventEditorOutput => {
-    const [createEventMutation, {isLoading, error}] = useCreateEventMutation();
+export const useEventEditor = (eventId?: string): UseEventEditorOutput => {
+    const navigate = useNavigate();
+    const [createEventMutation, {isLoading: isCreating, error: createError}] = useCreateEventMutation();
+    const [updateEventMutation, {isLoading: isUpdating, error: updateError}] = useUpdateEventMutation();
 
-    const handleSubmit = async (payload: CreateEventPayload) => {
+    const isLoading = isCreating || isUpdating;
+    const error = createError || updateError;
+
+    const handleSubmit = async (payload: CreateEventPayload | UpdateEventPayload) => {
         try {
-            await createEventMutation(payload);
-            console.log('Событие успешно создано');
+            if (eventId) {
+                await updateEventMutation({eventId, body: payload as UpdateEventPayload});
+                console.log('Событие успешно обновлено');
+            } else {
+                await createEventMutation(payload as CreateEventPayload);
+                console.log('Событие успешно создано');
+            }
+            navigate('/main');
         } catch (err) {
-            console.error('Ошибка создания события:', err);
+            console.error('Ошибка сохранения события:', err);
         }
     };
 

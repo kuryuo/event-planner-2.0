@@ -16,20 +16,24 @@ import Checkbox from "@/ui/checkbox/Checkbox.tsx";
 import TextArea from "@/ui/text-area/TextArea.tsx";
 import Button from "@/ui/button/Button.tsx";
 import {useEventForm} from "@/hooks/ui/useEventForm.ts";
-import type {CreateEventPayload} from "@/types/api/Event.ts";
+import type {CreateEventPayload, EventResponse} from "@/types/api/Event.ts";
 import {filterDigits} from "@/utils/string.ts";
 
 interface EventFormProps {
-    onSubmit: (data: CreateEventPayload) => void;
+    eventData?: EventResponse | null;
+    onSubmit: (data: CreateEventPayload | any) => void;
     loading?: boolean;
     error?: string | null;
+    isEditMode?: boolean;
 }
 
 export default function EventForm({
-                                      onSubmit,
-                                      loading = false,
-                                      error
-                                  }: EventFormProps) {
+    eventData,
+    onSubmit,
+    loading = false,
+    error,
+    isEditMode = false
+}: EventFormProps) {
     const {
         title,
         setTitle,
@@ -62,7 +66,7 @@ export default function EventForm({
         removeChip,
         handleKeyDown,
         preparePayload,
-    } = useEventForm();
+    } = useEventForm(eventData);
 
     const handleSubmit = () => {
         const payload = preparePayload();
@@ -237,7 +241,7 @@ export default function EventForm({
 
                 <div className={styles.actions}>
                     <Button variant="Filled" color="purple" type="button" onClick={handleSubmit}>
-                        Создать
+                        {isEditMode ? 'Сохранить изменения' : 'Создать'}
                     </Button>
                 </div>
             </div>
