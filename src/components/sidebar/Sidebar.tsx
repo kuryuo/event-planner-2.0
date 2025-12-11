@@ -23,25 +23,31 @@ export default function Sidebar({subscriptions, notificationCount = 3, isAdmin =
     const fallbackAvatar = 'https://api.dicebear.com/7.x/shapes/png?size=200&radius=50';
 
     const handleCreateEvent = () => {
-            navigate("/editor");
+        navigate("/editor");
+    };
+
+    const handleProfileClick = () => {
+        navigate("/profile");
     };
 
     return (
         <div className={styles.sidebar}>
             <div className={styles.block}>
-                <CardExtra
-                    title={`${profile?.lastName ?? ''} ${profile?.firstName ?? ''} ${profile?.middleName ?? ''}`.trim()}
-                    subtitle=""
-                    avatarUrl={
-                        profile?.avatarUrl
-                            ? buildImageUrl(profile.avatarUrl)!
-                            : fallbackAvatar
-                    }
-                    addon={
-                        <NotificationBadge icon={<img src={bell} alt="Уведомления"/>} count={notificationCount}/>
-                    }
-                    onAddonClick={() => console.log('Открыть уведомления')}
-                />
+                <div onClick={handleProfileClick} style={{cursor: 'pointer'}}>
+                    <CardExtra
+                        title={`${profile?.lastName ?? ''} ${profile?.firstName ?? ''} ${profile?.middleName ?? ''}`.trim()}
+                        subtitle=""
+                        avatarUrl={
+                            profile?.avatarUrl
+                                ? buildImageUrl(profile.avatarUrl)!
+                                : fallbackAvatar
+                        }
+                        addon={
+                            <NotificationBadge icon={<img src={bell} alt="Уведомления"/>} count={notificationCount}/>
+                        }
+                        onAddonClick={() => console.log('Открыть уведомления')}
+                    />
+                </div>
             </div>
 
             {isAdmin && (

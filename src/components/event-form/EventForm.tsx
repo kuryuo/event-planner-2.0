@@ -18,6 +18,7 @@ import Button from "@/ui/button/Button.tsx";
 import {useEventForm} from "@/hooks/ui/useEventForm.ts";
 import type {CreateEventPayload, EventResponse} from "@/types/api/Event.ts";
 import {filterDigits} from "@/utils/string.ts";
+import {useNavigate} from "react-router-dom";
 
 interface EventFormProps {
     eventData?: EventResponse | null;
@@ -28,12 +29,14 @@ interface EventFormProps {
 }
 
 export default function EventForm({
-    eventData,
-    onSubmit,
-    loading = false,
-    error,
-    isEditMode = false
-}: EventFormProps) {
+                                      eventData,
+                                      onSubmit,
+                                      loading = false,
+                                      error,
+                                      isEditMode = false
+                                  }: EventFormProps) {
+    const navigate = useNavigate();
+
     const {
         title,
         setTitle,
@@ -75,6 +78,10 @@ export default function EventForm({
         }
     };
 
+    const handleClose = () => {
+        navigate(-1);
+    };
+
     return (
         <div className={styles.formWrapper}>
             <div className={styles.header}>
@@ -85,7 +92,7 @@ export default function EventForm({
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                 />
-                <button className={styles.closeButton}>
+                <button className={styles.closeButton} onClick={handleClose}>
                     <img src={CloseIcon} alt="close"/>
                 </button>
             </div>

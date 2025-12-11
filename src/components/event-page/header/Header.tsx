@@ -31,6 +31,10 @@ export default function Header({isAdmin = false, name, eventId}: HeaderProps) {
         console.log('Выбран таб:', index);
     };
 
+    const handleBack = () => {
+        navigate('/main');
+    };
+
     const handleEdit = () => {
         if (eventId) {
             navigate(`/editor?id=${eventId}`);
@@ -56,7 +60,7 @@ export default function Header({isAdmin = false, name, eventId}: HeaderProps) {
 
     return (
         <header className={styles.header}>
-            <button className={styles.backButton}>
+            <button className={styles.backButton} onClick={handleBack}>
                 <ChevronLeftIcon className={styles.icon}/>
                 <span className={styles.text}>Назад</span>
             </button>
