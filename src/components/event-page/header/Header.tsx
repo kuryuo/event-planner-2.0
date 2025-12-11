@@ -8,6 +8,7 @@ import Avatar from '@/ui/avatar/Avatar';
 import Button from '@/ui/button/Button';
 import Tabs, {type TabItem} from '@/ui/tabs/Tabs';
 import {useClickOutside} from '@/hooks/ui/useClickOutside.ts';
+import {useEventDeleter} from '@/hooks/ui/useEventDeleter.ts';
 
 interface HeaderProps {
     isAdmin?: boolean;
@@ -19,7 +20,7 @@ export default function Header({isAdmin = false, name, eventId}: HeaderProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
-
+    const {handleDelete, isLoading: isDeleting} = useEventDeleter();
     const tabItems: TabItem[] = [
         {label: 'О мероприятии', badgeCount: 3},
         {label: 'Чат'},
@@ -40,9 +41,15 @@ export default function Header({isAdmin = false, name, eventId}: HeaderProps) {
         setIsMenuOpen(!isMenuOpen);
     };
 
-    const handleDelete = () => {
-        console.log('Удалить мероприятие');
-        setIsMenuOpen(false);
+    const handleDeleteClick = async () => {
+        if (eventId) {
+            try {
+                await handleDelete(eventId);
+                setIsMenuOpen(false);
+            } catch (err) {
+                console.error('Не удалось удалить событие:', err);
+            }
+        }
     };
 
     useClickOutside(menuRef, () => setIsMenuOpen(false), isMenuOpen);
@@ -53,7 +60,6 @@ export default function Header({isAdmin = false, name, eventId}: HeaderProps) {
                 <ChevronLeftIcon className={styles.icon}/>
                 <span className={styles.text}>Назад</span>
             </button>
-
             <div className={styles.main}>
                 <div className={styles.left}>
                     <Avatar size="L" name="Название мероприятия"/>
@@ -79,9 +85,10 @@ export default function Header({isAdmin = false, name, eventId}: HeaderProps) {
                                             variant="Text"
                                             color="red"
                                             leftIcon={<TrashIcon className={styles.trashIcon}/>}
-                                            onClick={handleDelete}
+                                            onClick={handleDeleteClick}
+                                            disabled={isDeleting}
                                         >
-                                            Удалить мероприятие
+                                            {isDeleting ? 'Удаление...' : 'Удалить мероприятие'}
                                         </Button>
                                     </div>
                                 )}
@@ -92,7 +99,6 @@ export default function Header({isAdmin = false, name, eventId}: HeaderProps) {
                     )}
                 </div>
             </div>
-
             <div className={styles.tabs}>
                 <Tabs items={tabItems} onChange={handleTabChange}/>
             </div>

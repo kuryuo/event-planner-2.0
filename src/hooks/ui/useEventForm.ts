@@ -1,4 +1,4 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, useRef} from "react";
 import {useDateTime} from "@/hooks/api/useDateTime.ts";
 import {useChips} from "@/hooks/ui/useChips.ts";
 import type {CreateEventPayload, UpdateEventPayload, EventResponse} from "@/types/api/Event.ts";
@@ -21,6 +21,9 @@ export const useEventForm = (eventData?: EventResponse | null) => {
     const [showRoleSelect, setShowRoleSelect] = useState(false);
     const [description, setDescription] = useState("");
 
+    const isInitialized = useRef(false);
+    const initializedEventId = useRef<string | null>(null);
+
     const {
         chips: categories,
         inputValue,
@@ -40,13 +43,13 @@ export const useEventForm = (eventData?: EventResponse | null) => {
     } = useChips(["Организатор"]);
 
     useEffect(() => {
-        if (eventData) {
+        if (eventData && (!isInitialized.current || initializedEventId.current !== eventData.id)) {
             setTitle(eventData.name);
             setDescription(eventData.description || "");
             setLocation(eventData.location);
             setFormat(FORMAT_REVERSE_MAP[eventData.format] || eventData.format);
             setIsPrivate(eventData.eventType === "closed");
-            
+
             if (eventData.maxParticipants && eventData.maxParticipants < 999999) {
                 setParticipants(eventData.maxParticipants.toString());
                 setIsParticipantsUnlimited(false);
@@ -68,8 +71,14 @@ export const useEventForm = (eventData?: EventResponse | null) => {
                 if (date) setEndDate(date);
                 if (time) setEndTime(time);
             }
+
+            isInitialized.current = true;
+            initializedEventId.current = eventData.id;
+        } else if (!eventData && isInitialized.current) {
+            isInitialized.current = false;
+            initializedEventId.current = null;
         }
-    }, [eventData, setStartDate, setEndDate, setStartTime, setEndTime, setCategories]);
+    }, [eventData?.id, setStartDate, setEndDate, setStartTime, setEndTime, setCategories]);
 
     const validate = (): string | null => {
         if (!title.trim()) return 'Необходимо указать название';
