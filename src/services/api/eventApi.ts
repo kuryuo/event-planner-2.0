@@ -6,7 +6,9 @@ import type {
     CreateEventPayload,
     CreateEventResponse,
     UpdateEventPayload,
-    UpdateEventResponse
+    UpdateEventResponse,
+    GetEventSubscribersPayload,
+    GetEventSubscribersResponse
 } from "@/types/api/Event.ts";
 
 export const eventApi = baseApi.injectEndpoints({
@@ -68,6 +70,18 @@ export const eventApi = baseApi.injectEndpoints({
             invalidatesTags: (result, error, eventId) =>
                 [{type: 'Event', id: eventId}, 'Event'],
         }),
+        /**
+         * Получить пользователей подписанных на мероприятие
+         */
+        getEventSubscribers: builder.query<GetEventSubscribersResponse, GetEventSubscribersPayload>({
+            query: ({eventId, ...params}) => ({
+                url: `/events/${eventId}/subscribers`,
+                method: 'GET',
+                params,
+            }),
+            providesTags: (result, error, {eventId}) =>
+                result ? [{type: 'Event', id: eventId}] : ['Event'],
+        }),
     }),
     overrideExisting: false,
 });
@@ -77,5 +91,6 @@ export const {
     useGetEventByIdQuery,
     useCreateEventMutation,
     useUpdateEventMutation,
-    useDeleteEventMutation
+    useDeleteEventMutation,
+    useGetEventSubscribersQuery
 } = eventApi;

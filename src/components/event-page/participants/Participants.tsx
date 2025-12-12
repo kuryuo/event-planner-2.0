@@ -2,42 +2,24 @@ import {useState, useEffect, useRef} from "react";
 import styles from "./Participants.module.scss";
 import Avatar from "@/ui/avatar/Avatar";
 import Button from "@/ui/button/Button";
-
-interface Participant {
-    id: string;
-    name: string;
-    avatarUrl?: string;
-}
+import {useEventSubscribers} from "@/hooks/api/useEventSubscribers.ts";
 
 interface ParticipantsProps {
-    participants?: Participant[];
+    eventId: string | null;
     maxParticipants?: number;
     isAdmin?: boolean;
 }
-
-const mockParticipants: Participant[] = [
-    {id: "1", name: "Алексей Смирнов", avatarUrl: "https://randomuser.me/api/portraits/men/15.jpg"},
-    {id: "2", name: "Мария Волкова", avatarUrl: "https://randomuser.me/api/portraits/women/21.jpg"},
-    {id: "3", name: "Дмитрий Орлов", avatarUrl: "https://randomuser.me/api/portraits/men/42.jpg"},
-    {id: "4", name: "Екатерина Иванова", avatarUrl: "https://randomuser.me/api/portraits/women/38.jpg"},
-    {id: "5", name: "Илья Кузнецов", avatarUrl: "https://randomuser.me/api/portraits/men/5.jpg"},
-    {id: "6", name: "Анна Петрова", avatarUrl: "https://randomuser.me/api/portraits/women/44.jpg"},
-    {id: "7", name: "Сергей Новиков", avatarUrl: "https://randomuser.me/api/portraits/men/32.jpg"},
-    {id: "8", name: "Ольга Соколова", avatarUrl: "https://randomuser.me/api/portraits/women/56.jpg"},
-    {id: "9", name: "Павел Лебедев", avatarUrl: "https://randomuser.me/api/portraits/men/18.jpg"},
-    {id: "10", name: "Татьяна Морозова", avatarUrl: "https://randomuser.me/api/portraits/women/25.jpg"},
-    {id: "11", name: "Иван Федоров", avatarUrl: "https://randomuser.me/api/portraits/men/28.jpg"},
-];
 
 const AVATAR_SIZE = 48;
 const AVATAR_OVERLAP = 12;
 const REMAINING_BADGE_WIDTH = 48;
 
 export default function Participants({
-                                         participants = mockParticipants,
+                                         eventId,
                                          maxParticipants,
                                          isAdmin = false,
                                      }: ParticipantsProps) {
+    const {participants, isLoading} = useEventSubscribers(eventId);
     const containerRef = useRef<HTMLDivElement>(null);
     const [visibleCount, setVisibleCount] = useState(8);
 
@@ -106,6 +88,17 @@ export default function Participants({
     const handleInvite = () => {
         console.log("Пригласить участников");
     };
+
+    if (isLoading) {
+        return (
+            <div className={styles.participants}>
+                <div className={styles.header}>
+                    <h2 className={styles.title}>Участники</h2>
+                </div>
+                <div>Загрузка...</div>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.participants}>

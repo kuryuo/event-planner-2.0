@@ -74,3 +74,25 @@ export interface CreateEventResponse {
 export interface UpdateEventResponse {
     result: EventResponse;
 }
+
+// Payload для GET /events/{eventId}/subscribers
+export interface GetEventSubscribersPayload {
+    eventId: string;
+    name?: string;
+    count?: number;
+    offset?: number;
+}
+
+// Response для GET /events/{eventId}/subscribers
+export interface GetEventSubscribersResponse {
+    result: Array<{
+        id: string;
+        lastName: string;
+        firstName: string;
+        middleName: string;
+        phoneNumber: string | null;
+        telegram: string | null;
+        city: string | null;
+        avatarUrl: string | null;
+    }>;
+}
