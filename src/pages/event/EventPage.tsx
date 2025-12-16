@@ -1,6 +1,4 @@
-import {useState} from "react";
 import Sidebar from "@/components/sidebar/Sidebar";
-import type {CardBaseProps} from "@/ui/card/CardBase.tsx";
 import styles from "./EventPage.module.scss";
 import Header from "@/components/event-page/header/Header.tsx";
 import EventInfo from "@/components/event-page/event-info/EventInfo.tsx";
@@ -9,22 +7,10 @@ import Participants from "@/components/event-page/participants/Participants.tsx"
 import Contacts from "@/components/event-page/contacts/Contacts.tsx";
 import {useEventPage} from '@/hooks/api/useEventPage.ts';
 
-const subscriptionsData: CardBaseProps[] = [
-    {title: "Подписка 1", subtitle: "Описание подписки 1", avatarUrl: "https://randomuser.me/api/portraits/men/32.jpg"},
-    {
-        title: "Подписка 2",
-        subtitle: "Описание подписки 2",
-        avatarUrl: "https://randomuser.me/api/portraits/women/44.jpg"
-    },
-    {title: "Подписка 3", subtitle: "Описание подписки 3", avatarUrl: "https://randomuser.me/api/portraits/men/56.jpg"},
-    {title: "Подписка 3", subtitle: "Описание подписки 3", avatarUrl: "https://randomuser.me/api/portraits/men/56.jpg"},
-];
-
 
 export default function EventPage() {
     const {event, isLoading, error} = useEventPage();
-    const [subscriptions] = useState<CardBaseProps[]>(subscriptionsData);
-    const [isAdmin] = useState(true);
+    const isAdmin = true;
 
     if (isLoading) {
         return <div>Загрузка...</div>;
@@ -38,7 +24,6 @@ export default function EventPage() {
         <div className={styles.pageWrapper}>
             <div className={styles.sidebar}>
                 <Sidebar
-                    subscriptions={subscriptions}
                     notificationCount={5}
                     isAdmin={isAdmin}
                 />
@@ -58,7 +43,7 @@ export default function EventPage() {
                         <Post isAdmin={isAdmin}/>
                     </div>
                     <div className={styles.sideContent}>
-                        <Participants isAdmin={isAdmin}/>
+                        <Participants eventId={event.id} isAdmin={isAdmin}/>
                         <Contacts/>
                     </div>
                 </div>

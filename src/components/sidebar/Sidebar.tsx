@@ -4,7 +4,6 @@ import {NotificationBadge} from '@/ui/notification-badge/NotificationBadge.tsx';
 import CircleButton from '@/ui/button-circle/ButtonCircle.tsx';
 import bell from '@/assets/img/icon-l/bell.svg';
 import styles from './Sidebar.module.scss';
-import type {CardBaseProps} from '@/ui/card/CardBase.tsx';
 import NextEvent from "@/components/sidebar/next-event/NextEvent.tsx";
 import clsx from "clsx";
 import {buildImageUrl} from "@/utils/buildImageUrl.ts";
@@ -17,15 +16,16 @@ interface SidebarProps {
 }
 
 export default function Sidebar({notificationCount = 3, isAdmin = false}: SidebarProps) {
-    const {data: profile, isLoading} = useGetProfileQuery();
+    const {data: profile} = useGetProfileQuery();
     const {data: events} = useGetProfileEventsQuery();
     const navigate = useNavigate();
     const fallbackAvatar = 'https://api.dicebear.com/7.x/shapes/png?size=200&radius=50';
 
-    const subscriptions: CardBaseProps[] = (events ?? []).map((event) => ({
+    const subscriptions = (events ?? []).map((event) => ({
         title: event.name,
         subtitle: event.location ?? '',
         avatarUrl: buildImageUrl(event.previewPhotos?.[0]) ?? fallbackAvatar,
+        onClick: () => navigate(`/event?id=${event.id}`),
     }));
 
     const handleCreateEvent = () => {

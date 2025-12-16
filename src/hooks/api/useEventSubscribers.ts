@@ -21,14 +21,18 @@ export const useEventSubscribers = (eventId: string | null): UseEventSubscribers
     );
 
     const participants = useMemo(() => {
-        if (!data?.result) return [];
+        if (!data?.res) return [];
 
-        return data.result.map(subscriber => ({
+        return data.res.map((subscriber, index) => ({
             id: subscriber.id,
-            name: `${subscriber.lastName ?? ''} ${subscriber.firstName ?? ''} ${subscriber.middleName ?? ''}`.trim(),
+            name: subscriber.name?.trim() || `Пользователь ${index + 1}`,
             avatarUrl: buildImageUrl(subscriber.avatarUrl) ?? undefined,
         }));
     }, [data]);
+
+    if (data) {
+        console.log("Fetched event subscribers:", data);
+    }
 
     return {
         participants,

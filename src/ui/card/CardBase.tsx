@@ -11,6 +11,7 @@ export interface CardBaseProps {
     avatarUrl: string;
     className?: string;
     children?: React.ReactNode;
+    onClick?: () => void;
 }
 
 export function CardBase({
@@ -20,9 +21,20 @@ export function CardBase({
                              avatarUrl,
                              className,
                              children,
+                             onClick,
                          }: CardBaseProps) {
     return (
-        <div className={clsx(styles.wrapper, styles[size], className)}>
+        <div
+            className={clsx(
+                styles.wrapper,
+                styles[size],
+                onClick && styles.clickable,
+                className
+            )}
+            onClick={onClick}
+            role={onClick ? 'button' : undefined}
+            tabIndex={onClick ? 0 : undefined}
+        >
             {avatarUrl && <Avatar size={size} avatarUrl={avatarUrl} name={title} />}
             <div className={styles.content}>
                 <div className={styles.textBlock}>

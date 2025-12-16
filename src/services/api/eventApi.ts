@@ -74,10 +74,13 @@ export const eventApi = baseApi.injectEndpoints({
          * Получить пользователей подписанных на мероприятие
          */
         getEventSubscribers: builder.query<GetEventSubscribersResponse, GetEventSubscribersPayload>({
-            query: ({eventId, ...params}) => ({
+            query: ({eventId, count, ...params}) => ({
                 url: `/events/${eventId}/subscribers`,
                 method: 'GET',
-                params,
+                params: {
+                    count: count ?? 10,
+                    ...params,
+                },
             }),
             providesTags: (result, error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}] : ['Event'],

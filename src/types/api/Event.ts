@@ -85,14 +85,14 @@ export interface GetEventSubscribersPayload {
 
 // Response для GET /events/{eventId}/subscribers
 export interface GetEventSubscribersResponse {
-    result: Array<{
+    res: Array<{
         id: string;
-        lastName: string;
-        firstName: string;
-        middleName: string;
+        email: string | null;
+        name: string | null;
         phoneNumber: string | null;
         telegram: string | null;
         city: string | null;
         avatarUrl: string | null;
+        role: string | null;
     }>;
 }
