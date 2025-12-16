@@ -7,8 +7,14 @@ import ChevronLeftIcon from '@/assets/img/icon-s/chevron-left.svg?react';
 import BoxArrowLeftIcon from '@/assets/img/icon-m/box-arrow-left.svg?react';
 import ProfileForm from "@/components/profile-page/ProfileForm.tsx";
 import {CardBase} from '@/ui/card/CardBase.tsx';
+import AvatarMenu from "@/components/profile-page/AvatarMenu.tsx";
 import Button from '@/ui/button/Button.tsx';
 import Switch from '@/ui/switch/Switch.tsx';
+import {useGetProfileQuery, useUpdateProfileMutation} from "@/services/api/profileApi.ts";
+import {buildImageUrl} from "@/utils/buildImageUrl.ts";
+import type {UpdateUserProfilePayload} from "@/types/api/Profile.ts";
+import {useAuth} from "@/hooks/api/useAuth.ts";
+import {useAvatarUpload} from "@/hooks/api/useAvatarUpload.ts";
 
 const subscriptionsData: CardBaseProps[] = [
     {title: "Подписка 1", subtitle: "Описание подписки 1", avatarUrl: "https://randomuser.me/api/portraits/men/32.jpg"},
@@ -26,29 +32,36 @@ export default function ProfilePage() {
     const [isAdmin] = useState(true);
     const [darkTheme, setDarkTheme] = useState(false);
     const navigate = useNavigate();
+    const {logout} = useAuth();
+    const {data: profile, isLoading} = useGetProfileQuery();
+    const [updateProfile, {isLoading: isUpdating}] = useUpdateProfileMutation();
+    const {
+        fileInputRef,
+        isUploading,
+        triggerFileDialog,
+        handleFileChange,
+    } = useAvatarUpload();
 
     const handleBack = () => {
         navigate('/main');
     };
 
-    const handleSubmit = (data: any) => {
-        console.log('Данные профиля:', data);
-    };
-
-    const handleCancel = () => {
-        navigate('/main');
+    const handleSubmit = async (data: UpdateUserProfilePayload) => {
+        try {
+            await updateProfile(data).unwrap();
+            console.log('Профиль обновлен');
+        } catch (err) {
+            console.error('Ошибка обновления профиля', err);
+        }
     };
 
     const handleLogout = () => {
-        console.log('Выход из аккаунта');
+        logout();
         navigate('/');
     };
 
-    const mockUserData = {
-        title: "Иванов Иван Иванович",
-        subtitle: "email@example.com",
-        avatarUrl: "https://randomuser.me/api/portraits/men/32.jpg"
-    };
+    const fallbackAvatar = 'https://api.dicebear.com/7.x/shapes/png?size=200&radius=50';
+    const fullName = `${profile?.lastName ?? ''} ${profile?.firstName ?? ''} ${profile?.middleName ?? ''}`.trim() || '—';
 
     return (
         <div className={styles.pageWrapper}>
@@ -66,17 +79,38 @@ export default function ProfilePage() {
                 </button>
 
                 <div className={styles.cardWrapper}>
-                    <CardBase
-                        size="M"
-                        title={mockUserData.title}
-                        subtitle={mockUserData.subtitle}
-                        avatarUrl={mockUserData.avatarUrl}
+                    <AvatarMenu
+                        onUpload={triggerFileDialog}
+                        onClear={() => console.log('Очистить аватар')}
+                    >
+                        <CardBase
+                            size="M"
+                            title={fullName}
+                            subtitle={profile?.city ?? ''}
+                            avatarUrl={buildImageUrl(profile?.avatarUrl) ?? fallbackAvatar}
+                        />
+                    </AvatarMenu>
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        style={{display: 'none'}}
+                        onChange={handleFileChange}
+                        disabled={isUploading}
                     />
                 </div>
 
                 <ProfileForm
                     onSubmit={handleSubmit}
-                    onCancel={handleCancel}
+                    loading={isLoading || isUpdating}
+                    initialData={{
+                        firstName: profile?.firstName,
+                        lastName: profile?.lastName,
+                        middleName: profile?.middleName ?? '',
+                        city: profile?.city ?? '',
+                        phoneNumber: profile?.phoneNumber ?? '',
+                        telegram: profile?.telegram ?? '',
+                    }}
                 />
 
                 <div className={styles.divider}></div>

@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import styles from "./ProfileForm.module.scss";
 import TextField from "@/ui/text-field/TextField.tsx";
 import Button from "@/ui/button/Button.tsx";
@@ -11,30 +11,49 @@ interface ProfileFormProps {
     onSubmit?: (data: any) => void;
     onCancel?: () => void;
     loading?: boolean;
+    initialData?: {
+        firstName?: string;
+        lastName?: string;
+        middleName?: string;
+        city?: string;
+        email?: string;
+        phoneNumber?: string;
+        telegram?: string;
+    };
 }
 
 export default function ProfileForm({
                                         onSubmit,
                                         onCancel,
-                                        loading = false
+                                        loading = false,
+                                        initialData,
                                     }: ProfileFormProps) {
-    const [firstName, setFirstName] = useState("Мария");
-    const [lastName, setLastName] = useState("Пшеничная");
-    const [position, setPosition] = useState("Продуктовый менеджер");
-    const [location, setLocation] = useState("г. Екатеринбург");
+    const [firstName, setFirstName] = useState(initialData?.firstName ?? "Мария");
+    const [lastName, setLastName] = useState(initialData?.lastName ?? "Пшеничная");
+    const [middleName, setMiddleName] = useState(initialData?.middleName ?? "Отчество");
+    const [city, setCity] = useState(initialData?.city ?? "г. Екатеринбург");
+    const [email, setEmail] = useState(initialData?.email ?? "email@example.com");
+    const [phoneNumber, setPhoneNumber] = useState(initialData?.phoneNumber ?? "+7 (994) 430-11-34");
+    const [telegram, setTelegram] = useState(initialData?.telegram ?? "@pshenica_maria");
 
-    const [email, setEmail] = useState("");
-    const [phone, setPhone] = useState("+7 (994) 430-11-34");
-    const [telegram, setTelegram] = useState("@pshenica_maria");
+    useEffect(() => {
+        if (!initialData) return;
+        setFirstName(initialData.firstName ?? "");
+        setLastName(initialData.lastName ?? "");
+        setMiddleName(initialData.middleName ?? "");
+        setCity(initialData.city ?? "");
+        setEmail(initialData.email ?? "");
+        setPhoneNumber(initialData.phoneNumber ?? "");
+        setTelegram(initialData.telegram ?? "");
+    }, [initialData]);
 
     const handleSubmit = () => {
         const formData = {
             firstName,
             lastName,
-            position,
-            location,
-            email,
-            phone,
+            middleName,
+            city,
+            phoneNumber,
             telegram,
         };
         if (onSubmit) {
@@ -43,6 +62,15 @@ export default function ProfileForm({
     };
 
     const handleCancel = () => {
+        if (initialData) {
+            setFirstName(initialData.firstName ?? "");
+            setLastName(initialData.lastName ?? "");
+            setMiddleName(initialData.middleName ?? "");
+            setCity(initialData.city ?? "");
+            setEmail(initialData.email ?? "");
+            setPhoneNumber(initialData.phoneNumber ?? "");
+            setTelegram(initialData.telegram ?? "");
+        }
         if (onCancel) {
             onCancel();
         }
@@ -67,15 +95,15 @@ export default function ProfileForm({
                     />
                 </div>
                 <TextField
-                    placeholder="Должность"
-                    value={position}
-                    onChange={(e) => setPosition(e.target.value)}
+                    placeholder="Отчество"
+                    value={middleName}
+                    onChange={(e) => setMiddleName(e.target.value)}
                     fieldSize="M"
                 />
                 <TextField
-                    placeholder="Местоположение"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="Город"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
                     leftIcon={<GeoAltIcon/>}
                     fieldSize="M"
                 />
@@ -96,8 +124,8 @@ export default function ProfileForm({
                 <TextField
                     placeholder="Телефон"
                     type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
                     leftIcon={<TelephoneIcon/>}
                     fieldSize="M"
                 />
