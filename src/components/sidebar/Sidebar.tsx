@@ -8,19 +8,25 @@ import type {CardBaseProps} from '@/ui/card/CardBase.tsx';
 import NextEvent from "@/components/sidebar/next-event/NextEvent.tsx";
 import clsx from "clsx";
 import {buildImageUrl} from "@/utils/buildImageUrl.ts";
-import {useGetProfileQuery} from "@/services/api/profileApi.ts";
+import {useGetProfileEventsQuery, useGetProfileQuery} from "@/services/api/profileApi.ts";
 import {useNavigate} from "react-router-dom";
 
 interface SidebarProps {
-    subscriptions: CardBaseProps[];
     notificationCount?: number;
     isAdmin?: boolean;
 }
 
-export default function Sidebar({subscriptions, notificationCount = 3, isAdmin = false}: SidebarProps) {
+export default function Sidebar({notificationCount = 3, isAdmin = false}: SidebarProps) {
     const {data: profile, isLoading} = useGetProfileQuery();
+    const {data: events} = useGetProfileEventsQuery();
     const navigate = useNavigate();
     const fallbackAvatar = 'https://api.dicebear.com/7.x/shapes/png?size=200&radius=50';
+
+    const subscriptions: CardBaseProps[] = (events ?? []).map((event) => ({
+        title: event.name,
+        subtitle: event.location ?? '',
+        avatarUrl: buildImageUrl(event.previewPhotos?.[0]) ?? fallbackAvatar,
+    }));
 
     const handleCreateEvent = () => {
         navigate("/editor");

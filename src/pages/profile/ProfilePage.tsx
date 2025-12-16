@@ -1,7 +1,6 @@
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import Sidebar from "@/components/sidebar/Sidebar";
-import type {CardBaseProps} from "@/ui/card/CardBase.tsx";
 import styles from "./ProfilePage.module.scss";
 import ChevronLeftIcon from '@/assets/img/icon-s/chevron-left.svg?react';
 import BoxArrowLeftIcon from '@/assets/img/icon-m/box-arrow-left.svg?react';
@@ -16,19 +15,7 @@ import type {UpdateUserProfilePayload} from "@/types/api/Profile.ts";
 import {useAuth} from "@/hooks/api/useAuth.ts";
 import {useAvatarUpload} from "@/hooks/api/useAvatarUpload.ts";
 
-const subscriptionsData: CardBaseProps[] = [
-    {title: "Подписка 1", subtitle: "Описание подписки 1", avatarUrl: "https://randomuser.me/api/portraits/men/32.jpg"},
-    {
-        title: "Подписка 2",
-        subtitle: "Описание подписки 2",
-        avatarUrl: "https://randomuser.me/api/portraits/women/44.jpg"
-    },
-    {title: "Подписка 3", subtitle: "Описание подписки 3", avatarUrl: "https://randomuser.me/api/portraits/men/56.jpg"},
-    {title: "Подписка 3", subtitle: "Описание подписки 3", avatarUrl: "https://randomuser.me/api/portraits/men/56.jpg"},
-];
-
 export default function ProfilePage() {
-    const [subscriptions] = useState<CardBaseProps[]>(subscriptionsData);
     const [isAdmin] = useState(true);
     const [darkTheme, setDarkTheme] = useState(false);
     const navigate = useNavigate();
@@ -67,7 +54,6 @@ export default function ProfilePage() {
         <div className={styles.pageWrapper}>
             <div className={styles.sidebar}>
                 <Sidebar
-                    subscriptions={subscriptions}
                     notificationCount={5}
                     isAdmin={isAdmin}
                 />

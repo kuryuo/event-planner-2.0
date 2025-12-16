@@ -44,7 +44,7 @@ export const profileApi = baseApi.injectEndpoints({
         /**
          * Получить список мероприятий, на которые подписан пользователь
          */
-        getProfileEvents: builder.query<UserEvent, void>({
+        getProfileEvents: builder.query<UserEvent[], void>({
             query: () => ({
                 url: 'users/me/events',
                 method: 'GET',
