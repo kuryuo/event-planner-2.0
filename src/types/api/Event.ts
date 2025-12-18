@@ -166,3 +166,36 @@ export interface DeleteEventPostPayload {
     eventId: string;
     postId: string;
 }
+
+// Payload для GET /events/{eventId}/photos
+export interface GetEventPhotosPayload {
+    eventId: string;
+    offset?: number;
+    count: number;
+}
+
+// Response для GET /events/{eventId}/photos
+export interface GetEventPhotosResponse {
+    result: Array<{
+        id: string;
+        filePath: string;
+    }>;
+}
+
+// Payload для POST /events/{eventId}/photos
+export interface UploadEventPhotoPayload {
+    eventId: string;
+    file: File;
+}
+
+// Response для POST /events/{eventId}/photos
+export interface UploadEventPhotoResponse {
+    path: string;
+}
+
+// Payload для DELETE /events/{eventId}/photos/{photoId}
+export interface DeleteEventPhotoPayload {
+    eventId: string;
+    photoId: string;
+    roleId?: string;
+}

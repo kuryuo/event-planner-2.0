@@ -9,7 +9,12 @@ import type {
     UpdateEventResponse,
     GetEventSubscribersPayload,
     GetEventSubscribersResponse,
-    GetEventContactsResponse
+    GetEventContactsResponse,
+    GetEventPhotosPayload,
+    GetEventPhotosResponse,
+    UploadEventPhotoPayload,
+    UploadEventPhotoResponse,
+    DeleteEventPhotoPayload
 } from "@/types/api/Event.ts";
 
 export const eventApi = baseApi.injectEndpoints({
@@ -97,6 +102,49 @@ export const eventApi = baseApi.injectEndpoints({
             providesTags: (result, error, eventId) =>
                 result ? [{type: 'Event', id: eventId}] : ['Event'],
         }),
+        /**
+         * Получить фотографии мероприятия
+         */
+        getEventPhotos: builder.query<GetEventPhotosResponse, GetEventPhotosPayload>({
+            query: ({eventId, offset = 0, count}) => ({
+                url: `/events/${eventId}/photos`,
+                method: 'GET',
+                params: {
+                    offset,
+                    count,
+                },
+            }),
+            providesTags: (result, error, {eventId}) =>
+                result ? [{type: 'Event', id: eventId}] : ['Event'],
+        }),
+        /**
+         * Загрузить фотографию на мероприятие
+         */
+        uploadEventPhoto: builder.mutation<UploadEventPhotoResponse, UploadEventPhotoPayload>({
+            query: ({eventId, file}) => {
+                const formData = new FormData();
+                formData.append('file', file);
+                return {
+                    url: `/events/${eventId}/photos`,
+                    method: 'POST',
+                    body: formData,
+                };
+            },
+            invalidatesTags: (result, error, {eventId}) =>
+                result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
+        }),
+        /**
+         * Удалить фотографию мероприятия
+         */
+        deleteEventPhoto: builder.mutation<void, DeleteEventPhotoPayload>({
+            query: ({eventId, photoId, roleId}) => ({
+                url: `/events/${eventId}/photos/${photoId}`,
+                method: 'DELETE',
+                params: roleId ? {roleId} : undefined,
+            }),
+            invalidatesTags: (result, error, {eventId}) =>
+                result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
+        }),
     }),
     overrideExisting: false,
 });
@@ -108,5 +156,8 @@ export const {
     useUpdateEventMutation,
     useDeleteEventMutation,
     useGetEventSubscribersQuery,
-    useGetEventContactsQuery
+    useGetEventContactsQuery,
+    useGetEventPhotosQuery,
+    useUploadEventPhotoMutation,
+    useDeleteEventPhotoMutation
 } = eventApi;

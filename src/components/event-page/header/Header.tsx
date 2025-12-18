@@ -14,9 +14,11 @@ interface HeaderProps {
     isAdmin?: boolean;
     name: string;
     eventId?: string;
+    activeTab?: number;
+    onTabChange?: (index: number) => void;
 }
 
-export default function Header({isAdmin = false, name, eventId}: HeaderProps) {
+export default function Header({isAdmin = false, name, eventId, activeTab = 0, onTabChange}: HeaderProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
@@ -28,7 +30,9 @@ export default function Header({isAdmin = false, name, eventId}: HeaderProps) {
     ];
 
     const handleTabChange = (index: number) => {
-        console.log('Выбран таб:', index);
+        if (onTabChange) {
+            onTabChange(index);
+        }
     };
 
     const handleBack = () => {
@@ -104,7 +108,7 @@ export default function Header({isAdmin = false, name, eventId}: HeaderProps) {
                 </div>
             </div>
             <div className={styles.tabs}>
-                <Tabs items={tabItems} onChange={handleTabChange}/>
+                <Tabs items={tabItems} activeIndex={activeTab} onChange={handleTabChange}/>
             </div>
         </header>
     );

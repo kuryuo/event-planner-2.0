@@ -12,14 +12,16 @@ export interface TabItem {
 interface TabsProps {
     items: TabItem[];
     initialIndex?: number;
+    activeIndex?: number;
     onChange?: (index: number) => void;
 }
 
 const WIDTH_PERCENT = 0.5;
 const OFFSET_PERCENT = (1 - WIDTH_PERCENT) / 2;
 
-const Tabs = ({items, initialIndex = 0, onChange}: TabsProps) => {
-    const [activeIndex, setActiveIndex] = useState(initialIndex);
+const Tabs = ({items, initialIndex = 0, activeIndex: controlledActiveIndex, onChange}: TabsProps) => {
+    const [internalActiveIndex, setInternalActiveIndex] = useState(initialIndex);
+    const activeIndex = controlledActiveIndex !== undefined ? controlledActiveIndex : internalActiveIndex;
     const [indicatorStyle, setIndicatorStyle] = useState({left: 0, width: 0});
     const [hoverStyle, setHoverStyle] = useState<{ left: number; width: number } | null>(null);
     const tabRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -47,7 +49,9 @@ const Tabs = ({items, initialIndex = 0, onChange}: TabsProps) => {
     }, [activeIndex]);
 
     const handleClick = (index: number) => {
-        setActiveIndex(index);
+        if (controlledActiveIndex === undefined) {
+            setInternalActiveIndex(index);
+        }
         onChange?.(index);
     };
 
