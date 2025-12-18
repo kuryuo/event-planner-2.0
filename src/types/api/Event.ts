@@ -96,3 +96,73 @@ export interface GetEventSubscribersResponse {
         role: string | null;
     }>;
 }
+
+// Response для GET /events/{eventId}/contacts
+export interface GetEventContactsResponse {
+    result: Array<{
+        name: string;
+        role: string;
+        avatarUrl: string;
+    }>;
+}
+
+// Тип поста мероприятия
+export interface EventPost {
+    id: string;
+    eventId: string;
+    authorId: string;
+    text: string;
+    createdAt: string;
+}
+
+// Payload для GET /events/{eventId}/posts
+export interface GetEventPostsPayload {
+    eventId: string;
+    count?: number;
+    offset?: number;
+}
+
+// Response для GET /events/{eventId}/posts
+export interface GetEventPostsResponse {
+    result: EventPost[];
+}
+
+// Payload для POST /events/{eventId}/posts
+export interface CreateEventPostPayload {
+    eventId: string;
+    text: string;
+}
+
+// Response для POST /events/{eventId}/posts
+export interface CreateEventPostResponse {
+    result: EventPost;
+}
+
+// Payload для GET /events/{eventId}/posts/{postId}
+export interface GetEventPostByIdPayload {
+    eventId: string;
+    postId: string;
+}
+
+// Response для GET /events/{eventId}/posts/{postId}
+export interface GetEventPostByIdResponse {
+    result: EventPost;
+}
+
+// Payload для PUT /events/{eventId}/posts/{postId}
+export interface UpdateEventPostPayload {
+    eventId: string;
+    postId: string;
+    text: string;
+}
+
+// Response для PUT /events/{eventId}/posts/{postId}
+export interface UpdateEventPostResponse {
+    result: EventPost;
+}
+
+// Payload для DELETE /events/{eventId}/posts/{postId}
+export interface DeleteEventPostPayload {
+    eventId: string;
+    postId: string;
+}

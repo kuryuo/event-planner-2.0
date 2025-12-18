@@ -8,7 +8,8 @@ import type {
     UpdateEventPayload,
     UpdateEventResponse,
     GetEventSubscribersPayload,
-    GetEventSubscribersResponse
+    GetEventSubscribersResponse,
+    GetEventContactsResponse
 } from "@/types/api/Event.ts";
 
 export const eventApi = baseApi.injectEndpoints({
@@ -85,6 +86,17 @@ export const eventApi = baseApi.injectEndpoints({
             providesTags: (result, error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}] : ['Event'],
         }),
+        /**
+         * Получить контакты мероприятия
+         */
+        getEventContacts: builder.query<GetEventContactsResponse, string>({
+            query: (eventId) => ({
+                url: `/events/${eventId}/contacts`,
+                method: 'GET',
+            }),
+            providesTags: (result, error, eventId) =>
+                result ? [{type: 'Event', id: eventId}] : ['Event'],
+        }),
     }),
     overrideExisting: false,
 });
@@ -95,5 +107,6 @@ export const {
     useCreateEventMutation,
     useUpdateEventMutation,
     useDeleteEventMutation,
-    useGetEventSubscribersQuery
+    useGetEventSubscribersQuery,
+    useGetEventContactsQuery
 } = eventApi;

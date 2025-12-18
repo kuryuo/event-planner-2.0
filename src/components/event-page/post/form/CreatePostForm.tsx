@@ -11,9 +11,10 @@ interface CreatePostFormProps {
     initialTitle?: string;
     initialText?: string;
     isEditMode?: boolean;
+    isLoading?: boolean;
 }
 
-export default function CreatePostForm({onClose, onSubmit, initialTitle, initialText, isEditMode = false}: CreatePostFormProps) {
+export default function CreatePostForm({onClose, onSubmit, initialTitle, initialText, isEditMode = false, isLoading = false}: CreatePostFormProps) {
     const [postTitle, setPostTitle] = useState(initialTitle || "");
     const [postText, setPostText] = useState(initialText || "");
 
@@ -68,8 +69,9 @@ export default function CreatePostForm({onClose, onSubmit, initialTitle, initial
                 color="purple"
                 onClick={handlePublish}
                 className={styles.button}
+                disabled={isLoading}
             >
-                {isEditMode ? "Сохранить" : "Опубликовать"}
+                {isLoading ? "Сохранение..." : (isEditMode ? "Сохранить" : "Опубликовать")}
             </Button>
         </div>
     );

@@ -7,35 +7,24 @@ import CreatePostForm from "./form/CreatePostForm";
 import PenIcon from "@/assets/img/icon-m/pen.svg?react";
 import TrashIcon from "@/assets/img/icon-m/trash.svg?react";
 import {useClickOutside} from "@/hooks/ui/useClickOutside.ts";
-
-interface Post {
-    id: string;
-    title: string;
-    text: string;
-    date: Date;
-}
+import {useEventPosts} from "@/hooks/api/useEventPosts.ts";
 
 interface PostsProps {
-    posts?: Post[];
+    eventId: string;
     isAdmin?: boolean;
 }
 
-const mockPosts: Post[] = [
-    {
-        id: "1",
-        title: "Добро пожаловать на мероприятие!",
-        text: "Мы рады приветствовать всех участников нашего события. Сегодня вас ждет увлекательная программа с выступлениями спикеров и интересными дискуссиями.",
-        date: new Date(2024, 8, 1),
-    },
-    {
-        id: "2",
-        title: "Обновление программы",
-        text: "Хотим сообщить об изменениях в расписании. Второе выступление переносится на 15:00 вместо 14:30. Просим учесть это при планировании времени.",
-        date: new Date(2024, 8, 5),
-    },
-];
+export default function Post({eventId, isAdmin = false}: PostsProps) {
+    const {
+        posts,
+        isLoading,
+        createPost,
+        updatePost,
+        deletePost,
+        isCreating,
+        isUpdating,
+    } = useEventPosts(eventId);
 
-export default function Post({posts = mockPosts, isAdmin = false}: PostsProps) {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingPostId, setEditingPostId] = useState<string | null>(null);
     const [openDeleteMenuId, setOpenDeleteMenuId] = useState<string | null>(null);
@@ -52,14 +41,18 @@ export default function Post({posts = mockPosts, isAdmin = false}: PostsProps) {
         setEditingPostId(null);
     };
 
-    const handleSubmit = (title: string, text: string) => {
-        if (editingPostId) {
-            console.log("Редактировать пост:", {id: editingPostId, title, text});
-        } else {
-            console.log("Опубликовать пост:", {title, text});
+    const handleSubmit = async (_title: string, text: string) => {
+        try {
+            if (editingPostId) {
+                await updatePost(editingPostId, text);
+            } else {
+                await createPost(text);
+            }
+            setIsFormOpen(false);
+            setEditingPostId(null);
+        } catch (error) {
+            console.error("Ошибка при сохранении поста:", error);
         }
-        setIsFormOpen(false);
-        setEditingPostId(null);
     };
 
     const handleEditPost = (postId: string) => {
@@ -71,12 +64,27 @@ export default function Post({posts = mockPosts, isAdmin = false}: PostsProps) {
         setOpenDeleteMenuId(openDeleteMenuId === postId ? null : postId);
     };
 
-    const handleDeletePost = (postId: string) => {
-        console.log("Удалить пост:", postId);
-        setOpenDeleteMenuId(null);
+    const handleDeletePost = async (postId: string) => {
+        try {
+            await deletePost(postId);
+            setOpenDeleteMenuId(null);
+        } catch (error) {
+            console.error("Ошибка при удалении поста:", error);
+        }
     };
 
     useClickOutside(menuRef, () => setOpenDeleteMenuId(null), isMenuOpen);
+
+    if (isLoading) {
+        return (
+            <div className={styles.posts}>
+                <div className={styles.header}>
+                    <h2 className={styles.title}>Посты</h2>
+                </div>
+                <div>Загрузка...</div>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.posts}>
@@ -98,6 +106,7 @@ export default function Post({posts = mockPosts, isAdmin = false}: PostsProps) {
                     initialTitle={editingPostId ? posts.find(p => p.id === editingPostId)?.title : undefined}
                     initialText={editingPostId ? posts.find(p => p.id === editingPostId)?.text : undefined}
                     isEditMode={editingPostId !== null}
+                    isLoading={isCreating || isUpdating}
                 />
             )}
 

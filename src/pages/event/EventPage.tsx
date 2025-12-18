@@ -40,11 +40,11 @@ export default function EventPage() {
                             description={event.description}
                             categories={event.categories}
                         />
-                        <Post isAdmin={isAdmin}/>
+                        <Post eventId={event.id} isAdmin={isAdmin}/>
                     </div>
                     <div className={styles.sideContent}>
                         <Participants eventId={event.id} isAdmin={isAdmin}/>
-                        <Contacts/>
+                        <Contacts eventId={event.id}/>
                     </div>
                 </div>
             </div>

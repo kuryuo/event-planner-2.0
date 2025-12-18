@@ -1,39 +1,52 @@
 import styles from "./Contacts.module.scss";
-import {CardBase, type CardBaseProps} from "@/ui/card/CardBase";
-
-interface Contact extends CardBaseProps {
-    id: string;
-}
+import {CardBase} from "@/ui/card/CardBase";
+import {useGetEventContactsQuery} from "@/services/api/eventApi.ts";
+import {buildImageUrl} from "@/utils/buildImageUrl.ts";
 
 interface ContactsProps {
-    contacts?: Contact[];
+    eventId: string;
 }
 
-const mockContacts: Contact[] = [
-    {
-        id: "1",
-        title: "Алексей Смирнов",
-        subtitle: "Главный организатор",
-        avatarUrl: "https://randomuser.me/api/portraits/men/15.jpg",
-        size: "M",
-    },
-    {
-        id: "2",
-        title: "Мария Волкова",
-        subtitle: "PR-менеджер",
-        avatarUrl: "https://randomuser.me/api/portraits/women/21.jpg",
-        size: "M",
-    },
-    {
-        id: "3",
-        title: "Дмитрий Орлов",
-        subtitle: "Технический директор",
-        avatarUrl: "https://randomuser.me/api/portraits/men/42.jpg",
-        size: "M",
-    },
-];
+export default function Contacts({eventId}: ContactsProps) {
+    const {data, isLoading, error} = useGetEventContactsQuery(eventId, {
+        skip: !eventId,
+    });
 
-export default function Contacts({contacts = mockContacts}: ContactsProps) {
+    const contacts = data?.result?.map((contact, index) => ({
+        id: `${contact.name}-${index}`,
+        title: contact.name,
+        subtitle: contact.role,
+        avatarUrl: buildImageUrl(contact.avatarUrl) || "",
+        size: "M" as const,
+    })) || [];
+
+    if (isLoading) {
+        return (
+            <div className={styles.contacts}>
+                <h2 className={styles.title}>Контакты</h2>
+                <div>Загрузка...</div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className={styles.contacts}>
+                <h2 className={styles.title}>Контакты</h2>
+                <div>Ошибка загрузки контактов</div>
+            </div>
+        );
+    }
+
+    if (!contacts || contacts.length === 0) {
+        return (
+            <div className={styles.contacts}>
+                <h2 className={styles.title}>Контакты</h2>
+                <div>Контакты не найдены</div>
+            </div>
+        );
+    }
+
     return (
         <div className={styles.contacts}>
             <h2 className={styles.title}>Контакты</h2>
