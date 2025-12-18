@@ -75,6 +75,8 @@ export default function Post({eventId, isAdmin = false}: PostsProps) {
 
     useClickOutside(menuRef, () => setOpenDeleteMenuId(null), isMenuOpen);
 
+    const editingPost = editingPostId ? posts.find(p => p.id === editingPostId) : null;
+
     if (isLoading) {
         return (
             <div className={styles.posts}>
@@ -103,8 +105,8 @@ export default function Post({eventId, isAdmin = false}: PostsProps) {
                 <CreatePostForm
                     onClose={handleCloseForm}
                     onSubmit={handleSubmit}
-                    initialTitle={editingPostId ? posts.find(p => p.id === editingPostId)?.title : undefined}
-                    initialText={editingPostId ? posts.find(p => p.id === editingPostId)?.text : undefined}
+                    initialTitle={editingPost?.title}
+                    initialText={editingPost?.text}
                     isEditMode={editingPostId !== null}
                     isLoading={isCreating || isUpdating}
                 />

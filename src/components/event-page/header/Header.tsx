@@ -23,17 +23,6 @@ export default function Header({isAdmin = false, name, eventId, activeTab = 0, o
     const menuRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
     const {handleDelete, isLoading: isDeleting} = useEventDeleter();
-    const tabItems: TabItem[] = [
-        {label: 'О мероприятии', badgeCount: 3},
-        {label: 'Чат'},
-        {label: 'Фотографии'},
-    ];
-
-    const handleTabChange = (index: number) => {
-        if (onTabChange) {
-            onTabChange(index);
-        }
-    };
 
     const handleBack = () => {
         navigate('/main');
@@ -61,6 +50,18 @@ export default function Header({isAdmin = false, name, eventId, activeTab = 0, o
     };
 
     useClickOutside(menuRef, () => setIsMenuOpen(false), isMenuOpen);
+
+    const tabItems: TabItem[] = [
+        {label: 'О мероприятии', badgeCount: 3},
+        {label: 'Чат'},
+        {label: 'Фотографии'},
+    ];
+
+    const handleTabChange = (index: number) => {
+        if (onTabChange) {
+            onTabChange(index);
+        }
+    };
 
     return (
         <header className={styles.header}>

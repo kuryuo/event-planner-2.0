@@ -54,7 +54,6 @@ export default function PhotoViewer({
     const canGoNext = initialIndex < photos.length - 1;
 
     const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-        // Если клик был на viewer (изображение или кнопки), не обрабатываем
         if (containerRef.current?.contains(e.target as Node)) {
             return;
         }
@@ -63,20 +62,17 @@ export default function PhotoViewer({
         const clickX = e.clientX - rect.left;
         const width = rect.width;
         
-        // Клик на левую половину - предыдущее фото
         if (clickX < width / 2) {
             if (canGoPrev) {
                 onPrev();
             }
         } else {
-            // Клик на правую половину - следующее фото
             if (canGoNext) {
                 onNext();
             }
         }
     };
 
-    // Закрытие при клике вне overlay (например, на краю экрана)
     useClickOutside(overlayRef, onClose, true);
 
     return (

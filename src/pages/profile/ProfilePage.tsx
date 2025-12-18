@@ -36,7 +36,6 @@ export default function ProfilePage() {
     const handleSubmit = async (data: UpdateUserProfilePayload) => {
         try {
             await updateProfile(data).unwrap();
-            console.log('Профиль обновлен');
         } catch (err) {
             console.error('Ошибка обновления профиля', err);
         }

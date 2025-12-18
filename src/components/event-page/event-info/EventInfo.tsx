@@ -1,7 +1,6 @@
 import {useState} from "react";
 import styles from "./EventInfo.module.scss";
 import Chip from "@/ui/chip/Chip";
-import type {AppColor} from "@/const";
 import CalendarIcon from "@/assets/img/icon-m/calendar.svg?react";
 import GeoAltIcon from "@/assets/img/icon-m/geo-alt.svg?react";
 import LinkIcon from "@/assets/img/icon-m/link-45deg.svg?react";
