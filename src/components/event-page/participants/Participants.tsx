@@ -3,6 +3,8 @@ import styles from "./Participants.module.scss";
 import Avatar from "@/ui/avatar/Avatar";
 import Button from "@/ui/button/Button";
 import {useEventSubscribers} from "@/hooks/api/useEventSubscribers.ts";
+import {useParticipantsModal} from "@/hooks/api/useParticipantsModal.ts";
+import ParticipantsModal from "./ParticipantsModal.tsx";
 
 interface ParticipantsProps {
     eventId: string | null;
@@ -20,6 +22,14 @@ export default function Participants({
                                          isAdmin = false,
                                      }: ParticipantsProps) {
     const {participants, isLoading} = useEventSubscribers(eventId);
+    const {
+        isOpen,
+        openModal,
+        closeModal,
+        participants: modalParticipants,
+        totalCount: modalTotalCount,
+        isLoading: isModalLoading,
+    } = useParticipantsModal(eventId, 50);
     const containerRef = useRef<HTMLDivElement>(null);
     const [visibleCount, setVisibleCount] = useState(8);
 
@@ -101,11 +111,12 @@ export default function Participants({
     }
 
     return (
-        <div className={styles.participants}>
-            <div className={styles.header}>
-                <h2 className={styles.title}>Участники</h2>
-                <span className={styles.count}>{formatCount()}</span>
-            </div>
+        <>
+            <div className={styles.participants}>
+                <div className={styles.header}>
+                    <h2 className={styles.title} onClick={openModal} style={{cursor: 'pointer'}}>Участники</h2>
+                    <span className={styles.count}>{formatCount()}</span>
+                </div>
 
             <div ref={containerRef} className={styles.avatarsContainer}>
                 {visibleParticipants.map((participant, index) => (
@@ -134,11 +145,20 @@ export default function Participants({
                 )}
             </div>
 
-            {isAdmin && (
-                <Button variant="Filled" color="gray" onClick={handleInvite}>
-                    Пригласить
-                </Button>
-            )}
-        </div>
+                {isAdmin && (
+                    <Button variant="Filled" color="gray" onClick={handleInvite}>
+                        Пригласить
+                    </Button>
+                )}
+            </div>
+
+            <ParticipantsModal
+                isOpen={isOpen}
+                onClose={closeModal}
+                participants={modalParticipants}
+                totalCount={modalTotalCount}
+                isLoading={isModalLoading}
+            />
+        </>
     );
 }
