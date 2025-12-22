@@ -1,5 +1,5 @@
 import styles from "./Contacts.module.scss";
-import {CardBase} from "@/ui/card/CardBase";
+import {Card} from "@/ui/card/Card";
 import {useGetEventContactsQuery} from "@/services/api/eventApi.ts";
 import {buildImageUrl} from "@/utils/buildImageUrl.ts";
 
@@ -52,7 +52,7 @@ export default function Contacts({eventId}: ContactsProps) {
             <h2 className={styles.title}>Контакты</h2>
             <div className={styles.contactsList}>
                 {contacts.map((contact) => (
-                    <CardBase
+                    <Card
                         key={contact.id}
                         title={contact.title}
                         subtitle={contact.subtitle}

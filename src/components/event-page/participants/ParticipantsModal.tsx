@@ -1,14 +1,13 @@
-import {useEffect, useRef} from "react";
 import styles from "./ParticipantsModal.module.scss";
-import Avatar from "@/ui/avatar/Avatar";
 import XIcon from '@/assets/img/icon-s/x.svg?react';
-import {useClickOutside} from '@/hooks/ui/useClickOutside';
 import {buildImageUrl} from '@/utils/buildImageUrl';
+import ParticipantCard from './ParticipantCard';
 
 interface Participant {
     id: string;
     name: string | null;
     avatarUrl: string | null;
+    isInContacts?: boolean;
 }
 
 interface ParticipantsModalProps {
@@ -17,6 +16,9 @@ interface ParticipantsModalProps {
     participants: Participant[];
     totalCount: number;
     isLoading?: boolean;
+    isAdmin?: boolean;
+    onRemoveFromContacts?: (participantId: string) => void;
+    onExclude?: (participantId: string) => void;
 }
 
 export default function ParticipantsModal({
@@ -25,44 +27,18 @@ export default function ParticipantsModal({
     participants,
     totalCount,
     isLoading = false,
+    isAdmin = false,
+    onRemoveFromContacts,
+    onExclude,
 }: ParticipantsModalProps) {
-    const modalRef = useRef<HTMLDivElement>(null);
-    const overlayRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = '';
-        }
-
-        return () => {
-            document.body.style.overflow = '';
-        };
-    }, [isOpen]);
-
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape' && isOpen) {
-                onClose();
-            }
-        };
-
-        document.addEventListener('keydown', handleKeyDown);
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown);
-        };
-    }, [isOpen, onClose]);
-
-    useClickOutside(overlayRef, onClose, isOpen);
 
     if (!isOpen) {
         return null;
     }
 
     return (
-        <div className={styles.overlay} ref={overlayRef}>
-            <div className={styles.modal} ref={modalRef} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.overlay}>
+            <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.header}>
                     <div className={styles.headerContent}>
                         <h2 className={styles.title}>Участники</h2>
@@ -83,18 +59,17 @@ export default function ParticipantsModal({
                     ) : participants.length === 0 ? (
                         <div className={styles.empty}>Участников пока нет</div>
                     ) : (
-                        <div className={styles.participantsGrid}>
+                        <div className={styles.participantsList}>
                             {participants.map((participant) => (
-                                <div key={participant.id} className={styles.participantItem}>
-                                    <Avatar
-                                        size="M"
-                                        name={participant.name || 'Пользователь'}
-                                        avatarUrl={buildImageUrl(participant.avatarUrl) ?? undefined}
-                                    />
-                                    <span className={styles.participantName}>
-                                        {participant.name || 'Пользователь'}
-                                    </span>
-                                </div>
+                                <ParticipantCard
+                                    key={participant.id}
+                                    name={participant.name || 'Пользователь'}
+                                    avatarUrl={buildImageUrl(participant.avatarUrl)}
+                                    isInContacts={participant.isInContacts ?? true}
+                                    onRemoveFromContacts={() => onRemoveFromContacts?.(participant.id)}
+                                    onExclude={() => onExclude?.(participant.id)}
+                                    showActions={isAdmin}
+                                />
                             ))}
                         </div>
                     )}

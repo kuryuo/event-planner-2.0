@@ -1,0 +1,71 @@
+@use '@/typography-variables' as ty;
+
+.menuContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: var(--white);
+  border-radius: var(--radius-4);
+  box-shadow: var(--lvl2);
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  z-index: 1000;
+}
+
+.searchWrapper {
+  padding: var(--spacing-2);
+}
+
+.divider {
+  height: 1px;
+  background-color: var(--border-primary);
+  margin: 0;
+}
+
+.dropdown {
+  list-style: none;
+  overflow-y: auto;
+  max-height: 200px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-tertiary) var(--white);
+  margin: 0;
+  padding: 0;
+}
+
+.option {
+  display: flex;
+  align-items: flex-start;
+  padding: var(--spacing-2) var(--spacing-3);
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background-color: var(--hover-bg);
+  }
+
+  .optionContent {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .optionLabel {
+    @include ty.font(body-m, regular);
+    color: var(--content-primary);
+  }
+
+  .optionDescription {
+    @include ty.font(caption-m, regular);
+    color: var(--content-secondary);
+  }
+}
+
+.dividerItem {
+  height: 1px;
+  background-color: var(--border-primary);
+  margin: var(--spacing-1) 0;
+  padding: 0;
+  cursor: default;
+}
+

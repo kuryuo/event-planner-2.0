@@ -1,13 +1,13 @@
 import Sidebar from "@/components/sidebar/Sidebar";
 import EventForm from "@/components/event-form/EventForm";
 import styles from "./EventEditorPage.module.scss";
-import type {CardBaseProps} from "@/ui/card/CardBase.tsx";
+import type {CardProps} from "@/ui/card/Card.tsx";
 import {useState} from "react";
 import {useSearchParams} from "react-router-dom";
 import {useEventEditor} from "@/hooks/ui/useEventEditor.ts";
 import {useGetEventByIdQuery} from "@/services/api/eventApi.ts";
 
-const subscriptionsData: CardBaseProps[] = [
+const subscriptionsData: CardProps[] = [
     {title: 'Подписка 1', subtitle: 'Описание подписки 1', avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg'},
     {
         title: 'Подписка 2',
@@ -19,7 +19,7 @@ const subscriptionsData: CardBaseProps[] = [
 ];
 
 export default function EventEditorPage() {
-    const [subscriptions] = useState<CardBaseProps[]>(subscriptionsData);
+    const [subscriptions] = useState<CardProps[]>(subscriptionsData);
     const [searchParams] = useSearchParams();
     const eventId = searchParams.get('id');
     

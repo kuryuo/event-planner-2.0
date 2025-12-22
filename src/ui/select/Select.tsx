@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
 import styles from './Select.module.scss';
 import ChevronDownImg from '../../assets/img/icon-m/chevron-down.svg';
+import Menu, { type MenuOption } from '../menu/Menu';
 
-interface Option {
+export interface Option {
     label?: string;
     description?: string;
     content?: React.ReactNode;
@@ -76,29 +77,15 @@ export default function Select({
             )}
 
             {isOpen && !disabled && (
-                <ul className={styles.dropdown}>
-                    {options.map((option, idx) => (
-                        <li
-                            key={idx}
-                            className={styles.option}
-                            onClick={() => {
-                                setValue(option.label ?? '');
-                                setIsOpen(false);
-                            }}
-                        >
-                            <div className={styles.optionContent}>
-                                {option.content ?? (
-                                    <>
-                                        <div className={styles.optionLabel}>{option.label}</div>
-                                        {option.description && (
-                                            <div className={styles.optionDescription}>{option.description}</div>
-                                        )}
-                                    </>
-                                )}
-                            </div>
-                        </li>
-                    ))}
-                </ul>
+                <div className={styles.dropdownContainer}>
+                    <Menu
+                        options={options as MenuOption[]}
+                        onOptionClick={(option) => {
+                            setValue(option.label ?? '');
+                            setIsOpen(false);
+                        }}
+                    />
+                </div>
             )}
         </div>
     );

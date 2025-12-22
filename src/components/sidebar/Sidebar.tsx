@@ -1,4 +1,4 @@
-import {CardExtra} from '@/ui/card/CardExtra.tsx';
+import {Card} from '@/ui/card/Card.tsx';
 import {Sublist} from '@/components/sidebar/sub-list/SubList.tsx';
 import {NotificationBadge} from '@/ui/notification-badge/NotificationBadge.tsx';
 import CircleButton from '@/ui/button-circle/ButtonCircle.tsx';
@@ -40,18 +40,17 @@ export default function Sidebar({notificationCount = 3, isAdmin = false}: Sideba
         <div className={styles.sidebar}>
             <div className={styles.block}>
                 <div onClick={handleProfileClick} style={{cursor: 'pointer'}}>
-                    <CardExtra
+                    <Card
                         title={`${profile?.lastName ?? ''} ${profile?.firstName ?? ''} ${profile?.middleName ?? ''}`.trim()}
-                        subtitle=""
                         avatarUrl={
                             profile?.avatarUrl
                                 ? buildImageUrl(profile.avatarUrl)!
                                 : fallbackAvatar
                         }
-                        addon={
+                        rightIcon={
                             <NotificationBadge icon={<img src={bell} alt="Уведомления"/>} count={notificationCount}/>
                         }
-                        onAddonClick={() => console.log('Открыть уведомления')}
+                        onRightIconClick={() => console.log('Открыть уведомления')}
                     />
                 </div>
             </div>

@@ -1,11 +1,10 @@
-import {CardExtra} from '@/ui/card/CardExtra.tsx';
-import type {CardBaseProps} from '@/ui/card/CardBase.tsx';
+import {Card, type CardProps} from '@/ui/card/Card.tsx';
 import Badge from '@/ui/badge/Badge.tsx';
 import styles from './SubList.module.scss';
 
 interface SublistProps {
     title?: string;
-    items: CardBaseProps[];
+    items: CardProps[];
 }
 
 export function Sublist({title = 'Мои подписки', items}: SublistProps) {
@@ -18,10 +17,10 @@ export function Sublist({title = 'Мои подписки', items}: SublistProps
 
             <div className={styles.list}>
                 {items.map((item, index) => (
-                    <CardExtra
+                    <Card
                         key={index}
                         {...item}
-                        addon={<Badge variant="dot" color="brand-green" size="M"/>}
+                        rightIcon={<Badge variant="dot" color="brand-green" size="M"/>}
                     />
                 ))}
             </div>

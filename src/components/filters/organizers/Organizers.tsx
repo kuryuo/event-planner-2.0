@@ -1,6 +1,6 @@
 import {useState} from "react";
 import Select from "@/ui/select/Select.tsx";
-import {CardBase} from "@/ui/card/CardBase.tsx";
+import {Card} from "@/ui/card/Card.tsx";
 
 export default function Organizers() {
     const [inputValue, setInputValue] = useState("");
@@ -17,7 +17,7 @@ export default function Organizers() {
                         label: "Алексей Смирнов",
                         description: "Главный организатор",
                         content: (
-                            <CardBase
+                            <Card
                                 title="Алексей Смирнов"
                                 avatarUrl="https://randomuser.me/api/portraits/men/15.jpg"
                                 size="S"
@@ -28,7 +28,7 @@ export default function Organizers() {
                         label: "Мария Волкова",
                         description: "PR-менеджер",
                         content: (
-                            <CardBase
+                            <Card
                                 title="Мария Волкова"
                                 avatarUrl="https://randomuser.me/api/portraits/women/21.jpg"
                                 size="S"
@@ -39,7 +39,7 @@ export default function Organizers() {
                         label: "Дмитрий Орлов",
                         description: "Технический директор",
                         content: (
-                            <CardBase
+                            <Card
                                 title="Дмитрий Орлов"
                                 avatarUrl="https://randomuser.me/api/portraits/men/42.jpg"
                                 size="S"
@@ -50,7 +50,7 @@ export default function Organizers() {
                         label: "Екатерина Иванова",
                         description: "Координатор мероприятий",
                         content: (
-                            <CardBase
+                            <Card
                                 title="Екатерина Иванова"
                                 avatarUrl="https://randomuser.me/api/portraits/women/38.jpg"
                                 size="S"
@@ -61,7 +61,7 @@ export default function Organizers() {
                         label: "Илья Кузнецов",
                         description: "Дизайнер сцены",
                         content: (
-                            <CardBase
+                            <Card
                                 title="Илья Кузнецов"
                                 avatarUrl="https://randomuser.me/api/portraits/men/5.jpg"
                                 size="S"

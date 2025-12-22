@@ -5,7 +5,7 @@ import styles from "./ProfilePage.module.scss";
 import ChevronLeftIcon from '@/assets/img/icon-s/chevron-left.svg?react';
 import BoxArrowLeftIcon from '@/assets/img/icon-m/box-arrow-left.svg?react';
 import ProfileForm from "@/components/profile-page/ProfileForm.tsx";
-import {CardBase} from '@/ui/card/CardBase.tsx';
+import {Card} from '@/ui/card/Card.tsx';
 import AvatarMenu from "@/components/profile-page/AvatarMenu.tsx";
 import Button from '@/ui/button/Button.tsx';
 import Switch from '@/ui/switch/Switch.tsx';
@@ -68,7 +68,7 @@ export default function ProfilePage() {
                         onUpload={triggerFileDialog}
                         onClear={() => console.log('Очистить аватар')}
                     >
-                        <CardBase
+                        <Card
                             size="M"
                             title={fullName}
                             subtitle={profile?.city ?? ''}

@@ -158,6 +158,9 @@ export default function Participants({
                 participants={modalParticipants}
                 totalCount={modalTotalCount}
                 isLoading={isModalLoading}
+                isAdmin={isAdmin}
+                onRemoveFromContacts={(id) => console.log('Убрать из контактов', id)}
+                onExclude={(id) => console.log('Исключить', id)}
             />
         </>
     );
