@@ -34,7 +34,12 @@ export default function CalendarToolbar({
     return (
         <div className={styles.customToolbar}>
             <div className={styles.leftPart}>
-                <span className={styles.navLabel}>{formatCalendarLabel(currentDate, currentView)}</span>
+                <span className={styles.navLabel}>
+                    {showingList 
+                        ? currentDate.toLocaleString('ru-RU', {month: 'long', year: 'numeric'}).replace(/^./, str => str.toUpperCase())
+                        : formatCalendarLabel(currentDate, currentView)
+                    }
+                </span>
                 <button className={styles.navBtn} onClick={onPrev}>
                     <img src={ChevronLeft} alt="Предыдущая"/>
                 </button>

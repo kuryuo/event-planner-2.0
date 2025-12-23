@@ -181,6 +181,26 @@ export const eventApi = baseApi.injectEndpoints({
             invalidatesTags: (result, error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
         }),
+        /**
+         * Подписаться на мероприятие
+         */
+        subscribeToEvent: builder.mutation<void, string>({
+            query: (eventId) => ({
+                url: `/events/${eventId}/subscribe`,
+                method: 'POST',
+            }),
+            invalidatesTags: ['Profile', 'Event'],
+        }),
+        /**
+         * Отписаться от мероприятия
+         */
+        unsubscribeFromEvent: builder.mutation<void, string>({
+            query: (eventId) => ({
+                url: `/events/${eventId}/unsubscribe`,
+                method: 'POST',
+            }),
+            invalidatesTags: ['Profile', 'Event'],
+        }),
     }),
     overrideExisting: false,
 });
@@ -195,5 +215,7 @@ export const {
     useGetEventContactsQuery,
     useGetEventPhotosQuery,
     useUploadEventPhotoMutation,
-    useDeleteEventPhotoMutation
+    useDeleteEventPhotoMutation,
+    useSubscribeToEventMutation,
+    useUnsubscribeFromEventMutation
 } = eventApi;

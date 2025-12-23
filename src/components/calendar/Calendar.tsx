@@ -27,13 +27,15 @@ export default function Calendar({onFilterClick, filters}: CalendarProps) {
 
     const {listEvents} = useEventsData(filters);
 
-    const currentDate = currentView === 'dayGridMonth' ? monthDate : weekDate;
+    const currentDate = showEventsList ? monthDate : (currentView === 'dayGridMonth' ? monthDate : weekDate);
 
     const goToPrevious = () => {
-        if (currentView === 'dayGridMonth') {
+        if (showEventsList || currentView === 'dayGridMonth') {
             const prev = shiftMonth(monthDate, -1);
             setMonthDate(prev);
-            calendarRef.current?.getApi().gotoDate(prev);
+            if (calendarRef.current) {
+                calendarRef.current.getApi().gotoDate(prev);
+            }
         } else {
             const prev = shiftWeek(weekDate, -1);
             setWeekDate(prev);
@@ -42,10 +44,12 @@ export default function Calendar({onFilterClick, filters}: CalendarProps) {
     };
 
     const goToNext = () => {
-        if (currentView === 'dayGridMonth') {
+        if (showEventsList || currentView === 'dayGridMonth') {
             const next = shiftMonth(monthDate, 1);
             setMonthDate(next);
-            calendarRef.current?.getApi().gotoDate(next);
+            if (calendarRef.current) {
+                calendarRef.current.getApi().gotoDate(next);
+            }
         } else {
             const next = shiftWeek(weekDate, 1);
             setWeekDate(next);
@@ -74,7 +78,7 @@ export default function Calendar({onFilterClick, filters}: CalendarProps) {
             />
 
             {showEventsList ? (
-                <EventsList events={listEvents}/>
+                <EventsList events={listEvents} currentMonth={monthDate}/>
             ) : (
                 <CalendarBody
                     calendarRef={calendarRef}

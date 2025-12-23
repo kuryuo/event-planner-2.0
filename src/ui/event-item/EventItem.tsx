@@ -1,14 +1,41 @@
 import Button from '../button/Button';
 import styles from './EventItem.module.scss';
 import BoxArrowUpIcon from '@/assets/img/icon-m/box-arrow-up-right.svg';
+import {useNavigate} from "react-router-dom";
 
 interface EventItemProps {
+    eventId: string;
     time: string;
     title: string;
     description: string;
+    isSubscribed: boolean;
+    onSubscribe?: (eventId: string) => void;
+    onUnsubscribe?: (eventId: string) => void;
 }
 
-export default function EventItem({time, title, description}: EventItemProps) {
+export default function EventItem({
+    eventId,
+    time,
+    title,
+    description,
+    isSubscribed,
+    onSubscribe,
+    onUnsubscribe
+}: EventItemProps) {
+    const navigate = useNavigate();
+
+    const handleButtonClick = () => {
+        if (isSubscribed) {
+            onUnsubscribe?.(eventId);
+        } else {
+            onSubscribe?.(eventId);
+        }
+    };
+
+    const handleIconClick = () => {
+        navigate(`/event?id=${eventId}`);
+    };
+
     return (
         <div className={styles.eventItem}>
             <div className={styles.time}>{time}</div>
@@ -24,10 +51,20 @@ export default function EventItem({time, title, description}: EventItemProps) {
                 </div>
             </div>
             <div className={styles.buttonWrapper}>
-                <Button variant="Filled" color="purple">
-                    Действие
+                <Button 
+                    variant="Filled" 
+                    color={isSubscribed ? "gray" : "purple"}
+                    onClick={handleButtonClick}
+                >
+                    {isSubscribed ? "Я не пойду" : "Я пойду"}
                 </Button>
-                <img src={BoxArrowUpIcon} alt="icon" className={styles.buttonIcon}/>
+                <img 
+                    src={BoxArrowUpIcon} 
+                    alt="icon" 
+                    className={styles.buttonIcon}
+                    onClick={handleIconClick}
+                    style={{cursor: 'pointer'}}
+                />
             </div>
         </div>
     );
