@@ -1,6 +1,7 @@
 import Select from "@/ui/select/Select.tsx";
 import {useChips} from "@/hooks/ui/useChips.ts";
 import styles from "./Category.module.scss";
+import {useGetCategoriesQuery} from "@/services/api/categoryApi.ts";
 
 interface CategorySelectProps {
     label?: string;
@@ -8,15 +9,26 @@ interface CategorySelectProps {
     helperText?: string;
     options?: { label: string; description?: string }[];
     disabled?: boolean;
+    isOpen?: boolean;
+    onOpenChange?: (isOpen: boolean) => void;
 }
 
 export default function Category({
                                      error,
                                      helperText,
-                                     options = [],
-                                     disabled
+                                     disabled,
+                                     isOpen,
+                                     onOpenChange
                                  }: CategorySelectProps) {
     const {inputValue, setInputValue, addChip, handleKeyDown} = useChips();
+    const {data: categoriesData, isLoading} = useGetCategoriesQuery();
+
+    const categoryOptions = categoriesData?.result
+        ? categoriesData.result.map(category => ({
+            label: category.name,
+            description: undefined
+        }))
+        : [];
 
     return (
         <div>
@@ -27,17 +39,15 @@ export default function Category({
                 onKeyDown={handleKeyDown}
                 error={error}
                 helperText={helperText}
-                disabled={disabled}
-                options={[
-                    {label: 'Просто текст'},
-                    {label: 'Просто текст'},
-                    {label: 'Просто текст'}
-                ]}
+                disabled={disabled || isLoading}
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+                options={categoryOptions}
             />
 
-            {inputValue && options.length > 0 && !disabled && (
+            {inputValue && categoryOptions.length > 0 && !disabled && (
                 <div className={styles.menu}>
-                    {options
+                    {categoryOptions
                         .filter((opt) => opt.label.toLowerCase().includes(inputValue.toLowerCase()))
                         .map((opt) => (
                             <div

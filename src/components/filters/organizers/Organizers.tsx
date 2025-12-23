@@ -2,7 +2,12 @@ import {useState} from "react";
 import Select from "@/ui/select/Select.tsx";
 import {Card} from "@/ui/card/Card.tsx";
 
-export default function Organizers() {
+interface OrganizersProps {
+    isOpen?: boolean;
+    onOpenChange?: (isOpen: boolean) => void;
+}
+
+export default function Organizers({isOpen, onOpenChange}: OrganizersProps = {}) {
     const [inputValue, setInputValue] = useState("");
 
     return (
@@ -12,6 +17,8 @@ export default function Organizers() {
                 placeholder="Выберите организатора"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
                 options={[
                     {
                         label: "Алексей Смирнов",

@@ -1,4 +1,4 @@
-const BASE_URL = 'http://95.82.231.190:5002/';
+const BASE_URL = 'https://cpbeventplanner.ru/';
 
 /**
  * Строит полный URL для изображения на основе относительного пути.

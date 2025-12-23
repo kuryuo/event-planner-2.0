@@ -19,6 +19,8 @@ import {useEventForm} from "@/hooks/ui/useEventForm.ts";
 import type {CreateEventPayload, EventResponse} from "@/types/api/Event.ts";
 import {filterDigits} from "@/utils/string.ts";
 import {useNavigate} from "react-router-dom";
+import {useGetCategoriesQuery} from "@/services/api/categoryApi.ts";
+import {useRef} from "react";
 
 interface EventFormProps {
     eventData?: EventResponse | null;
@@ -36,6 +38,15 @@ export default function EventForm({
                                       isEditMode = false
                                   }: EventFormProps) {
     const navigate = useNavigate();
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const {data: categoriesData, isLoading: isLoadingCategories} = useGetCategoriesQuery();
+
+    const categoryOptions = categoriesData?.result
+        ? categoriesData.result.map(category => ({
+            label: category.name,
+            description: undefined
+        }))
+        : [];
 
     const {
         title,
@@ -46,6 +57,9 @@ export default function EventForm({
         setLocation,
         avatarColor,
         setAvatarColor,
+        avatarFile,
+        avatarPreview,
+        handleAvatarChange,
         isPrivate,
         setIsPrivate,
         showCategorySelect,
@@ -66,6 +80,7 @@ export default function EventForm({
         categories,
         inputValue,
         setInputValue,
+        addChip,
         removeChip,
         handleKeyDown,
         preparePayload,
@@ -120,8 +135,16 @@ export default function EventForm({
                         <Avatar
                             size="L"
                             variant="update"
-                            avatarUrl={undefined}
+                            avatarUrl={avatarPreview || undefined}
                             name=""
+                            onClick={() => fileInputRef.current?.click()}
+                        />
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            style={{display: 'none'}}
+                            onChange={handleAvatarChange}
                         />
                         <ColorPicker
                             value={avatarColor}
@@ -149,11 +172,14 @@ export default function EventForm({
                                 value={inputValue}
                                 onChange={(e) => setInputValue(e.target.value)}
                                 onKeyDown={handleKeyDown}
-                                options={[
-                                    {label: 'Маркетинг', description: 'SMM, PR, digital'},
-                                    {label: 'IT', description: 'Разработка и технологии'},
-                                    {label: 'Дизайн', description: 'UX/UI, графика'},
-                                ]}
+                                disabled={isLoadingCategories}
+                                options={categoryOptions}
+                                onOptionClick={(option) => {
+                                    if (option.label) {
+                                        addChip(option.label);
+                                        setInputValue('');
+                                    }
+                                }}
                             />
 
                             <div className={styles.chipContainer}>

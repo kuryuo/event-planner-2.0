@@ -46,22 +46,58 @@ export const eventApi = baseApi.injectEndpoints({
          * Создать мероприятие
          */
         createEvent: builder.mutation<CreateEventResponse, CreateEventPayload>({
-            query: (body) => ({
-                url: '/events',
-                method: 'POST',
-                body,
-            }),
+            query: (payload) => {
+                const formData = new FormData();
+                formData.append('Name', payload.name);
+                formData.append('Description', payload.description);
+                formData.append('StartDate', payload.startDate);
+                formData.append('EndDate', payload.endDate);
+                formData.append('Location', payload.location);
+                formData.append('Format', payload.format);
+                formData.append('EventType', payload.eventType);
+                formData.append('ResponsiblePersonId', payload.responsiblePersonId);
+                formData.append('MaxParticipants', payload.maxParticipants.toString());
+                payload.categories.forEach(category => {
+                    formData.append('Categories', category);
+                });
+                payload.roles.forEach(role => {
+                    formData.append('Roles', role);
+                });
+                formData.append('Color', payload.color);
+                if (payload.avatar) {
+                    formData.append('Avatar', payload.avatar);
+                }
+                return {
+                    url: '/events',
+                    method: 'POST',
+                    body: formData,
+                };
+            },
             invalidatesTags: ['Event'],
         }),
         /**
          * Обновить мероприятие
          */
         updateEvent: builder.mutation<UpdateEventResponse, {eventId: string; body: UpdateEventPayload}>({
-            query: ({eventId, body}) => ({
-                url: `/events/${eventId}`,
-                method: 'PUT',
-                body,
-            }),
+            query: ({eventId, body}) => {
+                const formData = new FormData();
+                formData.append('Name', body.name);
+                formData.append('Description', body.description);
+                formData.append('StartDate', body.startDate);
+                formData.append('EndDate', body.endDate);
+                formData.append('Location', body.location);
+                formData.append('Format', body.format);
+                formData.append('EventType', body.eventType);
+                formData.append('MaxParticipants', body.maxParticipants.toString());
+                if (body.avatar) {
+                    formData.append('Avatar', body.avatar);
+                }
+                return {
+                    url: `/events/${eventId}`,
+                    method: 'PUT',
+                    body: formData,
+                };
+            },
             invalidatesTags: (result, error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
         }),

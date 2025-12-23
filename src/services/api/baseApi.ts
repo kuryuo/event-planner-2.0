@@ -3,7 +3,7 @@ import type {RootState} from '@/store/store'
 import {setTokens, clearTokens} from '@/store/authSlice'
 
 const rawBaseQuery = fetchBaseQuery({
-    baseUrl: 'http://95.82.231.190:5002/api/',
+    baseUrl: 'https://cpbeventplanner.ru/api/',
     prepareHeaders: (headers, {getState}) => {
         const token = (getState() as RootState).auth.accessToken
         if (token) {
@@ -52,6 +52,6 @@ const baseQueryWithReauth: typeof rawBaseQuery = async (args, api, extraOptions)
 
 export const baseApi = createApi({
     baseQuery: baseQueryWithReauth,
-    tagTypes: ['Event', 'Profile', 'EventPost'],
+    tagTypes: ['Event', 'Profile', 'EventPost', 'Category'],
     endpoints: () => ({}),
 })

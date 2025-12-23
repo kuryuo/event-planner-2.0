@@ -22,6 +22,7 @@ export default function Filters({onClose}: FiltersProps) {
 
     const [mySubscriptions, setMySubscriptions] = useState(false);
     const [availableSeats, setAvailableSeats] = useState(false);
+    const [openSelect, setOpenSelect] = useState<'organizers' | 'category' | null>(null);
 
     const toggleFormat = (key: keyof typeof formats) => {
         setFormats(prev => ({...prev, [key]: !prev[key]}));
@@ -62,11 +63,17 @@ export default function Filters({onClose}: FiltersProps) {
             </div>
 
             <div className={styles.selectSection}>
-                <Organizers/>
+                <Organizers
+                    isOpen={openSelect === 'organizers'}
+                    onOpenChange={(isOpen) => setOpenSelect(isOpen ? 'organizers' : null)}
+                />
             </div>
 
             <div className={styles.selectSection}>
-                <Category/>
+                <Category
+                    isOpen={openSelect === 'category'}
+                    onOpenChange={(isOpen) => setOpenSelect(isOpen ? 'category' : null)}
+                />
             </div>
 
 

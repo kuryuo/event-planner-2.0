@@ -13,7 +13,9 @@ export const useEventForm = (eventData?: EventResponse | null) => {
     const [title, setTitle] = useState("");
     const [format, setFormat] = useState("Очно");
     const [location, setLocation] = useState("");
-    const [avatarColor, setAvatarColor] = useState("var(--pink-100)");
+    const [avatarColor, setAvatarColor] = useState("#C2185B");
+    const [avatarFile, setAvatarFile] = useState<File | null>(null);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const [isPrivate, setIsPrivate] = useState(false);
     const [showCategorySelect, setShowCategorySelect] = useState(false);
     const [participants, setParticipants] = useState("");
@@ -28,6 +30,7 @@ export const useEventForm = (eventData?: EventResponse | null) => {
         chips: categories,
         inputValue,
         setInputValue,
+        addChip,
         removeChip,
         handleKeyDown,
         setChips: setCategories,
@@ -115,15 +118,36 @@ export const useEventForm = (eventData?: EventResponse | null) => {
         };
 
         if (!eventData && profile?.id) {
-            return {
+            const payload = {
                 ...basePayload,
                 responsiblePersonId: profile.id,
                 categories: categories,
                 roles: roles,
+                color: avatarColor,
+                avatar: avatarFile,
             } as CreateEventPayload;
+            console.log('Создание мероприятия, отправляемые данные:', payload);
+            return payload;
         }
 
-        return basePayload as UpdateEventPayload;
+        const updatePayload = {
+            ...basePayload,
+            avatar: avatarFile,
+        } as UpdateEventPayload;
+        console.log('Обновление мероприятия, отправляемые данные:', updatePayload);
+        return updatePayload;
+    };
+
+    const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setAvatarFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setAvatarPreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     return {
@@ -135,6 +159,9 @@ export const useEventForm = (eventData?: EventResponse | null) => {
         setLocation,
         avatarColor,
         setAvatarColor,
+        avatarFile,
+        avatarPreview,
+        handleAvatarChange,
         isPrivate,
         setIsPrivate,
         showCategorySelect,
@@ -156,6 +183,7 @@ export const useEventForm = (eventData?: EventResponse | null) => {
         categories,
         inputValue,
         setInputValue,
+        addChip,
         removeChip,
         handleKeyDown,
 
