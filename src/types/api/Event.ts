@@ -31,15 +31,15 @@ export interface CreateEventPayload {
 }
 
 export interface GetEventsPayload {
-    start?: string;
-    end?: string;
-    name?: string;
-    organizers?: string[];
-    format?: string;
-    hasFreePlaces?: boolean;
-    categories?: string[];
-    offset?: number;
-    count: number;
+    Start?: string;
+    End?: string;
+    Name?: string;
+    Organizators?: string[];
+    Format?: string;
+    HasFreePlaces?: boolean;
+    Categories?: string[];
+    Offset?: number;
+    Count?: number;
 }
 
 export interface GetEventsResponse {

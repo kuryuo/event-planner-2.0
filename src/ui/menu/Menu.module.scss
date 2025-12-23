@@ -37,6 +37,7 @@
 .option {
   display: flex;
   align-items: flex-start;
+  justify-content: space-between;
   padding: var(--spacing-2) var(--spacing-3);
   cursor: pointer;
   transition: background 0.2s;
@@ -59,6 +60,13 @@
   .optionDescription {
     @include ty.font(caption-m, regular);
     color: var(--content-secondary);
+  }
+
+  .checkIcon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    margin-left: var(--spacing-2);
   }
 }
 

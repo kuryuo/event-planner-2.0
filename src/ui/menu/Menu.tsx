@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import styles from './Menu.module.scss';
 import TextField from '../text-field/TextField';
+import Check2Icon from '@/assets/img/icon-m/check2.svg';
 
 export interface MenuOption {
     label?: string;
@@ -14,9 +15,10 @@ interface MenuProps {
     onOptionClick?: (option: MenuOption, index: number) => void;
     withSearch?: boolean;
     searchPlaceholder?: string;
+    selectedValues?: string[];
 }
 
-export default function Menu({ options, onOptionClick, withSearch = false, searchPlaceholder = 'Поиск...' }: MenuProps) {
+export default function Menu({ options, onOptionClick, withSearch = false, searchPlaceholder = 'Поиск...', selectedValues = [] }: MenuProps) {
     const [searchQuery, setSearchQuery] = useState('');
 
     const filteredOptions = useMemo(() => {
@@ -65,6 +67,8 @@ export default function Menu({ options, onOptionClick, withSearch = false, searc
                         );
                     }
 
+                    const isSelected = option.label ? selectedValues.includes(option.label) : false;
+
                     return (
                         <li
                             key={originalIndex >= 0 ? originalIndex : idx}
@@ -83,6 +87,9 @@ export default function Menu({ options, onOptionClick, withSearch = false, searc
                                     </>
                                 )}
                             </div>
+                            {isSelected && (
+                                <img src={Check2Icon} alt="Выбрано" className={styles.checkIcon} />
+                            )}
                         </li>
                     );
                 })}

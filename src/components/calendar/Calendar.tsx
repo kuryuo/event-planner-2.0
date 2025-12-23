@@ -6,12 +6,14 @@ import styles from './Calendar.module.scss';
 import {shiftMonth, shiftWeek} from '@/utils';
 import EventsList from "@/components/events-list/EventsList.tsx";
 import {useEventsData} from '@/hooks/api/useEventsData.ts';
+import type {GetEventsPayload} from '@/types/api/Event.ts';
 
 interface CalendarProps {
     onFilterClick?: () => void;
+    filters?: GetEventsPayload;
 }
 
-export default function Calendar({onFilterClick}: CalendarProps) {
+export default function Calendar({onFilterClick, filters}: CalendarProps) {
     const calendarRef = useRef<FullCalendar | null>(null);
 
     const [currentView, setCurrentView] = useState<'dayGridMonth' | 'timeGridWeek'>('dayGridMonth');
@@ -23,7 +25,7 @@ export default function Calendar({onFilterClick}: CalendarProps) {
         setShowEventsList(prev => !prev);
     };
 
-    const {listEvents} = useEventsData();
+    const {listEvents} = useEventsData(filters);
 
     const currentDate = currentView === 'dayGridMonth' ? monthDate : weekDate;
 
@@ -77,6 +79,7 @@ export default function Calendar({onFilterClick}: CalendarProps) {
                 <CalendarBody
                     calendarRef={calendarRef}
                     currentView={currentView}
+                    filters={filters}
                 />
             )}
         </div>

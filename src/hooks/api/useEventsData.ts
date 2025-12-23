@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 import {useGetEventsQuery} from '@/services/api/eventApi.ts';
-import type {EventResponse} from '@/types/api/Event.ts';
+import type {EventResponse, GetEventsPayload} from '@/types/api/Event.ts';
 
 export interface UseEventsOutput {
     calendarEvents: {
@@ -18,8 +18,9 @@ export interface UseEventsOutput {
     }[];
 }
 
-export const useEventsData = (): UseEventsOutput => {
-    const {data} = useGetEventsQuery({count: 50});
+export const useEventsData = (filters?: GetEventsPayload): UseEventsOutput => {
+    const payload: GetEventsPayload = filters || {Count: 50};
+    const {data} = useGetEventsQuery(payload);
 
     const {calendarEvents, listEvents} = useMemo(() => {
         const events = (data?.result || []) as EventResponse[];

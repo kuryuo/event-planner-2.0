@@ -9,17 +9,19 @@ import './CalendarBody.module.scss';
 import {useEventsData} from '@/hooks/api/useEventsData.ts';
 import type {EventClickArg} from "@fullcalendar/core";
 import {useNavigate} from "react-router-dom";
+import type {GetEventsPayload} from '@/types/api/Event.ts';
 
 import {SLOT_LABEL_FORMAT, CALENDAR_SLOT_TIMES, CALENDAR_OPTIONS} from '@/const';
 
 interface CalendarBodyProps {
     calendarRef: React.RefObject<FullCalendar | null>;
     currentView: 'dayGridMonth' | 'timeGridWeek';
+    filters?: GetEventsPayload;
 }
 
-export default function CalendarBody({calendarRef, currentView}: CalendarBodyProps) {
+export default function CalendarBody({calendarRef, currentView, filters}: CalendarBodyProps) {
     const navigate = useNavigate();
-    const {calendarEvents} = useEventsData();
+    const {calendarEvents} = useEventsData(filters);
 
     const handleClick = (event: EventClickArg) => {
         navigate('/event?id=' + event.event.id)

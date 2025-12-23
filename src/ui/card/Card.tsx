@@ -39,7 +39,7 @@ export function Card({
             role={onClick ? 'button' : undefined}
             tabIndex={onClick ? 0 : undefined}
         >
-            {avatarUrl && <Avatar size={size} avatarUrl={avatarUrl} name={title} />}
+            <Avatar size={size} avatarUrl={avatarUrl} name={title} />
             <div className={styles.content}>
                 <div className={styles.textBlock}>
                     <span className={clsx(styles.title, styles[size])}>{title}</span>

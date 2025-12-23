@@ -19,6 +19,7 @@ interface SelectProps extends React.InputHTMLAttributes<HTMLInputElement> {
     isOpen?: boolean;
     onOpenChange?: (isOpen: boolean) => void;
     onOptionClick?: (option: Option) => void;
+    selectedValues?: string[];
 }
 
 export default function Select({
@@ -35,6 +36,7 @@ export default function Select({
                                    isOpen: controlledIsOpen,
                                    onOpenChange,
                                    onOptionClick,
+                                   selectedValues = [],
                                    ...props
                                }: SelectProps) {
     const [internalIsOpen, setInternalIsOpen] = useState(false);
@@ -64,7 +66,18 @@ export default function Select({
                     className={styles.input}
                     disabled={disabled}
                     value={value}
-                    onChange={(e) => setValue(e.target.value)}
+                    onChange={(e) => {
+                        setValue(e.target.value);
+                        if (e.target.value && options.length > 0) {
+                            setIsOpen(true);
+                        }
+                    }}
+                    onFocus={(e) => {
+                        if (options.length > 0) {
+                            setIsOpen(true);
+                        }
+                        props.onFocus?.(e);
+                    }}
                     {...props}
                 />
                 <span
@@ -95,6 +108,7 @@ export default function Select({
                 <div className={styles.dropdownContainer}>
                     <Menu
                         options={options as MenuOption[]}
+                        selectedValues={selectedValues}
                         onOptionClick={(option) => {
                             if (onOptionClick) {
                                 onOptionClick(option);
