@@ -12,6 +12,7 @@ interface Event {
     time: string;
     title: string;
     description: string;
+    avatar?: string | null;
 }
 
 interface EventsListProps {
@@ -70,6 +71,7 @@ export default function EventsList({events, currentMonth}: EventsListProps) {
                                     time={event.time}
                                     title={event.title}
                                     description={event.description}
+                                    avatar={event.avatar}
                                     isSubscribed={subscribedEventIds.has(event.id)}
                                     onSubscribe={handleSubscribe}
                                     onUnsubscribe={handleUnsubscribe}

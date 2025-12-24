@@ -41,12 +41,12 @@ export default function Post({eventId, isAdmin = false}: PostsProps) {
         setEditingPostId(null);
     };
 
-    const handleSubmit = async (_title: string, text: string) => {
+    const handleSubmit = async (title: string, text: string) => {
         try {
             if (editingPostId) {
-                await updatePost(editingPostId, text);
+                await updatePost(editingPostId, title, text);
             } else {
-                await createPost(text);
+                await createPost(title, text);
             }
             setIsFormOpen(false);
             setEditingPostId(null);

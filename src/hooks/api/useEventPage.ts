@@ -11,6 +11,7 @@ export interface UseEventPageOutput {
         location: string;
         formattedDate: string;
         categories: Array<{ text: string }>;
+        avatar?: string | null;
     } | null;
     isLoading: boolean;
     error: unknown;
@@ -36,6 +37,7 @@ export const useEventPage = (): UseEventPageOutput => {
                 ? formatDateTimeRange(eventData.startDate, eventData.endDate)
                 : '',
             categories: eventData.categories?.map(cat => ({text: cat})) ?? [],
+            avatar: eventData.avatar,
         };
     }, [data]);
 

@@ -77,6 +77,7 @@ export default function EventPage() {
                         isAdmin={isAdmin}
                         name={event.name}
                         eventId={event.id}
+                        avatar={event.avatar}
                         activeTab={activeTab}
                         onTabChange={setActiveTab}
                     />

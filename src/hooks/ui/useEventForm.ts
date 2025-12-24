@@ -62,24 +62,51 @@ export const useEventForm = (eventData?: EventResponse | null) => {
 
             if (eventData.categories) {
                 setCategories(eventData.categories);
+            } else {
+                setCategories([]);
             }
 
             if (eventData.startDate) {
                 const {date, time} = parseDateTime(eventData.startDate);
                 if (date) setStartDate(date);
                 if (time) setStartTime(time);
+            } else {
+                setStartDate(undefined);
+                setStartTime("");
             }
+            
             if (eventData.endDate) {
                 const {date, time} = parseDateTime(eventData.endDate);
                 if (date) setEndDate(date);
                 if (time) setEndTime(time);
+            } else {
+                setEndDate(undefined);
+                setEndTime("");
             }
 
             isInitialized.current = true;
             initializedEventId.current = eventData.id;
-        } else if (!eventData && isInitialized.current) {
-            isInitialized.current = false;
-            initializedEventId.current = null;
+        } else if (!eventData) {
+            if (isInitialized.current) {
+                setTitle("");
+                setDescription("");
+                setLocation("");
+                setFormat("Очно");
+                setIsPrivate(false);
+                setParticipants("");
+                setIsParticipantsUnlimited(true);
+                setCategories([]);
+                setRoles(["Организатор"]);
+                setAvatarColor("#C2185B");
+                setAvatarFile(null);
+                setAvatarPreview(null);
+                setStartDate(undefined);
+                setEndDate(undefined);
+                setStartTime("");
+                setEndTime("");
+                isInitialized.current = false;
+                initializedEventId.current = null;
+            }
         }
     }, [eventData?.id, setStartDate, setEndDate, setStartTime, setEndTime, setCategories]);
 
@@ -132,6 +159,7 @@ export const useEventForm = (eventData?: EventResponse | null) => {
 
         const updatePayload = {
             ...basePayload,
+            color: avatarColor,
             avatar: avatarFile,
         } as UpdateEventPayload;
         console.log('Обновление мероприятия, отправляемые данные:', updatePayload);

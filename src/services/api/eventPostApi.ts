@@ -32,10 +32,11 @@ export const eventPostApi = baseApi.injectEndpoints({
          * Создать пост на странице мероприятия
          */
         createEventPost: builder.mutation<CreateEventPostResponse, CreateEventPostPayload>({
-            query: ({eventId, text}) => ({
+            query: ({eventId, title, text}) => ({
                 url: `/events/${eventId}/posts`,
                 method: 'POST',
                 params: {
+                    title,
                     text,
                 },
             }),
@@ -57,10 +58,11 @@ export const eventPostApi = baseApi.injectEndpoints({
          * Обновить пост
          */
         updateEventPost: builder.mutation<UpdateEventPostResponse, UpdateEventPostPayload>({
-            query: ({eventId, postId, text}) => ({
+            query: ({eventId, postId, title, text}) => ({
                 url: `/events/${eventId}/posts/${postId}`,
                 method: 'PUT',
                 params: {
+                    title,
                     text,
                 },
             }),

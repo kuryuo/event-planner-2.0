@@ -1,5 +1,10 @@
 import {useNavigate} from 'react-router-dom';
-import {useCreateEventMutation, useUpdateEventMutation, useDeleteEventMutation} from '@/services/api/eventApi.ts';
+import {
+    useCreateEventMutation,
+    useUpdateEventMutation,
+    useDeleteEventMutation,
+    useUploadEventAvatarMutation
+} from '@/services/api/eventApi.ts';
 import type {CreateEventPayload, UpdateEventPayload} from '@/types/api/Event.ts';
 
 export interface UseEventEditorOutput {
@@ -15,18 +20,28 @@ export const useEventEditor = (eventId?: string): UseEventEditorOutput => {
     const [createEventMutation, {isLoading: isCreating, error: createError}] = useCreateEventMutation();
     const [updateEventMutation, {isLoading: isUpdating, error: updateError}] = useUpdateEventMutation();
     const [deleteEventMutation, {isLoading: isDeleting, error: deleteError}] = useDeleteEventMutation();
+    const [uploadAvatarMutation, {isLoading: isUploadingAvatar}] = useUploadEventAvatarMutation();
 
-    const isLoading = isCreating || isUpdating;
+    const isLoading = isCreating || isUpdating || isUploadingAvatar;
     const error = createError || updateError || deleteError;
 
     const handleSubmit = async (payload: CreateEventPayload | UpdateEventPayload) => {
         try {
+            const avatar = payload.avatar;
+            
             if (eventId) {
-                await updateEventMutation({eventId, body: payload as UpdateEventPayload}).unwrap();
-                console.log('Событие успешно обновлено');
+                if (avatar) {
+                    await uploadAvatarMutation({eventId, avatar}).unwrap();
+                }
+                const {avatar: _, ...updatePayload} = payload as UpdateEventPayload;
+                await updateEventMutation({eventId, body: updatePayload}).unwrap();
             } else {
-                await createEventMutation(payload as CreateEventPayload).unwrap();
-                console.log('Событие успешно создано');
+                const createPayload = payload as CreateEventPayload;
+                const result = await createEventMutation(createPayload).unwrap();
+                
+                if (avatar && result?.result?.id) {
+                    await uploadAvatarMutation({eventId: result.result.id, avatar}).unwrap();
+                }
             }
             navigate('/main');
         } catch (err) {
@@ -37,7 +52,6 @@ export const useEventEditor = (eventId?: string): UseEventEditorOutput => {
     const handleDelete = async (eventId: string) => {
         try {
             await deleteEventMutation(eventId).unwrap();
-            console.log('Событие успешно удалено');
             navigate('/main');
         } catch (err: any) {
             console.error('Ошибка удаления события:', err);

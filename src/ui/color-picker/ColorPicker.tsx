@@ -5,7 +5,7 @@ import ChevronUpImg from "../../assets/img/icon-m/chevron-up.svg";
 import {useClickOutside} from "@/hooks/ui/useClickOutside.ts";
 
 const PREDEFINED_COLORS = [
-    "#C2185B",
+    "#C2298A",
     "#A1309D",
     "#7A0CA8",
     "#512DA8",

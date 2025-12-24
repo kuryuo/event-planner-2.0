@@ -47,59 +47,48 @@ export const eventApi = baseApi.injectEndpoints({
          */
         createEvent: builder.mutation<CreateEventResponse, CreateEventPayload>({
             query: (payload) => {
-                const formData = new FormData();
-                formData.append('Name', payload.name);
-                formData.append('Description', payload.description);
-                formData.append('StartDate', payload.startDate);
-                formData.append('EndDate', payload.endDate);
-                formData.append('Location', payload.location);
-                formData.append('Format', payload.format);
-                formData.append('EventType', payload.eventType);
-                formData.append('ResponsiblePersonId', payload.responsiblePersonId);
-                formData.append('MaxParticipants', payload.maxParticipants.toString());
-                payload.categories.forEach(category => {
-                    formData.append('Categories', category);
-                });
-                payload.roles.forEach(role => {
-                    formData.append('Roles', role);
-                });
-                formData.append('Color', payload.color);
-                if (payload.avatar) {
-                    formData.append('Avatar', payload.avatar);
-                }
+                const {avatar, ...jsonPayload} = payload;
+                const cleanedPayload = Object.fromEntries(
+                    Object.entries(jsonPayload).map(([key, value]) => [
+                        key,
+                        value === '' ? null : value
+                    ])
+                );
                 return {
                     url: '/events',
                     method: 'POST',
-                    body: formData,
+                    body: cleanedPayload,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                 };
             },
-            invalidatesTags: ['Event'],
+            invalidatesTags: (result) =>
+                result ? ['Event'] : [],
         }),
         /**
          * Обновить мероприятие
          */
         updateEvent: builder.mutation<UpdateEventResponse, {eventId: string; body: UpdateEventPayload}>({
             query: ({eventId, body}) => {
-                const formData = new FormData();
-                formData.append('Name', body.name);
-                formData.append('Description', body.description);
-                formData.append('StartDate', body.startDate);
-                formData.append('EndDate', body.endDate);
-                formData.append('Location', body.location);
-                formData.append('Format', body.format);
-                formData.append('EventType', body.eventType);
-                formData.append('MaxParticipants', body.maxParticipants.toString());
-                if (body.avatar) {
-                    formData.append('Avatar', body.avatar);
-                }
+                const {avatar, ...jsonPayload} = body;
+                const cleanedPayload = Object.fromEntries(
+                    Object.entries(jsonPayload).map(([key, value]) => [
+                        key,
+                        value === '' ? null : value
+                    ])
+                );
                 return {
                     url: `/events/${eventId}`,
                     method: 'PUT',
-                    body: formData,
+                    body: cleanedPayload,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                 };
             },
             invalidatesTags: (result, error, {eventId}) =>
-                result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
+                result ? [{type: 'Event', id: eventId}, 'Event'] : [],
         }),
         /**
          * Удалить мероприятие
@@ -201,6 +190,22 @@ export const eventApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ['Profile', 'Event'],
         }),
+        /**
+         * Загрузить аватар мероприятия
+         */
+        uploadEventAvatar: builder.mutation<void, {eventId: string; avatar: File}>({
+            query: ({eventId, avatar}) => {
+                const formData = new FormData();
+                formData.append('avatar', avatar);
+                return {
+                    url: `/events/${eventId}/avatar`,
+                    method: 'POST',
+                    body: formData,
+                };
+            },
+            invalidatesTags: (result, error, {eventId}) =>
+                result ? [{type: 'Event', id: eventId}, 'Event'] : [],
+        }),
     }),
     overrideExisting: false,
 });
@@ -217,5 +222,6 @@ export const {
     useUploadEventPhotoMutation,
     useDeleteEventPhotoMutation,
     useSubscribeToEventMutation,
-    useUnsubscribeFromEventMutation
+    useUnsubscribeFromEventMutation,
+    useUploadEventAvatarMutation
 } = eventApi;

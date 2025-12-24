@@ -9,6 +9,7 @@ interface UseParticipantsModalOutput {
         id: string;
         name: string | null;
         avatarUrl: string | null;
+        isContact?: boolean;
     }>;
     totalCount: number;
     isLoading: boolean;
@@ -28,8 +29,8 @@ export const useParticipantsModal = (eventId: string | null, count: number = 50)
         }
     );
 
-    const participants = data?.res || [];
-    const totalCount = participants.length;
+    const participants = data?.res?.users || [];
+    const totalCount = data?.res?.totalCount || 0;
 
     const openModal = () => {
         setIsOpen(true);

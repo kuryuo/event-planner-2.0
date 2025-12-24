@@ -2,6 +2,7 @@ import Button from '../button/Button';
 import styles from './EventItem.module.scss';
 import BoxArrowUpIcon from '@/assets/img/icon-m/box-arrow-up-right.svg';
 import {useNavigate} from "react-router-dom";
+import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 
 interface EventItemProps {
     eventId: string;
@@ -9,6 +10,7 @@ interface EventItemProps {
     title: string;
     description: string;
     isSubscribed: boolean;
+    avatar?: string | null;
     onSubscribe?: (eventId: string) => void;
     onUnsubscribe?: (eventId: string) => void;
 }
@@ -19,6 +21,7 @@ export default function EventItem({
     title,
     description,
     isSubscribed,
+    avatar,
     onSubscribe,
     onUnsubscribe
 }: EventItemProps) {
@@ -41,7 +44,7 @@ export default function EventItem({
             <div className={styles.time}>{time}</div>
             <div className={styles.content}>
                 <img
-                    src="https://api.dicebear.com/7.x/shapes/png?size=200&radius=50"
+                    src={buildImageUrl(avatar) || "https://api.dicebear.com/7.x/shapes/png?size=200&radius=50"}
                     alt={title}
                     className={styles.avatar}
                 />

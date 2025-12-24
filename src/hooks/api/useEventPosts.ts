@@ -20,8 +20,8 @@ export interface UseEventPostsOutput {
     posts: Post[];
     isLoading: boolean;
     error: unknown;
-    createPost: (text: string) => Promise<void>;
-    updatePost: (postId: string, text: string) => Promise<void>;
+    createPost: (title: string, text: string) => Promise<void>;
+    updatePost: (postId: string, title: string, text: string) => Promise<void>;
     deletePost: (postId: string) => Promise<void>;
     isCreating: boolean;
     isUpdating: boolean;
@@ -39,11 +39,11 @@ export const useEventPosts = (eventId: string | null): UseEventPostsOutput => {
     const [deletePostMutation, {isLoading: isDeleting}] = useDeleteEventPostMutation();
 
     const posts = useMemo(() => {
-        if (!data?.result) return [];
+        if (!data?.result || !Array.isArray(data.result)) return [];
 
         return data.result.map((post) => ({
             id: post.id,
-            title: 'Заголовок поста',
+            title: post.title || 'Заголовок поста',
             text: post.text,
             date: new Date(post.createdAt),
             createdAt: post.createdAt,
@@ -52,14 +52,14 @@ export const useEventPosts = (eventId: string | null): UseEventPostsOutput => {
         }));
     }, [data]);
 
-    const createPost = async (text: string) => {
+    const createPost = async (title: string, text: string) => {
         if (!eventId) return;
-        await createPostMutation({eventId, text}).unwrap();
+        await createPostMutation({eventId, title, text}).unwrap();
     };
 
-    const updatePost = async (postId: string, text: string) => {
+    const updatePost = async (postId: string, title: string, text: string) => {
         if (!eventId) return;
-        await updatePostMutation({eventId, postId, text}).unwrap();
+        await updatePostMutation({eventId, postId, title, text}).unwrap();
     };
 
     const deletePost = async (postId: string) => {

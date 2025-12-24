@@ -21,9 +21,9 @@ export const useEventSubscribers = (eventId: string | null): UseEventSubscribers
     );
 
     const participants = useMemo(() => {
-        if (!data?.res) return [];
+        if (!data?.res?.users || !Array.isArray(data.res.users)) return [];
 
-        return data.res.map((subscriber, index) => ({
+        return data.res.users.map((subscriber, index) => ({
             id: subscriber.id,
             name: subscriber.name?.trim() || `Пользователь ${index + 1}`,
             avatarUrl: buildImageUrl(subscriber.avatarUrl) ?? undefined,

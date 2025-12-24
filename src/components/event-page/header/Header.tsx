@@ -9,16 +9,18 @@ import Button from '@/ui/button/Button';
 import Tabs, {type TabItem} from '@/ui/tabs/Tabs';
 import {useClickOutside} from '@/hooks/ui/useClickOutside.ts';
 import {useEventDeleter} from '@/hooks/ui/useEventDeleter.ts';
+import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 
 interface HeaderProps {
     isAdmin?: boolean;
     name: string;
     eventId?: string;
     activeTab?: number;
+    avatar?: string | null;
     onTabChange?: (index: number) => void;
 }
 
-export default function Header({isAdmin = false, name, eventId, activeTab = 0, onTabChange}: HeaderProps) {
+export default function Header({isAdmin = false, name, eventId, activeTab = 0, avatar, onTabChange}: HeaderProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
@@ -71,7 +73,7 @@ export default function Header({isAdmin = false, name, eventId, activeTab = 0, o
             </button>
             <div className={styles.main}>
                 <div className={styles.left}>
-                    <Avatar size="L" name="Название мероприятия"/>
+                    <Avatar size="L" name={name} avatarUrl={buildImageUrl(avatar)}/>
                     <h2 className={styles.title}>{name}</h2>
                 </div>
                 <div className={styles.right}>

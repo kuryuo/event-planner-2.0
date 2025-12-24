@@ -15,6 +15,7 @@ export interface UseEventsOutput {
         time: string;
         title: string;
         description: string;
+        avatar?: string | null;
     }[];
 }
 
@@ -44,6 +45,7 @@ export const useEventsData = (filters?: GetEventsPayload): UseEventsOutput => {
                 time,
                 title: e.name,
                 description: e.description ?? '',
+                avatar: e.avatar,
             };
         });
 

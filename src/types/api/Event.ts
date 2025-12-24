@@ -12,6 +12,7 @@ export interface EventResponse {
     categories: string[];
     previewPhotos: string[];
     status: string | null;
+    avatar?: string | null;
 }
 
 export interface CreateEventPayload {
@@ -59,6 +60,7 @@ export interface UpdateEventPayload {
     format: string;
     eventType: string;
     maxParticipants: number;
+    color: string;
     avatar?: File | null;
 }
 
@@ -78,16 +80,20 @@ export interface GetEventSubscribersPayload {
 }
 
 export interface GetEventSubscribersResponse {
-    res: Array<{
-        id: string;
-        email: string | null;
-        name: string | null;
-        phoneNumber: string | null;
-        telegram: string | null;
-        city: string | null;
-        avatarUrl: string | null;
-        role: string | null;
-    }>;
+    res: {
+        users: Array<{
+            id: string;
+            email: string | null;
+            name: string | null;
+            phoneNumber: string | null;
+            telegram: string | null;
+            city: string | null;
+            avatarUrl: string | null;
+            role: string | null;
+            isContact?: boolean;
+        }>;
+        totalCount: number;
+    };
 }
 
 export interface GetEventContactsResponse {
@@ -102,6 +108,7 @@ export interface EventPost {
     id: string;
     eventId: string;
     authorId: string;
+    title: string;
     text: string;
     createdAt: string;
 }
@@ -118,6 +125,7 @@ export interface GetEventPostsResponse {
 
 export interface CreateEventPostPayload {
     eventId: string;
+    title: string;
     text: string;
 }
 
@@ -137,6 +145,7 @@ export interface GetEventPostByIdResponse {
 export interface UpdateEventPostPayload {
     eventId: string;
     postId: string;
+    title: string;
     text: string;
 }
 
