@@ -12,6 +12,7 @@ export interface UseEventPageOutput {
         formattedDate: string;
         categories: Array<{ text: string }>;
         avatar?: string | null;
+        color?: string;
     } | null;
     isLoading: boolean;
     error: unknown;
@@ -38,6 +39,7 @@ export const useEventPage = (): UseEventPageOutput => {
                 : '',
             categories: eventData.categories?.map(cat => ({text: cat})) ?? [],
             avatar: eventData.avatar,
+            color: eventData.color,
         };
     }, [data]);
 

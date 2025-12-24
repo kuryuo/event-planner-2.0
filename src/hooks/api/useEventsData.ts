@@ -8,6 +8,9 @@ export interface UseEventsOutput {
         title: string;
         start: Date;
         end: Date;
+        extendedProps?: {
+            color?: string;
+        };
     }[];
     listEvents: {
         id: string;
@@ -30,6 +33,9 @@ export const useEventsData = (filters?: GetEventsPayload): UseEventsOutput => {
             title: e.name,
             start: new Date(e.startDate),
             end: new Date(e.endDate),
+            extendedProps: {
+                color: e.color,
+            },
         }));
 
         const listEvents = events.map(e => {

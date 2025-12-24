@@ -13,6 +13,7 @@ export interface EventResponse {
     previewPhotos: string[];
     status: string | null;
     avatar?: string | null;
+    color?: string;
 }
 
 export interface CreateEventPayload {

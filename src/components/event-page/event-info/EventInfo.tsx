@@ -6,18 +6,20 @@ import GeoAltIcon from "@/assets/img/icon-m/geo-alt.svg?react";
 import LinkIcon from "@/assets/img/icon-m/link-45deg.svg?react";
 import ChevronDownIcon from "@/assets/img/icon-s/chevron-down.svg?react";
 import Button from "@/ui/button/Button";
+import {hexToAppColor} from "@/const";
 
 interface EventInfoProps {
     categories?: Array<{ text: string }>;
     date: string;
     location: string;
     description: string;
+    color?: string;
 }
 
 const MAX_DESCRIPTION_LENGTH = 200;
 const mockLink = "https://example.com/event"
 
-export default function EventInfo({categories, date, location, description}: EventInfoProps) {
+export default function EventInfo({categories, date, location, description, color}: EventInfoProps) {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
     const shouldShowExpandButton = description.length > MAX_DESCRIPTION_LENGTH;
@@ -25,15 +27,18 @@ export default function EventInfo({categories, date, location, description}: Eve
         ? description
         : description.slice(0, MAX_DESCRIPTION_LENGTH) + (shouldShowExpandButton ? "..." : "");
 
+    const appColor = hexToAppColor(color);
+
     return (
         <div className={styles.eventInfo}>
-            {categories.length > 0 && (
+            {categories && categories.length > 0 && (
                 <div className={styles.categories}>
                     {categories.map((category, index) => (
                         <Chip
                             key={index}
                             text={category.text}
                             size="M"
+                            color={appColor}
                         />
                     ))}
                 </div>

@@ -17,8 +17,8 @@
 :global(.fc.fc-theme-standard .fc-timegrid-event) {
   position: relative;
   cursor: pointer;
-  background-color: var(--bg-pink);
-  color: var(--content-pink);
+  background-color: var(--event-bg-color, var(--bg-pink));
+  color: var(--event-content-color, var(--content-pink));
   border-radius: var(--radius-1);
   padding: var(--spacing-1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;

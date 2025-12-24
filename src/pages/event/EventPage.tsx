@@ -37,6 +37,7 @@ export default function EventPage() {
                                 location={event.location}
                                 description={event.description}
                                 categories={event.categories}
+                                color={event.color}
                             />
                             <Post eventId={event.id} isAdmin={isAdmin}/>
                         </div>

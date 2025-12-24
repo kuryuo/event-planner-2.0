@@ -7,11 +7,11 @@ import CalendarHeader from '@/components/calendar/header/CalendarHeader';
 import CalendarEvent from '@/components/calendar/event/CalendarEvent';
 import './CalendarBody.module.scss';
 import {useEventsData} from '@/hooks/api/useEventsData.ts';
-import type {EventClickArg} from "@fullcalendar/core";
+import type {EventClickArg, EventApi} from "@fullcalendar/core";
 import {useNavigate} from "react-router-dom";
 import type {GetEventsPayload} from '@/types/api/Event.ts';
 
-import {SLOT_LABEL_FORMAT, CALENDAR_SLOT_TIMES, CALENDAR_OPTIONS} from '@/const';
+import {SLOT_LABEL_FORMAT, CALENDAR_SLOT_TIMES, CALENDAR_OPTIONS, hexToAppColor} from '@/const';
 
 interface CalendarBodyProps {
     calendarRef: React.RefObject<FullCalendar | null>;
@@ -38,6 +38,13 @@ export default function CalendarBody({calendarRef, currentView, filters}: Calend
         calendar.classList.add(`weeks-${weeks}`);
     };
 
+    const handleEventDidMount = (arg: { event: EventApi; el: HTMLElement }) => {
+        const eventColor = (arg.event.extendedProps as { color?: string })?.color;
+        const appColor = hexToAppColor(eventColor);
+        arg.el.style.setProperty('--event-bg-color', `var(--bg-${appColor})`);
+        arg.el.style.setProperty('--event-content-color', `var(--content-${appColor})`);
+    };
+
     return (
         <FullCalendar
             ref={calendarRef}
@@ -53,6 +60,7 @@ export default function CalendarBody({calendarRef, currentView, filters}: Calend
             events={calendarEvents}
             eventClick={handleClick}
             datesSet={handleDatesSet}
+            eventDidMount={handleEventDidMount}
             {...CALENDAR_OPTIONS}
         />
     );

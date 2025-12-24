@@ -25,6 +25,7 @@ export const useEventForm = (eventData?: EventResponse | null) => {
 
     const isInitialized = useRef(false);
     const initializedEventId = useRef<string | null>(null);
+    const previousEventDataId = useRef<string | null | undefined>(undefined);
 
     const {
         chips: categories,
@@ -46,6 +47,9 @@ export const useEventForm = (eventData?: EventResponse | null) => {
     } = useChips(["Организатор"]);
 
     useEffect(() => {
+        const currentEventId = eventData?.id ?? null;
+        const eventIdChanged = previousEventDataId.current !== currentEventId;
+        
         if (eventData && (!isInitialized.current || initializedEventId.current !== eventData.id)) {
             setTitle(eventData.name);
             setDescription(eventData.description || "");
@@ -64,6 +68,10 @@ export const useEventForm = (eventData?: EventResponse | null) => {
                 setCategories(eventData.categories);
             } else {
                 setCategories([]);
+            }
+
+            if (eventData.color) {
+                setAvatarColor(eventData.color);
             }
 
             if (eventData.startDate) {
@@ -86,29 +94,31 @@ export const useEventForm = (eventData?: EventResponse | null) => {
 
             isInitialized.current = true;
             initializedEventId.current = eventData.id;
-        } else if (!eventData) {
-            if (isInitialized.current) {
-                setTitle("");
-                setDescription("");
-                setLocation("");
-                setFormat("Очно");
-                setIsPrivate(false);
-                setParticipants("");
-                setIsParticipantsUnlimited(true);
-                setCategories([]);
-                setRoles(["Организатор"]);
-                setAvatarColor("#C2185B");
-                setAvatarFile(null);
-                setAvatarPreview(null);
-                setStartDate(undefined);
-                setEndDate(undefined);
-                setStartTime("");
-                setEndTime("");
-                isInitialized.current = false;
-                initializedEventId.current = null;
-            }
+            previousEventDataId.current = currentEventId;
+        } else if (!eventData && eventIdChanged) {
+            // Сбрасываем форму при переключении на создание нового события
+            // Только если действительно произошло изменение (переход от события к null)
+            setTitle("");
+            setDescription("");
+            setLocation("");
+            setFormat("Очно");
+            setIsPrivate(false);
+            setParticipants("");
+            setIsParticipantsUnlimited(true);
+            setCategories([]);
+            setRoles(["Организатор"]);
+            setAvatarColor("#C2298A");
+            setAvatarFile(null);
+            setAvatarPreview(null);
+            setStartDate(undefined);
+            setEndDate(undefined);
+            setStartTime("");
+            setEndTime("");
+            isInitialized.current = false;
+            initializedEventId.current = null;
+            previousEventDataId.current = currentEventId;
         }
-    }, [eventData?.id, setStartDate, setEndDate, setStartTime, setEndTime, setCategories]);
+    }, [eventData?.id]);
 
     const validate = (): string | null => {
         if (!title.trim()) return 'Необходимо указать название';

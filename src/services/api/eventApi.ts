@@ -58,9 +58,6 @@ export const eventApi = baseApi.injectEndpoints({
                     url: '/events',
                     method: 'POST',
                     body: cleanedPayload,
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
                 };
             },
             invalidatesTags: (result) =>
@@ -82,9 +79,6 @@ export const eventApi = baseApi.injectEndpoints({
                     url: `/events/${eventId}`,
                     method: 'PUT',
                     body: cleanedPayload,
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
                 };
             },
             invalidatesTags: (result, error, {eventId}) =>
