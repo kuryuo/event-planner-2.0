@@ -12,7 +12,7 @@ import {useNavigate} from "react-router-dom";
 import {useMemo, useState, useEffect} from "react";
 import {format} from 'date-fns';
 import {ru} from 'date-fns/locale';
-import {useSubscribeToEventMutation, useUnsubscribeFromEventMutation, useGetEventByIdQuery} from "@/services/api/eventApi.ts";
+import {useSubscribeToEventMutation, useUnsubscribeFromEventMutation, useGetEventByIdQuery, useGetEventsQuery} from "@/services/api/eventApi.ts";
 
 interface SidebarProps {
     notificationCount?: number;
@@ -21,26 +21,31 @@ interface SidebarProps {
 
 export default function Sidebar({notificationCount = 3, isAdmin = false}: SidebarProps) {
     const {data: profile} = useGetProfileQuery();
-    const {data: events} = useGetProfileEventsQuery();
+    const {data: subscribedEvents} = useGetProfileEventsQuery();
+    const {data: allEventsData} = useGetEventsQuery(
+        {Count: 100},
+        {skip: isAdmin}
+    );
     const navigate = useNavigate();
     const fallbackAvatar = 'https://api.dicebear.com/7.x/shapes/png?size=200&radius=50';
     const [subscribeToEvent] = useSubscribeToEventMutation();
     const [unsubscribeFromEvent] = useUnsubscribeFromEventMutation();
     const [savedNextEventId, setSavedNextEventId] = useState<string | null>(null);
 
-    const subscriptions = (events ?? []).map((event) => ({
+    const subscriptions = (subscribedEvents ?? []).map((event) => ({
         title: event.name,
         subtitle: event.location ?? '',
         avatarUrl: buildImageUrl(event.avatar) ?? fallbackAvatar,
         onClick: () => navigate(`/event?id=${event.id}`),
     }));
 
-    // Находим ближайшее мероприятие (с startDate в будущем)
+    const eventsForNextEvent = isAdmin ? subscribedEvents : (allEventsData?.result || []);
+    
     const nextEventFromSubscriptions = useMemo(() => {
-        if (!events || events.length === 0) return null;
+        if (!eventsForNextEvent || eventsForNextEvent.length === 0) return null;
         
         const now = new Date();
-        const upcomingEvents = events
+        const upcomingEvents = eventsForNextEvent
             .filter(event => {
                 const eventDate = new Date(event.startDate);
                 return eventDate >= now;
@@ -52,47 +57,43 @@ export default function Sidebar({notificationCount = 3, isAdmin = false}: Sideba
             });
 
         return upcomingEvents.length > 0 ? upcomingEvents[0] : null;
-    }, [events]);
+    }, [eventsForNextEvent]);
 
-    // Сохраняем ID ближайшего мероприятия при первом обнаружении
     useEffect(() => {
         if (nextEventFromSubscriptions && !savedNextEventId) {
             setSavedNextEventId(nextEventFromSubscriptions.id);
         }
     }, [nextEventFromSubscriptions, savedNextEventId]);
 
-    // Получаем данные о сохраненном мероприятии, если оно не в подписках
     const {data: savedEventData} = useGetEventByIdQuery(
         savedNextEventId ?? '',
         {skip: !savedNextEventId || !!nextEventFromSubscriptions}
     );
 
-    // Определяем, какое мероприятие показывать
     const nextEvent = nextEventFromSubscriptions || savedEventData?.result || null;
 
-    // Проверяем, подписан ли пользователь на ближайшее мероприятие
     const isSubscribedToNextEvent = useMemo(() => {
-        if (!nextEvent || !events) return false;
-        // Если мероприятие есть в списке подписок, значит пользователь подписан
-        return events.some(event => event.id === nextEvent.id);
-    }, [nextEvent, events]);
+        if (!nextEvent || !subscribedEvents) return false;
+        return subscribedEvents.some(event => event.id === nextEvent.id);
+    }, [nextEvent, subscribedEvents]);
 
-    // Проверяем, что мероприятие еще не прошло
+    const isOrganizerOfNextEvent = useMemo(() => {
+        if (!nextEvent || !profile) return false;
+        return nextEvent.responsiblePersonId === profile.id;
+    }, [nextEvent, profile]);
+
     const isEventUpcoming = useMemo(() => {
         if (!nextEvent) return false;
         const eventDate = new Date(nextEvent.startDate);
         return eventDate >= new Date();
     }, [nextEvent]);
 
-    // Форматируем дату для отображения
     const formattedNextEventDate = useMemo(() => {
         if (!nextEvent) return '';
         
         const startDate = new Date(nextEvent.startDate);
         const endDate = new Date(nextEvent.endDate);
-        
-        // Если даты в один день: "10 ноября, 19:00"
-        // Если в разные дни: "10 ноября 19:00 - 11 ноября 20:00"
+
         const isSameDay = startDate.getDate() === endDate.getDate() &&
             startDate.getMonth() === endDate.getMonth() &&
             startDate.getFullYear() === endDate.getFullYear();
@@ -136,7 +137,6 @@ export default function Sidebar({notificationCount = 3, isAdmin = false}: Sideba
         }
     };
 
-    // Закомментировано до реализации функционала уведомлений
     // const cardRightIcon = (
     //     <NotificationBadge icon={<img src={bell} alt="Уведомления"/>} count={notificationCount}/>
     // );
@@ -172,6 +172,7 @@ export default function Sidebar({notificationCount = 3, isAdmin = false}: Sideba
                         title={nextEvent.name}
                         date={formattedNextEventDate}
                         isSubscribed={isSubscribedToNextEvent}
+                        isOrganizer={isOrganizerOfNextEvent}
                         onAttend={handleNextEventAttend}
                         onDetails={handleNextEventDetails}
                     />

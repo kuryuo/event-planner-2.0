@@ -53,14 +53,13 @@ export default function ParticipantsFilterMenu({
             clearTimeout(timeoutRef.current);
             timeoutRef.current = null;
         }
-        
-        // Вычисляем позицию подменю относительно элемента "роль"
+
         if (roleItemRef.current && menuRef.current) {
             const roleItemRect = roleItemRef.current.getBoundingClientRect();
             const menuRect = menuRef.current.getBoundingClientRect();
             setRolesMenuPosition({
                 top: roleItemRect.top,
-                left: menuRect.right + 8, // 8px отступ от правого края меню
+                left: menuRect.right + 8,
             });
         }
         
@@ -115,22 +114,24 @@ export default function ParticipantsFilterMenu({
                         ) : roles.length === 0 ? (
                             <div className={styles.loading}>Ролей нет</div>
                         ) : (
-                            roles.map((role) => (
-                                <div
-                                    key={role.id}
-                                    className={styles.roleOption}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onRoleToggle(role.id);
-                                    }}
-                                >
-                                    <Checkbox
-                                        checked={selectedRoles.includes(role.id)}
-                                        onChange={() => onRoleToggle(role.id)}
-                                    />
-                                    <span className={styles.roleName}>{role.name}</span>
-                                </div>
-                            ))
+                            roles.map((role) => {
+                                const isChecked = selectedRoles.includes(role.id);
+                                return (
+                                    <div
+                                        key={role.id}
+                                        className={styles.roleOption}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onRoleToggle(role.id);
+                                        }}
+                                    >
+                                        <Checkbox
+                                            checked={isChecked}
+                                        />
+                                        <span className={styles.roleName}>{role.name}</span>
+                                    </div>
+                                );
+                            })
                         )}
                     </div>
                 )}

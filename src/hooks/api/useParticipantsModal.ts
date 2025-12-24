@@ -1,4 +1,4 @@
-import {useState, useMemo} from 'react';
+import {useState, useMemo, useCallback} from 'react';
 import {useGetEventSubscribersQuery} from '@/services/api/eventApi.ts';
 
 interface UseParticipantsModalFilters {
@@ -61,13 +61,13 @@ export const useParticipantsModal = (
         return participants.length;
     }, [serverTotalCount, participants.length, filters.inContacts]);
 
-    const openModal = () => {
+    const openModal = useCallback(() => {
         setIsOpen(true);
-    };
+    }, []);
 
-    const closeModal = () => {
+    const closeModal = useCallback(() => {
         setIsOpen(false);
-    };
+    }, []);
 
     return {
         isOpen,

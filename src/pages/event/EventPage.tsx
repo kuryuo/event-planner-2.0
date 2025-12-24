@@ -8,6 +8,7 @@ import Participants from "@/components/event-page/participants/Participants.tsx"
 import Contacts from "@/components/event-page/contacts/Contacts.tsx";
 import PhotosGallery from "@/components/event-page/photos/PhotosGallery.tsx";
 import {useEventPage} from '@/hooks/api/useEventPage.ts';
+import {useGetProfileQuery} from "@/services/api/profileApi.ts";
 
 const TAB_INDEX_ABOUT = 0;
 const TAB_INDEX_CHAT = 1;
@@ -15,8 +16,12 @@ const TAB_INDEX_PHOTOS = 2;
 
 export default function EventPage() {
     const {event, isLoading, error} = useEventPage();
-    const isAdmin = true;
+    const {data: profile} = useGetProfileQuery();
     const [activeTab, setActiveTab] = useState(TAB_INDEX_ABOUT);
+
+    const isAdmin = profile && event?.responsiblePersonId 
+        ? profile.id === event.responsiblePersonId 
+        : false;
 
     if (isLoading) {
         return <div>Загрузка...</div>;

@@ -13,6 +13,7 @@ export interface UseEventPageOutput {
         categories: Array<{ text: string }>;
         avatar?: string | null;
         color?: string;
+        responsiblePersonId?: string;
     } | null;
     isLoading: boolean;
     error: unknown;
@@ -40,6 +41,7 @@ export const useEventPage = (): UseEventPageOutput => {
             categories: eventData.categories?.map(cat => ({text: cat})) ?? [],
             avatar: eventData.avatar,
             color: eventData.color,
+            responsiblePersonId: eventData.responsiblePersonId,
         };
     }, [data]);
 

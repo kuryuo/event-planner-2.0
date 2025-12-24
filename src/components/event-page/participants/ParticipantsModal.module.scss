@@ -129,6 +129,13 @@
   gap: var(--spacing-2);
 }
 
+.participantsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: var(--spacing-4);
+  padding: var(--spacing-2);
+}
+
 .participantItem {
   display: flex;
   flex-direction: column;

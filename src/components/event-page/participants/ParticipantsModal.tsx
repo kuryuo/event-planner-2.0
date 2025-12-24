@@ -9,6 +9,7 @@ import Filter from '@/assets/img/icon-m/filter.svg';
 import ParticipantsFilterMenu from './ParticipantsFilterMenu';
 import {useParticipantsModal} from '@/hooks/api/useParticipantsModal';
 import {useGetEventRolesQuery} from '@/services/api/eventApi';
+import Avatar from '@/ui/avatar/Avatar';
 
 interface ParticipantsModalProps {
     isOpen: boolean;
@@ -33,11 +34,10 @@ export default function ParticipantsModal({
     
     const {data: rolesData} = useGetEventRolesQuery(
         {eventId, count: 100},
-        {skip: !isOpen || !eventId}
+        {skip: !isOpen || !eventId || !isAdmin}
     );
     const roles = rolesData?.res || [];
-    
-    // Определяем выбранную роль (берем первую из массива, если есть) и получаем её название
+
     const selectedRoleId = selectedRoles.length > 0 ? selectedRoles[0] : undefined;
     const selectedRole = selectedRoleId 
         ? roles.find(r => r.id === selectedRoleId)?.name 
@@ -51,26 +51,24 @@ export default function ParticipantsModal({
         closeModal,
     } = useParticipantsModal(
         eventId,
-        {
+        isAdmin ? {
             name: searchName || undefined,
             role: selectedRole,
             inContacts: inContacts || undefined,
-        },
+        } : {},
         50
     );
-    
-    // Синхронизируем состояние открытия модального окна
+
     useEffect(() => {
         if (isOpen) {
             openModal();
         } else {
             closeModal();
-            // Сбрасываем фильтры при закрытии
             setSearchName('');
             setSelectedRoles([]);
             setInContacts(false);
         }
-    }, [isOpen, openModal, closeModal]);
+    }, [isOpen]);
 
     const handleFilterClick = () => {
         setIsFilterMenuOpen(!isFilterMenuOpen);
@@ -80,7 +78,7 @@ export default function ParticipantsModal({
         setSelectedRoles(prev =>
             prev.includes(roleId)
                 ? prev.filter(id => id !== roleId)
-                : [roleId] // Оставляем только одну выбранную роль
+                : [roleId]
         );
     };
 
@@ -114,52 +112,79 @@ export default function ParticipantsModal({
                 </div>
 
                 <div className={styles.content}>
-                    <div className={styles.searchSection}>
-                        <div className={styles.searchInput}>
-                            <TextField
-                                placeholder="введите имя"
-                                leftIcon={<SearchIcon />}
-                                value={searchName}
-                                onChange={(e) => handleSearchChange(e.target.value)}
-                            />
-                        </div>
-                        <div className={styles.filterButtonWrapper} ref={filterButtonRef}>
-                            <button className={styles.filterButton} onClick={handleFilterClick}>
-                                <img src={Filter} alt="Фильтр"/>
-                            </button>
-                            {isFilterMenuOpen && (
-                                <ParticipantsFilterMenu
-                                    eventId={eventId}
-                                    isOpen={isFilterMenuOpen}
-                                    onClose={() => setIsFilterMenuOpen(false)}
-                                    selectedRoles={selectedRoles}
-                                    onRoleToggle={handleRoleToggle}
-                                    inContacts={inContacts}
-                                    onInContactsToggle={handleInContactsToggle}
-                                />
+                    {isAdmin ? (
+                        <>
+                            <div className={styles.searchSection}>
+                                <div className={styles.searchInput}>
+                                    <TextField
+                                        placeholder="введите имя"
+                                        leftIcon={<SearchIcon />}
+                                        value={searchName}
+                                        onChange={(e) => handleSearchChange(e.target.value)}
+                                    />
+                                </div>
+                                <div className={styles.filterButtonWrapper} ref={filterButtonRef}>
+                                    <button className={styles.filterButton} onClick={handleFilterClick}>
+                                        <img src={Filter} alt="Фильтр"/>
+                                    </button>
+                                    {isFilterMenuOpen && (
+                                        <ParticipantsFilterMenu
+                                            eventId={eventId}
+                                            isOpen={isFilterMenuOpen}
+                                            onClose={() => setIsFilterMenuOpen(false)}
+                                            selectedRoles={selectedRoles}
+                                            onRoleToggle={handleRoleToggle}
+                                            inContacts={inContacts}
+                                            onInContactsToggle={handleInContactsToggle}
+                                        />
+                                    )}
+                                </div>
+                            </div>
+                            {isLoading ? (
+                                <div className={styles.loading}>Загрузка...</div>
+                            ) : participants.length === 0 ? (
+                                <div className={styles.empty}>Участников пока нет</div>
+                            ) : (
+                                <div className={styles.participantsList}>
+                                    {participants.map((participant) => (
+                                        <ParticipantCard
+                                            key={participant.id}
+                                            name={participant.name || 'Пользователь'}
+                                            avatarUrl={buildImageUrl(participant.avatarUrl)}
+                                            role={participant.role}
+                                            eventId={eventId}
+                                            userId={participant.id}
+                                            isInContacts={participant.isContact ?? false}
+                                            onExclude={() => onExclude?.(participant.id)}
+                                            showActions={isAdmin}
+                                        />
+                                    ))}
+                                </div>
                             )}
-                        </div>
-                    </div>
-                    {isLoading ? (
-                        <div className={styles.loading}>Загрузка...</div>
-                    ) : participants.length === 0 ? (
-                        <div className={styles.empty}>Участников пока нет</div>
+                        </>
                     ) : (
-                        <div className={styles.participantsList}>
-                            {participants.map((participant) => (
-                                <ParticipantCard
-                                    key={participant.id}
-                                    name={participant.name || 'Пользователь'}
-                                    avatarUrl={buildImageUrl(participant.avatarUrl)}
-                                    role={participant.role}
-                                    eventId={eventId}
-                                    userId={participant.id}
-                                    isInContacts={participant.isContact ?? false}
-                                    onExclude={() => onExclude?.(participant.id)}
-                                    showActions={isAdmin}
-                                />
-                            ))}
-                        </div>
+                        <>
+                            {isLoading ? (
+                                <div className={styles.loading}>Загрузка...</div>
+                            ) : participants.length === 0 ? (
+                                <div className={styles.empty}>Участников пока нет</div>
+                            ) : (
+                                <div className={styles.participantsGrid}>
+                                    {participants.map((participant) => (
+                                        <div key={participant.id} className={styles.participantItem}>
+                                            <Avatar
+                                                size="L"
+                                                name={participant.name || 'Пользователь'}
+                                                avatarUrl={buildImageUrl(participant.avatarUrl)}
+                                            />
+                                            <span className={styles.participantName}>
+                                                {participant.name || 'Пользователь'}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>

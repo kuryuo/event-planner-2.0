@@ -47,7 +47,6 @@ export const FORMAT_REVERSE_MAP: Record<string, string> = {
     "hybrid": "Гибрид"
 };
 
-// Маппинг hex цветов к AppColor
 const COLOR_HEX_TO_APP_COLOR: Record<string, AppColor> = {
     "#C2298A": "pink",
     "#A1309D": "plum",

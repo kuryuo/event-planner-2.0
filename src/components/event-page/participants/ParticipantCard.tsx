@@ -40,7 +40,6 @@ export default function ParticipantCard({
     const [isSelectOpen, setIsSelectOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
-    // Загружаем роли при открытии меню выбора роли
     const {data: rolesData, isLoading: isLoadingRoles} = useGetEventRolesQuery(
         {eventId, count: 100},
         {skip: !isSelectOpen || !eventId}
