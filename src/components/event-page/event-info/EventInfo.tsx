@@ -3,7 +3,6 @@ import styles from "./EventInfo.module.scss";
 import Chip from "@/ui/chip/Chip";
 import CalendarIcon from "@/assets/img/icon-m/calendar.svg?react";
 import GeoAltIcon from "@/assets/img/icon-m/geo-alt.svg?react";
-import LinkIcon from "@/assets/img/icon-m/link-45deg.svg?react";
 import ChevronDownIcon from "@/assets/img/icon-s/chevron-down.svg?react";
 import Button from "@/ui/button/Button";
 import {hexToAppColor} from "@/const";
@@ -17,7 +16,6 @@ interface EventInfoProps {
 }
 
 const MAX_DESCRIPTION_LENGTH = 200;
-const mockLink = "https://example.com/event"
 
 export default function EventInfo({categories, date, location, description, color}: EventInfoProps) {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
@@ -53,13 +51,6 @@ export default function EventInfo({categories, date, location, description, colo
                 <div className={styles.infoRow}>
                     <GeoAltIcon className={styles.icon}/>
                     <span className={styles.infoText}>{location}</span>
-                </div>
-
-                <div className={styles.infoRow}>
-                    <LinkIcon className={styles.icon}/>
-                    <a href={mockLink} target="_blank" rel="noopener noreferrer" className={styles.link}>
-                        {mockLink}
-                    </a>
                 </div>
             </div>
 

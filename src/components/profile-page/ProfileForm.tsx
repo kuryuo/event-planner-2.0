@@ -28,13 +28,13 @@ export default function ProfileForm({
                                         loading = false,
                                         initialData,
                                     }: ProfileFormProps) {
-    const [firstName, setFirstName] = useState(initialData?.firstName ?? "Мария");
-    const [lastName, setLastName] = useState(initialData?.lastName ?? "Пшеничная");
-    const [middleName, setMiddleName] = useState(initialData?.middleName ?? "Отчество");
-    const [city, setCity] = useState(initialData?.city ?? "г. Екатеринбург");
-    const [email, setEmail] = useState(initialData?.email ?? "email@example.com");
-    const [phoneNumber, setPhoneNumber] = useState(initialData?.phoneNumber ?? "+7 (994) 430-11-34");
-    const [telegram, setTelegram] = useState(initialData?.telegram ?? "@pshenica_maria");
+    const [firstName, setFirstName] = useState(initialData?.firstName ?? "");
+    const [lastName, setLastName] = useState(initialData?.lastName ?? "");
+    const [middleName, setMiddleName] = useState(initialData?.middleName ?? "");
+    const [city, setCity] = useState(initialData?.city ?? "");
+    const [email, setEmail] = useState(initialData?.email ?? "");
+    const [phoneNumber, setPhoneNumber] = useState(initialData?.phoneNumber ?? "");
+    const [telegram, setTelegram] = useState(initialData?.telegram ?? "");
 
     useEffect(() => {
         if (!initialData) return;

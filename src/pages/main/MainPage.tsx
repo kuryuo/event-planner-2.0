@@ -18,7 +18,6 @@ export default function MainPage() {
             <div className={styles.sidebar}>
                 <Sidebar
                     isAdmin={isAdmin}
-                    notificationCount={5}
                 />
             </div>
 

@@ -76,6 +76,7 @@ export interface UpdateEventResponse {
 export interface GetEventSubscribersPayload {
     eventId: string;
     name?: string;
+    role?: string;
     count?: number;
     offset?: number;
 }
@@ -185,4 +186,41 @@ export interface DeleteEventPhotoPayload {
     eventId: string;
     photoId: string;
     roleId?: string;
+}
+
+export interface GetEventRolesPayload {
+    eventId: string;
+    count?: number;
+    offset?: number;
+}
+
+export interface EventRole {
+    id: string;
+    name: string;
+    eventId: string;
+}
+
+export interface GetEventRolesResponse {
+    res: EventRole[];
+}
+
+export interface AssignUserRolePayload {
+    eventId: string;
+    userId: string;
+    roleId: string;
+}
+
+export interface CreateEventRolePayload {
+    eventId: string;
+    roleName: string;
+}
+
+export interface AddEventContactPayload {
+    eventId: string;
+    userId: string;
+}
+
+export interface RemoveEventContactPayload {
+    eventId: string;
+    userId: string;
 }

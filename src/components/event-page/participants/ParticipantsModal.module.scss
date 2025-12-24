@@ -79,6 +79,40 @@
   overflow-x: visible;
   flex: 1;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.searchSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.searchInput {
+  flex: 1;
+}
+
+.filterButtonWrapper {
+  position: relative;
+}
+
+.filterButton {
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-2);
+  border-radius: var(--radius-2);
+  transition: background-color 0.2s ease;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background-color: var(--bg-secondary);
+  }
 }
 
 .loading,

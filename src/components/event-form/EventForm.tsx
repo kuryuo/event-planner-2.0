@@ -73,8 +73,6 @@ export default function EventForm({
         setRoleInputValue,
         removeRole,
         handleRoleKeyDown,
-        showRoleSelect,
-        setShowRoleSelect,
         description,
         setDescription,
         categories,
@@ -230,37 +228,25 @@ export default function EventForm({
 
                     <div className={styles.participantsRoles}>
                         <div className={styles.chipContainer}>
-                            {roles.map((role) => (
-                                <Chip
-                                    key={role}
-                                    text={role}
-                                    closable={role !== "Организатор"}
-                                    onClose={() => removeRole(role)}
-                                />
-                            ))}
+                            {roles.map((role) => {
+                                const isDefaultRole = role === "Организатор" || role === "Участник";
+                                return (
+                                    <Chip
+                                        key={role}
+                                        text={role}
+                                        closable={!isDefaultRole}
+                                        onClose={() => removeRole(role)}
+                                    />
+                                );
+                            })}
                         </div>
-
-                        <button
-                            className={styles.categoryButton}
-                            onClick={() => setShowRoleSelect((prev) => !prev)}
-                        >
-                            <img src={Plus} alt="Добавить роль"/>
-                        </button>
-                    </div>
-
-                    {showRoleSelect && (
-                        <Select
-                            placeholder="Выберите роль"
+                        <TextField
+                            placeholder="Введите роль"
                             value={roleInputValue}
                             onChange={(e) => setRoleInputValue(e.target.value)}
                             onKeyDown={handleRoleKeyDown}
-                            options={[
-                                {label: "Организатор", description: "Отвечает за мероприятие"},
-                                {label: "Спикер", description: "Выступающий"},
-                                {label: "Гость", description: "Посетитель"},
-                            ]}
                         />
-                    )}
+                    </div>
                 </div>
 
                 <div className={styles.description}>

@@ -14,7 +14,13 @@ import type {
     GetEventPhotosResponse,
     UploadEventPhotoPayload,
     UploadEventPhotoResponse,
-    DeleteEventPhotoPayload
+    DeleteEventPhotoPayload,
+    GetEventRolesPayload,
+    GetEventRolesResponse,
+    AssignUserRolePayload,
+    CreateEventRolePayload,
+    AddEventContactPayload,
+    RemoveEventContactPayload
 } from "@/types/api/Event.ts";
 
 export const eventApi = baseApi.injectEndpoints({
@@ -200,6 +206,71 @@ export const eventApi = baseApi.injectEndpoints({
             invalidatesTags: (result, error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}, 'Event'] : [],
         }),
+        /**
+         * Получить роли в рамках мероприятия
+         */
+        getEventRoles: builder.query<GetEventRolesResponse, GetEventRolesPayload>({
+            query: ({eventId, count = 10, offset}) => ({
+                url: `/events/${eventId}/roles`,
+                method: 'GET',
+                params: {
+                    count,
+                    ...(offset !== undefined && {offset}),
+                },
+            }),
+            providesTags: (result, error, {eventId}) =>
+                result ? [{type: 'Event', id: eventId}] : ['Event'],
+        }),
+        /**
+         * Дать пользователю роль на мероприятии
+         */
+        assignUserRole: builder.mutation<void, AssignUserRolePayload>({
+            query: ({eventId, userId, roleId}) => ({
+                url: `/events/${eventId}/users/${userId}/roles/${roleId}`,
+                method: 'POST',
+            }),
+            invalidatesTags: (result, error, {eventId}) =>
+                result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
+        }),
+        /**
+         * Создать роль в рамках мероприятия
+         */
+        createEventRole: builder.mutation<void, CreateEventRolePayload>({
+            query: ({eventId, roleName}) => ({
+                url: `/events/${eventId}/roles`,
+                method: 'POST',
+                params: {
+                    roleName,
+                },
+            }),
+            invalidatesTags: (result, error, {eventId}) =>
+                result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
+        }),
+        /**
+         * Сделать пользователя контактом на мероприятии
+         */
+        addEventContact: builder.mutation<void, AddEventContactPayload>({
+            query: ({eventId, userId}) => ({
+                url: `/events/${eventId}/contacts`,
+                method: 'POST',
+                params: {
+                    userId,
+                },
+            }),
+            invalidatesTags: (result, error, {eventId}) =>
+                result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
+        }),
+        /**
+         * Удалить пользователя из контактов мероприятия
+         */
+        removeEventContact: builder.mutation<void, RemoveEventContactPayload>({
+            query: ({eventId, userId}) => ({
+                url: `/events/${eventId}/contacts/${userId}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: (result, error, {eventId}) =>
+                result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
+        }),
     }),
     overrideExisting: false,
 });
@@ -217,5 +288,10 @@ export const {
     useDeleteEventPhotoMutation,
     useSubscribeToEventMutation,
     useUnsubscribeFromEventMutation,
-    useUploadEventAvatarMutation
+    useUploadEventAvatarMutation,
+    useGetEventRolesQuery,
+    useAssignUserRoleMutation,
+    useCreateEventRoleMutation,
+    useAddEventContactMutation,
+    useRemoveEventContactMutation
 } = eventApi;

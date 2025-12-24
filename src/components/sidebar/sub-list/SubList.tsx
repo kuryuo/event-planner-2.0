@@ -15,15 +15,19 @@ export function Sublist({title = 'Мои подписки', items}: SublistProps
                 <span className={styles.count}>{items.length}</span>
             </div>
 
-            <div className={styles.list}>
-                {items.map((item, index) => (
-                    <Card
-                        key={index}
-                        {...item}
-                        rightIcon={<Badge variant="dot" color="brand-green" size="M"/>}
-                    />
-                ))}
-            </div>
+            {items.length === 0 ? (
+                <div className={styles.empty}>Нет подписок</div>
+            ) : (
+                <div className={styles.list}>
+                    {items.map((item, index) => (
+                        <Card
+                            key={index}
+                            {...item}
+                            rightIcon={<Badge variant="dot" color="brand-green" size="M"/>}
+                        />
+                    ))}
+                </div>
+            )}
 
         </div>
     );

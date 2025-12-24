@@ -21,14 +21,16 @@ export interface UpdateUserProfilePayload {
 export interface UserEvent {
     id: string;
     name: string;
-    description: string;
+    avatar?: string | null;
+    description: string | null;
     startDate: string;
     endDate: string;
-    location: string;
+    location: string | null;
     format: 'online' | 'offline';
     eventType: 'open' | 'closed' | string;
     responsiblePersonId: string;
     maxParticipants: number;
+    color?: string;
     categories: string[];
     previewPhotos: string[];
     status: string | null;

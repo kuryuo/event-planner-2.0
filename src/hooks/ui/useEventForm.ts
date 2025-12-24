@@ -20,7 +20,6 @@ export const useEventForm = (eventData?: EventResponse | null) => {
     const [showCategorySelect, setShowCategorySelect] = useState(false);
     const [participants, setParticipants] = useState("");
     const [isParticipantsUnlimited, setIsParticipantsUnlimited] = useState(true);
-    const [showRoleSelect, setShowRoleSelect] = useState(false);
     const [description, setDescription] = useState("");
 
     const isInitialized = useRef(false);
@@ -37,14 +36,28 @@ export const useEventForm = (eventData?: EventResponse | null) => {
         setChips: setCategories,
     } = useChips();
 
+    const DEFAULT_ROLES = ["Организатор", "Участник"];
+    
     const {
         chips: roles,
         inputValue: roleInputValue,
         setInputValue: setRoleInputValue,
         removeChip: removeRole,
-        handleKeyDown: handleRoleKeyDown,
+        handleKeyDown: handleRoleKeyDownBase,
         setChips: setRoles,
-    } = useChips(["Организатор"]);
+        addChip: addRole,
+    } = useChips(DEFAULT_ROLES);
+    
+    const handleRoleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if ((event.key === 'Enter' || event.key === ' ') && roleInputValue.trim()) {
+            event.preventDefault();
+            const normalized = roleInputValue.trim();
+            if (!roles.includes(normalized) && !DEFAULT_ROLES.includes(normalized)) {
+                addRole(normalized);
+                setRoleInputValue('');
+            }
+        }
+    };
 
     useEffect(() => {
         const currentEventId = eventData?.id ?? null;
@@ -96,8 +109,6 @@ export const useEventForm = (eventData?: EventResponse | null) => {
             initializedEventId.current = eventData.id;
             previousEventDataId.current = currentEventId;
         } else if (!eventData && eventIdChanged) {
-            // Сбрасываем форму при переключении на создание нового события
-            // Только если действительно произошло изменение (переход от события к null)
             setTitle("");
             setDescription("");
             setLocation("");
@@ -106,7 +117,7 @@ export const useEventForm = (eventData?: EventResponse | null) => {
             setParticipants("");
             setIsParticipantsUnlimited(true);
             setCategories([]);
-            setRoles(["Организатор"]);
+            setRoles(DEFAULT_ROLES);
             setAvatarColor("#C2298A");
             setAvatarFile(null);
             setAvatarPreview(null);
@@ -155,11 +166,12 @@ export const useEventForm = (eventData?: EventResponse | null) => {
         };
 
         if (!eventData && profile?.id) {
+            const customRoles = roles.filter(role => !DEFAULT_ROLES.includes(role));
             const payload = {
                 ...basePayload,
                 responsiblePersonId: profile.id,
                 categories: categories,
-                roles: roles,
+                roles: customRoles,
                 color: avatarColor,
                 avatar: avatarFile,
             } as CreateEventPayload;
@@ -213,8 +225,6 @@ export const useEventForm = (eventData?: EventResponse | null) => {
         setRoleInputValue,
         removeRole,
         handleRoleKeyDown,
-        showRoleSelect,
-        setShowRoleSelect,
         description,
         setDescription,
 

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import styles from './Menu.module.scss';
 import TextField from '../text-field/TextField';
 import Check2Icon from '@/assets/img/icon-m/check2.svg';
+import PlusLgIcon from '@/assets/img/icon-s/plus-lg.svg?react';
 
 export interface MenuOption {
     label?: string;
@@ -15,11 +16,22 @@ interface MenuProps {
     onOptionClick?: (option: MenuOption, index: number) => void;
     withSearch?: boolean;
     searchPlaceholder?: string;
+    withNewRoleInput?: boolean;
+    onNewRoleCreate?: (roleName: string) => void;
     selectedValues?: string[];
 }
 
-export default function Menu({ options, onOptionClick, withSearch = false, searchPlaceholder = 'Поиск...', selectedValues = [] }: MenuProps) {
+export default function Menu({ 
+    options, 
+    onOptionClick, 
+    withSearch = false, 
+    searchPlaceholder = 'Поиск...', 
+    withNewRoleInput = false,
+    onNewRoleCreate,
+    selectedValues = [] 
+}: MenuProps) {
     const [searchQuery, setSearchQuery] = useState('');
+    const [newRoleName, setNewRoleName] = useState('');
 
     const filteredOptions = useMemo(() => {
         if (!withSearch || !searchQuery.trim()) {
@@ -34,6 +46,21 @@ export default function Menu({ options, onOptionClick, withSearch = false, searc
         });
     }, [options, searchQuery, withSearch]);
 
+    const handleNewRoleCreate = () => {
+        const trimmed = newRoleName.trim();
+        if (trimmed && onNewRoleCreate) {
+            onNewRoleCreate(trimmed);
+            setNewRoleName('');
+        }
+    };
+
+    const handleNewRoleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleNewRoleCreate();
+        }
+    };
+
     return (
         <div className={styles.menuContainer}>
             {withSearch && (
@@ -45,6 +72,32 @@ export default function Menu({ options, onOptionClick, withSearch = false, searc
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onClick={(e) => e.stopPropagation()}
                             onKeyDown={(e) => e.stopPropagation()}
+                        />
+                    </div>
+                    <div className={styles.divider} />
+                </>
+            )}
+            {withNewRoleInput && (
+                <>
+                    <div className={styles.newRoleWrapper}>
+                        <TextField
+                            placeholder="новая роль"
+                            value={newRoleName}
+                            onChange={(e) => setNewRoleName(e.target.value)}
+                            onKeyDown={handleNewRoleKeyDown}
+                            onClick={(e) => e.stopPropagation()}
+                            rightIcon={
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleNewRoleCreate();
+                                    }}
+                                    className={styles.plusButton}
+                                >
+                                    <PlusLgIcon />
+                                </button>
+                            }
                         />
                     </div>
                     <div className={styles.divider} />

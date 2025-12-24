@@ -26,10 +26,7 @@ export default function Participants({
         isOpen,
         openModal,
         closeModal,
-        participants: modalParticipants,
-        totalCount: modalTotalCount,
-        isLoading: isModalLoading,
-    } = useParticipantsModal(eventId, 50);
+    } = useParticipantsModal(eventId, {}, 50);
     const containerRef = useRef<HTMLDivElement>(null);
     const [visibleCount, setVisibleCount] = useState(8);
 
@@ -145,21 +142,18 @@ export default function Participants({
                 )}
             </div>
 
-                {isAdmin && (
+                {/* {isAdmin && (
                     <Button variant="Filled" color="gray" onClick={handleInvite}>
                         Пригласить
                     </Button>
-                )}
+                )} */}
             </div>
 
             <ParticipantsModal
                 isOpen={isOpen}
                 onClose={closeModal}
-                participants={modalParticipants}
-                totalCount={modalTotalCount}
-                isLoading={isModalLoading}
                 isAdmin={isAdmin}
-                onRemoveFromContacts={(id) => console.log('Убрать из контактов', id)}
+                eventId={eventId || ''}
                 onExclude={(id) => console.log('Исключить', id)}
             />
         </>

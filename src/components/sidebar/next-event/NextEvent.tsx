@@ -4,6 +4,7 @@ import Button from "@/ui/button/Button.tsx";
 interface NextEventProps {
     title: string;
     date: string;
+    isSubscribed?: boolean;
     onAttend?: () => void;
     onDetails?: () => void;
 }
@@ -11,6 +12,7 @@ interface NextEventProps {
 export default function NextEvent({
                                       title,
                                       date,
+                                      isSubscribed = false,
                                       onAttend,
                                       onDetails,
                                   }: NextEventProps) {
@@ -20,8 +22,13 @@ export default function NextEvent({
             <div className={styles.title}>{title}</div>
             <div className={styles.date}>{date}</div>
             <div className={styles.actions}>
-                <Button size="M" variant="Filled" onClick={onAttend}>
-                    Я пойду
+                <Button 
+                    size="M" 
+                    variant="Filled" 
+                    color={isSubscribed ? "gray" : "purple"}
+                    onClick={onAttend}
+                >
+                    {isSubscribed ? "Я не пойду" : "Я пойду"}
                 </Button>
                 <Button size="M" variant="Dense" onClick={onDetails}>
                     Подробнее

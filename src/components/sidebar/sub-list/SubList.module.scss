@@ -26,3 +26,9 @@
   flex-direction: column;
   gap: var(--spacing-2);
 }
+
+.empty {
+  @include ty.font(body-m, regular);
+  color: var(--content-secondary);
+  padding: var(--spacing-2) 0;
+}
