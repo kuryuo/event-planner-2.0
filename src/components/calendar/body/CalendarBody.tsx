@@ -5,9 +5,10 @@ import interactionPlugin from '@fullcalendar/interaction';
 import ruLocale from '@fullcalendar/core/locales/ru';
 import CalendarHeader from '@/components/calendar/header/CalendarHeader';
 import CalendarEvent from '@/components/calendar/event/CalendarEvent';
-// Side-effect import для применения глобальных стилей календаря
 import styles from './CalendarBody.module.scss';
 import {useEventsData} from '@/hooks/api/useEventsData.ts';
+
+void styles;
 import type {EventClickArg, EventApi} from "@fullcalendar/core";
 import {useNavigate} from "react-router-dom";
 import type {GetEventsPayload} from '@/types/api/Event.ts';

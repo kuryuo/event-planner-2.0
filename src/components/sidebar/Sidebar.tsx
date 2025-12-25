@@ -17,7 +17,7 @@ interface SidebarProps {
     isAdmin?: boolean;
 }
 
-export default function Sidebar({notificationCount: _notificationCount = 3, isAdmin = false}: SidebarProps) {
+export default function Sidebar({notificationCount: _notificationCount = 3, isAdmin: _isAdmin = false}: SidebarProps) {
     const {data: profile} = useGetProfileQuery();
     const {data: subscribedEvents} = useGetProfileEventsQuery();
     const isAdminOrOrganizer = profile?.userPrivilege === 'ADMIN' || profile?.userPrivilege === 'ORGANIZER';
