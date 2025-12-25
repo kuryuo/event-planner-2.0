@@ -43,7 +43,7 @@ export const useEventForm = (eventData?: EventResponse | null) => {
         inputValue: roleInputValue,
         setInputValue: setRoleInputValue,
         removeChip: removeRole,
-        handleKeyDown: handleRoleKeyDownBase,
+        handleKeyDown: _handleRoleKeyDownBase,
         setChips: setRoles,
         addChip: addRole,
     } = useChips(DEFAULT_ROLES);

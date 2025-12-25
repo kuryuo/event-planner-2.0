@@ -1,6 +1,5 @@
 import {useState, useRef, useEffect} from 'react';
 import styles from './Filters.module.scss';
-import TextField from '@/ui/text-field/TextField.tsx';
 import Checkbox from '@/ui/checkbox/Checkbox';
 import CloseIcon from '@/assets/img/icon-m/x.svg';
 import CalendarIcon from '@/assets/img/icon-m/calendar.svg?react';
@@ -8,7 +7,8 @@ import Organizers from "@/components/filters/organizers/Organizers";
 import Category from "@/components/filters/сategory/Category";
 import Switch from "@/ui/switch/Switch.tsx";
 import Button from "@/ui/button/Button";
-import {DatePicker, type DateRange} from "@/ui/date-picker/DatePicker.tsx";
+import {DatePicker} from "@/ui/date-picker/DatePicker.tsx";
+import type {DateRange} from 'react-day-picker';
 import {useClickOutside} from "@/hooks/ui/useClickOutside.ts";
 import {format} from "date-fns";
 import {ru} from "date-fns/locale";

@@ -7,7 +7,7 @@ export const usePhotosGallery = (eventId: string) => {
     const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
     const [isSelectionMode, setIsSelectionMode] = useState(false);
     const [selectedPhotoIds, setSelectedPhotoIds] = useState<Set<string>>(new Set());
-    const [offset, setOffset] = useState(0);
+    const [offset] = useState(0);
     const fileInputRef = useRef<HTMLInputElement>(null);
     
     const {data, isLoading, error, refetch} = useGetEventPhotosQuery({

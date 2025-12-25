@@ -25,7 +25,7 @@ export const eventPostApi = baseApi.injectEndpoints({
                     ...(offset !== undefined && {offset}),
                 },
             }),
-            providesTags: (result, error, {eventId}) =>
+            providesTags: (result, _error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}, 'EventPost'] : ['EventPost'],
         }),
         /**
@@ -40,7 +40,7 @@ export const eventPostApi = baseApi.injectEndpoints({
                     text,
                 },
             }),
-            invalidatesTags: (result, error, {eventId}) =>
+            invalidatesTags: (_result, _error, {eventId}) =>
                 [{type: 'Event', id: eventId}, 'EventPost'],
         }),
         /**
@@ -51,7 +51,7 @@ export const eventPostApi = baseApi.injectEndpoints({
                 url: `/events/${eventId}/posts/${postId}`,
                 method: 'GET',
             }),
-            providesTags: (result, error, {eventId, postId}) =>
+            providesTags: (result, _error, {eventId, postId}) =>
                 result ? [{type: 'EventPost', id: postId}, {type: 'Event', id: eventId}] : ['EventPost'],
         }),
         /**
@@ -66,7 +66,7 @@ export const eventPostApi = baseApi.injectEndpoints({
                     text,
                 },
             }),
-            invalidatesTags: (result, error, {eventId, postId}) =>
+            invalidatesTags: (_result, _error, {eventId, postId}) =>
                 [{type: 'EventPost', id: postId}, {type: 'Event', id: eventId}, 'EventPost'],
         }),
         /**
@@ -77,7 +77,7 @@ export const eventPostApi = baseApi.injectEndpoints({
                 url: `/events/${eventId}/posts/${postId}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: (result, error, {eventId, postId}) =>
+            invalidatesTags: (_result, _error, {eventId, postId}) =>
                 [{type: 'EventPost', id: postId}, {type: 'Event', id: eventId}, 'EventPost'],
         }),
     }),

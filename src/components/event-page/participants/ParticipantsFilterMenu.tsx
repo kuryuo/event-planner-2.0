@@ -29,7 +29,7 @@ export default function ParticipantsFilterMenu({
     const menuRef = useRef<HTMLDivElement>(null);
     const rolesMenuRef = useRef<HTMLDivElement>(null);
     const roleItemRef = useRef<HTMLDivElement>(null);
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const {data: rolesData, isLoading: isLoadingRoles} = useGetEventRolesQuery(
         {eventId, count: 100},

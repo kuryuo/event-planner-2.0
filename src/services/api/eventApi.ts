@@ -45,7 +45,7 @@ export const eventApi = baseApi.injectEndpoints({
                 method: 'GET',
                 eventId,
             }),
-            providesTags: (result, error, eventId) =>
+            providesTags: (result, _error, eventId) =>
                 result ? [{type: 'Event', id: eventId}] : ['Event'],
         }),
         /**
@@ -87,7 +87,7 @@ export const eventApi = baseApi.injectEndpoints({
                     body: cleanedPayload,
                 };
             },
-            invalidatesTags: (result, error, {eventId}) =>
+            invalidatesTags: (result, _error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}, 'Event'] : [],
         }),
         /**
@@ -98,7 +98,7 @@ export const eventApi = baseApi.injectEndpoints({
                 url: `/events/${eventId}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: (result, error, eventId) =>
+            invalidatesTags: (_result, _error, eventId) =>
                 [{type: 'Event', id: eventId}, 'Event'],
         }),
         /**
@@ -113,7 +113,7 @@ export const eventApi = baseApi.injectEndpoints({
                     ...params,
                 },
             }),
-            providesTags: (result, error, {eventId}) =>
+            providesTags: (result, _error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}] : ['Event'],
         }),
         /**
@@ -124,7 +124,7 @@ export const eventApi = baseApi.injectEndpoints({
                 url: `/events/${eventId}/contacts`,
                 method: 'GET',
             }),
-            providesTags: (result, error, eventId) =>
+            providesTags: (result, _error, eventId) =>
                 result ? [{type: 'Event', id: eventId}] : ['Event'],
         }),
         /**
@@ -139,7 +139,7 @@ export const eventApi = baseApi.injectEndpoints({
                     count,
                 },
             }),
-            providesTags: (result, error, {eventId}) =>
+            providesTags: (result, _error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}] : ['Event'],
         }),
         /**
@@ -155,7 +155,7 @@ export const eventApi = baseApi.injectEndpoints({
                     body: formData,
                 };
             },
-            invalidatesTags: (result, error, {eventId}) =>
+            invalidatesTags: (result, _error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
         }),
         /**
@@ -167,7 +167,7 @@ export const eventApi = baseApi.injectEndpoints({
                 method: 'DELETE',
                 params: roleId ? {roleId} : undefined,
             }),
-            invalidatesTags: (result, error, {eventId}) =>
+            invalidatesTags: (result, _error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
         }),
         /**
@@ -203,7 +203,7 @@ export const eventApi = baseApi.injectEndpoints({
                     body: formData,
                 };
             },
-            invalidatesTags: (result, error, {eventId}) =>
+            invalidatesTags: (result, _error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}, 'Event'] : [],
         }),
         /**
@@ -218,7 +218,7 @@ export const eventApi = baseApi.injectEndpoints({
                     ...(offset !== undefined && {offset}),
                 },
             }),
-            providesTags: (result, error, {eventId}) =>
+            providesTags: (result, _error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}] : ['Event'],
         }),
         /**
@@ -229,7 +229,7 @@ export const eventApi = baseApi.injectEndpoints({
                 url: `/events/${eventId}/users/${userId}/roles/${roleId}`,
                 method: 'POST',
             }),
-            invalidatesTags: (result, error, {eventId}) =>
+            invalidatesTags: (result, _error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
         }),
         /**
@@ -243,7 +243,7 @@ export const eventApi = baseApi.injectEndpoints({
                     roleName,
                 },
             }),
-            invalidatesTags: (result, error, {eventId}) =>
+            invalidatesTags: (result, _error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
         }),
         /**
@@ -257,7 +257,7 @@ export const eventApi = baseApi.injectEndpoints({
                     userId,
                 },
             }),
-            invalidatesTags: (result, error, {eventId}) =>
+            invalidatesTags: (result, _error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
         }),
         /**
@@ -268,7 +268,7 @@ export const eventApi = baseApi.injectEndpoints({
                 url: `/events/${eventId}/contacts/${userId}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: (result, error, {eventId}) =>
+            invalidatesTags: (result, _error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
         }),
     }),

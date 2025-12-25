@@ -33,8 +33,8 @@ interface EventFormProps {
 export default function EventForm({
                                       eventData,
                                       onSubmit,
-                                      loading = false,
-                                      error,
+                                      loading: _loading = false,
+                                      error: _error,
                                       isEditMode = false
                                   }: EventFormProps) {
     const navigate = useNavigate();
@@ -57,7 +57,7 @@ export default function EventForm({
         setLocation,
         avatarColor,
         setAvatarColor,
-        avatarFile,
+        avatarFile: _avatarFile,
         avatarPreview,
         handleAvatarChange,
         isPrivate,

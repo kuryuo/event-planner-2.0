@@ -34,7 +34,7 @@ export default function NextEvent({
                         {isSubscribed ? "Я не пойду" : "Я пойду"}
                     </Button>
                 )}
-                <Button size="M" variant="Dense" onClick={onDetails}>
+                <Button size="M" variant="Text" onClick={onDetails}>
                     Подробнее
                 </Button>
             </div>

@@ -1,5 +1,5 @@
 import {useState, useRef} from "react";
-import {useNavigate, useLocation} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import styles from './Header.module.scss';
 import ChevronLeftIcon from '@/assets/img/icon-s/chevron-left.svg?react';
 import ThreeDotsVerticalIcon from '@/assets/img/icon-m/three-dots-vertical.svg?react';

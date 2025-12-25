@@ -1,7 +1,6 @@
 import {useState, useEffect, useRef} from "react";
 import styles from "./Participants.module.scss";
 import Avatar from "@/ui/avatar/Avatar";
-import Button from "@/ui/button/Button";
 import {useEventSubscribers} from "@/hooks/api/useEventSubscribers.ts";
 import {useParticipantsModal} from "@/hooks/api/useParticipantsModal.ts";
 import ParticipantsModal from "./ParticipantsModal.tsx";
@@ -92,9 +91,6 @@ export default function Participants({
         return totalCount.toString();
     };
 
-    const handleInvite = () => {
-        console.log("Пригласить участников");
-    };
 
     if (isLoading) {
         return (

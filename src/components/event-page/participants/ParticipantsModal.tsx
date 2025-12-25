@@ -30,7 +30,7 @@ export default function ParticipantsModal({
     const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
     const [inContacts, setInContacts] = useState(false);
     const [searchName, setSearchName] = useState('');
-    const filterButtonRef = useRef<HTMLButtonElement>(null);
+    const filterButtonRef = useRef<HTMLDivElement>(null);
     
     const {data: rolesData} = useGetEventRolesQuery(
         {eventId, count: 100},
@@ -150,7 +150,7 @@ export default function ParticipantsModal({
                                         <ParticipantCard
                                             key={participant.id}
                                             name={participant.name || 'Пользователь'}
-                                            avatarUrl={buildImageUrl(participant.avatarUrl)}
+                                            avatarUrl={buildImageUrl(participant.avatarUrl) ?? null}
                                             role={participant.role}
                                             eventId={eventId}
                                             userId={participant.id}

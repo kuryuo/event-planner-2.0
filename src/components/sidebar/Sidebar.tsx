@@ -1,8 +1,6 @@
 import {Card} from '@/ui/card/Card.tsx';
 import {Sublist} from '@/components/sidebar/sub-list/SubList.tsx';
-import {NotificationBadge} from '@/ui/notification-badge/NotificationBadge.tsx';
 import CircleButton from '@/ui/button-circle/ButtonCircle.tsx';
-import bell from '@/assets/img/icon-l/bell.svg';
 import styles from './Sidebar.module.scss';
 import NextEvent from "@/components/sidebar/next-event/NextEvent.tsx";
 import clsx from "clsx";
@@ -19,7 +17,7 @@ interface SidebarProps {
     isAdmin?: boolean;
 }
 
-export default function Sidebar({notificationCount = 3, isAdmin = false}: SidebarProps) {
+export default function Sidebar({notificationCount: _notificationCount = 3, isAdmin = false}: SidebarProps) {
     const {data: profile} = useGetProfileQuery();
     const {data: subscribedEvents} = useGetProfileEventsQuery();
     const {data: allEventsData} = useGetEventsQuery(

@@ -45,8 +45,8 @@ export default function ParticipantCard({
         {skip: !isSelectOpen || !eventId}
     );
 
-    const [assignRole, {isLoading: isAssigningRole}] = useAssignUserRoleMutation();
-    const [createRole, {isLoading: isCreatingRole}] = useCreateEventRoleMutation();
+    const [assignRole] = useAssignUserRoleMutation();
+    const [createRole] = useCreateEventRoleMutation();
     const [addContact] = useAddEventContactMutation();
     const [removeContact] = useRemoveEventContactMutation();
 

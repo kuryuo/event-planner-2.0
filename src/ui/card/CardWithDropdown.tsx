@@ -91,7 +91,7 @@ export function CardWithDropdown({
                                                 description: opt.description,
                                                 content: opt.content,
                                             }))}
-                                            onOptionClick={(option, index) => {
+                                            onOptionClick={(_option, index) => {
                                                 selectOptions[index]?.onClick?.();
                                                 setIsSelectOpen(false);
                                                 onSelectOpenChange?.(false);
