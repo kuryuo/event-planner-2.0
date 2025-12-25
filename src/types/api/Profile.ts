@@ -1,3 +1,5 @@
+export type UserPrivilege = 'COMMON' | 'ADMIN' | 'ORGANIZER';
+
 export interface UserProfile {
     id: string;
     lastName: string;
@@ -7,6 +9,7 @@ export interface UserProfile {
     telegram: string | null;
     city: string | null;
     avatarUrl: string | null;
+    userPrivilege: UserPrivilege;
 }
 
 export interface UpdateUserProfilePayload {

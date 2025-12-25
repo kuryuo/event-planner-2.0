@@ -16,7 +16,6 @@ import {useAuth} from "@/hooks/api/useAuth.ts";
 import {useAvatarUpload} from "@/hooks/api/useAvatarUpload.ts";
 
 export default function ProfilePage() {
-    const [isAdmin] = useState(true);
     const [darkTheme, setDarkTheme] = useState(false);
     const navigate = useNavigate();
     const {logout} = useAuth();
@@ -54,7 +53,6 @@ export default function ProfilePage() {
             <div className={styles.sidebar}>
                 <Sidebar
                     notificationCount={5}
-                    isAdmin={isAdmin}
                 />
             </div>
             <div className={styles.content}>

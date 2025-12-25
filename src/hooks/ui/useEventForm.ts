@@ -5,6 +5,8 @@ import type {CreateEventPayload, UpdateEventPayload, EventResponse} from "@/type
 import {EVENT_FORMAT_MAP, FORMAT_REVERSE_MAP} from "@/const.ts";
 import {combineDateTime, parseDateTime} from "@/utils/date";
 import {useGetProfileQuery} from "@/services/api/profileApi.ts";
+import {useGetEventRolesQuery} from "@/services/api/eventApi.ts";
+import {buildImageUrl} from "@/utils/buildImageUrl.ts";
 
 export const useEventForm = (eventData?: EventResponse | null) => {
     const {data: profile} = useGetProfileQuery();
@@ -47,6 +49,12 @@ export const useEventForm = (eventData?: EventResponse | null) => {
         setChips: setRoles,
         addChip: addRole,
     } = useChips(DEFAULT_ROLES);
+
+    // Загружаем роли мероприятия при редактировании
+    const {data: eventRolesData} = useGetEventRolesQuery(
+        {eventId: eventData?.id ?? '', count: 100},
+        {skip: !eventData?.id}
+    );
     
     const handleRoleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if ((event.key === 'Enter' || event.key === ' ') && roleInputValue.trim()) {
@@ -83,8 +91,19 @@ export const useEventForm = (eventData?: EventResponse | null) => {
                 setCategories([]);
             }
 
+            // Роли будут загружены через отдельный useEffect ниже
+
             if (eventData.color) {
                 setAvatarColor(eventData.color);
+            }
+
+            if (eventData.avatar) {
+                const avatarUrl = buildImageUrl(eventData.avatar);
+                if (avatarUrl) {
+                    setAvatarPreview(avatarUrl);
+                }
+            } else {
+                setAvatarPreview(null);
             }
 
             if (eventData.startDate) {
@@ -130,6 +149,21 @@ export const useEventForm = (eventData?: EventResponse | null) => {
             previousEventDataId.current = currentEventId;
         }
     }, [eventData?.id]);
+
+    // Загружаем роли мероприятия при редактировании
+    useEffect(() => {
+        if (eventRolesData?.res && eventData?.id && initializedEventId.current === eventData.id) {
+            const roleNames = eventRolesData.res.map(role => role.name);
+            // Объединяем дефолтные роли с загруженными, убирая дубликаты
+            const allRoles = [...DEFAULT_ROLES];
+            roleNames.forEach(roleName => {
+                if (!allRoles.includes(roleName)) {
+                    allRoles.push(roleName);
+                }
+            });
+            setRoles(allRoles);
+        }
+    }, [eventRolesData, eventData?.id, setRoles]);
 
     const validate = (): string | null => {
         if (!title.trim()) return 'Необходимо указать название';
@@ -179,8 +213,11 @@ export const useEventForm = (eventData?: EventResponse | null) => {
             return payload;
         }
 
+        const customRoles = roles.filter(role => !DEFAULT_ROLES.includes(role));
         const updatePayload = {
             ...basePayload,
+            categories: categories,
+            roles: customRoles,
             color: avatarColor,
             avatar: avatarFile,
         } as UpdateEventPayload;

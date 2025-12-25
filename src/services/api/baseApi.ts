@@ -2,8 +2,10 @@ import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
 import type {RootState} from '@/store/store'
 import {setTokens, clearTokens} from '@/store/authSlice'
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://cpbeventplanner.ru'
+
 const rawBaseQuery = fetchBaseQuery({
-    baseUrl: 'https://cpbeventplanner.ru/api/',
+    baseUrl: `${API_BASE_URL}/api/`,
     prepareHeaders: (headers, {getState}) => {
         const token = (getState() as RootState).auth.accessToken
         if (token) {

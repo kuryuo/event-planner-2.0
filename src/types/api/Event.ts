@@ -61,6 +61,8 @@ export interface UpdateEventPayload {
     format: string;
     eventType: string;
     maxParticipants: number;
+    categories: string[];
+    roles: string[];
     color: string;
     avatar?: File | null;
 }

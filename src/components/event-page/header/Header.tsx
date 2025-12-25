@@ -1,4 +1,4 @@
-import {useState, useRef} from "react";
+import {useState, useRef, useMemo} from "react";
 import {useNavigate} from "react-router-dom";
 import styles from './Header.module.scss';
 import ChevronLeftIcon from '@/assets/img/icon-s/chevron-left.svg?react';
@@ -10,6 +10,8 @@ import Tabs, {type TabItem} from '@/ui/tabs/Tabs';
 import {useClickOutside} from '@/hooks/ui/useClickOutside.ts';
 import {useEventDeleter} from '@/hooks/ui/useEventDeleter.ts';
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
+import {useGetProfileEventsQuery} from "@/services/api/profileApi.ts";
+import {useSubscribeToEventMutation, useUnsubscribeFromEventMutation} from "@/services/api/eventApi.ts";
 
 interface HeaderProps {
     isAdmin?: boolean;
@@ -25,6 +27,15 @@ export default function Header({isAdmin = false, name, eventId, activeTab = 0, a
     const menuRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
     const {handleDelete, isLoading: isDeleting} = useEventDeleter();
+    
+    const {data: subscribedEvents} = useGetProfileEventsQuery();
+    const [subscribeToEvent] = useSubscribeToEventMutation();
+    const [unsubscribeFromEvent] = useUnsubscribeFromEventMutation();
+    
+    const isSubscribed = useMemo(() => {
+        if (!eventId || !subscribedEvents) return false;
+        return subscribedEvents.some(event => event.id === eventId);
+    }, [eventId, subscribedEvents]);
 
     const handleBack = () => {
         navigate('/main');
@@ -62,6 +73,20 @@ export default function Header({isAdmin = false, name, eventId, activeTab = 0, a
     const handleTabChange = (index: number) => {
         if (onTabChange) {
             onTabChange(index);
+        }
+    };
+
+    const handleSubscribeClick = async () => {
+        if (!eventId) return;
+        
+        try {
+            if (isSubscribed) {
+                await unsubscribeFromEvent(eventId).unwrap();
+            } else {
+                await subscribeToEvent(eventId).unwrap();
+            }
+        } catch (error) {
+            console.error('Ошибка при подписке/отписке:', error);
         }
     };
 
@@ -110,7 +135,13 @@ export default function Header({isAdmin = false, name, eventId, activeTab = 0, a
                             </div>
                         </div>
                     ) : (
-                        <Button variant="Filled" color="purple">Я пойду</Button>
+                        <Button 
+                            variant="Filled" 
+                            color={isSubscribed ? "gray" : "purple"}
+                            onClick={handleSubscribeClick}
+                        >
+                            {isSubscribed ? "Я не пойду" : "Я пойду"}
+                        </Button>
                     )}
                 </div>
             </div>

@@ -20,9 +20,10 @@ interface SidebarProps {
 export default function Sidebar({notificationCount: _notificationCount = 3, isAdmin = false}: SidebarProps) {
     const {data: profile} = useGetProfileQuery();
     const {data: subscribedEvents} = useGetProfileEventsQuery();
+    const isAdminOrOrganizer = profile?.userPrivilege === 'ADMIN' || profile?.userPrivilege === 'ORGANIZER';
     const {data: allEventsData} = useGetEventsQuery(
         {Count: 100},
-        {skip: isAdmin}
+        {skip: isAdminOrOrganizer}
     );
     const navigate = useNavigate();
     const fallbackAvatar = 'https://api.dicebear.com/7.x/shapes/png?size=200&radius=50';
@@ -37,7 +38,7 @@ export default function Sidebar({notificationCount: _notificationCount = 3, isAd
         onClick: () => navigate(`/event?id=${event.id}`),
     }));
 
-    const eventsForNextEvent = isAdmin ? subscribedEvents : (allEventsData?.result || []);
+    const eventsForNextEvent = isAdminOrOrganizer ? subscribedEvents : (allEventsData?.result || []);
     
     const nextEventFromSubscriptions = useMemo(() => {
         if (!eventsForNextEvent || eventsForNextEvent.length === 0) return null;
@@ -157,7 +158,7 @@ export default function Sidebar({notificationCount: _notificationCount = 3, isAd
                 </div>
             </div>
 
-            {isAdmin && (
+            {(profile?.userPrivilege === 'ADMIN' || profile?.userPrivilege === 'ORGANIZER') && (
                 <div className={clsx(styles.block, styles.createEventWrapper)}>
                     <CircleButton onClick={handleCreateEvent} variant={"green"}/>
                     <span className={styles.createEventText}>Создайте мероприятие</span>

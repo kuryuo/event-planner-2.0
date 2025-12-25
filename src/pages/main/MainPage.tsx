@@ -9,16 +9,13 @@ import type {GetEventsPayload} from "@/types/api/Event.ts";
 export default function MainPage() {
     const [showFilters, setShowFilters] = useState(false);
     const [filters, setFilters] = useState<GetEventsPayload | undefined>(undefined);
-    const [isAdmin] = useState(true);
 
     useGetProfileQuery();
 
     return (
         <div className={styles.pageWrapper}>
             <div className={styles.sidebar}>
-                <Sidebar
-                    isAdmin={isAdmin}
-                />
+                <Sidebar />
             </div>
 
             <div className={styles.calendar}>
