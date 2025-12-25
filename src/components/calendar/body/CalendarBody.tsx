@@ -7,8 +7,6 @@ import CalendarHeader from '@/components/calendar/header/CalendarHeader';
 import CalendarEvent from '@/components/calendar/event/CalendarEvent';
 import styles from './CalendarBody.module.scss';
 import {useEventsData} from '@/hooks/api/useEventsData.ts';
-
-void styles;
 import type {EventClickArg, EventApi} from "@fullcalendar/core";
 import {useNavigate} from "react-router-dom";
 import type {GetEventsPayload} from '@/types/api/Event.ts';
@@ -48,22 +46,24 @@ export default function CalendarBody({calendarRef, currentView, filters}: Calend
     };
 
     return (
-        <FullCalendar
-            ref={calendarRef}
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            initialView={currentView}
-            locale={ruLocale}
-            headerToolbar={false}
-            slotMinTime={CALENDAR_SLOT_TIMES.min}
-            slotMaxTime={CALENDAR_SLOT_TIMES.max}
-            slotLabelFormat={SLOT_LABEL_FORMAT}
-            dayHeaderContent={(args) => <CalendarHeader {...args} currentView={currentView}/>}
-            eventContent={(arg) => <CalendarEvent arg={arg} viewType={currentView}/>}
-            events={calendarEvents}
-            eventClick={handleClick}
-            datesSet={handleDatesSet}
-            eventDidMount={handleEventDidMount}
-            {...CALENDAR_OPTIONS}
-        />
+        <div className={styles.calendarBody}>
+            <FullCalendar
+                ref={calendarRef}
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                initialView={currentView}
+                locale={ruLocale}
+                headerToolbar={false}
+                slotMinTime={CALENDAR_SLOT_TIMES.min}
+                slotMaxTime={CALENDAR_SLOT_TIMES.max}
+                slotLabelFormat={SLOT_LABEL_FORMAT}
+                dayHeaderContent={(args) => <CalendarHeader {...args} currentView={currentView}/>}
+                eventContent={(arg) => <CalendarEvent arg={arg} viewType={currentView}/>}
+                events={calendarEvents}
+                eventClick={handleClick}
+                datesSet={handleDatesSet}
+                eventDidMount={handleEventDidMount}
+                {...CALENDAR_OPTIONS}
+            />
+        </div>
     );
 }

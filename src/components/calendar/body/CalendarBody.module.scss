@@ -1,5 +1,8 @@
 @use '@/typography-variables' as ty;
 
+.calendarBody {
+}
+
 :global(.fc) {
   border-radius: inherit;
   overflow: hidden;
