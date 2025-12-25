@@ -86,7 +86,7 @@ const baseQueryWithReauth: typeof rawBaseQuery = async (args, api, extraOptions)
                         }
                     },
                     reject: (error: any) => {
-                        console.log('[Auth] Request rejected from queue due to refresh failure')
+                        console.log('[Auth] Request rejected from queue due to refresh failure:', error)
                         reject(result)
                     }
                 })
