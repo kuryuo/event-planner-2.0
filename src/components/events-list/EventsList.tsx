@@ -3,7 +3,7 @@ import styles from './EventsList.module.scss';
 import {parseISO, format, startOfMonth, endOfMonth, isWithinInterval} from 'date-fns';
 import {ru} from 'date-fns/locale';
 import {groupBy} from "@/utils/array.ts";
-import {useGetProfileEventsQuery} from "@/services/api/profileApi.ts";
+import {useGetProfileEventsQuery, useGetProfileQuery} from "@/services/api/profileApi.ts";
 import {useSubscribeToEventMutation, useUnsubscribeFromEventMutation} from "@/services/api/eventApi.ts";
 
 interface Event {
@@ -13,6 +13,7 @@ interface Event {
     title: string;
     description: string;
     avatar?: string | null;
+    responsiblePersonId: string;
 }
 
 interface EventsListProps {
@@ -22,6 +23,7 @@ interface EventsListProps {
 
 export default function EventsList({events, currentMonth}: EventsListProps) {
     const {data: subscribedEvents} = useGetProfileEventsQuery();
+    const {data: profile} = useGetProfileQuery();
     const [subscribeToEvent] = useSubscribeToEventMutation();
     const [unsubscribeFromEvent] = useUnsubscribeFromEventMutation();
     
@@ -64,19 +66,23 @@ export default function EventsList({events, currentMonth}: EventsListProps) {
                                 {eventsForDay.length > 1 && ` (${eventsForDay.length} мероприятия)`}
                                 {dateWithDay}
                             </div>
-                            {eventsForDay.map(event => (
-                                <EventItem
-                                    key={event.id}
-                                    eventId={event.id}
-                                    time={event.time}
-                                    title={event.title}
-                                    description={event.description}
-                                    avatar={event.avatar}
-                                    isSubscribed={subscribedEventIds.has(event.id)}
-                                    onSubscribe={handleSubscribe}
-                                    onUnsubscribe={handleUnsubscribe}
-                                />
-                            ))}
+                            {eventsForDay.map(event => {
+                                const isOrganizer = profile && event.responsiblePersonId === profile.id;
+                                return (
+                                    <EventItem
+                                        key={event.id}
+                                        eventId={event.id}
+                                        time={event.time}
+                                        title={event.title}
+                                        description={event.description}
+                                        avatar={event.avatar}
+                                        isSubscribed={subscribedEventIds.has(event.id)}
+                                        isOrganizer={isOrganizer}
+                                        onSubscribe={handleSubscribe}
+                                        onUnsubscribe={handleUnsubscribe}
+                                    />
+                                );
+                            })}
                         </div>
                     );
                 })

@@ -11,6 +11,7 @@ interface EventItemProps {
     description: string;
     isSubscribed: boolean;
     avatar?: string | null;
+    isOrganizer?: boolean;
     onSubscribe?: (eventId: string) => void;
     onUnsubscribe?: (eventId: string) => void;
 }
@@ -22,6 +23,7 @@ export default function EventItem({
     description,
     isSubscribed,
     avatar,
+    isOrganizer = false,
     onSubscribe,
     onUnsubscribe
 }: EventItemProps) {
@@ -54,13 +56,15 @@ export default function EventItem({
                 </div>
             </div>
             <div className={styles.buttonWrapper}>
-                <Button 
-                    variant="Filled" 
-                    color={isSubscribed ? "gray" : "purple"}
-                    onClick={handleButtonClick}
-                >
-                    {isSubscribed ? "Я не пойду" : "Я пойду"}
-                </Button>
+                {!isOrganizer && (
+                    <Button 
+                        variant="Filled" 
+                        color={isSubscribed ? "gray" : "purple"}
+                        onClick={handleButtonClick}
+                    >
+                        {isSubscribed ? "Я не пойду" : "Я пойду"}
+                    </Button>
+                )}
                 <img 
                     src={BoxArrowUpIcon} 
                     alt="icon" 
