@@ -4,7 +4,7 @@ export interface UserProfile {
     id: string;
     lastName: string;
     firstName: string;
-    middleName: string;
+    profession: string;
     phoneNumber: string | null;
     telegram: string | null;
     city: string | null;
@@ -15,7 +15,7 @@ export interface UserProfile {
 export interface UpdateUserProfilePayload {
     lastName: string;
     firstName: string;
-    middleName: string;
+    profession: string;
     phoneNumber: string;
     telegram: string;
     city: string;

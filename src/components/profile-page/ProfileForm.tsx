@@ -14,7 +14,7 @@ interface ProfileFormProps {
     initialData?: {
         firstName?: string;
         lastName?: string;
-        middleName?: string;
+        profession?: string;
         city?: string;
         email?: string;
         phoneNumber?: string;
@@ -30,7 +30,7 @@ export default function ProfileForm({
                                     }: ProfileFormProps) {
     const [firstName, setFirstName] = useState(initialData?.firstName ?? "");
     const [lastName, setLastName] = useState(initialData?.lastName ?? "");
-    const [middleName, setMiddleName] = useState(initialData?.middleName ?? "");
+    const [profession, setProfession] = useState(initialData?.profession ?? "");
     const [city, setCity] = useState(initialData?.city ?? "");
     const [email, setEmail] = useState(initialData?.email ?? "");
     const [phoneNumber, setPhoneNumber] = useState(initialData?.phoneNumber ?? "");
@@ -40,7 +40,7 @@ export default function ProfileForm({
         if (!initialData) return;
         setFirstName(initialData.firstName ?? "");
         setLastName(initialData.lastName ?? "");
-        setMiddleName(initialData.middleName ?? "");
+        setProfession(initialData.profession ?? "");
         setCity(initialData.city ?? "");
         setEmail(initialData.email ?? "");
         setPhoneNumber(initialData.phoneNumber ?? "");
@@ -51,7 +51,7 @@ export default function ProfileForm({
         const formData = {
             firstName,
             lastName,
-            middleName,
+            profession,
             city,
             phoneNumber,
             telegram,
@@ -65,7 +65,7 @@ export default function ProfileForm({
         if (initialData) {
             setFirstName(initialData.firstName ?? "");
             setLastName(initialData.lastName ?? "");
-            setMiddleName(initialData.middleName ?? "");
+            setProfession(initialData.profession ?? "");
             setCity(initialData.city ?? "");
             setEmail(initialData.email ?? "");
             setPhoneNumber(initialData.phoneNumber ?? "");
@@ -95,9 +95,9 @@ export default function ProfileForm({
                     />
                 </div>
                 <TextField
-                    placeholder="Отчество"
-                    value={middleName}
-                    onChange={(e) => setMiddleName(e.target.value)}
+                    placeholder="Должность"
+                    value={profession}
+                    onChange={(e) => setProfession(e.target.value)}
                     fieldSize="M"
                 />
                 <TextField

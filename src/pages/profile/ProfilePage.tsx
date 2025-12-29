@@ -46,7 +46,7 @@ export default function ProfilePage() {
     };
 
     const fallbackAvatar = 'https://api.dicebear.com/7.x/shapes/png?size=200&radius=50';
-    const fullName = `${profile?.lastName ?? ''} ${profile?.firstName ?? ''} ${profile?.middleName ?? ''}`.trim() || '—';
+    const fullName = `${profile?.lastName ?? ''} ${profile?.firstName ?? ''}`.trim() || '—';
 
     return (
         <div className={styles.pageWrapper}>
@@ -89,7 +89,7 @@ export default function ProfilePage() {
                     initialData={{
                         firstName: profile?.firstName,
                         lastName: profile?.lastName,
-                        middleName: profile?.middleName ?? '',
+                        profession: profile?.profession ?? '',
                         city: profile?.city ?? '',
                         phoneNumber: profile?.phoneNumber ?? '',
                         telegram: profile?.telegram ?? '',
