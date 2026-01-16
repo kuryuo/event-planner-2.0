@@ -3,7 +3,7 @@ import styles from "./ProfileForm.module.scss";
 import TextField from "@/ui/text-field/TextField.tsx";
 import Button from "@/ui/button/Button.tsx";
 import GeoAltIcon from "@/assets/img/icon-m/geo-alt.svg?react";
-import EnvelopeIcon from "@/assets/img/icon-m/envelope.svg?react";
+// import EnvelopeIcon from "@/assets/img/icon-m/envelope.svg?react";
 import TelephoneIcon from "@/assets/img/icon-m/telephone.svg?react";
 import TelegramIcon from "@/assets/img/icon-m/telegram.svg?react";
 
@@ -32,7 +32,7 @@ export default function ProfileForm({
     const [lastName, setLastName] = useState(initialData?.lastName ?? "");
     const [profession, setProfession] = useState(initialData?.profession ?? "");
     const [city, setCity] = useState(initialData?.city ?? "");
-    const [email, setEmail] = useState(initialData?.email ?? "");
+    // const [email, setEmail] = useState(initialData?.email ?? "");
     const [phoneNumber, setPhoneNumber] = useState(initialData?.phoneNumber ?? "");
     const [telegram, setTelegram] = useState(initialData?.telegram ?? "");
 
@@ -42,7 +42,7 @@ export default function ProfileForm({
         setLastName(initialData.lastName ?? "");
         setProfession(initialData.profession ?? "");
         setCity(initialData.city ?? "");
-        setEmail(initialData.email ?? "");
+        // setEmail(initialData.email ?? "");
         setPhoneNumber(initialData.phoneNumber ?? "");
         setTelegram(initialData.telegram ?? "");
     }, [initialData]);
@@ -67,7 +67,7 @@ export default function ProfileForm({
             setLastName(initialData.lastName ?? "");
             setProfession(initialData.profession ?? "");
             setCity(initialData.city ?? "");
-            setEmail(initialData.email ?? "");
+            // setEmail(initialData.email ?? "");
             setPhoneNumber(initialData.phoneNumber ?? "");
             setTelegram(initialData.telegram ?? "");
         }

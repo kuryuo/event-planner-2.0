@@ -1,9 +1,13 @@
-import {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import type {RootState, AppDispatch} from '@/store/store.ts';
 import {setTokens, clearTokens} from '@/store/authSlice.ts';
 import {baseApi} from '@/services/api/baseApi.ts';
-import {useLoginMutation, useRegisterMutation, useRecoverPasswordMutation, useLogoutMutation} from '@/services/api/authApi.ts';
+import {
+    useLoginMutation,
+    useRegisterMutation,
+    useRecoverPasswordMutation,
+    useLogoutMutation
+} from '@/services/api/authApi.ts';
 import type {LoginPayload, RegisterPayload} from '@/types/api/Auth.ts';
 
 export const useAuth = () => {

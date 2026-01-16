@@ -10,7 +10,12 @@ import {useNavigate} from "react-router-dom";
 import {useMemo, useState, useEffect} from "react";
 import {format} from 'date-fns';
 import {ru} from 'date-fns/locale';
-import {useSubscribeToEventMutation, useUnsubscribeFromEventMutation, useGetEventByIdQuery, useGetEventsQuery} from "@/services/api/eventApi.ts";
+import {
+    useSubscribeToEventMutation,
+    useUnsubscribeFromEventMutation,
+    useGetEventByIdQuery,
+    useGetEventsQuery
+} from "@/services/api/eventApi.ts";
 
 interface SidebarProps {
     notificationCount?: number;
@@ -39,10 +44,10 @@ export default function Sidebar({notificationCount: _notificationCount = 3, isAd
     }));
 
     const eventsForNextEvent = isAdminOrOrganizer ? subscribedEvents : (allEventsData?.result || []);
-    
+
     const nextEventFromSubscriptions = useMemo(() => {
         if (!eventsForNextEvent || eventsForNextEvent.length === 0) return null;
-        
+
         const now = new Date();
         const upcomingEvents = eventsForNextEvent
             .filter(event => {
@@ -89,7 +94,7 @@ export default function Sidebar({notificationCount: _notificationCount = 3, isAd
 
     const formattedNextEventDate = useMemo(() => {
         if (!nextEvent) return '';
-        
+
         const startDate = new Date(nextEvent.startDate);
         const endDate = new Date(nextEvent.endDate);
 
@@ -124,7 +129,7 @@ export default function Sidebar({notificationCount: _notificationCount = 3, isAd
 
     const handleNextEventAttend = async () => {
         if (!nextEvent) return;
-        
+
         try {
             if (isSubscribedToNextEvent) {
                 await unsubscribeFromEvent(nextEvent.id).unwrap();
@@ -146,7 +151,7 @@ export default function Sidebar({notificationCount: _notificationCount = 3, isAd
             <div className={styles.block}>
                 <div onClick={handleProfileClick} style={{cursor: 'pointer'}}>
                     <Card
-                        title={`${profile?.lastName ?? ''} ${profile?.firstName ?? ''} ${profile?.middleName ?? ''}`.trim()}
+                        title={`${profile?.lastName ?? ''} ${profile?.firstName ?? ''}`.trim()}
                         avatarUrl={
                             profile?.avatarUrl
                                 ? buildImageUrl(profile.avatarUrl)!

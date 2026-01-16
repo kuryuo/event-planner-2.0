@@ -67,12 +67,12 @@ export const eventApi = baseApi.injectEndpoints({
                 };
             },
             invalidatesTags: (result) =>
-                result ? ['Event'] : [],
+                result ? ['Event', 'Profile'] : [],
         }),
         /**
          * Обновить мероприятие
          */
-        updateEvent: builder.mutation<UpdateEventResponse, {eventId: string; body: UpdateEventPayload}>({
+        updateEvent: builder.mutation<UpdateEventResponse, { eventId: string; body: UpdateEventPayload }>({
             query: ({eventId, body}) => {
                 const {avatar, ...jsonPayload} = body;
                 const cleanedPayload = Object.fromEntries(
@@ -88,7 +88,7 @@ export const eventApi = baseApi.injectEndpoints({
                 };
             },
             invalidatesTags: (result, _error, {eventId}) =>
-                result ? [{type: 'Event', id: eventId}, 'Event'] : [],
+                result ? [{type: 'Event', id: eventId}, 'Event', 'Profile'] : [],
         }),
         /**
          * Удалить мероприятие
@@ -99,7 +99,7 @@ export const eventApi = baseApi.injectEndpoints({
                 method: 'DELETE',
             }),
             invalidatesTags: (_result, _error, eventId) =>
-                [{type: 'Event', id: eventId}, 'Event'],
+                [{type: 'Event', id: eventId}, 'Event', 'Profile'],
         }),
         /**
          * Получить пользователей подписанных на мероприятие
@@ -178,7 +178,7 @@ export const eventApi = baseApi.injectEndpoints({
                 url: `/events/${eventId}/subscribe`,
                 method: 'POST',
             }),
-            invalidatesTags: ['Profile', 'Event'],
+            invalidatesTags: ['Profile', 'Event', 'Profile'],
         }),
         /**
          * Отписаться от мероприятия
@@ -188,12 +188,12 @@ export const eventApi = baseApi.injectEndpoints({
                 url: `/events/${eventId}/unsubscribe`,
                 method: 'POST',
             }),
-            invalidatesTags: ['Profile', 'Event'],
+            invalidatesTags: ['Profile', 'Event', 'Profile'],
         }),
         /**
          * Загрузить аватар мероприятия
          */
-        uploadEventAvatar: builder.mutation<void, {eventId: string; avatar: File}>({
+        uploadEventAvatar: builder.mutation<void, { eventId: string; avatar: File }>({
             query: ({eventId, avatar}) => {
                 const formData = new FormData();
                 formData.append('avatar', avatar);
