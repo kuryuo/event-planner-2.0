@@ -63,9 +63,20 @@ const retryRequest = (args: any, api: any, token: string) => {
 }
 
 const baseQueryWithReauth: typeof rawBaseQuery = async (args, api, extraOptions) => {
+    const token = (api.getState() as RootState).auth.accessToken
+    const url = typeof args === 'string' ? args : args.url
+    if (!token && !url.startsWith('auth/')) {
+        return {error: {status: 401, data: 'Not authenticated'}}
+    }
+
     let result: any = await rawBaseQuery(args, api, extraOptions)
 
     if (result.error?.status === 401) {
+        const url = typeof args === 'string' ? args : args.url
+        if (url.startsWith('auth/')) {
+            return result
+        }
+
         const refreshTokenValue = (api.getState() as RootState).auth.refreshToken
         if (!refreshTokenValue) {
             console.log('[Auth] No refresh token available, clearing tokens')

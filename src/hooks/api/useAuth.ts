@@ -1,8 +1,9 @@
+import {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import type {RootState, AppDispatch} from '@/store/store.ts';
 import {setTokens, clearTokens} from '@/store/authSlice.ts';
 import {baseApi} from '@/services/api/baseApi.ts';
-import {useLoginMutation, useRegisterMutation, useRecoverPasswordMutation} from '@/services/api/authApi.ts';
+import {useLoginMutation, useRegisterMutation, useRecoverPasswordMutation, useLogoutMutation} from '@/services/api/authApi.ts';
 import type {LoginPayload, RegisterPayload} from '@/types/api/Auth.ts';
 
 export const useAuth = () => {
@@ -12,8 +13,9 @@ export const useAuth = () => {
     const [loginMutation, {isLoading: isLoginLoading, error: loginError}] = useLoginMutation();
     const [registerMutation, {isLoading: isRegisterLoading, error: registerError}] = useRegisterMutation();
     const [recoverPasswordMutation, {isLoading: isRecoverPasswordLoading}] = useRecoverPasswordMutation();
+    const [logoutMutation, {isLoading: isLogoutLoading}] = useLogoutMutation();
 
-    const isLoading = isLoginLoading || isRegisterLoading || isRecoverPasswordLoading;
+    const isLoading = isLoginLoading || isRegisterLoading || isRecoverPasswordLoading || isLogoutLoading;
 
     const error = loginError || registerError;
 
@@ -39,9 +41,15 @@ export const useAuth = () => {
         }
     };
 
-    const logout = () => {
-        dispatch(clearTokens());
-        dispatch(baseApi.util.resetApiState());
+    const logout = async () => {
+        try {
+            await logoutMutation().unwrap();
+        } catch (err) {
+            console.error('Ошибка при выходе', err);
+        } finally {
+            dispatch(clearTokens());
+            dispatch(baseApi.util.resetApiState());
+        }
     };
 
     const recoverPassword = async (payload: { email: string }) => {

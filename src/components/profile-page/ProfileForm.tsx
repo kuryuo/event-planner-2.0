@@ -113,14 +113,15 @@ export default function ProfileForm({
 
             <div className={styles.section}>
                 <h3 className={styles.sectionTitle}>Контактные данные</h3>
-                <TextField
+                {/* <TextField
                     placeholder="Email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     leftIcon={<EnvelopeIcon/>}
                     fieldSize="M"
-                />
+                    disabled
+                /> */}
                 <TextField
                     placeholder="Телефон"
                     type="tel"

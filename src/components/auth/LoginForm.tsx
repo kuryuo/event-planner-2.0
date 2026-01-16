@@ -23,9 +23,19 @@ export default function LoginForm({
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [rememberMe, setRememberMe] = useState(false);
+    const [validationError, setValidationError] = useState("");
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        setValidationError("");
+        if (!email.trim()) {
+            setValidationError("Email обязателен");
+            return;
+        }
+        if (!password.trim()) {
+            setValidationError("Пароль обязателен");
+            return;
+        }
         onSubmit({email, password});
     };
 
@@ -64,6 +74,11 @@ export default function LoginForm({
                         {error && (
                             <div>
                                 {error}
+                            </div>
+                        )}
+                        {validationError && (
+                            <div>
+                                {validationError}
                             </div>
                         )}
                     </div>

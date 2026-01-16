@@ -49,6 +49,15 @@ export const authApi = baseApi.injectEndpoints({
                 body,
             }),
         }),
+        /**
+         * Выход пользователя
+         */
+        logout: builder.mutation<void, void>({
+            query: () => ({
+                url: 'auth/logout',
+                method: 'POST',
+            }),
+        }),
     }),
     overrideExisting: false,
 });
@@ -57,5 +66,6 @@ export const {
     useRegisterMutation,
     useLoginMutation,
     useRefreshMutation,
-    useRecoverPasswordMutation
+    useRecoverPasswordMutation,
+    useLogoutMutation
 } = authApi;
