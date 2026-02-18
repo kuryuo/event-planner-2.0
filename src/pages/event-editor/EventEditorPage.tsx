@@ -21,12 +21,12 @@ export default function EventEditorPage() {
     }
 
     return (
-        <div className={styles.pageWrapper}>
-            <div className={styles.sidebar}>
-                <Sidebar
-                    notificationCount={5}
-                />
-            </div>
+             <div className={styles.pageWrapper}>
+                 <div className={styles.sidebar}>
+                     <Sidebar
+                         notificationCount={5}
+                     />
+                 </div>
             <div className={styles.form}>
                 <EventForm
                     eventData={eventData?.result}

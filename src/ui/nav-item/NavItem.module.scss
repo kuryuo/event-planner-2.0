@@ -1,0 +1,70 @@
+@use '@/typography-variables' as ty;
+
+.navItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 44px;
+  padding: 0 var(--spacing-3);
+  background: transparent;
+  border-radius: var(--radius-2);
+  cursor: pointer;
+  color: var(--content-primary);
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: var(--bg-secondary-subtle);
+  }
+
+  &:active {
+    background-color: var(--bg-secondary);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    color: var(--content-disabled);
+  }
+}
+
+.left {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  min-width: 0;
+}
+
+.label {
+  @include ty.font(body-m, regular);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.leftIcon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  > svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.rightIcon {
+  min-width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+
+  > svg {
+    width: 20px;
+    height: 20px;
+  }
+}

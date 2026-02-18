@@ -1,18 +1,19 @@
-import EventItem from '@/ui/event-item/EventItem.tsx';
 import styles from './EventsList.module.scss';
-import {parseISO, format, startOfMonth, endOfMonth, isWithinInterval} from 'date-fns';
-import {ru} from 'date-fns/locale';
-import {groupBy} from "@/utils/array.ts";
-import {useGetProfileEventsQuery, useGetProfileQuery} from "@/services/api/profileApi.ts";
-import {useSubscribeToEventMutation, useUnsubscribeFromEventMutation} from "@/services/api/eventApi.ts";
+import {parseISO, startOfMonth, endOfMonth, isWithinInterval} from 'date-fns';
+import {useNavigate} from 'react-router-dom';
+import {useGetOrganizersQuery} from '@/services/api/userApi.ts';
+import {buildImageUrl} from '@/utils/buildImageUrl.ts';
+import EventListCard from '@/ui/event-list-card/EventListCard.tsx';
 
 interface Event {
     id: string;
-    date: string;
-    time: string;
     title: string;
     description: string;
     avatar?: string | null;
+    startDate: string;
+    endDate: string;
+    location: string;
+    categories: string[];
     responsiblePersonId: string;
 }
 
@@ -22,68 +23,54 @@ interface EventsListProps {
 }
 
 export default function EventsList({events, currentMonth}: EventsListProps) {
-    const {data: subscribedEvents} = useGetProfileEventsQuery();
-    const {data: profile} = useGetProfileQuery();
-    const [subscribeToEvent] = useSubscribeToEventMutation();
-    const [unsubscribeFromEvent] = useUnsubscribeFromEventMutation();
-    
-    const subscribedEventIds = new Set(subscribedEvents?.map(event => event.id) || []);
+    const navigate = useNavigate();
+    const {data: organizersData} = useGetOrganizersQuery();
+    const organizersById = new Map((organizersData ?? []).map((o) => [o.id, o]));
 
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(currentMonth);
     
-    const filteredEvents = events.filter(event => {
-        const eventDate = parseISO(event.date);
+    const filteredEvents = events.filter((event) => {
+        const eventDate = parseISO(event.startDate);
         return isWithinInterval(eventDate, {start: monthStart, end: monthEnd});
     });
 
-    const grouped = groupBy(filteredEvents, (event) => event.date);
-
-    const handleSubscribe = async (eventId: string) => {
-        await subscribeToEvent(eventId);
-    };
-
-    const handleUnsubscribe = async (eventId: string) => {
-        await unsubscribeFromEvent(eventId);
-    };
-
     return (
         <div className={styles.eventsList}>
-            {Object.keys(grouped).length === 0 ? (
+            {filteredEvents.length === 0 ? (
                 <div className={styles.emptyState}>
                     Нет мероприятий в этом месяце
                 </div>
             ) : (
-                Object.entries(grouped).map(([date, eventsForDay]) => {
-                    const day = parseISO(date);
-                    const dayOfWeek = format(day, 'EEEE', {locale: ru});
-                    const formattedDate = format(day, "d MMMM", {locale: ru});
-                    const dateWithDay = `${formattedDate}, ${dayOfWeek}`;
+                filteredEvents.map((event) => {
+                    const organizer = organizersById.get(event.responsiblePersonId);
+                    const organizerName = organizer
+                        ? `${organizer.lastName ?? ''} ${organizer.firstName ?? ''}`.trim() || 'Организатор'
+                        : 'Организатор';
 
                     return (
-                        <div key={date} className={styles.dayGroup}>
-                            <div className={styles.dateHeader}>
-                                {eventsForDay.length > 1 && ` (${eventsForDay.length} мероприятия)`}
-                                {dateWithDay}
-                            </div>
-                            {eventsForDay.map(event => {
-                                const isOrganizer = profile && event.responsiblePersonId === profile.id;
-                                return (
-                                    <EventItem
-                                        key={event.id}
-                                        eventId={event.id}
-                                        time={event.time}
-                                        title={event.title}
-                                        description={event.description}
-                                        avatar={event.avatar}
-                                        isSubscribed={subscribedEventIds.has(event.id)}
-                                        isOrganizer={isOrganizer}
-                                        onSubscribe={handleSubscribe}
-                                        onUnsubscribe={handleUnsubscribe}
-                                    />
-                                );
-                            })}
-                        </div>
+                        <EventListCard
+                            key={event.id}
+                            title={event.title}
+                            description={event.description}
+                            location={event.location}
+                            categories={event.categories}
+                            startDate={event.startDate}
+                            endDate={event.endDate}
+                            coverUrl={buildImageUrl(event.avatar)}
+                            organizers={
+                                organizer
+                                    ? [
+                                        {
+                                            id: organizer.id,
+                                            name: organizerName,
+                                            avatarUrl: buildImageUrl(organizer.avatarUrl),
+                                        },
+                                    ]
+                                    : []
+                            }
+                            onClick={() => navigate(`/event?id=${event.id}`)}
+                        />
                     );
                 })
             )}

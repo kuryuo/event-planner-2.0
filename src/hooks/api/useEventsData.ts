@@ -14,11 +14,13 @@ export interface UseEventsOutput {
     }[];
     listEvents: {
         id: string;
-        date: string;
-        time: string;
         title: string;
         description: string;
         avatar?: string | null;
+        startDate: string;
+        endDate: string;
+        location: string;
+        categories: string[];
         responsiblePersonId: string;
     }[];
 }
@@ -40,19 +42,15 @@ export const useEventsData = (filters?: GetEventsPayload): UseEventsOutput => {
         }));
 
         const listEvents = events.map(e => {
-            const start = new Date(e.startDate);
-            const end = new Date(e.endDate);
-
-            const date = start.toISOString().split('T')[0];
-            const time = `${start.getHours()}:${start.getMinutes().toString().padStart(2, '0')} - ${end.getHours()}:${end.getMinutes().toString().padStart(2, '0')}`;
-
             return {
                 id: e.id,
-                date,
-                time,
                 title: e.name,
                 description: e.description ?? '',
                 avatar: e.avatar,
+                startDate: e.startDate,
+                endDate: e.endDate,
+                location: e.location,
+                categories: e.categories ?? [],
                 responsiblePersonId: e.responsiblePersonId,
             };
         });

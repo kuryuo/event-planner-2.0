@@ -1,10 +1,10 @@
 @use '@/typography-variables' as ty;
 
 .eventsList {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-12);
-  padding: var(--spacing-6);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--spacing-4);
+  padding: var(--spacing-3);
 }
 
 .emptyState {
@@ -12,16 +12,23 @@
   color: var(--content-secondary);
   text-align: center;
   padding: var(--spacing-8);
+  grid-column: 1 / -1;
 }
 
-.dayGroup {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-6);
+@media (max-width: 1440px) {
+  .eventsList {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
-.dateHeader {
-  @include ty.font(title-s, semibold);
-  border-bottom: 1px solid var(--bg-tertiary);
-  padding-bottom: var(--spacing-1);
+@media (max-width: 1100px) {
+  .eventsList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .eventsList {
+    grid-template-columns: 1fr;
+  }
 }

@@ -70,13 +70,12 @@ export default function EventPage() {
     };
 
     return (
-        <div className={styles.pageWrapper}>
-            <div className={styles.sidebar}>
-                <Sidebar
-                    notificationCount={5}
-                    isAdmin={isAdmin}
-                />
-            </div>
+             <div className={styles.pageWrapper}>
+                 <div className={styles.sidebar}>
+                     <Sidebar
+                         notificationCount={5}
+                     />
+                 </div>
             <div className={styles.content}>
                 <div className={styles.headerWrapper}>
                     <Header

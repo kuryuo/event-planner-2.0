@@ -1,7 +1,7 @@
 .pageWrapper {
   display: flex;
-  background-color: var(--bg-tertiary);
-  padding: var(--spacing-3);
+  background-color: var(--bg-secondary-subtle);
+  padding: 0;
   height: 100vh;
   gap: var(--spacing-3);
 }
@@ -15,6 +15,7 @@
   flex: 1;
   overflow: auto;
   position: relative;
+  padding: var(--spacing-3);
 }
 
 .filters {

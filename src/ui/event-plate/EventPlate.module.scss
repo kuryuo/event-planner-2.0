@@ -1,0 +1,53 @@
+@use '@/typography-variables' as ty;
+
+.plate {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  width: 100%;
+  padding: var(--spacing-2) var(--spacing-3);
+  background: transparent;
+  border-radius: var(--radius-2);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: var(--bg-secondary-subtle);
+  }
+
+  &:active {
+    background-color: var(--bg-secondary);
+  }
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-2);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-05);
+  min-width: 0;
+}
+
+.title {
+  @include ty.font(body-m, regular);
+  color: var(--content-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.date {
+  @include ty.font(caption-m, regular);
+  color: var(--content-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

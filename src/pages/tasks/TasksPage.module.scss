@@ -1,0 +1,34 @@
+@use '@/typography-variables' as ty;
+
+.pageWrapper {
+  display: flex;
+  background-color: var(--bg-secondary-subtle);
+  padding: 0;
+  height: 100vh;
+  gap: var(--spacing-3);
+}
+
+.sidebar {
+  overflow: auto;
+  height: 100%;
+}
+
+.content {
+  flex: 1;
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-6);
+  padding: var(--spacing-10) var(--spacing-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.title {
+  @include ty.font(title-m, semibold);
+  color: var(--content-primary);
+}
+
+.subtitle {
+  @include ty.font(body-m, regular);
+  color: var(--content-secondary);
+}

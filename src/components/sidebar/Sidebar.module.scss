@@ -1,35 +1,62 @@
 @use '@/typography-variables' as ty;
 
-.block {
-  padding: var(--spacing-6) var(--spacing-4);
-  background-color: var(--bg-primary);
-  border-radius: var(--radius-6);
-}
-
 .sidebar {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-2);
-  width: 345px;
+  width: 280px;
   height: 100%;
-}
-
-.createEventWrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  background-color: var(--bg-primary);
+  padding: var(--spacing-6) var(--spacing-3);
   gap: var(--spacing-4);
 }
 
-.createEventText {
-  @include ty.font(subtitle-m, semibold);
-  color: var(--text-primary);
-  text-align: center;
+.userCard {
+  cursor: pointer;
 }
 
-.block:last-child {
-  flex: 1;
+.search {
+  width: 100%;
+}
+
+.navGroup {
   display: flex;
   flex-direction: column;
-  min-height: 0;
+  gap: var(--spacing-2);
+}
+
+.chevron {
+  transition: transform 0.2s ease;
+  transform: rotate(180deg);
+  width: 20px;
+  height: 20px;
+}
+
+.chevronExpanded {
+  transform: rotate(0deg);
+}
+
+.eventsSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.eventsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  padding-left: var(--spacing-3);
+}
+
+.createEventButton {
+  width: 100%;
+  justify-content: flex-start;
+  padding-left: var(--spacing-3);
+  padding-right: var(--spacing-3);
+}
+
+.sectionTitle {
+  @include ty.font(caption-m, regular);
+  color: var(--content-secondary);
+  padding-left: var(--spacing-3);
 }

@@ -16,6 +16,15 @@
   padding: var(--spacing-1) var(--spacing-05);
 }
 
+.variant-plain {
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  min-width: auto;
+  height: auto;
+  color: var(--content-secondary);
+}
+
 .variant-dot {
   display: inline-block;
 }

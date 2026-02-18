@@ -49,12 +49,12 @@ export default function ProfilePage() {
     const fullName = `${profile?.lastName ?? ''} ${profile?.firstName ?? ''}`.trim() || '—';
 
     return (
-        <div className={styles.pageWrapper}>
-            <div className={styles.sidebar}>
-                <Sidebar
-                    notificationCount={5}
-                />
-            </div>
+             <div className={styles.pageWrapper}>
+                 <div className={styles.sidebar}>
+                     <Sidebar
+                         notificationCount={5}
+                     />
+                 </div>
             <div className={styles.content}>
                 <button className={styles.backButton} onClick={handleBack}>
                     <ChevronLeftIcon className={styles.icon}/>
