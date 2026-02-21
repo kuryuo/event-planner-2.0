@@ -17,15 +17,15 @@ interface CategorySelectProps {
     initialCategories?: string[];
 }
 
-export default function Category({
-                                     error,
-                                     helperText,
-                                     disabled,
-                                     isOpen,
-                                     onOpenChange,
-                                     onSelectedChange,
-                                     initialCategories
-                                 }: CategorySelectProps) {
+export default function Tags({
+                                      error,
+                                      helperText,
+                                      disabled,
+                                      isOpen,
+                                      onOpenChange,
+                                      onSelectedChange,
+                                      initialCategories
+                                  }: CategorySelectProps) {
     const {chips, inputValue, setInputValue, addChip, removeChip, setChips} = useChips(initialCategories || []);
     const [internalIsOpen, setInternalIsOpen] = useState(false);
     const {data: categoriesData, isLoading} = useGetCategoriesQuery();
@@ -68,8 +68,8 @@ export default function Category({
     return (
         <div>
             <Select
-                label="Категории"
-                placeholder="Выберите категорию"
+                label="Теги"
+                placeholder="Выберите тег"
                 value={inputValue}
                 onChange={(e) => {
                     setInputValue(e.target.value);
@@ -113,6 +113,7 @@ export default function Category({
                             key={chip}
                             text={chip}
                             closable
+                            variant="outlined"
                             onClose={() => {
                                 removeChip(chip);
                                 const newChips = chips.filter(c => c !== chip);

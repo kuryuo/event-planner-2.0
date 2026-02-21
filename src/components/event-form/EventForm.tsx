@@ -4,23 +4,18 @@ import SegmentedControl from "../../ui/segmented-control/SegmentedControl.tsx";
 import styles from "./EventForm.module.scss";
 import TextField from "@/ui/text-field/TextField.tsx";
 import GeoAltIcon from "@/assets/img/icon-m/geo-alt.svg";
-import Map from "@/assets/img/icon-m/map.svg";
 import Plus from "@/assets/img/icon-s/plus-lg.svg";
-import Avatar from "@/ui/avatar/Avatar.tsx";
-import ColorPicker from "@/ui/color-picker/ColorPicker.tsx";
-import Switch from "@/ui/switch/Switch.tsx";
 import Select from "@/ui/select/Select.tsx";
 import Chip from "@/ui/chip/Chip.tsx";
-import PeopleIcon from "@/assets/img/icon-m/people.svg";
-import Checkbox from "@/ui/checkbox/Checkbox.tsx";
 import TextArea from "@/ui/text-area/TextArea.tsx";
 import Button from "@/ui/button/Button.tsx";
 import {useEventForm} from "@/hooks/ui/useEventForm.ts";
 import type {CreateEventPayload, EventResponse} from "@/types/api/Event.ts";
-import {filterDigits} from "@/utils/string.ts";
 import {useNavigate} from "react-router-dom";
 import {useGetCategoriesQuery} from "@/services/api/categoryApi.ts";
-import {useRef} from "react";
+import Divider from "@/ui/divider/Divider";
+import {useRef, useState} from "react";
+import ImageIcon from "@/assets/img/icon-m/image.svg?react";
 
 interface EventFormProps {
     eventData?: EventResponse | null;
@@ -39,6 +34,8 @@ export default function EventForm({
                                   }: EventFormProps) {
     const navigate = useNavigate();
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const [participantName, setParticipantName] = useState("");
+    const [participantsList, setParticipantsList] = useState<string[]>([]);
     const {data: categoriesData, isLoading: isLoadingCategories} = useGetCategoriesQuery();
 
     const categoryOptions = categoriesData?.result
@@ -55,24 +52,10 @@ export default function EventForm({
         setFormat,
         location,
         setLocation,
-        avatarColor,
-        setAvatarColor,
-        avatarFile: _avatarFile,
         avatarPreview,
         handleAvatarChange,
-        isPrivate,
-        setIsPrivate,
         showCategorySelect,
         setShowCategorySelect,
-        participants,
-        setParticipants,
-        isParticipantsUnlimited,
-        setIsParticipantsUnlimited,
-        roles,
-        roleInputValue,
-        setRoleInputValue,
-        removeRole,
-        handleRoleKeyDown,
         description,
         setDescription,
         categories,
@@ -83,6 +66,8 @@ export default function EventForm({
         handleKeyDown,
         preparePayload,
     } = useEventForm(eventData);
+
+    const mockTypes = ["Хакатон", "Лекция", "Вебинар", "УрФУ", "ПП", "Спецкурс", "Практика"];
 
     const handleSubmit = () => {
         const payload = preparePayload();
@@ -105,164 +90,169 @@ export default function EventForm({
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                 />
-                <button className={styles.closeButton} onClick={handleClose}>
-                    <img src={CloseIcon} alt="close"/>
-                </button>
-            </div>
-            <div className={styles.form}>
-                <div className={styles.date}>
-                    <span className={styles.title}>Дата и место</span>
-                    <DateTimeSection/>
-                    <SegmentedControl
-                        options={["Очно", "Онлайн", "Гибрид"]}
-                        selected={format}
-                        onChange={setFormat}
-                    />
-                    <TextField
-                        placeholder="Место"
-                        value={location}
-                        onChange={e => setLocation(e.target.value)}
-                        leftIcon={<img src={GeoAltIcon} alt="location"/>}
-                        rightIcon={<img src={Map} alt="adornment"/>}
-                        fieldSize="M"
-                    />
+                    <button className={styles.closeButton} onClick={handleClose}>
+                        <img src={CloseIcon} alt="close"/>
+                    </button>
                 </div>
-                <div className={styles.avatar}>
-                    <span className={styles.title}>Аватар и цвет</span>
-                    <div className={styles.avatarRow}>
-                        <Avatar
-                            size="L"
-                            variant="update"
-                            avatarUrl={avatarPreview || undefined}
-                            name=""
-                            onClick={() => fileInputRef.current?.click()}
+            <div className={styles.contentGrid}>
+                <div className={styles.form}>
+                    <div className={styles.section}>
+                        <span className={styles.title}>Дата и время</span>
+                        <DateTimeSection/>
+                    </div>
+
+                    <div className={styles.section}>
+                        <span className={styles.title}>Место</span>
+                        <SegmentedControl
+                            options={["Очно", "Онлайн", "Гибрид"]}
+                            selected={format}
+                            onChange={setFormat}
                         />
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            style={{display: 'none'}}
-                            onChange={handleAvatarChange}
-                        />
-                        <ColorPicker
-                            value={avatarColor}
-                            onChange={setAvatarColor}
+                        <TextField
+                            placeholder="Адрес"
+                            value={location}
+                            onChange={e => setLocation(e.target.value)}
+                            leftIcon={<img src={GeoAltIcon} alt="location"/>}
+                            fieldSize="M"
                         />
                     </div>
-                    <span className={styles.hint}>
-                        Рекомендуем изображение шириной минимум 160 пикселей
-                    </span>
-                </div>
 
-                <div className={styles.categories}>
-                    <span className={styles.title}>Категория</span>
-                    <button
-                        className={styles.categoryButton}
-                        onClick={() => setShowCategorySelect(prev => !prev)}
-                    >
-                        <img src={Plus} alt="Добавить"/>
-                    </button>
+                    <div className={styles.section}>
+                        <span className={styles.title}>Тип</span>
+                        <div className={styles.chipContainer}>
+                            {mockTypes.map((type) => (
+                                <Chip key={type} text={type} size="S" />
+                            ))}
+                        </div>
+                    </div>
 
-                    {showCategorySelect && (
-                        <>
-                            <Select
-                                placeholder="Выберите категорию"
-                                value={inputValue}
-                                onChange={(e) => setInputValue(e.target.value)}
-                                onKeyDown={handleKeyDown}
-                                disabled={isLoadingCategories}
-                                options={categoryOptions}
-                                onOptionClick={(option) => {
-                                    if (option.label) {
-                                        addChip(option.label);
-                                        setInputValue('');
-                                    }
+                    <Divider />
+
+                    <div className={styles.section}>
+                        <span className={styles.title}>Участники</span>
+                        <div className={styles.inlineRow}>
+                            <div className={styles.growField}>
+                                <TextField
+                                    placeholder="Имя"
+                                    value={participantName}
+                                    onChange={(e) => setParticipantName(e.target.value)}
+                                />
+                            </div>
+                            <Button
+                                variant="Filled"
+                                color="gray"
+                                disabled={!participantName.trim()}
+                                onClick={() => {
+                                    const trimmed = participantName.trim();
+                                    if (!trimmed) return;
+                                    setParticipantsList((prev) => [...prev, trimmed]);
+                                    setParticipantName("");
                                 }}
-                            />
+                            >
+                                Добавить
+                            </Button>
+                        </div>
 
+                        {participantsList.length > 0 && (
                             <div className={styles.chipContainer}>
-                                {categories.map((category) => (
+                                {participantsList.map((name) => (
                                     <Chip
-                                        key={category}
-                                        text={category}
+                                        key={name}
+                                        text={name}
                                         closable
-                                        onClose={() => removeChip(category)}
+                                        onClose={() => setParticipantsList((prev) => prev.filter((item) => item !== name))}
                                     />
                                 ))}
                             </div>
-                        </>
-                    )}
-
-                    <Switch
-                        checked={isPrivate}
-                        onCheckedChange={setIsPrivate}
-                        label="Закрытое мероприятие"
-                        labelPosition="right"
-                        size="M"
-                        disabled={false}
-                    />
-                </div>
-
-                <div className={styles.participants}>
-                    <span className={styles.title}>Участники</span>
-                    <div className={styles.participantsRow}>
-                        <TextField
-                            placeholder="Количество"
-                            leftIcon={<img src={PeopleIcon} alt="people"/>}
-                            type="number"
-                            inputMode="numeric"
-                            pattern="\d*"
-                            value={participants}
-                            onChange={(e) => setParticipants(filterDigits(e.target.value))}
-                            disabled={isParticipantsUnlimited}
-                            fieldSize="M"
-                        />
-                        <div className={styles.participantsToggle}>
-                            <Checkbox
-                                checked={isParticipantsUnlimited}
-                                onChange={() => setIsParticipantsUnlimited(prev => !prev)}
-                            />
-                            <span className={styles.participantsLabel}>Не ограничено</span>
-                        </div>
+                        )}
                     </div>
 
-                    <div className={styles.participantsRoles}>
-                        <div className={styles.chipContainer}>
-                            {roles.map((role) => {
-                                const isDefaultRole = role === "Организатор" || role === "Участник";
-                                return (
-                                    <Chip
-                                        key={role}
-                                        text={role}
-                                        closable={!isDefaultRole}
-                                        onClose={() => removeRole(role)}
-                                    />
-                                );
-                            })}
-                        </div>
-                        <TextField
-                            placeholder="Введите роль"
-                            value={roleInputValue}
-                            onChange={(e) => setRoleInputValue(e.target.value)}
-                            onKeyDown={handleRoleKeyDown}
+                    <Divider />
+
+                    <div className={styles.section}>
+                        <span className={styles.title}>Теги</span>
+                        <button
+                            className={styles.categoryButton}
+                            onClick={() => setShowCategorySelect(prev => !prev)}
+                        >
+                            <img src={Plus} alt="Добавить"/>
+                        </button>
+
+                        {showCategorySelect && (
+                            <>
+                                <Select
+                                    placeholder="Выберите тег"
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                    disabled={isLoadingCategories}
+                                    options={categoryOptions}
+                                    onOptionClick={(option) => {
+                                        if (option.label) {
+                                            addChip(option.label);
+                                            setInputValue('');
+                                        }
+                                    }}
+                                />
+
+                                <div className={styles.chipContainer}>
+                                    {categories.map((category) => (
+                                        <Chip
+                                            key={category}
+                                            text={category}
+                                            closable
+                                            onClose={() => removeChip(category)}
+                                        />
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    <div className={styles.section}>
+                        <TextArea
+                            placeholder="Описание"
+                            label="Описание"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
                         />
+                    </div>
+
+                    <div className={styles.actions}>
+                        <Button variant="Filled" color="purple" type="button" onClick={handleSubmit}>
+                            {isEditMode ? 'Сохранить изменения' : 'Создать'}
+                        </Button>
                     </div>
                 </div>
 
-                <div className={styles.description}>
-                    <TextArea
-                        placeholder="Описание"
-                        label="Описание"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                <div className={styles.coverPanel}>
+                    <span className={styles.title}>Обложка</span>
+                    <span className={styles.hint}>Рекомендуемый размер - 544x213 пикселей.</span>
+
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        className={styles.hiddenInput}
+                        onChange={handleAvatarChange}
                     />
+
+                    <button
+                        type="button"
+                        className={styles.coverUpload}
+                        onClick={() => fileInputRef.current?.click()}
+                    >
+                        {avatarPreview ? (
+                            <img src={avatarPreview} alt="Обложка" className={styles.coverPreview} />
+                        ) : (
+                            <div className={styles.coverUploadInner}>
+                                <ImageIcon />
+                                <span>Загрузите изображение</span>
+                            </div>
+                        )}
+                    </button>
                 </div>
 
-                <div className={styles.actions}>
-                    <Button variant="Filled" color="purple" type="button" onClick={handleSubmit}>
-                        {isEditMode ? 'Сохранить изменения' : 'Создать'}
-                    </Button>
-                </div>
             </div>
         </div>
     );

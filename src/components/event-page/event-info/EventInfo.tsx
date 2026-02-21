@@ -37,6 +37,7 @@ export default function EventInfo({categories, date, location, description, colo
                             text={category.text}
                             size="M"
                             color={appColor}
+                            variant="filled"
                         />
                     ))}
                 </div>

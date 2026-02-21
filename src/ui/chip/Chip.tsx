@@ -7,26 +7,37 @@ interface ChipProps {
     text: string;
     size?: "S" | "M";
     closable?: boolean;
+    variant?: "outlined" | "filled";
     color?: AppColor;
     onClose?: () => void;
     className?: string;
 }
 
 const Chip = ({
-                  text,
-                  size = "M",
-                  closable = false,
-                  color = "pink",
-                  onClose,
-                  className
-              }: ChipProps) => {
+                   text,
+                   size = "M",
+                   closable = false,
+                   variant = "outlined",
+                   color = "pink",
+                   onClose,
+                   className
+               }: ChipProps) => {
     return (
         <div
-            className={clsx(styles.chip, styles[`size-${size}`], className)}
-            style={{
-                "--chip-bg": `var(--bg-${color})`,
-                "--chip-color": `var(--content-${color})`
-            } as React.CSSProperties}
+            className={clsx(
+                styles.chip,
+                styles[`size-${size}`],
+                styles[variant],
+                className
+            )}
+            style={
+                variant === "filled"
+                    ? ({
+                        "--chip-bg": `var(--bg-${color})`,
+                        "--chip-color": `var(--content-${color})`,
+                    } as React.CSSProperties)
+                    : undefined
+            }
         >
             <span className={styles.text}>{text}</span>
             {closable && (

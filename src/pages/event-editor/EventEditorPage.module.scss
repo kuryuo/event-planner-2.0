@@ -13,6 +13,9 @@
 
 .form {
   flex: 1;
-  overflow: auto;
+  overflow: hidden;
   position: relative;
+  padding: var(--spacing-3);
+  min-height: 0;
+  display: flex;
 }

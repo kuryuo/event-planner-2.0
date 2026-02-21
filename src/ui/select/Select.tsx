@@ -20,19 +20,21 @@ interface SelectProps extends React.InputHTMLAttributes<HTMLInputElement> {
     onOpenChange?: (isOpen: boolean) => void;
     onOptionClick?: (option: Option) => void;
     selectedValues?: string[];
+    shape?: 'rounded' | 'square';
 }
 
 export default function Select({
-                                   label,
-                                   leftIcon,
-                                   rightIcon,
-                                   error,
-                                   helperText,
-                                   disabled,
-                                   options = [
-                                       {label: 'Текст', description: 'Описание под текстом'},
-                                       {label: 'Текст 2', description: 'Описание под текстом'},
-                                   ],
+                                    label,
+                                    leftIcon,
+                                    rightIcon,
+                                    error,
+                                    helperText,
+                                    disabled,
+                                    shape = 'rounded',
+                                    options = [
+                                        {label: 'Текст', description: 'Описание под текстом'},
+                                        {label: 'Текст 2', description: 'Описание под текстом'},
+                                    ],
                                    isOpen: controlledIsOpen,
                                    onOpenChange,
                                    onOptionClick,
@@ -59,7 +61,9 @@ export default function Select({
                 </label>
             )}
 
-            <div className={`${styles.wrapper} ${error ? styles.error : ''} ${disabled ? styles.disabled : ''}`}>
+            <div
+                className={`${styles.wrapper} ${shape === 'square' ? styles.square : ''} ${error ? styles.error : ''} ${disabled ? styles.disabled : ''}`}
+            >
                 {leftIcon && <span className={styles.leftIcon}>{leftIcon}</span>}
                 <input
                     placeholder="placeholder"
@@ -109,6 +113,7 @@ export default function Select({
                     <Menu
                         options={options as MenuOption[]}
                         selectedValues={selectedValues}
+                        shape={shape}
                         onOptionClick={(option) => {
                             if (onOptionClick) {
                                 onOptionClick(option);

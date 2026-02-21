@@ -1,0 +1,62 @@
+@use '@/typography-variables' as ty;
+
+.dropdown {
+  position: fixed;
+  width: 344px;
+  max-width: min(344px, calc(100vw - var(--spacing-8)));
+  max-height: min(78vh, 720px);
+  z-index: 2000;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-4);
+  box-shadow: var(--lvl2);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  padding: var(--spacing-4);
+  overflow-y: auto;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.sectionTitle {
+  @include ty.font(caption-m, semibold);
+  color: var(--content-secondary);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.listItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  padding: var(--spacing-1) 0;
+}
+
+.emptyText {
+  @include ty.font(caption-m, regular);
+  color: var(--content-secondary);
+}
+
+.recentChip {
+  border: none;
+  border-radius: var(--radius-100);
+  background-color: var(--bg-secondary);
+  color: var(--content-primary);
+}

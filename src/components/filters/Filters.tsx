@@ -4,7 +4,7 @@ import Checkbox from '@/ui/checkbox/Checkbox';
 import CloseIcon from '@/assets/img/icon-m/x.svg';
 import CalendarIcon from '@/assets/img/icon-m/calendar.svg?react';
 import Organizers from "@/components/filters/organizers/Organizers";
-import Category from "@/components/filters/сategory/Category";
+import Tags from "@/components/filters/сategory/Category";
 import Switch from "@/ui/switch/Switch.tsx";
 import Button from "@/ui/button/Button";
 import {DatePicker} from "@/ui/date-picker/DatePicker.tsx";
@@ -15,6 +15,8 @@ import {ru} from "date-fns/locale";
 import type {Organizer} from "@/types/api/User.ts";
 import type {GetEventsPayload} from "@/types/api/Event.ts";
 import {useGetOrganizersQuery} from "@/services/api/userApi.ts";
+import Divider from "@/ui/divider/Divider";
+import Chip from "@/ui/chip/Chip";
 
 interface FiltersProps {
     onClose?: () => void;
@@ -29,15 +31,16 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
         online: false,
     });
 
-    const [mySubscriptions, setMySubscriptions] = useState(false);
-    const [availableSeats, setAvailableSeats] = useState(false);
-    const [openSelect, setOpenSelect] = useState<'organizers' | 'category' | null>(null);
+    const [myEvents, setMyEvents] = useState(false);
+    const [openSelect, setOpenSelect] = useState<'organizers' | 'tags' | null>(null);
     const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [selectedOrganizers, setSelectedOrganizers] = useState<Organizer[]>([]);
-    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const datePickerRef = useRef<HTMLDivElement>(null);
     const {data: organizersData} = useGetOrganizersQuery();
+
+    const mockTypeChips = ["хакатон", "лекция", "урФУ", "спецкурс"];
 
     const toggleFormat = (key: keyof typeof formats) => {
         setFormats(prev => ({...prev, [key]: !prev[key]}));
@@ -74,12 +77,8 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
                 }
             }
 
-            if (appliedFilters.HasFreePlaces) {
-                setAvailableSeats(true);
-            }
-
             if (appliedFilters.Categories) {
-                setSelectedCategories(appliedFilters.Categories);
+                setSelectedTags(appliedFilters.Categories);
             }
 
             if (appliedFilters.Organizators && organizersData) {
@@ -115,12 +114,8 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
             filters.Organizators = selectedOrganizers.map(org => org.id);
         }
 
-        if (selectedCategories.length > 0) {
-            filters.Categories = selectedCategories;
-        }
-
-        if (availableSeats) {
-            filters.HasFreePlaces = true;
+        if (selectedTags.length > 0) {
+            filters.Categories = selectedTags;
         }
 
         onApply?.(filters);
@@ -133,11 +128,10 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
             hybrid: false,
             online: false,
         });
-        setMySubscriptions(false);
-        setAvailableSeats(false);
+        setMyEvents(false);
         setDateRange(undefined);
         setSelectedOrganizers([]);
-        setSelectedCategories([]);
+        setSelectedTags([]);
         onApply?.({Count: 50});
     };
 
@@ -198,6 +192,24 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
                 </div>
             </div>
 
+            <div className={styles.typeSection}>
+                <span className={styles.typeTitle}>Тип</span>
+                <div className={styles.typeChips}>
+                    {mockTypeChips.map((t) => (
+                        <Chip key={t} text={t} size="S" />
+                    ))}
+                </div>
+            </div>
+
+            <div className={styles.selectSection}>
+                <Tags
+                    isOpen={openSelect === 'tags'}
+                    onOpenChange={(isOpen) => setOpenSelect(isOpen ? 'tags' : null)}
+                    onSelectedChange={setSelectedTags}
+                    initialCategories={selectedTags}
+                />
+            </div>
+
             <div className={styles.selectSection}>
                 <Organizers
                     isOpen={openSelect === 'organizers'}
@@ -207,38 +219,15 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
                 />
             </div>
 
-            <div className={styles.selectSection}>
-                <Category
-                    isOpen={openSelect === 'category'}
-                    onOpenChange={(isOpen) => setOpenSelect(isOpen ? 'category' : null)}
-                    onSelectedChange={setSelectedCategories}
-                    initialCategories={selectedCategories}
+            <Divider />
+
+            <div className={styles.switchRow}>
+                <Switch
+                    checked={myEvents}
+                    onCheckedChange={setMyEvents}
+                    label="Мои мероприятия"
+                    labelPosition="left"
                 />
-            </div>
-
-
-            <div className={styles.subscriptionList}>
-                <span className={styles.sectionTitle}>Другое</span>
-
-                <div className={styles.switchGroup}>
-                    <div className={styles.subscriptionItem}>
-                        <Switch
-                            checked={mySubscriptions}
-                            onCheckedChange={setMySubscriptions}
-                            label="Мои подписки"
-                            labelPosition="left"
-                        />
-                    </div>
-
-                    <div className={styles.subscriptionItem}>
-                        <Switch
-                            checked={availableSeats}
-                            onCheckedChange={setAvailableSeats}
-                            label="Есть места"
-                            labelPosition="left"
-                        />
-                    </div>
-                </div>
             </div>
 
             <div className={styles.actions}>

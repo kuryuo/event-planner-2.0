@@ -15,7 +15,13 @@
 }
 
 .search {
+  position: relative;
   width: 100%;
+  z-index: 20;
+
+  :global(input) {
+    cursor: pointer;
+  }
 }
 
 .navGroup {

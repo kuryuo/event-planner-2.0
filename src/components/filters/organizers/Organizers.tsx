@@ -79,7 +79,7 @@ export default function Organizers({isOpen, onOpenChange, onSelectedChange, init
     return (
         <div>
             <Select
-                label="Организаторы"
+                label="Организатор"
                 placeholder="Выберите организатора"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}

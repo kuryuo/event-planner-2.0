@@ -18,7 +18,7 @@
   width: 340px;
   flex-direction: column;
   gap: var(--spacing-8);
-  border-radius: var(--spacing-6) 0 0 var(--spacing-6);
+  border-radius: 0;
   padding: var(--spacing-10) var(--spacing-6);
   background-color: var(--bg-primary);
   height: 100%;
@@ -137,6 +137,39 @@
         box-shadow: var(--lvl2);
         padding: var(--spacing-2);
       }
+    }
+  }
+
+  .selectSection {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  .typeSection {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+
+    .typeTitle {
+      @include ty.font(subtitle-m, semibold);
+    }
+
+    .typeChips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-2);
+    }
+  }
+
+  .switchRow {
+    width: 100%;
+
+    > label {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
   }
 }

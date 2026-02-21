@@ -10,7 +10,7 @@ import clsx from 'clsx';
 import {buildImageUrl} from "@/utils/buildImageUrl.ts";
 import {useGetProfileEventsQuery, useGetProfileQuery} from "@/services/api/profileApi.ts";
 import {useNavigate} from "react-router-dom";
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {format} from 'date-fns';
 import {ru} from 'date-fns/locale';
 
@@ -22,6 +22,7 @@ import FaceSmileIcon from '@/assets/image/face-smile.svg?react';
 import ChevronIcon from '@/assets/image/chevron.svg?react';
 import PlusIcon from '@/assets/image/plus-lg.svg?react';
 import BoxArchiveIcon from '@/assets/image/box-archive.svg?react';
+import SearchModal from '@/components/sidebar/search-modal/SearchModal';
 
 interface SidebarProps {
     notificationCount?: number;
@@ -34,6 +35,28 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
     const navigate = useNavigate();
     const fallbackAvatar = 'https://api.dicebear.com/7.x/shapes/png?size=200&radius=12';
     const [eventsExpanded, setEventsExpanded] = useState(false);
+    const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+    const searchRef = useRef<HTMLDivElement>(null);
+    const searchDropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!isSearchModalOpen) {
+            return;
+        }
+
+        const handleOutsideClick = (event: MouseEvent) => {
+            const target = event.target as Node;
+            const clickedSearch = searchRef.current?.contains(target);
+            const clickedDropdown = searchDropdownRef.current?.contains(target);
+
+            if (!clickedSearch && !clickedDropdown) {
+                setIsSearchModalOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleOutsideClick);
+        return () => document.removeEventListener('mousedown', handleOutsideClick);
+    }, [isSearchModalOpen]);
 
     const handleProfileClick = () => {
         navigate("/profile");
@@ -62,11 +85,25 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
 
             <Divider />
 
-            <div className={styles.search}>
+            <div className={styles.search} ref={searchRef}>
                 <TextField
-                    placeholder="Поиск"
+                    placeholder="Поиск..."
                     leftIcon={<SearchIcon />}
                     aria-label="Поиск"
+                    onClick={() => setIsSearchModalOpen(true)}
+                    onFocus={() => setIsSearchModalOpen(true)}
+                />
+
+                <SearchModal
+                    isOpen={isSearchModalOpen}
+                    onClose={() => setIsSearchModalOpen(false)}
+                    events={subscribedEvents ?? []}
+                    anchorRef={searchRef}
+                    panelRef={searchDropdownRef}
+                    onEventClick={(eventId) => {
+                        setIsSearchModalOpen(false);
+                        navigate(`/event?id=${eventId}`);
+                    }}
                 />
             </div>
 
@@ -144,6 +181,7 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
                     onClick={() => navigate('/archive')}
                 />
             </div>
+
         </div>
     );
 }

@@ -3,11 +3,21 @@
 .chip {
   display: inline-flex;
   align-items: center;
-  border-radius: var(--radius-4);
-  background-color: var(--chip-bg, var(--bg-pink));
-  color: var(--chip-color, var(--content-pink));
+  border-radius: var(--radius-100);
   font-weight: 500;
   cursor: default;
+
+  &.outlined {
+    background-color: transparent;
+    border: 1px solid var(--border-primary);
+    color: var(--content-primary);
+  }
+
+  &.filled {
+    border: none;
+    background-color: var(--chip-bg, var(--bg-pink));
+    color: var(--chip-color, var(--content-pink));
+  }
 
   .text {
     white-space: nowrap;

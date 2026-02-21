@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import clsx from 'clsx';
 import styles from './Menu.module.scss';
 import TextField from '../text-field/TextField';
 import Check2Icon from '@/assets/img/icon-m/check2.svg';
@@ -19,6 +20,7 @@ interface MenuProps {
     withNewRoleInput?: boolean;
     onNewRoleCreate?: (roleName: string) => void;
     selectedValues?: string[];
+    shape?: 'rounded' | 'square';
 }
 
 export default function Menu({ 
@@ -28,7 +30,8 @@ export default function Menu({
     searchPlaceholder = 'Поиск...', 
     withNewRoleInput = false,
     onNewRoleCreate,
-    selectedValues = [] 
+    selectedValues = [],
+    shape = 'rounded',
 }: MenuProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [newRoleName, setNewRoleName] = useState('');
@@ -62,7 +65,7 @@ export default function Menu({
     };
 
     return (
-        <div className={styles.menuContainer}>
+        <div className={clsx(styles.menuContainer, shape === 'square' && styles.square)}>
             {withSearch && (
                 <>
                     <div className={styles.searchWrapper}>
