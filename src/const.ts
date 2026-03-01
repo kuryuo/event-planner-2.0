@@ -36,12 +36,15 @@ export const CALENDAR_OPTIONS = {
 };
 
 export const EVENT_FORMAT_MAP: Record<string, string> = {
-    "Очно": "offline",
-    "Онлайн": "online",
-    "Гибрид": "hybrid"
+    "Очно": "InPerson",
+    "Онлайн": "Online",
+    "Гибрид": "Hybrid"
 };
 
 export const FORMAT_REVERSE_MAP: Record<string, string> = {
+    "InPerson": "Очно",
+    "Online": "Онлайн",
+    "Hybrid": "Гибрид",
     "offline": "Очно",
     "online": "Онлайн",
     "hybrid": "Гибрид"

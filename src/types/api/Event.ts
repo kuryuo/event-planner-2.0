@@ -3,32 +3,54 @@ export interface EventResponse {
     name: string;
     description: string;
     startDate: string;
-    endDate: string;
+    endDate: string | null;
     location: string;
-    format: string;
+    auditorium?: string | null;
+    format?: string;
+    venueFormat?: VenueFormat;
     eventType: string;
-    responsiblePersonId: string;
+    responsiblePersonId?: string;
     maxParticipants: number;
     categories: string[];
+    types?: EventTypeKind[];
     previewPhotos: string[];
     status: string | null;
     avatar?: string | null;
     color?: string;
 }
 
+export type VenueFormat = 'InPerson' | 'Online' | 'Hybrid';
+
+export type EventTypeKind =
+    | 'Hackathon'
+    | 'Lecture'
+    | 'Webinar'
+    | 'UrFU'
+    | 'PP'
+    | 'SpecialCourse'
+    | 'Practice';
+
+export type ParticipantRoleKind = 'Organizer' | 'Editor' | 'Assistant' | 'Observer';
+
+export interface EventParticipantAssignment {
+    userId: string;
+    role: ParticipantRoleKind;
+}
+
 export interface CreateEventPayload {
     name: string;
     description: string;
     startDate: string;
-    endDate: string;
+    endDate?: string | null;
     location: string;
-    format: string;
-    eventType: string;
-    responsiblePersonId: string;
-    maxParticipants: number;
-    categories: string[];
-    roles: string[];
-    color: string;
+    auditorium?: string | null;
+    venueFormat: VenueFormat;
+    categories?: string[];
+    types?: EventTypeKind[];
+    participants?: EventParticipantAssignment[];
+    responsiblePersonId?: string;
+    maxParticipants?: number | null;
+    color?: string | null;
     avatar?: File | null;
 }
 
@@ -37,9 +59,12 @@ export interface GetEventsPayload {
     End?: string;
     Name?: string;
     Organizators?: string[];
+    VenueFormat?: VenueFormat;
+    Types?: EventTypeKind[];
     Format?: string;
     HasFreePlaces?: boolean;
     Categories?: string[];
+    MyEvents?: boolean;
     Offset?: number;
     Count?: number;
 }
@@ -55,15 +80,14 @@ export interface GetEventByIdResponse {
 export interface UpdateEventPayload {
     name: string;
     description: string;
-    startDate: string;
-    endDate: string;
+    startDate?: string | null;
+    endDate?: string | null;
     location: string;
-    format: string;
-    eventType: string;
-    maxParticipants: number;
-    categories: string[];
-    roles: string[];
-    color: string;
+    auditorium?: string | null;
+    venueFormat: VenueFormat;
+    types?: EventTypeKind[];
+    maxParticipants?: number | null;
+    color?: string | null;
     avatar?: File | null;
 }
 
@@ -209,7 +233,7 @@ export interface GetEventRolesResponse {
 export interface AssignUserRolePayload {
     eventId: string;
     userId: string;
-    roleId: string;
+    participantRole: ParticipantRoleKind;
 }
 
 export interface CreateEventRolePayload {
