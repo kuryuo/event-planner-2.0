@@ -36,6 +36,13 @@ export const eventApi = baseApi.injectEndpoints({
             }),
             providesTags: ['Event'],
         }),
+        getMyEvents: builder.query<GetEventsResponse, void>({
+            query: () => ({
+                url: '/events/myevents',
+                method: 'GET',
+            }),
+            providesTags: ['Event'],
+        }),
         /**
          * Получить мероприятие по ID
          */
@@ -204,7 +211,7 @@ export const eventApi = baseApi.injectEndpoints({
                 };
             },
             invalidatesTags: (result, _error, {eventId}) =>
-                result ? [{type: 'Event', id: eventId}, 'Event'] : [],
+                result ? [{type: 'Event', id: eventId}, 'Event', 'Profile'] : ['Profile'],
         }),
         /**
          * Получить роли в рамках мероприятия
@@ -225,9 +232,12 @@ export const eventApi = baseApi.injectEndpoints({
          * Дать пользователю роль на мероприятии
          */
         assignUserRole: builder.mutation<void, AssignUserRolePayload>({
-            query: ({eventId, userId, roleId}) => ({
-                url: `/events/${eventId}/users/${userId}/roles/${roleId}`,
+            query: ({eventId, userId, participantRole}) => ({
+                url: `/events/${eventId}/users/${userId}/roles`,
                 method: 'POST',
+                body: {
+                    participantRole,
+                },
             }),
             invalidatesTags: (result, _error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
@@ -277,6 +287,7 @@ export const eventApi = baseApi.injectEndpoints({
 
 export const {
     useGetEventsQuery,
+    useGetMyEventsQuery,
     useGetEventByIdQuery,
     useCreateEventMutation,
     useUpdateEventMutation,

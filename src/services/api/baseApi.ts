@@ -135,6 +135,6 @@ const baseQueryWithReauth: typeof rawBaseQuery = async (args, api, extraOptions)
 
 export const baseApi = createApi({
     baseQuery: baseQueryWithReauth,
-    tagTypes: ['Event', 'Profile', 'EventPost', 'Category'],
+    tagTypes: ['Event', 'Profile', 'EventPost', 'Category', 'Chat', 'Notification'],
     endpoints: () => ({}),
 })
