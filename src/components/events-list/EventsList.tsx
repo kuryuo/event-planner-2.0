@@ -11,7 +11,7 @@ interface Event {
     description: string;
     avatar?: string | null;
     startDate: string;
-    endDate: string;
+    endDate: string | null;
     location: string;
     categories: string[];
     responsiblePersonId: string;
@@ -56,7 +56,7 @@ export default function EventsList({events, currentMonth}: EventsListProps) {
                             location={event.location}
                             categories={event.categories}
                             startDate={event.startDate}
-                            endDate={event.endDate}
+                            endDate={event.endDate ?? event.startDate}
                             coverUrl={buildImageUrl(event.avatar)}
                             organizers={
                                 organizer

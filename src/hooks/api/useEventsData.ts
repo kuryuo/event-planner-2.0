@@ -1,5 +1,5 @@
 import {useMemo} from 'react';
-import {useGetEventsQuery} from '@/services/api/eventApi.ts';
+import {useGetEventsQuery, useGetMyEventsQuery} from '@/services/api/eventApi.ts';
 import type {EventResponse, GetEventsPayload} from '@/types/api/Event.ts';
 
 export interface UseEventsOutput {
@@ -18,7 +18,7 @@ export interface UseEventsOutput {
         description: string;
         avatar?: string | null;
         startDate: string;
-        endDate: string;
+        endDate: string | null;
         location: string;
         categories: string[];
         responsiblePersonId: string;
@@ -27,7 +27,20 @@ export interface UseEventsOutput {
 
 export const useEventsData = (filters?: GetEventsPayload): UseEventsOutput => {
     const payload: GetEventsPayload = filters || {Count: 50};
-    const {data} = useGetEventsQuery(payload);
+    const isMyEvents = !!payload.MyEvents;
+
+    const queryPayload = useMemo(() => {
+        if (!isMyEvents) {
+            return payload;
+        }
+
+        const {MyEvents, ...rest} = payload;
+        return rest;
+    }, [payload, isMyEvents]);
+
+    const {data: allEventsData} = useGetEventsQuery(queryPayload, {skip: isMyEvents});
+    const {data: myEventsData} = useGetMyEventsQuery(undefined, {skip: !isMyEvents});
+    const data = isMyEvents ? myEventsData : allEventsData;
 
     const {calendarEvents, listEvents} = useMemo(() => {
         const events = (data?.result || []) as EventResponse[];
@@ -35,7 +48,7 @@ export const useEventsData = (filters?: GetEventsPayload): UseEventsOutput => {
             id: e.id,
             title: e.name,
             start: new Date(e.startDate),
-            end: new Date(e.endDate),
+            end: new Date(e.endDate ?? e.startDate),
             extendedProps: {
                 color: e.color,
             },
@@ -51,7 +64,7 @@ export const useEventsData = (filters?: GetEventsPayload): UseEventsOutput => {
                 endDate: e.endDate,
                 location: e.location,
                 categories: e.categories ?? [],
-                responsiblePersonId: e.responsiblePersonId,
+                responsiblePersonId: e.responsiblePersonId ?? '',
             };
         });
 
