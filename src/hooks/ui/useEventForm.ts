@@ -1,28 +1,45 @@
-import {useState, useEffect, useRef} from "react";
-import {useDateTime} from "@/hooks/api/useDateTime.ts";
-import {useChips} from "@/hooks/ui/useChips.ts";
-import type {CreateEventPayload, UpdateEventPayload, EventResponse} from "@/types/api/Event.ts";
-import {EVENT_FORMAT_MAP, FORMAT_REVERSE_MAP} from "@/const.ts";
-import {combineDateTime, parseDateTime} from "@/utils/date";
-import {useGetProfileQuery} from "@/services/api/profileApi.ts";
-import {useGetEventRolesQuery} from "@/services/api/eventApi.ts";
-import {buildImageUrl} from "@/utils/buildImageUrl.ts";
+import {useState, useEffect, useRef} from 'react';
+import {useDateTime} from '@/hooks/api/useDateTime.ts';
+import {useChips} from '@/hooks/ui/useChips.ts';
+import type {CreateEventPayload, EventResponse, EventTypeKind, UpdateEventPayload, VenueFormat} from '@/types/api/Event.ts';
+import {EVENT_FORMAT_MAP, FORMAT_REVERSE_MAP} from '@/const.ts';
+import {buildImageUrl} from '@/utils/buildImageUrl.ts';
+import {combineDateTime, parseDateTime} from '@/utils/date';
+
+const EVENT_TYPE_OPTIONS: EventTypeKind[] = [
+    'Hackathon',
+    'Lecture',
+    'Webinar',
+    'UrFU',
+    'PP',
+    'SpecialCourse',
+    'Practice',
+];
+
+const VENUE_FORMAT_MAP: Record<string, VenueFormat> = {
+    InPerson: 'InPerson',
+    Online: 'Online',
+    Hybrid: 'Hybrid',
+    offline: 'InPerson',
+    online: 'Online',
+    hybrid: 'Hybrid',
+};
 
 export const useEventForm = (eventData?: EventResponse | null) => {
-    const {data: profile} = useGetProfileQuery();
     const {startDate, endDate, startTime, endTime, setStartDate, setEndDate, setStartTime, setEndTime} = useDateTime();
 
-    const [title, setTitle] = useState("");
-    const [format, setFormat] = useState("Очно");
-    const [location, setLocation] = useState("");
-    const [avatarColor, setAvatarColor] = useState("#C2185B");
+    const [title, setTitle] = useState('');
+    const [format, setFormat] = useState('Очно');
+    const [location, setLocation] = useState('');
+    const [auditorium, setAuditorium] = useState('');
+    const [avatarColor, setAvatarColor] = useState('#C2185B');
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-    const [isPrivate, setIsPrivate] = useState(false);
     const [showCategorySelect, setShowCategorySelect] = useState(false);
-    const [participants, setParticipants] = useState("");
+    const [participants, setParticipants] = useState('');
     const [isParticipantsUnlimited, setIsParticipantsUnlimited] = useState(true);
-    const [description, setDescription] = useState("");
+    const [description, setDescription] = useState('');
+    const [selectedTypes, setSelectedTypes] = useState<EventTypeKind[]>([]);
 
     const isInitialized = useRef(false);
     const initializedEventId = useRef<string | null>(null);
@@ -38,60 +55,29 @@ export const useEventForm = (eventData?: EventResponse | null) => {
         setChips: setCategories,
     } = useChips();
 
-    const DEFAULT_ROLES = ["Организатор", "Участник"];
-    
-    const {
-        chips: roles,
-        inputValue: roleInputValue,
-        setInputValue: setRoleInputValue,
-        removeChip: removeRole,
-        handleKeyDown: _handleRoleKeyDownBase,
-        setChips: setRoles,
-        addChip: addRole,
-    } = useChips(DEFAULT_ROLES);
-
-    // Загружаем роли мероприятия при редактировании
-    const {data: eventRolesData} = useGetEventRolesQuery(
-        {eventId: eventData?.id ?? '', count: 100},
-        {skip: !eventData?.id}
-    );
-    
-    const handleRoleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if ((event.key === 'Enter' || event.key === ' ') && roleInputValue.trim()) {
-            event.preventDefault();
-            const normalized = roleInputValue.trim();
-            if (!roles.includes(normalized) && !DEFAULT_ROLES.includes(normalized)) {
-                addRole(normalized);
-                setRoleInputValue('');
-            }
-        }
-    };
-
     useEffect(() => {
         const currentEventId = eventData?.id ?? null;
         const eventIdChanged = previousEventDataId.current !== currentEventId;
-        
+
         if (eventData && (!isInitialized.current || initializedEventId.current !== eventData.id)) {
             setTitle(eventData.name);
-            setDescription(eventData.description || "");
+            setDescription(eventData.description || '');
             setLocation(eventData.location);
-            setFormat(FORMAT_REVERSE_MAP[eventData.format] || eventData.format);
-            setIsPrivate(eventData.eventType === "closed");
+            setAuditorium(eventData.auditorium || '');
+
+            const rawVenueFormat = eventData.venueFormat || eventData.format || 'InPerson';
+            setFormat(FORMAT_REVERSE_MAP[rawVenueFormat] || 'Очно');
 
             if (eventData.maxParticipants && eventData.maxParticipants < 999999) {
                 setParticipants(eventData.maxParticipants.toString());
                 setIsParticipantsUnlimited(false);
             } else {
+                setParticipants('');
                 setIsParticipantsUnlimited(true);
             }
 
-            if (eventData.categories) {
-                setCategories(eventData.categories);
-            } else {
-                setCategories([]);
-            }
-
-            // Роли будут загружены через отдельный useEffect ниже
+            setCategories(eventData.categories ?? []);
+            setSelectedTypes(eventData.types ?? []);
 
             if (eventData.color) {
                 setAvatarColor(eventData.color);
@@ -99,9 +85,7 @@ export const useEventForm = (eventData?: EventResponse | null) => {
 
             if (eventData.avatar) {
                 const avatarUrl = buildImageUrl(eventData.avatar);
-                if (avatarUrl) {
-                    setAvatarPreview(avatarUrl);
-                }
+                setAvatarPreview(avatarUrl ?? null);
             } else {
                 setAvatarPreview(null);
             }
@@ -110,67 +94,49 @@ export const useEventForm = (eventData?: EventResponse | null) => {
                 const {date, time} = parseDateTime(eventData.startDate);
                 if (date) setStartDate(date);
                 if (time) setStartTime(time);
-            } else {
-                setStartDate(undefined);
-                setStartTime("");
             }
-            
+
             if (eventData.endDate) {
                 const {date, time} = parseDateTime(eventData.endDate);
                 if (date) setEndDate(date);
                 if (time) setEndTime(time);
-            } else {
-                setEndDate(undefined);
-                setEndTime("");
             }
 
             isInitialized.current = true;
             initializedEventId.current = eventData.id;
             previousEventDataId.current = currentEventId;
         } else if (!eventData && eventIdChanged) {
-            setTitle("");
-            setDescription("");
-            setLocation("");
-            setFormat("Очно");
-            setIsPrivate(false);
-            setParticipants("");
+            setTitle('');
+            setDescription('');
+            setLocation('');
+            setAuditorium('');
+            setFormat('Очно');
+            setParticipants('');
             setIsParticipantsUnlimited(true);
             setCategories([]);
-            setRoles(DEFAULT_ROLES);
-            setAvatarColor("#C2298A");
+            setSelectedTypes([]);
+            setAvatarColor('#C2298A');
             setAvatarFile(null);
             setAvatarPreview(null);
             setStartDate(undefined);
             setEndDate(undefined);
-            setStartTime("");
-            setEndTime("");
+            setStartTime('');
+            setEndTime('');
             isInitialized.current = false;
             initializedEventId.current = null;
             previousEventDataId.current = currentEventId;
         }
-    }, [eventData?.id]);
+    }, [eventData?.id, eventData, setCategories, setEndDate, setEndTime, setStartDate, setStartTime]);
 
-    // Загружаем роли мероприятия при редактировании
-    useEffect(() => {
-        if (eventRolesData?.res && eventData?.id && initializedEventId.current === eventData.id) {
-            const roleNames = eventRolesData.res.map(role => role.name);
-            // Объединяем дефолтные роли с загруженными, убирая дубликаты
-            const allRoles = [...DEFAULT_ROLES];
-            roleNames.forEach(roleName => {
-                if (!allRoles.includes(roleName)) {
-                    allRoles.push(roleName);
-                }
-            });
-            setRoles(allRoles);
-        }
-    }, [eventRolesData, eventData?.id, setRoles]);
+    const toggleEventType = (type: EventTypeKind) => {
+        setSelectedTypes(prev => prev.includes(type) ? prev.filter(item => item !== type) : [...prev, type]);
+    };
 
     const validate = (): string | null => {
         if (!title.trim()) return 'Необходимо указать название';
         if (!location.trim()) return 'Необходимо указать место';
         if (!startDate || !startTime) return 'Необходимо указать дату и время начала';
         if (!endDate || !endTime) return 'Необходимо указать дату и время окончания';
-        if (!eventData && !profile?.id) return 'Не удалось получить ID пользователя';
         return null;
     };
 
@@ -188,53 +154,45 @@ export const useEventForm = (eventData?: EventResponse | null) => {
             return null;
         }
 
+        const venueFormat = VENUE_FORMAT_MAP[EVENT_FORMAT_MAP[format] || format] || 'InPerson';
+
         const basePayload = {
             name: title,
-            description: description,
+            description,
             startDate: startDateTime,
             endDate: endDateTime,
-            location: location,
-            format: EVENT_FORMAT_MAP[format] || format,
-            eventType: isPrivate ? "closed" : "open",
-            maxParticipants: isParticipantsUnlimited ? 999999 : Number(participants),
+            location,
+            auditorium: auditorium.trim() || null,
+            venueFormat,
+            categories,
+            types: selectedTypes,
+            maxParticipants: isParticipantsUnlimited ? 0 : Number(participants),
+            color: avatarColor,
         };
 
-        if (!eventData && profile?.id) {
-            const customRoles = roles.filter(role => !DEFAULT_ROLES.includes(role));
-            const payload = {
+        if (!eventData) {
+            return {
                 ...basePayload,
-                responsiblePersonId: profile.id,
-                categories: categories,
-                roles: customRoles,
-                color: avatarColor,
                 avatar: avatarFile,
-            } as CreateEventPayload;
-            console.log('Создание мероприятия, отправляемые данные:', payload);
-            return payload;
+            };
         }
 
-        const customRoles = roles.filter(role => !DEFAULT_ROLES.includes(role));
-        const updatePayload = {
+        return {
             ...basePayload,
-            categories: categories,
-            roles: customRoles,
-            color: avatarColor,
             avatar: avatarFile,
-        } as UpdateEventPayload;
-        console.log('Обновление мероприятия, отправляемые данные:', updatePayload);
-        return updatePayload;
+        };
     };
 
     const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
-        if (file) {
-            setAvatarFile(file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setAvatarPreview(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-        }
+        if (!file) return;
+
+        setAvatarFile(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setAvatarPreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
     };
 
     return {
@@ -244,34 +202,29 @@ export const useEventForm = (eventData?: EventResponse | null) => {
         setFormat,
         location,
         setLocation,
+        auditorium,
+        setAuditorium,
         avatarColor,
         setAvatarColor,
-        avatarFile,
         avatarPreview,
         handleAvatarChange,
-        isPrivate,
-        setIsPrivate,
         showCategorySelect,
         setShowCategorySelect,
         participants,
         setParticipants,
         isParticipantsUnlimited,
         setIsParticipantsUnlimited,
-        roles,
-        roleInputValue,
-        setRoleInputValue,
-        removeRole,
-        handleRoleKeyDown,
         description,
         setDescription,
-
         categories,
         inputValue,
         setInputValue,
         addChip,
         removeChip,
         handleKeyDown,
-
+        selectedTypes,
+        toggleEventType,
+        eventTypeOptions: EVENT_TYPE_OPTIONS,
         preparePayload,
         isEditMode: !!eventData,
     };
