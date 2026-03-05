@@ -30,11 +30,12 @@ export const useEventEditor = (eventId?: string): UseEventEditorOutput => {
             const avatar = payload.avatar;
             
             if (eventId) {
+                const {avatar: _, ...updatePayload} = payload as UpdateEventPayload;
+                await updateEventMutation({eventId, body: updatePayload}).unwrap();
+
                 if (avatar) {
                     await uploadAvatarMutation({eventId, avatar}).unwrap();
                 }
-                const {avatar: _, ...updatePayload} = payload as UpdateEventPayload;
-                await updateEventMutation({eventId, body: updatePayload}).unwrap();
             } else {
                 const createPayload = payload as CreateEventPayload;
                 const result = await createEventMutation(createPayload).unwrap();

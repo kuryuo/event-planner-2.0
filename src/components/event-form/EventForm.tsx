@@ -14,8 +14,9 @@ import type {CreateEventPayload, EventResponse} from "@/types/api/Event.ts";
 import {useNavigate} from "react-router-dom";
 import {useGetCategoriesQuery} from "@/services/api/categoryApi.ts";
 import Divider from "@/ui/divider/Divider";
-import {useRef, useState} from "react";
+import {useRef} from "react";
 import ImageIcon from "@/assets/img/icon-m/image.svg?react";
+import Checkbox from "@/ui/checkbox/Checkbox.tsx";
 
 interface EventFormProps {
     eventData?: EventResponse | null;
@@ -34,8 +35,6 @@ export default function EventForm({
                                   }: EventFormProps) {
     const navigate = useNavigate();
     const fileInputRef = useRef<HTMLInputElement | null>(null);
-    const [participantName, setParticipantName] = useState("");
-    const [participantsList, setParticipantsList] = useState<string[]>([]);
     const {data: categoriesData, isLoading: isLoadingCategories} = useGetCategoriesQuery();
 
     const categoryOptions = categoriesData?.result
@@ -52,10 +51,16 @@ export default function EventForm({
         setFormat,
         location,
         setLocation,
+        auditorium,
+        setAuditorium,
         avatarPreview,
         handleAvatarChange,
         showCategorySelect,
         setShowCategorySelect,
+        participants,
+        setParticipants,
+        isParticipantsUnlimited,
+        setIsParticipantsUnlimited,
         description,
         setDescription,
         categories,
@@ -64,10 +69,21 @@ export default function EventForm({
         addChip,
         removeChip,
         handleKeyDown,
+        selectedTypes,
+        toggleEventType,
+        eventTypeOptions,
         preparePayload,
     } = useEventForm(eventData);
 
-    const mockTypes = ["Хакатон", "Лекция", "Вебинар", "УрФУ", "ПП", "Спецкурс", "Практика"];
+    const EVENT_TYPE_LABELS = {
+        Hackathon: 'Хакатон',
+        Lecture: 'Лекция',
+        Webinar: 'Вебинар',
+        UrFU: 'УрФУ',
+        PP: 'ПП',
+        SpecialCourse: 'Спецкурс',
+        Practice: 'Практика',
+    };
 
     const handleSubmit = () => {
         const payload = preparePayload();
@@ -115,13 +131,30 @@ export default function EventForm({
                             leftIcon={<img src={GeoAltIcon} alt="location"/>}
                             fieldSize="M"
                         />
+                        <TextField
+                            placeholder="Аудитория / ссылка"
+                            value={auditorium}
+                            onChange={e => setAuditorium(e.target.value)}
+                            fieldSize="M"
+                        />
                     </div>
 
                     <div className={styles.section}>
                         <span className={styles.title}>Тип</span>
                         <div className={styles.chipContainer}>
-                            {mockTypes.map((type) => (
-                                <Chip key={type} text={type} size="S" />
+                            {eventTypeOptions.map((type) => (
+                                <button
+                                    key={type}
+                                    type="button"
+                                    className={styles.typeButton}
+                                    onClick={() => toggleEventType(type)}
+                                >
+                                    <Chip
+                                        text={EVENT_TYPE_LABELS[type]}
+                                        size="S"
+                                        variant={selectedTypes.includes(type) ? 'filled' : 'outlined'}
+                                    />
+                                </button>
                             ))}
                         </div>
                     </div>
@@ -130,40 +163,22 @@ export default function EventForm({
 
                     <div className={styles.section}>
                         <span className={styles.title}>Участники</span>
-                        <div className={styles.inlineRow}>
-                            <div className={styles.growField}>
-                                <TextField
-                                    placeholder="Имя"
-                                    value={participantName}
-                                    onChange={(e) => setParticipantName(e.target.value)}
-                                />
-                            </div>
-                            <Button
-                                variant="Filled"
-                                color="gray"
-                                disabled={!participantName.trim()}
-                                onClick={() => {
-                                    const trimmed = participantName.trim();
-                                    if (!trimmed) return;
-                                    setParticipantsList((prev) => [...prev, trimmed]);
-                                    setParticipantName("");
-                                }}
-                            >
-                                Добавить
-                            </Button>
-                        </div>
+                        <label className={styles.inlineCheckboxRow}>
+                            <Checkbox
+                                checked={isParticipantsUnlimited}
+                                onChange={() => setIsParticipantsUnlimited(prev => !prev)}
+                            />
+                            <span>Без лимита участников</span>
+                        </label>
 
-                        {participantsList.length > 0 && (
-                            <div className={styles.chipContainer}>
-                                {participantsList.map((name) => (
-                                    <Chip
-                                        key={name}
-                                        text={name}
-                                        closable
-                                        onClose={() => setParticipantsList((prev) => prev.filter((item) => item !== name))}
-                                    />
-                                ))}
-                            </div>
+                        {!isParticipantsUnlimited && (
+                            <TextField
+                                type="number"
+                                min={1}
+                                placeholder="Максимум участников"
+                                value={participants}
+                                onChange={(e) => setParticipants(e.target.value)}
+                            />
                         )}
                     </div>
 
