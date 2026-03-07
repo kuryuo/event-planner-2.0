@@ -15,6 +15,17 @@ import {
 } from '@/services/api/eventApi';
 import styles from './ParticipantCard.module.scss';
 
+const ROLE_MAP = {
+    Организатор: 'Organizer',
+    Редактор: 'Editor',
+    Помощник: 'Assistant',
+    Наблюдатель: 'Observer',
+    Organizer: 'Organizer',
+    Editor: 'Editor',
+    Assistant: 'Assistant',
+    Observer: 'Observer',
+} as const;
+
 interface ParticipantCardProps {
     name: string;
     avatarUrl: string | null;
@@ -52,7 +63,6 @@ export default function ParticipantCard({
 
     const roles = rolesData?.res || [];
     const currentRole = roles.find(r => r.name === role);
-    const currentRoleId = currentRole?.id;
 
     const handleMenuToggle = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -63,13 +73,18 @@ export default function ParticipantCard({
         setIsSelectOpen(isOpen);
     };
 
-    const handleRoleClick = async (roleId: string) => {
-        if (roleId === currentRoleId) {
+    const handleRoleClick = async (roleName: string) => {
+        if (roleName === currentRole?.name) {
+            return;
+        }
+
+        const participantRole = ROLE_MAP[roleName as keyof typeof ROLE_MAP];
+        if (!participantRole) {
             return;
         }
 
         try {
-            await assignRole({eventId, userId, roleId}).unwrap();
+            await assignRole({eventId, userId, participantRole}).unwrap();
         } catch (error) {
             console.error('Ошибка при назначении роли:', error);
         }
@@ -111,7 +126,7 @@ export default function ParticipantCard({
     const selectOptions = roles.map((roleItem) => ({
         label: roleItem.name,
         description: undefined,
-        onClick: () => handleRoleClick(roleItem.id),
+        onClick: () => handleRoleClick(roleItem.name),
     }));
 
     const selectedRoleLabel = currentRole?.name;

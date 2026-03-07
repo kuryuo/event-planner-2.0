@@ -13,7 +13,7 @@ import {useClickOutside} from "@/hooks/ui/useClickOutside.ts";
 import {format} from "date-fns";
 import {ru} from "date-fns/locale";
 import type {Organizer} from "@/types/api/User.ts";
-import type {GetEventsPayload} from "@/types/api/Event.ts";
+import type {EventTypeKind, GetEventsPayload} from "@/types/api/Event.ts";
 import {useGetOrganizersQuery} from "@/services/api/userApi.ts";
 import Divider from "@/ui/divider/Divider";
 import Chip from "@/ui/chip/Chip";
@@ -37,10 +37,26 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [selectedOrganizers, setSelectedOrganizers] = useState<Organizer[]>([]);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const [selectedTypes, setSelectedTypes] = useState<EventTypeKind[]>([]);
     const datePickerRef = useRef<HTMLDivElement>(null);
     const {data: organizersData} = useGetOrganizersQuery();
 
-    const mockTypeChips = ["хакатон", "лекция", "урФУ", "спецкурс"];
+    const typeChips: Array<{label: string; value: EventTypeKind}> = [
+        {label: 'Хакатон', value: 'Hackathon'},
+        {label: 'Лекция', value: 'Lecture'},
+        {label: 'Вебинар', value: 'Webinar'},
+        {label: 'УрФУ', value: 'UrFU'},
+        {label: 'ПП', value: 'PP'},
+        {label: 'Спецкурс', value: 'SpecialCourse'},
+        {label: 'Практика', value: 'Practice'},
+    ];
+
+    const toggleType = (value: EventTypeKind) => {
+        setSelectedTypes(prev => prev.includes(value)
+            ? prev.filter(type => type !== value)
+            : [...prev, value],
+        );
+    };
 
     const toggleFormat = (key: keyof typeof formats) => {
         setFormats(prev => ({...prev, [key]: !prev[key]}));
@@ -65,13 +81,17 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
                 });
             }
 
-            if (appliedFilters.Format) {
+            if (appliedFilters.VenueFormat || appliedFilters.Format) {
                 const formatMap: Record<string, keyof typeof formats> = {
+                    'InPerson': 'inPerson',
+                    'Online': 'online',
+                    'Hybrid': 'hybrid',
                     'offline': 'inPerson',
                     'hybrid': 'hybrid',
                     'online': 'online',
                 };
-                const formatKey = formatMap[appliedFilters.Format];
+                const rawFormat = appliedFilters.VenueFormat ?? appliedFilters.Format;
+                const formatKey = rawFormat ? formatMap[rawFormat] : undefined;
                 if (formatKey) {
                     setFormats(prev => ({...prev, [formatKey]: true}));
                 }
@@ -79,6 +99,14 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
 
             if (appliedFilters.Categories) {
                 setSelectedTags(appliedFilters.Categories);
+            }
+
+            if (appliedFilters.Types) {
+                setSelectedTypes(appliedFilters.Types);
+            }
+
+            if (appliedFilters.MyEvents) {
+                setMyEvents(true);
             }
 
             if (appliedFilters.Organizators && organizersData) {
@@ -102,12 +130,12 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
             filters.End = dateRange.to.toISOString();
         }
 
-        const selectedFormats: string[] = [];
-        if (formats.inPerson) selectedFormats.push('offline');
-        if (formats.hybrid) selectedFormats.push('hybrid');
-        if (formats.online) selectedFormats.push('online');
-        if (selectedFormats.length > 0) {
-            filters.Format = selectedFormats[0];
+        if (formats.inPerson) {
+            filters.VenueFormat = 'InPerson';
+        } else if (formats.hybrid) {
+            filters.VenueFormat = 'Hybrid';
+        } else if (formats.online) {
+            filters.VenueFormat = 'Online';
         }
 
         if (selectedOrganizers.length > 0) {
@@ -116,6 +144,14 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
 
         if (selectedTags.length > 0) {
             filters.Categories = selectedTags;
+        }
+
+        if (selectedTypes.length > 0) {
+            filters.Types = selectedTypes;
+        }
+
+        if (myEvents) {
+            filters.MyEvents = true;
         }
 
         onApply?.(filters);
@@ -132,6 +168,7 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
         setDateRange(undefined);
         setSelectedOrganizers([]);
         setSelectedTags([]);
+        setSelectedTypes([]);
         onApply?.({Count: 50});
     };
 
@@ -195,8 +232,25 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
             <div className={styles.typeSection}>
                 <span className={styles.typeTitle}>Тип</span>
                 <div className={styles.typeChips}>
-                    {mockTypeChips.map((t) => (
-                        <Chip key={t} text={t} size="S" />
+                    {typeChips.map((type) => (
+                        selectedTypes.includes(type.value) ? (
+                            <Chip
+                                key={type.value}
+                                text={type.label}
+                                size="S"
+                                closable
+                                onClose={() => toggleType(type.value)}
+                            />
+                        ) : (
+                            <button
+                                key={type.value}
+                                type="button"
+                                className={styles.typeChipButton}
+                                onClick={() => toggleType(type.value)}
+                            >
+                                <Chip text={type.label} size="S" />
+                            </button>
+                        )
                     ))}
                 </div>
             </div>
