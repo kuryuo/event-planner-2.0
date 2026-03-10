@@ -9,6 +9,7 @@ import Contacts from "@/components/event-page/contacts/Contacts.tsx";
 import PhotosGallery from "@/components/event-page/photos/PhotosGallery.tsx";
 import {useEventPage} from '@/hooks/api/useEventPage.ts';
 import {useGetProfileQuery} from "@/services/api/profileApi.ts";
+import EventChat from '@/components/event-page/chat/EventChat.tsx';
 
 const TAB_INDEX_ABOUT = 0;
 const TAB_INDEX_CHAT = 1;
@@ -55,7 +56,7 @@ export default function EventPage() {
             case TAB_INDEX_CHAT:
                 return (
                     <div className={styles.tabContent}>
-                        <p>Чат пока не реализован</p>
+                        <EventChat eventId={event.id}/>
                     </div>
                 );
             case TAB_INDEX_PHOTOS:
