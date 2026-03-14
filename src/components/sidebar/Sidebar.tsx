@@ -9,10 +9,13 @@ import Button from '@/ui/button/Button.tsx';
 import clsx from 'clsx';
 import {buildImageUrl} from "@/utils/buildImageUrl.ts";
 import {useGetProfileEventsQuery, useGetProfileQuery} from "@/services/api/profileApi.ts";
+import {useCreateEventMutation} from '@/services/api/eventApi.ts';
 import {useNavigate} from "react-router-dom";
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {format} from 'date-fns';
 import {ru} from 'date-fns/locale';
+import {useGetNotificationsQuery} from '@/services/api/notificationApi.ts';
+import {APRIL_TEST_EVENTS} from '@/dev/aprilEventsSeed.ts';
 
 import SearchIcon from '@/assets/image/search.svg?react';
 import BellIcon from '@/assets/image/bell.svg?react';
@@ -32,6 +35,8 @@ interface SidebarProps {
 export default function Sidebar({notificationCount = 3, tasksCount = 0}: SidebarProps) {
     const {data: profile} = useGetProfileQuery();
     const {data: subscribedEvents} = useGetProfileEventsQuery();
+    const {data: notifications, isLoading: notificationsLoading} = useGetNotificationsQuery({count: 100, offset: 0});
+    const [createEventMutation] = useCreateEventMutation();
     const navigate = useNavigate();
     const fallbackAvatar = 'https://api.dicebear.com/7.x/shapes/png?size=200&radius=12';
     const [eventsExpanded, setEventsExpanded] = useState(false);
@@ -74,6 +79,33 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
         });
     }, [subscribedEvents]);
 
+    const unreadNotificationsCount = useMemo(() => {
+        if (notificationsLoading || !notifications) {
+            return notificationCount;
+        }
+
+        return notifications.filter(notification => !notification.isRead).length;
+    }, [notifications, notificationCount, notificationsLoading]);
+
+    const handleCreateAprilEvents = async () => {
+        // TODO REMOVE: кнопка нужна только для быстрого ручного теста.
+        const shouldCreate = window.confirm(`Создать ${APRIL_TEST_EVENTS.length} тестовых мероприятий за апрель?`);
+        if (!shouldCreate) return;
+
+        let createdCount = 0;
+
+        for (const eventPayload of APRIL_TEST_EVENTS) {
+            try {
+                await createEventMutation(eventPayload).unwrap();
+                createdCount += 1;
+            } catch (error) {
+                console.error('Не удалось создать тестовое мероприятие', eventPayload.name, error);
+            }
+        }
+
+        window.alert(`Создано мероприятий: ${createdCount} из ${APRIL_TEST_EVENTS.length}`);
+    };
+
     return (
         <div className={styles.sidebar}>
             <div className={styles.userCard} onClick={handleProfileClick}>
@@ -111,11 +143,11 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
                 label="Уведомления"
                 leftIcon={<BellIcon />}
                 rightIcon={
-                    notificationCount > 0 ? (
-                        <Badge count={notificationCount} variant="text" color="brand-green" />
+                    unreadNotificationsCount > 0 ? (
+                        <Badge count={unreadNotificationsCount} variant="text" color="brand-green" />
                     ) : null
                 }
-                onClick={() => console.log('Открыть уведомления')}
+                onClick={() => navigate('/notifications')}
             />
 
             <Divider />
@@ -161,19 +193,31 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
                                 />
                             ))}
 
-                            <Button
-                                className={styles.createEventButton}
-                                variant="Text"
-                                color="default"
-                                leftIcon={<PlusIcon />}
-                                onClick={() => navigate('/editor')}
-                                style={{justifyContent: 'flex-start'}}
-                            >
-                                Создать новое
-                            </Button>
-                        </div>
-                    )}
-                </div>
+                             <Button
+                                 className={styles.createEventButton}
+                                 variant="Text"
+                                 color="default"
+                                 leftIcon={<PlusIcon />}
+                                 onClick={() => navigate('/editor')}
+                                 style={{justifyContent: 'flex-start'}}
+                             >
+                                 Создать новое
+                             </Button>
+
+                            {import.meta.env.DEV && (
+                                <Button
+                                    className={styles.seedEventsButton}
+                                    variant="Text"
+                                    color="default"
+                                    onClick={handleCreateAprilEvents}
+                                    style={{justifyContent: 'flex-start'}}
+                                >
+                                    Создать 3 апрельских тестовых
+                                </Button>
+                            )}
+                         </div>
+                     )}
+                 </div>
 
                 <NavItem
                     label="Архив"

@@ -61,6 +61,14 @@
   padding-right: var(--spacing-3);
 }
 
+.seedEventsButton {
+  width: 100%;
+  justify-content: flex-start;
+  padding-left: var(--spacing-3);
+  padding-right: var(--spacing-3);
+  color: var(--content-secondary);
+}
+
 .sectionTitle {
   @include ty.font(caption-m, regular);
   color: var(--content-secondary);

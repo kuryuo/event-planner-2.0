@@ -1,0 +1,93 @@
+.pageWrapper {
+  display: flex;
+  background-color: var(--bg-secondary-subtle);
+  height: 100vh;
+  gap: var(--spacing-3);
+}
+
+.sidebar {
+  overflow: auto;
+  height: 100%;
+}
+
+.content {
+  background-color: var(--bg-primary);
+  padding: var(--spacing-8) var(--spacing-6);
+  border-radius: var(--spacing-6);
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+}
+
+.actions {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: center;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.card {
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-3);
+  padding: var(--spacing-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.unread {
+  border-color: var(--border-pink);
+  background-color: var(--bg-pink);
+}
+
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+}
+
+.cardTitle {
+  font-weight: 600;
+}
+
+.cardText {
+  color: var(--content-secondary);
+}
+
+.cardDate {
+  color: var(--content-tertiary);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.invitationBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.empty {
+  color: var(--content-secondary);
+}
+
+@media (max-width: 1024px) {
+  .pageWrapper {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+}

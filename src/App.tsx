@@ -6,6 +6,7 @@ import EventPage from "@/pages/event/EventPage.tsx";
 import ProfilePage from "@/pages/profile/ProfilePage.tsx";
 import TasksPage from "@/pages/tasks/TasksPage.tsx";
 import ArchivePage from "@/pages/archive/ArchivePage.tsx";
+import NotificationsPage from '@/pages/notifications/NotificationsPage.tsx';
 import {useEffect, useState} from "react";
 
 function getInitialPath(): string {
@@ -33,6 +34,7 @@ function AppRoutes() {
             <Route path="/profile" element={<ProfilePage/>}/>
             <Route path="/tasks" element={<TasksPage/>}/>
             <Route path="/archive" element={<ArchivePage/>}/>
+            <Route path="/notifications" element={<NotificationsPage/>}/>
         </Routes>
     );
 }
