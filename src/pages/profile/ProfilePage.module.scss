@@ -2,71 +2,556 @@
 
 .pageWrapper {
   display: flex;
-  background-color: var(--bg-secondary-subtle);
-  padding: 0;
   height: 100vh;
+  background: var(--bg-secondary-subtle);
   gap: var(--spacing-3);
 }
 
 .sidebar {
-  overflow: auto;
   height: 100%;
+  overflow: auto;
 }
 
 .content {
-  background-color: var(--bg-primary);
-  padding: var(--spacing-10) var(--spacing-6);
-  border-radius: var(--spacing-6);
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  border-radius: var(--radius-6);
+  padding: var(--spacing-4);
   overflow-y: auto;
-  gap: var(--spacing-10);
+}
+
+.topBar {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-4);
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: 0 var(--spacing-3);
 }
 
 .backButton {
-  gap: var(--spacing-2);
-  display: flex;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-2);
+  display: inline-flex;
   align-items: center;
-  background: none;
-  border: none;
+  justify-content: center;
+  background: transparent;
+  color: var(--content-secondary);
   cursor: pointer;
 
-  .icon {
-    color: var(--content-secondary);
-  }
-
-  .text {
-    @include ty.font(body-m, regular);
-    color: var(--content-link);
+  &:hover {
+    background: var(--bg-secondary);
+    color: var(--content-primary);
   }
 }
 
-.cardWrapper {
+.topAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.topTitle {
+  @include ty.font(body-s, semibold);
+  color: var(--content-primary);
+}
+
+.profileCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-4);
+  margin-top: var(--spacing-2);
+  overflow: hidden;
+}
+
+.coverSection {
+  position: relative;
+  height: 240px;
+  padding: var(--spacing-2);
+}
+
+.coverImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-4);
+}
+
+.coverActions {
+  position: absolute;
+  top: var(--spacing-4);
+  right: var(--spacing-4);
   display: flex;
-  flex-direction: column;
+  gap: var(--spacing-2);
 }
 
-.divider {
-  height: 1px;
-  background-color: var(--border-primary);
-  width: 500px;
-  margin: 0;
+.coverActionButton {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-2);
+  background: var(--white-alpha-50);
+  color: var(--content-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--white);
+  }
+}
+
+.avatarRow {
+  padding: 0 var(--spacing-4) var(--spacing-3);
+  margin-top: -46px;
+  border-bottom: 1px solid var(--border-primary);
+  display: flex;
+  gap: var(--spacing-4);
+  align-items: flex-end;
+}
+
+.avatarWrapper {
+  position: relative;
   flex-shrink: 0;
 }
 
-.appearanceSection {
+.profileAvatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 3px solid var(--bg-primary);
+  object-fit: cover;
+}
+
+.avatarMenuWrapper {
+  position: absolute;
+  right: -4px;
+  bottom: 8px;
+}
+
+.avatarMenuButton {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  color: var(--content-primary);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.avatarMenuPanel {
+  position: absolute;
+  top: 36px;
+  left: 0;
+  width: 132px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-2);
+  box-shadow: var(--lvl1);
+  overflow: hidden;
+  z-index: 30;
+}
+
+.avatarMenuItem {
+  width: 100%;
+  height: 36px;
+  text-align: left;
+  padding: 0 var(--spacing-3);
+  background: transparent;
+  color: var(--content-primary);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--bg-secondary-subtle);
+  }
+}
+
+.headerInfo {
+  flex: 1;
+  min-height: 94px;
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-4);
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--spacing-3);
+  padding-bottom: var(--spacing-2);
+}
+
+.fullName {
+  @include ty.font(title-s, semibold);
+  color: var(--content-primary);
+}
+
+.role {
+  @include ty.font(body-s, regular);
+  color: var(--content-secondary);
+}
+
+.editActions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.section {
+  padding: var(--spacing-4);
+  border-bottom: 1px solid var(--border-primary);
 }
 
 .sectionTitle {
   @include ty.font(subtitle-m, semibold);
+  color: var(--content-primary);
+  margin-bottom: var(--spacing-3);
+}
+
+.sectionTitleLarge {
+  @include ty.font(title-s, semibold);
+  color: var(--content-primary);
+  margin-bottom: var(--spacing-4);
+}
+
+.contactList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.contactRow {
+  display: grid;
+  grid-template-columns: 20px 160px minmax(120px, 1fr);
+  align-items: center;
+  gap: var(--spacing-2);
+  color: var(--content-secondary);
+}
+
+.contactLabel {
+  @include ty.font(body-s, regular);
+}
+
+.contactValue {
+  @include ty.font(body-s, regular);
+  color: var(--content-primary);
+}
+
+.eventsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  max-width: 420px;
+}
+
+.emptyText {
+  @include ty.font(caption-m, regular);
+  color: var(--content-secondary);
+}
+
+.tasksHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.sortWrapper {
+  position: relative;
+}
+
+.sortButton {
+  min-width: 160px;
+  height: 40px;
+  padding: 0 var(--spacing-3);
+  border-radius: var(--radius-2);
+  border: 1px solid var(--border-primary);
+  background: var(--bg-primary);
+  @include ty.font(body-s, regular);
+  color: var(--content-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+
+  svg {
+    transition: transform 0.2s ease;
+  }
+}
+
+.sortChevronOpen {
+  transform: rotate(180deg);
+}
+
+.sortMenu {
+  position: absolute;
+  top: 44px;
+  right: 0;
+  width: 180px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-2);
+  box-shadow: var(--lvl1);
+  overflow: hidden;
+  z-index: 20;
+}
+
+.sortMenuItem {
+  width: 100%;
+  height: 40px;
+  text-align: left;
+  padding: 0 var(--spacing-3);
+  background: transparent;
+  color: var(--content-primary);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--bg-secondary-subtle);
+  }
+}
+
+.sectionHint {
+  @include ty.font(caption-m, regular);
+  color: var(--content-secondary);
+  margin: var(--spacing-2) 0;
+}
+
+.tasksTable {
+  width: 100%;
+}
+
+.tableHead,
+.tableRow {
+  display: grid;
+  grid-template-columns: minmax(140px, 1.2fr) minmax(220px, 1.6fr) minmax(140px, 1fr) minmax(120px, 1fr) minmax(100px, 0.8fr);
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.tableHead {
+  @include ty.font(caption-m, regular);
+  color: var(--content-secondary);
   margin-bottom: var(--spacing-2);
 }
 
-.switchRow {
-  display: flex;
+.tableRow {
+  min-height: 48px;
+  @include ty.font(body-s, regular);
+  color: var(--content-primary);
+}
+
+.taskCell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eventCell {
+  display: inline-flex;
   align-items: center;
+  gap: var(--spacing-2);
+}
+
+.eventCover {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-1);
+  object-fit: cover;
+}
+
+.statusChip,
+.priorityChip {
+  height: 24px;
+  border-radius: var(--radius-100);
+  padding: 0 var(--spacing-2);
+  display: inline-flex;
+  align-items: center;
+  @include ty.font(caption-m, regular);
+}
+
+.statusChip {
+  background: var(--bg-secondary);
+  color: var(--content-primary);
+}
+
+.priorityChip {
+  background: var(--bg-blue);
+  color: var(--content-blue);
+}
+
+.settingsSection {
+  padding: var(--spacing-4);
+}
+
+.settingsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  border-bottom: 1px solid var(--border-primary);
+  padding-bottom: var(--spacing-4);
+}
+
+.nameRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-2);
+}
+
+.settingsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-4);
+  border-bottom: 1px solid var(--border-primary);
+  padding: var(--spacing-4) 0;
+}
+
+.settingsRowTitle {
+  @include ty.font(subtitle-s, semibold);
+  color: var(--content-primary);
+}
+
+.settingsRowText {
+  @include ty.font(caption-m, regular);
+  color: var(--content-secondary);
+}
+
+.notificationsChannels {
+  border-bottom: 1px solid var(--border-primary);
+  padding-bottom: var(--spacing-4);
+}
+
+.channelsList {
+  margin-top: var(--spacing-3);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-6);
+}
+
+.channelItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2);
+  color: var(--content-secondary);
+}
+
+.accountActions {
+  display: flex;
+  flex-direction: column;
+}
+
+.accountActionRow {
+  padding: var(--spacing-4) 0;
+  border-bottom: 1px solid var(--border-primary);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+  align-items: center;
+}
+
+.deleteTitle {
+  @include ty.font(subtitle-s, semibold);
+  color: var(--content-negative);
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.loading {
+  padding: var(--spacing-6) var(--spacing-4);
+  @include ty.font(body-s, regular);
+  color: var(--content-secondary);
+}
+
+.iconButton {
+  width: 20px;
+  height: 20px;
+  color: var(--content-secondary);
+  background: transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.snackbarContainer {
+  position: fixed;
+  top: var(--spacing-4);
+  right: var(--spacing-4);
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+@media (max-width: 1120px) {
+  .sidebar {
+    display: none;
+  }
+
+  .content {
+    border-radius: 0;
+    padding: var(--spacing-3);
+  }
+}
+
+@media (max-width: 860px) {
+  .coverSection {
+    height: 180px;
+  }
+
+  .avatarRow {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: -34px;
+  }
+
+  .headerInfo {
+    width: 100%;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .editActions {
+    width: 100%;
+  }
+
+  .contactRow {
+    grid-template-columns: 20px 120px 1fr;
+  }
+
+  .tableHead {
+    display: none;
+  }
+
+  .tableRow {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-1);
+    padding: var(--spacing-2) 0;
+    border-bottom: 1px solid var(--border-primary);
+  }
+
+  .nameRow {
+    grid-template-columns: 1fr;
+  }
+
+  .settingsRow,
+  .accountActionRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .channelsList {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .snackbarContainer {
+    left: var(--spacing-3);
+    right: var(--spacing-3);
+    top: auto;
+    bottom: var(--spacing-3);
+  }
 }

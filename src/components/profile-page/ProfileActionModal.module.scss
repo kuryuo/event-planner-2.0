@@ -1,0 +1,70 @@
+@use '@/typography-variables' as ty;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay-secondary);
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-4);
+}
+
+.modal {
+  width: min(100%, 540px);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-4);
+  box-shadow: var(--lvl2);
+  padding: var(--spacing-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  @include ty.font(subtitle-s, semibold);
+  color: var(--content-primary);
+}
+
+.closeButton {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-2);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+  color: var(--content-secondary);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--bg-secondary);
+    color: var(--content-primary);
+  }
+}
+
+.description {
+  @include ty.font(body-s, regular);
+  color: var(--content-secondary);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.actions {
+  margin-top: var(--spacing-1);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-2);
+}

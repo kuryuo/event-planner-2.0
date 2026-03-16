@@ -1,0 +1,95 @@
+@use '@/typography-variables' as ty;
+
+.snackbar {
+  min-width: 320px;
+  max-width: 560px;
+  height: 56px;
+  border-radius: var(--radius-100);
+  background: linear-gradient(90deg, #022434 0%, #011b28 100%);
+  color: var(--content-primary-inverse);
+  box-shadow: var(--lvl2);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: 0 var(--spacing-4);
+  border: 1px solid var(--white-alpha-12);
+}
+
+.leadingIcon {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.text {
+  @include ty.font(subtitle-s, regular);
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.action {
+  @include ty.font(button-m, semibold);
+  color: var(--content-primary-inverse);
+  background: transparent;
+  cursor: pointer;
+}
+
+.counter {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--bg-brand-green);
+  color: var(--content-brand-green);
+  @include ty.font(caption-m, semibold);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.closeButton {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: var(--content-primary-inverse);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  cursor: pointer;
+}
+
+.success .leadingIcon {
+  color: var(--content-positive);
+}
+
+.warning .leadingIcon {
+  color: var(--content-notice);
+}
+
+.error .leadingIcon {
+  color: var(--content-negative);
+}
+
+@media (max-width: 760px) {
+  .snackbar {
+    width: 100%;
+    min-width: 0;
+    border-radius: var(--radius-4);
+    height: auto;
+    min-height: 56px;
+    padding-top: var(--spacing-2);
+    padding-bottom: var(--spacing-2);
+  }
+}

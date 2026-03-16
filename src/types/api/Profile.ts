@@ -4,11 +4,14 @@ export interface UserProfile {
     id: string;
     lastName: string;
     firstName: string;
+    middleName?: string | null;
+    email?: string | null;
     profession: string;
     phoneNumber: string | null;
     telegram: string | null;
     city: string | null;
     avatarUrl: string | null;
+    backgroundUrl?: string | null;
     userPrivilege: UserPrivilege;
 }
 

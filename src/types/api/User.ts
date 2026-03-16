@@ -5,11 +5,13 @@ export interface UserForeignProfile {
     lastName: string;
     firstName: string;
     middleName: string;
+    profession?: string | null;
     phoneNumber: string | null;
     telegram: string | null;
     city: string | null;
     resetToken: string | null;
     avatarUrl: string | null;
+    backgroundUrl?: string | null;
     userPrivilege: number;
 }
 
@@ -20,11 +22,13 @@ export interface Organizer {
     lastName: string;
     firstName: string;
     middleName: string;
+    profession?: string | null;
     phoneNumber: string | null;
     telegram: string | null;
     city: string | null;
     resetToken: string | null;
     avatarUrl: string | null;
+    backgroundUrl?: string | null;
     userPrivilege: number;
 }
 
