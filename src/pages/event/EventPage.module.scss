@@ -22,6 +22,10 @@
   gap: var(--spacing-6);
 }
 
+.headerWrapper {
+  width: 100%;
+}
+
 .mainContent {
   display: flex;
   gap: var(--spacing-6);
@@ -49,4 +53,22 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+}
+
+.archivedWrapper {
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-4);
+  padding: var(--spacing-4);
+  background: var(--bg-primary);
+}
+
+.archivedPlaceholder {
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-4);
+  min-height: 220px;
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--content-secondary);
 }

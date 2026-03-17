@@ -36,6 +36,26 @@
       .title {
         @include ty.font(title-m, semibold);
       }
+
+      .archiveStatus,
+      .archiveRole {
+        @include ty.font(body-s, regular);
+        display: inline-flex;
+        align-items: center;
+        height: 36px;
+        border-radius: var(--radius-100);
+        padding: 0 var(--spacing-3);
+      }
+
+      .archiveStatus {
+        background: var(--bg-secondary);
+        color: var(--content-primary);
+      }
+
+      .archiveRole {
+        background: var(--bg-orange);
+        color: var(--content-orange);
+      }
     }
 
     .right {
@@ -84,6 +104,16 @@
 
     .trashIcon {
       color: var(--content-negative);
+    }
+  }
+}
+
+@media (max-width: 980px) {
+  .header {
+    .main {
+      .left {
+        flex-wrap: wrap;
+      }
     }
   }
 }

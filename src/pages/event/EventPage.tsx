@@ -10,19 +10,39 @@ import PhotosGallery from "@/components/event-page/photos/PhotosGallery.tsx";
 import {useEventPage} from '@/hooks/api/useEventPage.ts';
 import {useGetProfileQuery} from "@/services/api/profileApi.ts";
 import EventChat from '@/components/event-page/chat/EventChat.tsx';
+import ArchivedEventOverview from '@/components/event-page/archived-overview/ArchivedEventOverview.tsx';
 
-const TAB_INDEX_ABOUT = 0;
-const TAB_INDEX_CHAT = 1;
-const TAB_INDEX_PHOTOS = 2;
+const TAB_INDEX_OVERVIEW = 0;
+const TAB_INDEX_DOCUMENTS = 1;
+const TAB_INDEX_KANBAN = 2;
+const TAB_INDEX_CHAT = 3;
+const TAB_INDEX_MEDIA = 4;
+
+const TAB_INDEX_ARCHIVED_OVERVIEW = 0;
+const TAB_INDEX_ARCHIVED_DOCUMENTS = 1;
+const TAB_INDEX_ARCHIVED_MEDIA = 2;
 
 export default function EventPage() {
     const {event, isLoading, error} = useEventPage();
     const {data: profile} = useGetProfileQuery();
-    const [activeTab, setActiveTab] = useState(TAB_INDEX_ABOUT);
+    const [activeTab, setActiveTab] = useState(TAB_INDEX_OVERVIEW);
 
     const isAdmin = profile && event?.responsiblePersonId 
         ? profile.id === event.responsiblePersonId 
         : false;
+
+    const normalizedStatus = (event?.status ?? '').toLowerCase();
+    const isStatusArchived =
+        normalizedStatus.includes('finish')
+        || normalizedStatus.includes('complete')
+        || normalizedStatus.includes('done')
+        || normalizedStatus.includes('closed')
+        || normalizedStatus.includes('cancel')
+        || normalizedStatus.includes('archive');
+    const archiveByDate = Boolean(event?.endDate && new Date(event.endDate).getTime() < Date.now());
+    const isArchivedEvent = isStatusArchived || archiveByDate;
+
+    const archiveStatusLabel = normalizedStatus.includes('cancel') ? 'Отменено' : 'Окончено';
 
     if (isLoading) {
         return <div>Загрузка...</div>;
@@ -33,8 +53,41 @@ export default function EventPage() {
     }
 
     const renderContent = () => {
+        if (isArchivedEvent) {
+            switch (activeTab) {
+                case TAB_INDEX_ARCHIVED_OVERVIEW:
+                    return (
+                        <div className={styles.archivedWrapper}>
+                            <ArchivedEventOverview
+                                eventId={event.id}
+                                title={event.name}
+                                avatar={event.avatar}
+                                categories={event.categories}
+                                formattedDate={event.formattedDate}
+                                location={event.location}
+                                description={event.description}
+                            />
+                        </div>
+                    );
+                case TAB_INDEX_ARCHIVED_DOCUMENTS:
+                    return (
+                        <div className={styles.archivedPlaceholder}>
+                            Документы для архивного мероприятия в разработке
+                        </div>
+                    );
+                case TAB_INDEX_ARCHIVED_MEDIA:
+                    return (
+                        <div className={styles.tabContent}>
+                            <PhotosGallery eventId={event.id}/>
+                        </div>
+                    );
+                default:
+                    return null;
+            }
+        }
+
         switch (activeTab) {
-            case TAB_INDEX_ABOUT:
+            case TAB_INDEX_OVERVIEW:
                 return (
                     <div className={styles.mainContent}>
                         <div className={styles.eventContent}>
@@ -53,13 +106,25 @@ export default function EventPage() {
                         </div>
                     </div>
                 );
+            case TAB_INDEX_DOCUMENTS:
+                return (
+                    <div className={styles.archivedPlaceholder}>
+                        Документы мероприятия в разработке
+                    </div>
+                );
+            case TAB_INDEX_KANBAN:
+                return (
+                    <div className={styles.archivedPlaceholder}>
+                        Kanban доска в разработке
+                    </div>
+                );
             case TAB_INDEX_CHAT:
                 return (
                     <div className={styles.tabContent}>
                         <EventChat eventId={event.id}/>
                     </div>
                 );
-            case TAB_INDEX_PHOTOS:
+            case TAB_INDEX_MEDIA:
                 return (
                     <div className={styles.tabContent}>
                         <PhotosGallery eventId={event.id}/>
@@ -84,6 +149,8 @@ export default function EventPage() {
                         name={event.name}
                         eventId={event.id}
                         avatar={event.avatar}
+                        isArchived={isArchivedEvent}
+                        archiveStatusLabel={archiveStatusLabel}
                         activeTab={activeTab}
                         onTabChange={setActiveTab}
                     />

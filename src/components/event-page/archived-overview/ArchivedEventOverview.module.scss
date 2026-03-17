@@ -1,0 +1,120 @@
+@use '@/typography-variables' as ty;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  padding-bottom: var(--spacing-6);
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.title {
+  @include ty.font(title-m, semibold);
+  color: var(--content-primary);
+}
+
+.mainInfoRow {
+  display: grid;
+  grid-template-columns: 1.6fr minmax(260px, 0.8fr);
+  gap: var(--spacing-6);
+}
+
+.infoBlock,
+.descriptionBlock,
+.participantsBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.blockTitle {
+  @include ty.font(subtitle-m, semibold);
+  color: var(--content-primary);
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  column-gap: var(--spacing-4);
+  row-gap: var(--spacing-3);
+}
+
+.label {
+  @include ty.font(body-s, regular);
+  color: var(--content-secondary);
+}
+
+.value {
+  @include ty.font(body-s, regular);
+  color: var(--content-primary);
+}
+
+.tagsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-1);
+}
+
+.reportCard {
+  border-radius: var(--radius-4);
+  border: 1px solid var(--border-primary);
+  padding: var(--spacing-4);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, #f0f8e4 100%);
+  height: fit-content;
+}
+
+.reportTitle {
+  @include ty.font(subtitle-s, semibold);
+  color: var(--content-primary);
+  margin-bottom: var(--spacing-4);
+}
+
+.reportLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  @include ty.font(body-s, regular);
+}
+
+.descriptionText {
+  @include ty.font(body-m, regular);
+  color: var(--content-primary);
+  white-space: pre-wrap;
+}
+
+.participantsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.participantRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-2);
+}
+
+.participantInfo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  @include ty.font(body-s, regular);
+}
+
+@media (max-width: 1080px) {
+  .mainInfoRow {
+    grid-template-columns: 1fr;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+    row-gap: var(--spacing-1);
+  }
+}

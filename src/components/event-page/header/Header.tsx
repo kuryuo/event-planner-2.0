@@ -19,10 +19,21 @@ interface HeaderProps {
     eventId?: string;
     activeTab?: number;
     avatar?: string | null;
+    isArchived?: boolean;
+    archiveStatusLabel?: string;
     onTabChange?: (index: number) => void;
 }
 
-export default function Header({isAdmin = false, name, eventId, activeTab = 0, avatar, onTabChange}: HeaderProps) {
+export default function Header({
+    isAdmin = false,
+    name,
+    eventId,
+    activeTab = 0,
+    avatar,
+    isArchived = false,
+    archiveStatusLabel = 'Окончено',
+    onTabChange,
+}: HeaderProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
@@ -64,11 +75,9 @@ export default function Header({isAdmin = false, name, eventId, activeTab = 0, a
 
     useClickOutside(menuRef, () => setIsMenuOpen(false), isMenuOpen);
 
-    const tabItems: TabItem[] = [
-        {label: 'О мероприятии', badgeCount: 3},
-        {label: 'Чат'},
-        {label: 'Фотографии'},
-    ];
+    const tabItems: TabItem[] = isArchived
+        ? [{label: 'Обзор'}, {label: 'Документы'}, {label: 'Медиа'}]
+        : [{label: 'Обзор'}, {label: 'Документы'}, {label: 'Kanban доска'}, {label: 'Чат'}, {label: 'Медиа'}];
 
     const handleTabChange = (index: number) => {
         if (onTabChange) {
@@ -92,9 +101,9 @@ export default function Header({isAdmin = false, name, eventId, activeTab = 0, a
 
     return (
         <header className={styles.header}>
-            <button 
+            <button
                 type="button"
-                className={styles.backButton} 
+                className={styles.backButton}
                 onClick={handleBack}
             >
                 <ChevronLeftIcon className={styles.icon}/>
@@ -104,9 +113,15 @@ export default function Header({isAdmin = false, name, eventId, activeTab = 0, a
                 <div className={styles.left}>
                     <Avatar size="L" name={name} avatarUrl={buildImageUrl(avatar)}/>
                     <h2 className={styles.title}>{name}</h2>
+                    {isArchived && (
+                        <>
+                            <span className={styles.archiveStatus}>{archiveStatusLabel}</span>
+                            <span className={styles.archiveRole}>{isAdmin ? 'Вы организатор' : 'Вы участник'}</span>
+                        </>
+                    )}
                 </div>
                 <div className={styles.right}>
-                    {isAdmin ? (
+                    {isArchived ? null : isAdmin ? (
                         <div className={styles.adminActions} ref={menuRef}>
                             <Button variant="Filled" color="gray" onClick={handleEdit}>
                                 Редактировать

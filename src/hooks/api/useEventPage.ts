@@ -10,6 +10,9 @@ export interface UseEventPageOutput {
         description: string;
         location: string;
         formattedDate: string;
+        startDate: string;
+        endDate: string | null;
+        status: string | null;
         categories: Array<{ text: string }>;
         avatar?: string | null;
         color?: string;
@@ -35,6 +38,9 @@ export const useEventPage = (): UseEventPageOutput => {
             name: eventData.name,
             description: eventData.description ?? '',
             location: eventData.location,
+            startDate: eventData.startDate,
+            endDate: eventData.endDate,
+            status: eventData.status,
             formattedDate: eventData.startDate && eventData.endDate
                 ? formatDateTimeRange(eventData.startDate, eventData.endDate)
                 : '',
