@@ -1,78 +1,673 @@
+@use '@/typography-variables' as ty;
+
 .chatWrap {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-4);
+  position: relative;
   height: 100%;
-  min-height: 520px;
+  min-height: 560px;
 }
 
-.messages {
+.chatBody {
+  height: 100%;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-4);
+  background: var(--bg-primary);
+  display: grid;
+  grid-template-columns: 1fr;
+  position: relative;
+}
+
+.chatBodyWithSearch {
+  grid-template-columns: minmax(0, 1fr) 300px;
+}
+
+.messagesArea {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  position: relative;
+}
+
+.messagesScroll {
   flex: 1;
   overflow-y: auto;
+  padding: var(--spacing-3) var(--spacing-3) 112px;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-3);
-  padding: var(--spacing-3);
-  background-color: var(--bg-secondary-subtle);
-  border-radius: var(--radius-3);
+  gap: var(--spacing-1);
 }
 
-.empty {
+.messagesScroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.messagesScroll::-webkit-scrollbar-thumb {
+  background: var(--bg-secondary-hover);
+  border-radius: var(--radius-100);
+}
+
+.centerState,
+.emptyState {
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   color: var(--content-secondary);
+  @include ty.font(subtitle-s, regular);
+}
+
+.cubesPlaceholder {
+  width: 240px;
+  display: grid;
+  grid-template-columns: repeat(6, 20px);
+  gap: var(--spacing-1);
+  margin-bottom: var(--spacing-3);
+
+  span {
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-1);
+    background: var(--bg-secondary);
+    opacity: 0.3;
+
+    &:nth-child(2n) {
+      opacity: 0.2;
+    }
+
+    &:nth-child(3n) {
+      opacity: 0.5;
+    }
+  }
+}
+
+.dayDivider {
+  display: flex;
+  justify-content: center;
+  margin: var(--spacing-2) 0;
+}
+
+.unreadDivider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-3);
+  margin: var(--spacing-3) 0 var(--spacing-2);
+
+  &::before,
+  &::after {
+    content: '';
+    height: 1px;
+    background: var(--border-primary);
+    flex: 1;
+  }
+
+  span {
+    @include ty.font(caption-m, regular);
+    color: var(--content-secondary);
+  }
 }
 
 .messageRow {
   display: flex;
+  align-items: flex-end;
+  gap: var(--spacing-2);
+  max-width: 72%;
+
+  &.own {
+    align-self: flex-start;
+    flex-direction: row;
+  }
+
+  &.selected .bubble {
+    box-shadow: 0 0 0 1px var(--border-brand-green);
+  }
+}
+
+.stubAvatar {
+  width: 24px;
+  height: 24px;
+  color: var(--content-disabled-subtle);
+}
+
+.bubble {
+  border-radius: 14px;
+  background: var(--bg-secondary-subtle);
+  padding: var(--spacing-2) var(--spacing-3);
+  min-width: 180px;
+  max-width: 100%;
+  display: flex;
   flex-direction: column;
   gap: var(--spacing-1);
-  max-width: 76%;
-  padding: var(--spacing-3);
-  border-radius: var(--radius-2);
-  background-color: var(--bg-primary);
-  border: 1px solid var(--border-primary);
 }
 
-.own {
-  align-self: flex-end;
-  background-color: var(--bg-pink);
+.ownBubble {
+  background: linear-gradient(90deg, #022434 0%, #011b28 100%);
+  color: var(--content-primary-inverse);
 }
 
-.meta {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--spacing-2);
+.authorName {
+  @include ty.font(caption-m, regular);
   color: var(--content-secondary);
-  font-size: 12px;
 }
 
-.text {
+.messageTextRow {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: var(--spacing-2);
+}
+
+.messageText {
+  @include ty.font(subtitle-s, regular);
   white-space: pre-wrap;
   word-break: break-word;
 }
 
-.attachments {
+.time {
+  @include ty.font(caption-m, regular);
+  color: var(--content-secondary);
+}
+
+.ownBubble .time {
+  color: var(--white-alpha-50);
+}
+
+.replyPreview {
+  height: 24px;
+  border-radius: var(--radius-2);
+  background: var(--white-alpha-18);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  padding: 0 var(--spacing-1);
+  overflow: hidden;
+
+  span {
+    @include ty.font(caption-m, regular);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.attachmentsBlock {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: var(--spacing-2);
 }
 
-.attachment {
-  font-size: 12px;
-  color: var(--content-primary);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--radius-1);
-  padding: 2px 8px;
+.imageAttachment {
+  position: relative;
+  width: min(420px, 100%);
+  border-radius: var(--radius-2);
+  overflow: hidden;
+  min-height: 140px;
 }
 
-.composer {
+.imageBackground {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  filter: blur(10px);
+  transform: scale(1.1);
+  opacity: 0.55;
+}
+
+.imageContent {
+  position: relative;
+  max-width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+.videoAttachment {
+  border-radius: var(--radius-2);
+  overflow: hidden;
+  background: var(--bg-secondary);
+
+  video {
+    width: min(420px, 100%);
+    max-height: 460px;
+    display: block;
+  }
+}
+
+.fileAttachmentRow {
+  min-height: 52px;
+  border-radius: var(--radius-2);
+  background: var(--bg-secondary-subtle);
+  border: 1px solid var(--border-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  color: inherit;
+  max-width: 100%;
+}
+
+.fileIconWrap {
+  width: 20px;
+  height: 20px;
+  color: var(--content-positive);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fileDownloadIcon {
+  margin-left: auto;
+  width: 18px;
+  height: 18px;
+  color: var(--content-secondary);
+}
+
+.ownBubble .fileAttachmentRow {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.ownBubble .fileIconWrap {
+  color: #9be6b1;
+}
+
+.ownBubble .fileMeta span:first-child {
+  color: var(--content-primary-inverse);
+}
+
+.ownBubble .fileMeta span:last-child,
+.ownBubble .fileDownloadIcon,
+.ownBubble .fileRemoveRowButton {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.fileMeta {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-3);
+  min-width: 0;
+  flex: 1;
+
+  span:first-child {
+    @include ty.font(body-s, regular);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  span:last-child {
+    @include ty.font(caption-m, regular);
+    color: var(--content-secondary);
+  }
 }
 
-.composerActions {
+.oldMessagesBanner {
+  position: absolute;
+  left: 50%;
+  bottom: 88px;
+  transform: translateX(-50%);
+  z-index: 6;
+  min-width: 360px;
+  max-width: 80%;
+  height: 40px;
+  border-radius: var(--radius-100);
+  background: linear-gradient(90deg, #022434 0%, #011b28 100%);
+  color: var(--content-primary-inverse);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-3);
+  padding: 0 var(--spacing-3);
+
+  span {
+    @include ty.font(caption-m, regular);
+  }
+
+  button {
+    height: 28px;
+    border-radius: var(--radius-100);
+    padding: 0 var(--spacing-3);
+    border: 1px solid var(--white-alpha-18);
+    color: var(--content-primary-inverse);
+    background: transparent;
+    cursor: pointer;
+  }
+}
+
+.composerWrap {
+  position: absolute;
+  left: var(--spacing-3);
+  right: var(--spacing-3);
+  bottom: var(--spacing-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.selectedFilesGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--spacing-1);
+}
+
+.selectedFilesList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.filePreviewCard {
+  aspect-ratio: 1 / 1;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-1);
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-secondary-subtle);
+}
+
+.previewImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.removePreview {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--white-alpha-50);
+  cursor: pointer;
+}
+
+.fileRemoveRowButton {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--content-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.editingBanner,
+.replyBanner {
+  height: 34px;
+  border-radius: var(--radius-2);
+  background: var(--bg-secondary-subtle);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: 0 var(--spacing-2);
+
+  span {
+    @include ty.font(body-s, regular);
+  }
+
+  button {
+    margin-left: auto;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.composerRow {
+  min-height: 48px;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-2);
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: 0 var(--spacing-2);
+  position: relative;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.composerInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  @include ty.font(subtitle-s, regular);
+  color: var(--content-primary);
+}
+
+.composerInput::placeholder {
+  color: var(--content-secondary);
+}
+
+.composerRight {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+.iconButton {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--content-secondary);
+  background: transparent;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--bg-secondary-subtle);
+    color: var(--content-primary);
+  }
+}
+
+.sendButton {
+  color: var(--content-brand-green);
+}
+
+.emojiPanel {
+  position: absolute;
+  right: 0;
+  bottom: 52px;
+  z-index: 10;
+  box-shadow: var(--lvl2);
+}
+
+.searchToggle {
+  position: absolute;
+  right: var(--spacing-3);
+  top: var(--spacing-3);
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-2);
+  border: 1px solid var(--border-primary);
+  background: var(--bg-primary);
+  cursor: pointer;
+  color: var(--content-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+.searchPanel {
+  width: 300px;
+  border-left: 1px solid var(--border-primary);
+  background: var(--bg-primary);
+  padding: var(--spacing-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  z-index: 4;
+
+  h3 {
+    @include ty.font(subtitle-m, semibold);
+    color: var(--content-primary);
+    margin-top: var(--spacing-4);
+  }
+}
+
+.searchState,
+.searchEmpty {
+  @include ty.font(body-s, regular);
+  color: var(--content-secondary);
+}
+
+.searchEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.resultsCount {
+  @include ty.font(body-s, regular);
+  color: var(--content-secondary);
+}
+
+.resultsList {
+  overflow-y: auto;
+  margin: 0 calc(var(--spacing-4) * -1);
+}
+
+.resultItem {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  padding: var(--spacing-2) var(--spacing-4);
+  border-bottom: 1px solid var(--border-primary);
+  background: transparent;
+  cursor: pointer;
+
+  p {
+    @include ty.font(subtitle-s, regular);
+    color: var(--content-primary);
+  }
+}
+
+.resultHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+
+  span {
+    @include ty.font(caption-m, regular);
+    color: var(--content-secondary);
+  }
+
+  span:last-child {
+    margin-left: auto;
+  }
+}
+
+.resultActive {
+  background: var(--bg-brand-green-subtle);
+}
+
+.contextMenu {
+  position: fixed;
+  min-width: 180px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-2);
+  box-shadow: var(--lvl2);
+  overflow: hidden;
+  z-index: 80;
+
+  button {
+    width: 100%;
+    height: 36px;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    padding: 0 var(--spacing-2);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    color: var(--content-primary);
+
+    &:hover {
+      background: var(--bg-secondary-subtle);
+    }
+  }
+}
+
+.dangerItem {
+  color: var(--content-negative) !important;
+}
+
+.loadingOverlay {
+  position: absolute;
+  top: var(--spacing-2);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 8;
+  @include ty.font(caption-m, regular);
+  color: var(--content-secondary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-100);
+  padding: 4px var(--spacing-2);
+}
+
+@media (max-width: 1200px) {
+  .chatBodyWithSearch {
+    grid-template-columns: minmax(0, 1fr) 280px;
+  }
+
+  .searchPanel {
+    width: 280px;
+  }
+
+  .messageRow {
+    max-width: 82%;
+  }
+
+  .selectedFilesGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 920px) {
+  .chatBodyWithSearch {
+    grid-template-columns: 1fr;
+  }
+
+  .searchPanel {
+    position: fixed;
+    top: 80px;
+    right: var(--spacing-2);
+    height: calc(100vh - 160px);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-2);
+    box-shadow: var(--lvl2);
+  }
+
+  .oldMessagesBanner {
+    min-width: 260px;
+  }
 }

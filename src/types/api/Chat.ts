@@ -2,6 +2,14 @@ export interface ChatAttachment {
     id: string;
     fileName?: string | null;
     filePath?: string | null;
+    contentType?: string | null;
+    size?: number | null;
+}
+
+export interface ChatReplyMessage {
+    id: string;
+    authorName?: string | null;
+    text?: string | null;
 }
 
 export interface ChatMessage {
@@ -12,6 +20,8 @@ export interface ChatMessage {
     text: string;
     createdAt: string;
     isEdited?: boolean;
+    replyToMessageId?: string | null;
+    replyToMessage?: ChatReplyMessage | null;
     attachments?: ChatAttachment[];
 }
 
@@ -32,4 +42,34 @@ export interface SendChatMessageWithFilesPayload {
     text?: string;
     files?: File[];
     replyToMessageId?: string;
+}
+
+export interface SearchChatMessagesPayload {
+    eventId: string;
+    text: string;
+    maxResults?: number;
+}
+
+export interface UpdateChatMessagePayload {
+    eventId: string;
+    messageId: string;
+    text?: string;
+    removeAttachmentIds?: string[];
+}
+
+export interface DeleteChatMessagePayload {
+    eventId: string;
+    messageId: string;
+}
+
+export interface AddChatMessageAttachmentsPayload {
+    eventId: string;
+    messageId: string;
+    files: File[];
+}
+
+export interface DeleteChatMessageAttachmentPayload {
+    eventId: string;
+    messageId: string;
+    attachmentId: string;
 }
