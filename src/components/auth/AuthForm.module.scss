@@ -3,36 +3,30 @@
 .container {
   display: flex;
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
 }
 
 .imageSection {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  .image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+  display: none;
 }
 
 .formSection {
-  flex: 1;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 100dvh;
+  padding: clamp(16px, 3vw, 40px);
+  overflow: hidden;
 }
 
 .form {
   width: 100%;
-  max-width: 500px;
+  max-width: 460px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .title {
@@ -64,14 +58,14 @@
 
 .submitButton {
   width: 100%;
-  margin-top: var(--spacing-10);
+  margin-top: var(--spacing-6);
 }
 
 .links {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-4);
-  margin-top: var(--spacing-16);
+  margin-top: var(--spacing-10);
 }
 
 .linkWrapper {
@@ -91,5 +85,15 @@
 
   &:hover {
     opacity: 0.8;
+  }
+}
+
+@media (max-width: 680px) {
+  .formSection {
+    padding: var(--spacing-6);
+  }
+
+  .form {
+    max-width: 100%;
   }
 }

@@ -77,7 +77,7 @@ export default function Header({
 
     const tabItems: TabItem[] = isArchived
         ? [{label: 'Обзор'}, {label: 'Документы'}, {label: 'Медиа'}]
-        : [{label: 'Обзор'}, {label: 'Документы'}, {label: 'Kanban доска'}, {label: 'Чат'}, {label: 'Медиа'}];
+        : [{label: 'Обзор'}, {label: 'Документы'}, {label: 'Чат'}, {label: 'Медиа'}];
 
     const handleTabChange = (index: number) => {
         if (onTabChange) {

@@ -751,8 +751,6 @@ export default function ProfilePage() {
                                             </div>
                                         </div>
 
-                                        <p className={styles.sectionHint}>Канбан-доска в разработке</p>
-
                                         <div className={styles.tasksTable}>
                                             <div className={styles.tableHead}>
                                                 <span>Задача</span>

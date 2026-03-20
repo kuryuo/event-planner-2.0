@@ -14,9 +14,8 @@ import ArchivedEventOverview from '@/components/event-page/archived-overview/Arc
 
 const TAB_INDEX_OVERVIEW = 0;
 const TAB_INDEX_DOCUMENTS = 1;
-const TAB_INDEX_KANBAN = 2;
-const TAB_INDEX_CHAT = 3;
-const TAB_INDEX_MEDIA = 4;
+const TAB_INDEX_CHAT = 2;
+const TAB_INDEX_MEDIA = 3;
 
 const TAB_INDEX_ARCHIVED_OVERVIEW = 0;
 const TAB_INDEX_ARCHIVED_DOCUMENTS = 1;
@@ -110,12 +109,6 @@ export default function EventPage() {
                 return (
                     <div className={styles.archivedPlaceholder}>
                         Документы мероприятия в разработке
-                    </div>
-                );
-            case TAB_INDEX_KANBAN:
-                return (
-                    <div className={styles.archivedPlaceholder}>
-                        Kanban доска в разработке
                     </div>
                 );
             case TAB_INDEX_CHAT:
