@@ -1,7 +1,8 @@
-import {useState, useRef, useMemo} from "react";
-import {useNavigate} from "react-router-dom";
+import {useState, useRef, useMemo, useEffect} from "react";
+import {useNavigate} from 'react-router-dom';
 import styles from './Header.module.scss';
-import ChevronLeftIcon from '@/assets/img/icon-s/chevron-left.svg?react';
+import ChevronDownIcon from '@/assets/img/icon-m/chevron-down.svg?react';
+import Check2Icon from '@/assets/img/icon-m/check2.svg?react';
 import ThreeDotsVerticalIcon from '@/assets/img/icon-m/three-dots-vertical.svg?react';
 import TrashIcon from '@/assets/img/icon-m/trash.svg?react';
 import Avatar from '@/ui/avatar/Avatar';
@@ -11,7 +12,8 @@ import {useClickOutside} from '@/hooks/ui/useClickOutside.ts';
 import {useEventDeleter} from '@/hooks/ui/useEventDeleter.ts';
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 import {useGetProfileEventsQuery} from "@/services/api/profileApi.ts";
-import {useSubscribeToEventMutation, useUnsubscribeFromEventMutation} from "@/services/api/eventApi.ts";
+import {useSubscribeToEventMutation, useUnsubscribeFromEventMutation, useUpdateEventMutation} from "@/services/api/eventApi.ts";
+import type {EventLifecycleState, EventTypeKind, VenueFormat} from '@/types/api/Event.ts';
 
 interface HeaderProps {
     isAdmin?: boolean;
@@ -20,9 +22,38 @@ interface HeaderProps {
     activeTab?: number;
     avatar?: string | null;
     isArchived?: boolean;
-    archiveStatusLabel?: string;
+    status?: string | null;
+    updateData?: {
+        name: string;
+        description: string;
+        startDate?: string | null;
+        endDate?: string | null;
+        location: string;
+        venueFormat?: VenueFormat;
+        types?: EventTypeKind[];
+        maxParticipants?: number;
+        color?: string;
+    };
     onTabChange?: (index: number) => void;
 }
+
+const STATUS_OPTIONS = ['Черновик', 'В работе', 'Завершено', 'Отменено'];
+
+const statusLabelToApiValue: Record<string, EventLifecycleState> = {
+    'Черновик': 'Draft',
+    'В работе': 'Published',
+    'Завершено': 'Completed',
+    'Отменено': 'Cancelled',
+};
+
+const normalizeStatusLabel = (value?: string | null): string => {
+    const normalized = (value ?? '').toLowerCase();
+    if (normalized.includes('draft') || normalized.includes('чернов')) return 'Черновик';
+    if (normalized.includes('work') || normalized.includes('progress') || normalized.includes('в работе')) return 'В работе';
+    if (normalized.includes('cancel') || normalized.includes('отмен')) return 'Отменено';
+    if (normalized.includes('done') || normalized.includes('finish') || normalized.includes('complete') || normalized.includes('заверш')) return 'Завершено';
+    return 'Черновик';
+};
 
 export default function Header({
     isAdmin = false,
@@ -31,26 +62,27 @@ export default function Header({
     activeTab = 0,
     avatar,
     isArchived = false,
-    archiveStatusLabel = 'Окончено',
+    status,
+    updateData,
     onTabChange,
 }: HeaderProps) {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const menuRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isStatusOpen, setIsStatusOpen] = useState(false);
+    const [selectedStatus, setSelectedStatus] = useState(() => normalizeStatusLabel(status));
+    const menuRef = useRef<HTMLDivElement>(null);
+    const statusRef = useRef<HTMLDivElement>(null);
     const {handleDelete, isLoading: isDeleting} = useEventDeleter();
     
     const {data: subscribedEvents} = useGetProfileEventsQuery();
     const [subscribeToEvent] = useSubscribeToEventMutation();
     const [unsubscribeFromEvent] = useUnsubscribeFromEventMutation();
+    const [updateEvent] = useUpdateEventMutation();
     
     const isSubscribed = useMemo(() => {
         if (!eventId || !subscribedEvents) return false;
         return subscribedEvents.some(event => event.id === eventId);
     }, [eventId, subscribedEvents]);
-
-    const handleBack = () => {
-        navigate('/main');
-    };
 
     const handleEdit = () => {
         if (eventId) {
@@ -74,6 +106,7 @@ export default function Header({
     };
 
     useClickOutside(menuRef, () => setIsMenuOpen(false), isMenuOpen);
+    useClickOutside(statusRef, () => setIsStatusOpen(false), isStatusOpen);
 
     const tabItems: TabItem[] = isArchived
         ? [{label: 'Обзор'}, {label: 'Документы'}, {label: 'Медиа'}]
@@ -84,6 +117,10 @@ export default function Header({
             onTabChange(index);
         }
     };
+
+    useEffect(() => {
+        setSelectedStatus(normalizeStatusLabel(status));
+    }, [status]);
 
     const handleSubscribeClick = async () => {
         if (!eventId) return;
@@ -101,27 +138,85 @@ export default function Header({
 
     return (
         <header className={styles.header}>
-            <button
-                type="button"
-                className={styles.backButton}
-                onClick={handleBack}
-            >
-                <ChevronLeftIcon className={styles.icon}/>
-                <span className={styles.text}>Назад</span>
-            </button>
-            <div className={styles.main}>
-                <div className={styles.left}>
-                    <Avatar size="L" name={name} avatarUrl={buildImageUrl(avatar)}/>
-                    <h2 className={styles.title}>{name}</h2>
-                    {isArchived && (
-                        <>
-                            <span className={styles.archiveStatus}>{archiveStatusLabel}</span>
-                            <span className={styles.archiveRole}>{isAdmin ? 'Вы организатор' : 'Вы участник'}</span>
-                        </>
-                    )}
+            <div className={styles.summaryRow}>
+                <div className={styles.summaryLeft}>
+                    <Avatar size="S" shape="square" fallbackType="event" name={name} avatarUrl={buildImageUrl(avatar)}/>
+                    <h2 className={styles.summaryTitle}>{name}</h2>
+                    <span className={styles.summaryStatus}>{selectedStatus}</span>
+                    <span className={styles.summaryRole}>{isAdmin ? 'Вы организатор' : 'Вы участник'}</span>
                 </div>
-                <div className={styles.right}>
-                    {isArchived ? null : isAdmin ? (
+            </div>
+
+            <div className={styles.tabs}>
+                <Tabs items={tabItems} activeIndex={activeTab} onChange={handleTabChange}/>
+            </div>
+
+            {!isArchived && (
+                <div className={styles.main}>
+                    <div className={styles.left}>
+                        <Avatar size="L" shape="square" fallbackType="event" name={name} avatarUrl={buildImageUrl(avatar)}/>
+                        <h2 className={styles.title}>{name}</h2>
+
+                        <div className={styles.statusWrapper} ref={statusRef}>
+                            <button
+                                type="button"
+                                className={styles.statusButton}
+                                onClick={() => setIsStatusOpen((prev) => !prev)}
+                            >
+                                {selectedStatus}
+                                <ChevronDownIcon className={styles.statusChevron}/>
+                            </button>
+
+                            {isStatusOpen && (
+                                <div className={styles.statusDropdown}>
+                                    {STATUS_OPTIONS.map((option) => (
+                                        <button
+                                            key={option}
+                                            type="button"
+                                            className={styles.statusOption}
+                                            onClick={async () => {
+                                                if (!eventId || !updateData || !isAdmin) {
+                                                    setSelectedStatus(option);
+                                                    setIsStatusOpen(false);
+                                                    return;
+                                                }
+
+                                                const previousStatus = selectedStatus;
+                                                setSelectedStatus(option);
+                                                setIsStatusOpen(false);
+
+                                                try {
+                                                    await updateEvent({
+                                                        eventId,
+                                                        body: {
+                                                            name: updateData.name,
+                                                            description: updateData.description,
+                                                            startDate: updateData.startDate ?? null,
+                                                            endDate: updateData.endDate ?? null,
+                                                            location: updateData.location,
+                                                            venueFormat: updateData.venueFormat ?? 'InPerson',
+                                                            types: updateData.types,
+                                                            maxParticipants: updateData.maxParticipants ?? null,
+                                                            color: updateData.color ?? null,
+                                                            status: statusLabelToApiValue[option],
+                                                        },
+                                                    }).unwrap();
+                                                } catch (error) {
+                                                    console.error('Не удалось обновить статус мероприятия:', error);
+                                                    setSelectedStatus(previousStatus);
+                                                }
+                                            }}
+                                        >
+                                            <span>{option}</span>
+                                            {option === selectedStatus && <Check2Icon className={styles.statusCheck}/>}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    <div className={styles.right}>
+                        {isAdmin ? (
                         <div className={styles.adminActions} ref={menuRef}>
                             <Button variant="Filled" color="gray" onClick={handleEdit}>
                                 Редактировать
@@ -157,12 +252,10 @@ export default function Header({
                         >
                             {isSubscribed ? "Я не пойду" : "Я пойду"}
                         </Button>
-                    )}
+                        )}
+                    </div>
                 </div>
-            </div>
-            <div className={styles.tabs}>
-                <Tabs items={tabItems} activeIndex={activeTab} onChange={handleTabChange}/>
-            </div>
+            )}
         </header>
     );
 }

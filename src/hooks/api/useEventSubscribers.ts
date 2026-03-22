@@ -6,6 +6,7 @@ export interface Participant {
     id: string;
     name: string;
     avatarUrl?: string;
+    role?: string | null;
 }
 
 export interface UseEventSubscribersOutput {
@@ -27,12 +28,9 @@ export const useEventSubscribers = (eventId: string | null): UseEventSubscribers
             id: subscriber.id,
             name: subscriber.name?.trim() || `Пользователь ${index + 1}`,
             avatarUrl: buildImageUrl(subscriber.avatarUrl) ?? undefined,
+            role: subscriber.role,
         }));
     }, [data]);
-
-    if (data) {
-        console.log("Fetched event subscribers:", data);
-    }
 
     return {
         participants,

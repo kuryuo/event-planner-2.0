@@ -108,6 +108,21 @@
   @include ty.font(body-s, regular);
 }
 
+.ownerBadge {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-orange);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ownerIcon {
+  width: 24px;
+  height: 24px;
+}
+
 @media (max-width: 1080px) {
   .mainInfoRow {
     grid-template-columns: 1fr;

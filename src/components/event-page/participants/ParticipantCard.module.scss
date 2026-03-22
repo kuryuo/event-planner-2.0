@@ -1,11 +1,77 @@
 @use '@/typography-variables' as ty;
 
 .participantCard {
+  min-height: 40px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-3);
-  width: 100%;
+}
+
+.leftSection {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.mainInfo {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.name {
+  @include ty.font(subtitle-m, regular);
+  color: var(--content-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.roleText {
+  @include ty.font(body-m, regular);
+  color: var(--content-secondary);
+}
+
+.roleSelector {
+  position: relative;
+}
+
+.roleButtonAsSelect {
+  min-width: 170px;
+  height: 40px;
+  border-radius: var(--radius-2);
+  border: 1px solid var(--border-primary);
+  background: var(--bg-primary);
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  color: var(--content-primary);
+  @include ty.font(body-m, regular);
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 1;
+    color: var(--content-secondary);
+  }
+}
+
+.chevronIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.rolesDropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 1002;
 }
 
 .rightSection {
@@ -14,75 +80,40 @@
   gap: var(--spacing-3);
 }
 
-.contactStatus {
-  display: flex;
+.ownerBadge {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-orange);
+  display: inline-flex;
   align-items: center;
-  gap: var(--spacing-2);
-  padding: var(--spacing-1) var(--spacing-2);
-  border-radius: var(--radius-2);
-  background-color: var(--bg-secondary);
-
-  .checkIcon {
-    width: 16px;
-    height: 16px;
-    color: var(--content-positive);
-  }
-
-  .contactLabel {
-    @include ty.font(caption-m, regular);
-    color: var(--content-positive);
-  }
+  justify-content: center;
 }
 
-.menuWrapper {
-  position: relative;
+.ownerIcon {
+  width: 24px;
+  height: 24px;
 }
 
 .menuButton {
-  background: none;
   border: none;
+  background: transparent;
   padding: var(--spacing-1);
   cursor: pointer;
+  border-radius: var(--radius-2);
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-2);
-  transition: background-color 0.2s;
 
   &:hover {
-    background-color: var(--bg-secondary-hover);
+    background: var(--bg-secondary);
   }
-
-  .menuIcon {
-    width: 20px;
-    height: 20px;
-    color: var(--content-secondary);
-  }
-}
-
-.dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 4px;
-  background-color: var(--white);
-  border-radius: var(--radius-4);
-  box-shadow: var(--lvl2);
-  padding: var(--spacing-1);
-  display: flex;
-  flex-direction: column;
-  min-width: 200px;
-  z-index: 1001;
-}
-
-.divider {
-  height: 1px;
-  background-color: var(--border-primary);
-  margin: var(--spacing-1) 0;
 }
 
 .menuIcon {
   width: 16px;
   height: 16px;
+  color: var(--content-primary);
 }
-

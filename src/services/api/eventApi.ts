@@ -9,7 +9,6 @@ import type {
     UpdateEventResponse,
     GetEventSubscribersPayload,
     GetEventSubscribersResponse,
-    GetEventContactsResponse,
     GetEventPhotosPayload,
     GetEventPhotosResponse,
     UploadEventPhotoPayload,
@@ -17,10 +16,9 @@ import type {
     DeleteEventPhotoPayload,
     GetEventRolesPayload,
     GetEventRolesResponse,
+    GetEventBoardResponse,
     AssignUserRolePayload,
-    CreateEventRolePayload,
-    AddEventContactPayload,
-    RemoveEventContactPayload
+    CreateEventRolePayload
 } from "@/types/api/Event.ts";
 
 export const eventApi = baseApi.injectEndpoints({
@@ -51,6 +49,14 @@ export const eventApi = baseApi.injectEndpoints({
                 url: `/events/${eventId}`,
                 method: 'GET',
                 eventId,
+            }),
+            providesTags: (result, _error, eventId) =>
+                result ? [{type: 'Event', id: eventId}] : ['Event'],
+        }),
+        getEventBoard: builder.query<GetEventBoardResponse, string>({
+            query: (eventId) => ({
+                url: `/events/${eventId}/board`,
+                method: 'GET',
             }),
             providesTags: (result, _error, eventId) =>
                 result ? [{type: 'Event', id: eventId}] : ['Event'],
@@ -121,17 +127,6 @@ export const eventApi = baseApi.injectEndpoints({
                 },
             }),
             providesTags: (result, _error, {eventId}) =>
-                result ? [{type: 'Event', id: eventId}] : ['Event'],
-        }),
-        /**
-         * Получить контакты мероприятия
-         */
-        getEventContacts: builder.query<GetEventContactsResponse, string>({
-            query: (eventId) => ({
-                url: `/events/${eventId}/contacts`,
-                method: 'GET',
-            }),
-            providesTags: (result, _error, eventId) =>
                 result ? [{type: 'Event', id: eventId}] : ['Event'],
         }),
         /**
@@ -256,31 +251,6 @@ export const eventApi = baseApi.injectEndpoints({
             invalidatesTags: (result, _error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
         }),
-        /**
-         * Сделать пользователя контактом на мероприятии
-         */
-        addEventContact: builder.mutation<void, AddEventContactPayload>({
-            query: ({eventId, userId}) => ({
-                url: `/events/${eventId}/contacts`,
-                method: 'POST',
-                params: {
-                    userId,
-                },
-            }),
-            invalidatesTags: (result, _error, {eventId}) =>
-                result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
-        }),
-        /**
-         * Удалить пользователя из контактов мероприятия
-         */
-        removeEventContact: builder.mutation<void, RemoveEventContactPayload>({
-            query: ({eventId, userId}) => ({
-                url: `/events/${eventId}/contacts/${userId}`,
-                method: 'DELETE',
-            }),
-            invalidatesTags: (result, _error, {eventId}) =>
-                result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
-        }),
     }),
     overrideExisting: false,
 });
@@ -289,11 +259,11 @@ export const {
     useGetEventsQuery,
     useGetMyEventsQuery,
     useGetEventByIdQuery,
+    useGetEventBoardQuery,
     useCreateEventMutation,
     useUpdateEventMutation,
     useDeleteEventMutation,
     useGetEventSubscribersQuery,
-    useGetEventContactsQuery,
     useGetEventPhotosQuery,
     useUploadEventPhotoMutation,
     useDeleteEventPhotoMutation,
@@ -302,7 +272,5 @@ export const {
     useUploadEventAvatarMutation,
     useGetEventRolesQuery,
     useAssignUserRoleMutation,
-    useCreateEventRoleMutation,
-    useAddEventContactMutation,
-    useRemoveEventContactMutation
+    useCreateEventRoleMutation
 } = eventApi;

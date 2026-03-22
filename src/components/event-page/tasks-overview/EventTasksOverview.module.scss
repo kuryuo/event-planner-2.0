@@ -1,0 +1,134 @@
+@use '@/typography-variables' as ty;
+
+.panel {
+  width: 360px;
+  flex-shrink: 0;
+  border-radius: var(--radius-4);
+  background: var(--bg-secondary-subtle);
+  padding: var(--spacing-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  @include ty.font(subtitle-m, semibold);
+  color: var(--content-primary);
+}
+
+.linkButton {
+  @include ty.font(body-s, regular);
+  border: none;
+  background: transparent;
+  color: var(--content-secondary);
+  cursor: pointer;
+}
+
+.emptyState {
+  min-height: 210px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-3);
+}
+
+.emptyIcon {
+  color: var(--content-secondary);
+}
+
+.emptyText {
+  @include ty.font(body-m, regular);
+  color: var(--content-secondary);
+}
+
+.boardButton {
+  @include ty.font(button-m, semibold);
+  width: 100%;
+  height: 44px;
+  border-radius: var(--radius-2);
+  border: 1px solid var(--border-primary);
+  background: var(--bg-primary);
+  color: var(--content-primary);
+  cursor: pointer;
+}
+
+.progressBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  @include ty.font(body-m, regular);
+  color: var(--content-primary);
+}
+
+.progressTrack {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--bg-secondary);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--bg-brand-green);
+}
+
+.tasksList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.taskCard {
+  border-radius: var(--radius-3);
+  padding: var(--spacing-3);
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.priorityChip {
+  @include ty.font(caption-m, semibold);
+  color: var(--content-blue);
+  background: var(--bg-blue);
+  border-radius: var(--radius-100);
+  padding: 2px 8px;
+  align-self: flex-start;
+}
+
+.taskTitle {
+  @include ty.font(subtitle-m, semibold);
+  color: var(--content-primary);
+}
+
+.taskDescription {
+  @include ty.font(body-s, regular);
+  color: var(--content-secondary);
+}
+
+.taskMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-2);
+  @include ty.font(caption-m, regular);
+  color: var(--content-secondary);
+}
+
+@media (max-width: 1240px) {
+  .panel {
+    width: 100%;
+  }
+}

@@ -1,17 +1,14 @@
-import { useState, useRef } from 'react';
-import { CardWithDropdown } from '@/ui/card/CardWithDropdown';
-import Button from '@/ui/button/Button';
-import Check2Icon from '@/assets/img/icon-m/check2.svg?react';
-import ThreeDotsVerticalIcon from '@/assets/img/icon-m/three-dots-vertical.svg?react';
-import PersonIcon from '@/assets/img/icon-m/person.svg?react';
-import TrashIcon from '@/assets/img/icon-m/trash.svg?react';
-import { useClickOutside } from '@/hooks/ui/useClickOutside';
+import {useMemo, useRef, useState} from 'react';
+import Avatar from '@/ui/avatar/Avatar.tsx';
+import Menu from '@/ui/menu/Menu.tsx';
+import Chip from '@/ui/chip/Chip.tsx';
+import ChevronDownIcon from '@/assets/img/icon-m/chevron-down.svg?react';
+import XIcon from '@/assets/img/icon-s/x.svg?react';
+import OwnerIcon from '@/assets/image/owner-icon.svg?react';
+import {useClickOutside} from '@/hooks/ui/useClickOutside';
 import { 
     useGetEventRolesQuery, 
-    useAssignUserRoleMutation, 
-    useCreateEventRoleMutation,
-    useAddEventContactMutation,
-    useRemoveEventContactMutation
+    useAssignUserRoleMutation
 } from '@/services/api/eventApi';
 import styles from './ParticipantCard.module.scss';
 
@@ -26,55 +23,67 @@ const ROLE_MAP = {
     Observer: 'Observer',
 } as const;
 
+const ROLE_LABELS: Record<string, string> = {
+    Organizer: 'Организатор',
+    Editor: 'Редактор',
+    Assistant: 'Помощник',
+    Observer: 'Наблюдатель',
+};
+
+const toRoleLabel = (role?: string | null): string => {
+    if (!role) return 'Роль не назначена';
+    return ROLE_LABELS[role] || role;
+};
+
+const toRoleValue = (role?: string | null): string => {
+    if (!role) return '';
+    return ROLE_MAP[role as keyof typeof ROLE_MAP] || role;
+};
+
 interface ParticipantCardProps {
     name: string;
     avatarUrl: string | null;
-    isInContacts?: boolean;
     role?: string | null;
     eventId: string;
     userId: string;
     onExclude?: () => void;
     showActions?: boolean;
+    canEditRoles?: boolean;
 }
 
 export default function ParticipantCard({
     name,
     avatarUrl,
-    isInContacts = false,
     role,
     eventId,
     userId,
     onExclude,
     showActions = true,
+    canEditRoles = true,
 }: ParticipantCardProps) {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isSelectOpen, setIsSelectOpen] = useState(false);
-    const menuRef = useRef<HTMLDivElement>(null);
+    const [isRoleMenuOpen, setIsRoleMenuOpen] = useState(false);
+    const roleMenuRef = useRef<HTMLDivElement>(null);
 
     const {data: rolesData, isLoading: isLoadingRoles} = useGetEventRolesQuery(
         {eventId, count: 100},
-        {skip: !isSelectOpen || !eventId}
+        {skip: !isRoleMenuOpen || !eventId || !canEditRoles}
     );
 
     const [assignRole] = useAssignUserRoleMutation();
-    const [createRole] = useCreateEventRoleMutation();
-    const [addContact] = useAddEventContactMutation();
-    const [removeContact] = useRemoveEventContactMutation();
 
     const roles = rolesData?.res || [];
-    const currentRole = roles.find(r => r.name === role);
 
-    const handleMenuToggle = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        setIsMenuOpen(!isMenuOpen);
-    };
-
-    const handleSelectOpenChange = (isOpen: boolean) => {
-        setIsSelectOpen(isOpen);
-    };
+    const currentRoleValue = toRoleValue(role);
+    const currentRoleLabel = toRoleLabel(role);
+    const roleOptions = useMemo(() => {
+        return roles.map((roleItem) => ({
+            value: roleItem.name,
+            label: toRoleLabel(roleItem.name),
+        }));
+    }, [roles]);
 
     const handleRoleClick = async (roleName: string) => {
-        if (roleName === currentRole?.name) {
+        if (roleName === currentRoleValue) {
             return;
         }
 
@@ -90,125 +99,79 @@ export default function ParticipantCard({
         }
     };
 
-    const handleNewRoleCreate = async (roleName: string) => {
-        try {
-            await createRole({eventId, roleName}).unwrap();
-        } catch (error) {
-            console.error('Ошибка при создании роли:', error);
-        }
-    };
+    useClickOutside(roleMenuRef, () => {
+        setIsRoleMenuOpen(false);
+    }, isRoleMenuOpen);
 
-    const handleAddToContacts = async () => {
-        try {
-            await addContact({eventId, userId}).unwrap();
-            setIsMenuOpen(false);
-        } catch (error) {
-            console.error('Ошибка при добавлении в контакты:', error);
-        }
-    };
-
-    const handleRemoveFromContacts = async () => {
-        try {
-            await removeContact({eventId, userId}).unwrap();
-            setIsMenuOpen(false);
-        } catch (error) {
-            console.error('Ошибка при удалении из контактов:', error);
-        }
-    };
-
-    useClickOutside(menuRef, () => {
-        setIsMenuOpen(false);
-    }, isMenuOpen);
-
-    const subtitle = role || "Роль не назначена";
-    const isOrganizer = role === "Организатор";
-    
-    const selectOptions = roles.map((roleItem) => ({
-        label: roleItem.name,
-        description: undefined,
-        onClick: () => handleRoleClick(roleItem.name),
-    }));
-
-    const selectedRoleLabel = currentRole?.name;
+    const isOrganizer = currentRoleValue === 'Organizer';
 
     return (
         <div className={styles.participantCard}>
-            <CardWithDropdown
-                title={name}
-                avatarUrl={avatarUrl || ''}
-                size="M"
-                subtitle={subtitle}
-                selectOptions={isSelectOpen && isLoadingRoles ? [] : selectOptions}
-                onSelectOpenChange={handleSelectOpenChange}
-                selectedValues={selectedRoleLabel ? [selectedRoleLabel] : []}
-                withNewRoleInput={!isOrganizer}
-                onNewRoleCreate={handleNewRoleCreate}
-                disableRoleSelection={isOrganizer}
-            />
-            {showActions && (
-                <div className={styles.rightSection}>
-                    {isInContacts && (
-                        <div className={styles.contactStatus}>
-                            <Check2Icon className={styles.checkIcon} />
-                            <span className={styles.contactLabel}>В контактах</span>
-                        </div>
-                    )}
-                    {!isOrganizer && (
-                        <div className={styles.menuWrapper} ref={menuRef}>
-                            <button
-                                className={styles.menuButton}
-                                onClick={handleMenuToggle}
-                                aria-label="Меню действий"
-                                type="button"
-                            >
-                                <ThreeDotsVerticalIcon className={styles.menuIcon} />
-                            </button>
-                            {isMenuOpen && (
-                                <div className={styles.dropdown}>
-                                    {isInContacts ? (
-                                        <Button
-                                            variant="Text"
-                                            color="default"
-                                            leftIcon={<PersonIcon className={styles.menuIcon} />}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleRemoveFromContacts();
-                                            }}
-                                        >
-                                            Убрать из контактов
-                                        </Button>
-                                    ) : (
-                                        <Button
-                                            variant="Text"
-                                            color="default"
-                                            leftIcon={<PersonIcon className={styles.menuIcon} />}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleAddToContacts();
-                                            }}
-                                        >
-                                            Добавить в контакты
-                                        </Button>
-                                    )}
-                                    <div className={styles.divider} />
-                                    <Button
-                                        variant="Text"
-                                        color="red"
-                                        leftIcon={<TrashIcon className={styles.menuIcon} />}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onExclude?.();
-                                            setIsMenuOpen(false);
-                                        }}
-                                    >
-                                        Исключить
-                                    </Button>
-                                </div>
-                            )}
-                        </div>
+            <div className={styles.leftSection}>
+                <Avatar size="M" avatarUrl={avatarUrl || ''} name={name}/>
+                <div className={styles.mainInfo}>
+                    <span className={styles.name}>{name}</span>
+                    {!canEditRoles && (
+                        <span className={styles.roleText}>{currentRoleLabel}</span>
                     )}
                 </div>
-            )}
+            </div>
+
+            <div className={styles.rightSection}>
+                {isOrganizer && (
+                    <div className={styles.ownerBadge} aria-label="Организатор">
+                        <OwnerIcon className={styles.ownerIcon}/>
+                    </div>
+                )}
+
+                {canEditRoles && !isOrganizer && (
+                    <div className={styles.roleSelector} ref={roleMenuRef}>
+                        <button
+                            type="button"
+                            className={styles.roleButtonAsSelect}
+                            onClick={() => setIsRoleMenuOpen((prev) => !prev)}
+                            disabled={isOrganizer}
+                        >
+                            <span>{currentRoleLabel}</span>
+                            {!isOrganizer && <ChevronDownIcon className={styles.chevronIcon}/>} 
+                        </button>
+
+                        {isRoleMenuOpen && !isOrganizer && (
+                            <div className={styles.rolesDropdown}>
+                                <Menu
+                                    shape="square"
+                                    options={(isLoadingRoles ? [] : roleOptions).map((option) => ({
+                                        label: option.label,
+                                    }))}
+                                    selectedValues={[currentRoleLabel]}
+                                    onOptionClick={(_, index) => {
+                                        const selectedOption = roleOptions[index];
+                                        if (selectedOption) {
+                                            void handleRoleClick(selectedOption.value);
+                                        }
+                                        setIsRoleMenuOpen(false);
+                                    }}
+                                />
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {!canEditRoles && !isOrganizer && (
+                    <Chip text={currentRoleLabel} size="M" variant="filled" color="purple"/>
+                )}
+
+                {showActions && !isOrganizer && (
+                    <button
+                        className={styles.menuButton}
+                        aria-label="Исключить участника"
+                        type="button"
+                        onClick={() => onExclude?.()}
+                    >
+                        <XIcon className={styles.menuIcon}/>
+                    </button>
+                )}
+            </div>
         </div>
     );
 }

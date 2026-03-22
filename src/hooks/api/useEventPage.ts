@@ -2,6 +2,7 @@ import {useMemo} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {useGetEventByIdQuery} from '@/services/api/eventApi.ts';
 import {formatDateTimeRange} from '@/utils/date.ts';
+import type {VenueFormat} from '@/types/api/Event.ts';
 
 export interface UseEventPageOutput {
     event: {
@@ -16,7 +17,9 @@ export interface UseEventPageOutput {
         categories: Array<{ text: string }>;
         avatar?: string | null;
         color?: string;
+        venueFormat?: VenueFormat;
         responsiblePersonId?: string;
+        maxParticipants?: number;
     } | null;
     isLoading: boolean;
     error: unknown;
@@ -47,7 +50,9 @@ export const useEventPage = (): UseEventPageOutput => {
             categories: eventData.categories?.map(cat => ({text: cat})) ?? [],
             avatar: eventData.avatar,
             color: eventData.color,
+            venueFormat: eventData.venueFormat,
             responsiblePersonId: eventData.responsiblePersonId,
+            maxParticipants: eventData.maxParticipants,
         };
     }, [data]);
 

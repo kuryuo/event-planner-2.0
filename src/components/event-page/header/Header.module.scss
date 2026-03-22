@@ -3,117 +3,191 @@
 .header {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-8);
+  gap: var(--spacing-4);
+}
 
-  .icon {
-    color: var(--content-secondary);
-  }
+.summaryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-4);
+  padding: var(--spacing-3) var(--spacing-4);
+}
 
-  .backButton {
-    gap: var(--spacing-2);
-    display: flex;
-    align-items: center;
-    background: none;
-    border: none;
-    cursor: pointer;
+.summaryLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
 
-    .text {
-      @include ty.font(body-m, regular);
-      color: var(--content-link);
-    }
-  }
+.summaryTitle {
+  @include ty.font(title-s, semibold);
+}
 
-  .main {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.summaryStatus,
+.summaryRole {
+  @include ty.font(body-s, regular);
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  border-radius: var(--radius-100);
+  padding: 0 var(--spacing-3);
+}
 
-    .left {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-4);
+.summaryStatus {
+  background: var(--bg-secondary);
+  color: var(--content-primary);
+}
 
-      .title {
-        @include ty.font(title-m, semibold);
-      }
+.summaryRole {
+  background: var(--bg-orange);
+  color: var(--content-orange);
+}
 
-      .archiveStatus,
-      .archiveRole {
-        @include ty.font(body-s, regular);
-        display: inline-flex;
-        align-items: center;
-        height: 36px;
-        border-radius: var(--radius-100);
-        padding: 0 var(--spacing-3);
-      }
+.tabs {
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-4);
+  padding: 0 var(--spacing-2);
+}
 
-      .archiveStatus {
-        background: var(--bg-secondary);
-        color: var(--content-primary);
-      }
+.main {
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-4);
+  padding: var(--spacing-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-      .archiveRole {
-        background: var(--bg-orange);
-        color: var(--content-orange);
-      }
-    }
+.left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
 
-    .right {
-      display: flex;
-      align-items: center;
-    }
+.title {
+  @include ty.font(title-m, semibold);
+}
 
-    .adminActions {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-2);
-      position: relative;
-    }
+.statusWrapper {
+  position: relative;
+}
 
-    .menuWrapper {
-      position: relative;
-    }
+.statusButton {
+  height: 36px;
+  border-radius: var(--radius-100);
+  border: none;
+  background: var(--bg-secondary);
+  color: var(--content-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: 0 var(--spacing-3);
+  cursor: pointer;
+  @include ty.font(body-m, regular);
+}
 
-    .menuButton {
-      width: 44px;
-      height: 44px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--radius-2);
-      transition: background-color 0.2s;
+.statusChevron {
+  width: 18px;
+  height: 18px;
+}
 
-      &:hover {
-        background-color: var(--bg-secondary-hover);
-      }
-    }
+.statusDropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 140px;
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-3);
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--lvl2);
+  padding: var(--spacing-1);
+  z-index: 1000;
+}
 
-    .dropdown {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      margin-top: var(--spacing-1);
-      background-color: var(--bg-primary);
-      border-radius: var(--radius-4);
-      box-shadow: var(--lvl2);
-      z-index: 1000;
-      padding: var(--spacing-1);
-      white-space: nowrap;
-    }
+.statusOption {
+  width: 100%;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: var(--radius-2);
+  cursor: pointer;
+  @include ty.font(body-m, regular);
 
-    .trashIcon {
-      color: var(--content-negative);
-    }
+  &:hover {
+    background: var(--bg-secondary);
   }
 }
 
+.statusCheck {
+  color: var(--content-brand-green);
+}
+
+.right {
+  display: flex;
+  align-items: center;
+}
+
+.adminActions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  position: relative;
+}
+
+.menuWrapper {
+  position: relative;
+}
+
+.menuButton {
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-2);
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: var(--bg-secondary-hover);
+  }
+}
+
+.menuIcon {
+  color: var(--content-primary);
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-3);
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--lvl2);
+  z-index: 1000;
+  padding: var(--spacing-1);
+  white-space: nowrap;
+}
+
+.trashIcon {
+  color: var(--content-negative);
+}
+
 @media (max-width: 980px) {
-  .header {
-    .main {
-      .left {
-        flex-wrap: wrap;
-      }
-    }
+  .summaryLeft,
+  .left {
+    flex-wrap: wrap;
+  }
+
+  .main {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--spacing-3);
   }
 }

@@ -19,6 +19,8 @@ export interface EventResponse {
     color?: string;
 }
 
+export type EventLifecycleState = 'Draft' | 'Published' | 'Completed' | 'Cancelled';
+
 export type VenueFormat = 'InPerson' | 'Online' | 'Hybrid';
 
 export type EventTypeKind =
@@ -88,6 +90,7 @@ export interface UpdateEventPayload {
     types?: EventTypeKind[];
     maxParticipants?: number | null;
     color?: string | null;
+    status?: EventLifecycleState;
     avatar?: File | null;
 }
 
@@ -118,18 +121,9 @@ export interface GetEventSubscribersResponse {
             city: string | null;
             avatarUrl: string | null;
             role: string | null;
-            isContact?: boolean;
         }>;
         totalCount: number;
     };
-}
-
-export interface GetEventContactsResponse {
-    result: Array<{
-        name: string;
-        role: string;
-        avatarUrl: string;
-    }>;
 }
 
 export interface EventPost {
@@ -241,12 +235,31 @@ export interface CreateEventRolePayload {
     roleName: string;
 }
 
-export interface AddEventContactPayload {
-    eventId: string;
-    userId: string;
+export interface EventBoardTask {
+    id: string;
+    title?: string | null;
+    description?: string | null;
+    assigneeName?: string | null;
+    assignedUserName?: string | null;
+    dueDate?: string | null;
+    deadline?: string | null;
+    priority?: string | null;
+    commentsCount?: number;
+    commentCount?: number;
 }
 
-export interface RemoveEventContactPayload {
-    eventId: string;
-    userId: string;
+export interface EventBoardColumn {
+    id: string;
+    name?: string | null;
+    tasks?: EventBoardTask[];
+    boardTasks?: EventBoardTask[];
+}
+
+export interface GetEventBoardResponse {
+    result?: {
+        columns?: EventBoardColumn[];
+        boardColumns?: EventBoardColumn[];
+    };
+    columns?: EventBoardColumn[];
+    boardColumns?: EventBoardColumn[];
 }

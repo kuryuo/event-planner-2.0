@@ -1,9 +1,11 @@
-import {useState, useEffect, useRef} from "react";
-import styles from "./Participants.module.scss";
-import Avatar from "@/ui/avatar/Avatar";
-import {useEventSubscribers} from "@/hooks/api/useEventSubscribers.ts";
-import {useParticipantsModal} from "@/hooks/api/useParticipantsModal.ts";
-import ParticipantsModal from "./ParticipantsModal.tsx";
+import {useMemo, useState} from 'react';
+import styles from './Participants.module.scss';
+import TextField from '@/ui/text-field/TextField.tsx';
+import SearchIcon from '@/assets/img/icon-m/search.svg?react';
+import Button from '@/ui/button/Button.tsx';
+import ParticipantCard from './ParticipantCard.tsx';
+import {useGetEventSubscribersQuery} from '@/services/api/eventApi.ts';
+import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 
 interface ParticipantsProps {
     eventId: string | null;
@@ -11,147 +13,73 @@ interface ParticipantsProps {
     isAdmin?: boolean;
 }
 
-const AVATAR_SIZE = 48;
-const AVATAR_OVERLAP = 12;
-const REMAINING_BADGE_WIDTH = 48;
+export default function Participants({eventId, maxParticipants, isAdmin = false}: ParticipantsProps) {
+    const [searchName, setSearchName] = useState('');
 
-export default function Participants({
-                                         eventId,
-                                         maxParticipants,
-                                         isAdmin = false,
-                                     }: ParticipantsProps) {
-    const {participants, isLoading} = useEventSubscribers(eventId);
-    const {
-        isOpen,
-        openModal,
-        closeModal,
-    } = useParticipantsModal(eventId, {}, 50);
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [visibleCount, setVisibleCount] = useState(8);
+    const {data, isLoading, error} = useGetEventSubscribersQuery(
+        {
+            eventId: eventId ?? '',
+            count: 100,
+            name: searchName.trim() || undefined,
+        },
+        {skip: !eventId}
+    );
 
-    const totalCount = participants.length;
+    const participants = useMemo(() => data?.res?.users ?? [], [data]);
+    const participantsCount = data?.res?.totalCount ?? participants.length;
 
-    useEffect(() => {
-        const calculateVisibleCount = () => {
-            if (!containerRef.current) return;
-
-            const containerWidth = containerRef.current.offsetWidth;
-
-            let availableWidth = containerWidth;
-            let count = 0;
-
-            if (availableWidth < AVATAR_SIZE) {
-                setVisibleCount(0);
-                return;
-            }
-
-            availableWidth -= AVATAR_SIZE;
-            count = 1;
-
-            const avatarWidthWithOverlap = AVATAR_SIZE - AVATAR_OVERLAP;
-
-            while (availableWidth >= avatarWidthWithOverlap && count < totalCount) {
-                availableWidth -= avatarWidthWithOverlap;
-                count++;
-            }
-
-            if (count < totalCount) {
-                const spaceNeededForRemaining = REMAINING_BADGE_WIDTH - AVATAR_OVERLAP;
-                if (availableWidth < spaceNeededForRemaining && count > 1) {
-                    count--;
-                    availableWidth += avatarWidthWithOverlap;
-                }
-            }
-
-            setVisibleCount(Math.max(0, count));
-        };
-
-        calculateVisibleCount();
-
-        const resizeObserver = new ResizeObserver(() => {
-            calculateVisibleCount();
-        });
-
-        if (containerRef.current) {
-            resizeObserver.observe(containerRef.current);
-        }
-
-        return () => {
-            resizeObserver.disconnect();
-        };
-    }, [totalCount]);
-
-    const visibleParticipants = participants.slice(0, visibleCount);
-    const remainingCount = totalCount > visibleCount ? totalCount - visibleCount : 0;
-
-    const formatCount = () => {
-        if (maxParticipants) {
-            return `${totalCount} из ${maxParticipants}`;
-        }
-        return totalCount.toString();
-    };
-
-
-    if (isLoading) {
-        return (
-            <div className={styles.participants}>
-                <div className={styles.header}>
-                    <h2 className={styles.title}>Участники</h2>
-                </div>
-                <div>Загрузка...</div>
-            </div>
-        );
-    }
+    const formattedCount = maxParticipants
+        ? `${participantsCount} из ${maxParticipants}`
+        : String(participantsCount);
 
     return (
-        <>
-            <div className={styles.participants}>
-                <div className={styles.header}>
-                    <h2 className={styles.title} onClick={openModal} style={{cursor: 'pointer'}}>Участники</h2>
-                    <span className={styles.count}>{formatCount()}</span>
-                </div>
+        <section className={styles.participants}>
+            <div className={styles.header}>
+                <h2 className={styles.title}>Участники</h2>
+                <span className={styles.count}>{formattedCount}</span>
+            </div>
 
-            <div ref={containerRef} className={styles.avatarsContainer}>
-                {visibleParticipants.map((participant, index) => (
-                    <div
-                        key={participant.id}
-                        className={styles.avatarWrapper}
-                        style={{zIndex: index + 1}}
-                    >
-                        <Avatar
-                            size="M"
-                            name={participant.name}
-                            avatarUrl={participant.avatarUrl}
-                        />
-                    </div>
-                ))}
+            <div className={styles.controls}>
+                <TextField
+                    placeholder="Имя"
+                    value={searchName}
+                    leftIcon={<SearchIcon/>}
+                    onChange={(event) => setSearchName(event.target.value)}
+                />
 
-                {remainingCount > 0 && (
-                    <div
-                        className={styles.avatarWrapper}
-                        style={{zIndex: visibleCount + 1}}
-                    >
-                        <div className={styles.remainingCount}>
-                            <span className={styles.remainingText}>+{remainingCount}</span>
-                        </div>
-                    </div>
+                {isAdmin && (
+                    <Button variant="Filled" color="gray" disabled>
+                        Добавить
+                    </Button>
                 )}
             </div>
 
-                {/* {isAdmin && (
-                    <Button variant="Filled" color="gray" onClick={handleInvite}>
-                        Пригласить
-                    </Button>
-                )} */}
-            </div>
+            {isLoading && <div className={styles.state}>Загрузка...</div>}
 
-            <ParticipantsModal
-                isOpen={isOpen}
-                onClose={closeModal}
-                isAdmin={isAdmin}
-                eventId={eventId || ''}
-                onExclude={(id) => console.log('Исключить', id)}
-            />
-        </>
+            {!isLoading && error && (
+                <div className={styles.state}>Ошибка загрузки участников</div>
+            )}
+
+            {!isLoading && !error && participants.length === 0 && (
+                <div className={styles.state}>Участников пока нет</div>
+            )}
+
+            {!isLoading && !error && participants.length > 0 && (
+                <div className={styles.list}>
+                    {participants.map((participant) => (
+                        <ParticipantCard
+                            key={participant.id}
+                            name={participant.name || 'Пользователь'}
+                            avatarUrl={buildImageUrl(participant.avatarUrl) ?? null}
+                            role={participant.role}
+                            eventId={eventId || ''}
+                            userId={participant.id}
+                            showActions={isAdmin}
+                            canEditRoles={isAdmin}
+                        />
+                    ))}
+                </div>
+            )}
+        </section>
     );
 }

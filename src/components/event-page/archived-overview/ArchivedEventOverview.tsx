@@ -1,6 +1,7 @@
 import Avatar from '@/ui/avatar/Avatar.tsx';
 import Chip from '@/ui/chip/Chip.tsx';
 import FileLinesIcon from '@/assets/image/file-lines.svg?react';
+import OwnerIcon from '@/assets/image/owner-icon.svg?react';
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 import {useEventSubscribers} from '@/hooks/api/useEventSubscribers.ts';
 import styles from './ArchivedEventOverview.module.scss';
@@ -26,10 +27,19 @@ export default function ArchivedEventOverview({
 }: ArchivedEventOverviewProps) {
     const {participants} = useEventSubscribers(eventId);
 
+    const mapRoleLabel = (role?: string | null): string => {
+        const normalized = (role ?? '').toLowerCase();
+        if (normalized.includes('organizer')) return 'Организатор';
+        if (normalized.includes('editor')) return 'Редактор';
+        if (normalized.includes('assistant')) return 'Помощник';
+        if (normalized.includes('observer')) return 'Наблюдатель';
+        return 'Участник';
+    };
+
     return (
         <div className={styles.wrapper}>
             <div className={styles.topRow}>
-                <Avatar size="L" name={title} avatarUrl={buildImageUrl(avatar)}/>
+                <Avatar size="L" shape="square" fallbackType="event" name={title} avatarUrl={buildImageUrl(avatar)}/>
                 <h2 className={styles.title}>{title}</h2>
             </div>
 
@@ -83,7 +93,13 @@ export default function ArchivedEventOverview({
                                 <Avatar size="M" name={participant.name} avatarUrl={participant.avatarUrl}/>
                                 <span>{participant.name}</span>
                             </div>
-                            <Chip text="Редактор" size="M" variant="filled" color="purple"/>
+                            {mapRoleLabel(participant.role) === 'Организатор' ? (
+                                <div className={styles.ownerBadge}>
+                                    <OwnerIcon className={styles.ownerIcon}/>
+                                </div>
+                            ) : (
+                                <Chip text={mapRoleLabel(participant.role)} size="M" variant="filled" color="purple"/>
+                            )}
                         </div>
                     ))}
                 </div>

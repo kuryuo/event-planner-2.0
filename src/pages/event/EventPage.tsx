@@ -3,14 +3,14 @@ import Sidebar from "@/components/sidebar/Sidebar";
 import styles from "./EventPage.module.scss";
 import Header from "@/components/event-page/header/Header.tsx";
 import EventInfo from "@/components/event-page/event-info/EventInfo.tsx";
-import Post from "@/components/event-page/post/Post.tsx";
 import Participants from "@/components/event-page/participants/Participants.tsx";
-import Contacts from "@/components/event-page/contacts/Contacts.tsx";
 import PhotosGallery from "@/components/event-page/photos/PhotosGallery.tsx";
 import {useEventPage} from '@/hooks/api/useEventPage.ts';
 import {useGetProfileQuery} from "@/services/api/profileApi.ts";
 import EventChat from '@/components/event-page/chat/EventChat.tsx';
 import ArchivedEventOverview from '@/components/event-page/archived-overview/ArchivedEventOverview.tsx';
+import EventTasksOverview from '@/components/event-page/tasks-overview/EventTasksOverview.tsx';
+import {useGetEventSubscribersQuery} from '@/services/api/eventApi.ts';
 
 const TAB_INDEX_OVERVIEW = 0;
 const TAB_INDEX_DOCUMENTS = 1;
@@ -24,6 +24,10 @@ const TAB_INDEX_ARCHIVED_MEDIA = 2;
 export default function EventPage() {
     const {event, isLoading, error} = useEventPage();
     const {data: profile} = useGetProfileQuery();
+    const {data: subscribersData} = useGetEventSubscribersQuery(
+        {eventId: event?.id ?? '', count: 1, offset: 0},
+        {skip: !event?.id}
+    );
     const [activeTab, setActiveTab] = useState(TAB_INDEX_OVERVIEW);
 
     const isAdmin = profile && event?.responsiblePersonId 
@@ -41,7 +45,7 @@ export default function EventPage() {
     const archiveByDate = Boolean(event?.endDate && new Date(event.endDate).getTime() < Date.now());
     const isArchivedEvent = isStatusArchived || archiveByDate;
 
-    const archiveStatusLabel = normalizedStatus.includes('cancel') ? 'Отменено' : 'Окончено';
+    const visitorsCount = subscribersData?.res?.totalCount;
 
     if (isLoading) {
         return <div>Загрузка...</div>;
@@ -96,12 +100,12 @@ export default function EventPage() {
                                 description={event.description}
                                 categories={event.categories}
                                 color={event.color}
+                                visitorsCount={visitorsCount}
                             />
-                            <Post eventId={event.id} isAdmin={isAdmin}/>
+                            <Participants eventId={event.id} isAdmin={isAdmin}/>
                         </div>
                         <div className={styles.sideContent}>
-                            <Participants eventId={event.id} isAdmin={isAdmin}/>
-                            <Contacts eventId={event.id}/>
+                            <EventTasksOverview eventId={event.id}/>
                         </div>
                     </div>
                 );
@@ -143,7 +147,17 @@ export default function EventPage() {
                         eventId={event.id}
                         avatar={event.avatar}
                         isArchived={isArchivedEvent}
-                        archiveStatusLabel={archiveStatusLabel}
+                        status={event.status}
+                        updateData={{
+                            name: event.name,
+                            description: event.description,
+                            startDate: event.startDate,
+                            endDate: event.endDate,
+                            location: event.location,
+                            venueFormat: event.venueFormat,
+                            maxParticipants: event.maxParticipants,
+                            color: event.color,
+                        }}
                         activeTab={activeTab}
                         onTabChange={setActiveTab}
                     />
