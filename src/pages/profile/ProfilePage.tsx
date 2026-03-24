@@ -18,6 +18,7 @@ import TextField from '@/ui/text-field/TextField.tsx';
 import Button from '@/ui/button/Button.tsx';
 import Checkbox from '@/ui/checkbox/Checkbox.tsx';
 import EventPlate from '@/ui/event-plate/EventPlate.tsx';
+import Avatar from '@/ui/avatar/Avatar.tsx';
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 import {useAuth} from '@/hooks/api/useAuth.ts';
 import {useAvatarUpload} from '@/hooks/api/useAvatarUpload.ts';
@@ -66,9 +67,8 @@ interface ProfileTask {
     priority: string;
 }
 
-const FALLBACK_AVATAR = 'https://api.dicebear.com/7.x/shapes/png?size=200&radius=50';
-const FALLBACK_EVENT = 'https://api.dicebear.com/7.x/shapes/png?size=100&radius=8';
 const FALLBACK_COVER = 'https://images.unsplash.com/photo-1470163395405-d2b80e7450ed?auto=format&fit=crop&w=1600&q=80';
+const FALLBACK_EVENT = '';
 
 const SORT_OPTIONS: Array<{key: SortKey; label: string}> = [
     {key: 'deadline', label: 'По дедлайну'},
@@ -272,7 +272,7 @@ export default function ProfilePage() {
             id: event.id,
             title: event.name,
             date: formatEventDate(event.startDate),
-            cover: buildImageUrl(event.avatar) ?? buildImageUrl(event.previewPhotos?.[0]) ?? FALLBACK_EVENT,
+            cover: buildImageUrl(event.avatar) ?? buildImageUrl(event.previewPhotos?.[0]),
         }));
     }, [subscribedEvents]);
 
@@ -293,7 +293,7 @@ export default function ProfilePage() {
 
     const fullName = `${displayProfile?.firstName ?? ''} ${displayProfile?.lastName ?? ''}`.trim() || 'Пользователь';
     const coverUrl = backgroundPreviewUrl ?? displayProfile?.backgroundUrl ?? FALLBACK_COVER;
-    const avatarUrl = displayProfile?.avatarUrl ?? FALLBACK_AVATAR;
+    const avatarUrl = displayProfile?.avatarUrl;
     const loading = ownProfileLoading || foreignProfileLoading;
 
     const handleBack = () => {
@@ -583,7 +583,7 @@ export default function ProfilePage() {
                     <button className={styles.backButton} onClick={handleBack}>
                         <ChevronLeftIcon/>
                     </button>
-                    <img className={styles.topAvatar} src={avatarUrl} alt={fullName}/>
+                    <Avatar className={styles.topAvatar} size="S" avatarUrl={avatarUrl} name={fullName}/>
                     <span className={styles.topTitle}>{isForeignProfile ? fullName : 'Вы'}</span>
                 </div>
 
@@ -605,7 +605,7 @@ export default function ProfilePage() {
 
                     <div className={styles.avatarRow}>
                         <div className={styles.avatarWrapper}>
-                            <img className={styles.profileAvatar} src={avatarUrl} alt={fullName}/>
+                            <Avatar className={styles.profileAvatar} size="XL" avatarUrl={avatarUrl} name={fullName}/>
 
                             {!isForeignProfile && isEditMode && (
                                 <div className={styles.avatarMenuWrapper} ref={avatarMenuRef}>

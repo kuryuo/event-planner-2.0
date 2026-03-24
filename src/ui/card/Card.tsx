@@ -3,12 +3,14 @@ import styles from './Card.module.scss';
 import Avatar from '../avatar/Avatar.tsx';
 
 export type CardSize = 'M' | 'S';
+export type CardAvatarShape = 'circle' | 'square';
 
 export interface CardProps {
     size?: CardSize;
+    avatarShape?: CardAvatarShape;
     title: string;
     subtitle?: string;
-    avatarUrl: string;
+    avatarUrl?: string;
     className?: string;
     children?: React.ReactNode;
     onClick?: () => void;
@@ -18,6 +20,7 @@ export interface CardProps {
 
 export function Card({
     size = 'M',
+    avatarShape = 'circle',
     title,
     subtitle,
     avatarUrl,
@@ -39,7 +42,7 @@ export function Card({
             role={onClick ? 'button' : undefined}
             tabIndex={onClick ? 0 : undefined}
         >
-            <Avatar size={size} avatarUrl={avatarUrl} name={title} />
+            <Avatar size={size} shape={avatarShape} avatarUrl={avatarUrl} name={title} />
             <div className={styles.content}>
                 <div className={styles.textBlock}>
                     <span className={clsx(styles.title, styles[size])}>{title}</span>

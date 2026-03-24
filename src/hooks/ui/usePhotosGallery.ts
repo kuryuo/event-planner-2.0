@@ -60,14 +60,16 @@ export const usePhotosGallery = (eventId: string) => {
     };
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
+        const files = Array.from(e.target.files ?? []);
+        if (!files.length) return;
 
         try {
-            await uploadPhoto({eventId, file}).unwrap();
+            for (const file of files) {
+                await uploadPhoto({eventId, file}).unwrap();
+            }
             refetch();
         } catch (err) {
-            console.error('Ошибка при загрузке фото:', err);
+            console.error('Ошибка при загрузке медиа:', err);
         } finally {
             if (fileInputRef.current) {
                 fileInputRef.current.value = '';
@@ -97,6 +99,31 @@ export const usePhotosGallery = (eventId: string) => {
         }
     };
 
+    const handleDeleteCurrent = async () => {
+        if (selectedPhotoIndex === null) return;
+
+        const currentPhoto = photos[selectedPhotoIndex];
+        if (!currentPhoto) return;
+
+        try {
+            await deletePhoto({eventId, photoId: currentPhoto.id}).unwrap();
+
+            const nextTotal = photos.length - 1;
+            if (nextTotal <= 0) {
+                setSelectedPhotoIndex(null);
+            } else {
+                setSelectedPhotoIndex((prev) => {
+                    if (prev === null) return null;
+                    return Math.min(prev, nextTotal - 1);
+                });
+            }
+
+            refetch();
+        } catch (err) {
+            console.error('Ошибка при удалении медиа:', err);
+        }
+    };
+
     return {
         photos,
         isLoading,
@@ -117,5 +144,6 @@ export const usePhotosGallery = (eventId: string) => {
         handleFileChange,
         handleSelectModeToggle,
         handleDeleteSelected,
+        handleDeleteCurrent,
     };
 };

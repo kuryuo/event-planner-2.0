@@ -37,6 +37,35 @@
   gap: var(--spacing-2);
 }
 
+.recentChip {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  border-radius: var(--radius-100);
+  background-color: var(--bg-secondary);
+  color: var(--content-primary);
+  overflow: hidden;
+}
+
+.recentChipSelect {
+  @include ty.font(caption-m, regular);
+  border: none;
+  background: transparent;
+  padding: 4px 10px;
+  color: inherit;
+  cursor: pointer;
+}
+
+.recentChipRemove {
+  @include ty.font(caption-m, semibold);
+  border: none;
+  background: transparent;
+  color: var(--content-secondary);
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
 .list {
   display: flex;
   flex-direction: column;
@@ -52,11 +81,4 @@
 .emptyText {
   @include ty.font(caption-m, regular);
   color: var(--content-secondary);
-}
-
-.recentChip {
-  border: none;
-  border-radius: var(--radius-100);
-  background-color: var(--bg-secondary);
-  color: var(--content-primary);
 }

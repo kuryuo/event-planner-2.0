@@ -483,7 +483,23 @@
 }
 
 .sendButton {
+  svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.sendButtonActive {
   color: var(--content-brand-green);
+}
+
+.sendButtonInactive {
+  color: var(--content-disabled);
+
+  &:hover {
+    color: var(--content-disabled);
+    background: transparent;
+  }
 }
 
 .emojiPanel {

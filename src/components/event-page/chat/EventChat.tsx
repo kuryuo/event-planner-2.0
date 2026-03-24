@@ -25,6 +25,7 @@ import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 import Link45degIcon from '@/assets/img/icon-m/link-45deg.svg?react';
 import SearchIcon from '@/assets/img/icon-m/search.svg?react';
 import ArrowUpRightIcon from '@/assets/img/icon-m/arrow-up-right.svg?react';
+import SendIcon from '@/assets/image/send.svg?react';
 import PenIcon from '@/assets/img/icon-m/pen.svg?react';
 import TrashIcon from '@/assets/img/icon-m/trash.svg?react';
 import Check2Icon from '@/assets/img/icon-m/check2.svg?react';
@@ -507,6 +508,7 @@ export default function EventChat({eventId}: EventChatProps) {
     };
 
     const isBusy = isSendingText || isSendingWithFiles || isUpdatingMessage || isDeletingMessage;
+    const canSend = Boolean(text.trim() || composerFiles.length > 0);
     const mediaComposerFiles = composerFiles.filter((item) => item.previewType !== 'file');
     const documentComposerFiles = composerFiles.filter((item) => item.previewType === 'file');
 
@@ -727,12 +729,16 @@ export default function EventChat({eventId}: EventChatProps) {
                                 </button>
 
                                 <button
-                                    className={clsx(styles.iconButton, styles.sendButton)}
+                                    className={clsx(
+                                        styles.iconButton,
+                                        styles.sendButton,
+                                        canSend ? styles.sendButtonActive : styles.sendButtonInactive,
+                                    )}
                                     onClick={() => void handleSend()}
-                                    disabled={isBusy}
+                                    disabled={isBusy || !canSend}
                                     aria-label="Отправить"
                                 >
-                                    <ArrowUpRightIcon/>
+                                    <SendIcon/>
                                 </button>
                             </div>
 

@@ -1,10 +1,11 @@
 import clsx from 'clsx';
 import styles from './EventPlate.module.scss';
+import Avatar from '@/ui/avatar/Avatar.tsx';
 
 interface EventPlateProps {
     title: string;
     date: string;
-    avatarUrl: string;
+    avatarUrl?: string;
     className?: string;
     onClick?: () => void;
 }
@@ -22,7 +23,7 @@ export default function EventPlate({
             className={clsx(styles.plate, className)}
             onClick={onClick}
         >
-            <img className={styles.avatar} src={avatarUrl} alt={title} />
+            <Avatar className={styles.avatar} size="S" shape="square" fallbackType="event" avatarUrl={avatarUrl} name={title}/>
             <span className={styles.text}>
                 <span className={styles.title}>{title}</span>
                 <span className={styles.date}>{date}</span>

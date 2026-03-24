@@ -15,6 +15,7 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 import {format} from 'date-fns';
 import {ru} from 'date-fns/locale';
 import {useGetNotificationsQuery} from '@/services/api/notificationApi.ts';
+import {useNotificationsSignalR} from '@/hooks/realtime/useNotificationsSignalR.ts';
 import {APRIL_TEST_EVENTS} from '@/dev/aprilEventsSeed.ts';
 
 import SearchIcon from '@/assets/image/search.svg?react';
@@ -32,17 +33,45 @@ interface SidebarProps {
     tasksCount?: number;
 }
 
+const RECENT_SEARCHES_STORAGE_KEY = 'sidebar_recent_searches';
+const RECENT_SEARCHES_LIMIT = 8;
+
+const loadRecentSearches = (): string[] => {
+    try {
+        const raw = localStorage.getItem(RECENT_SEARCHES_STORAGE_KEY);
+        if (!raw) return [];
+
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+
+        return parsed
+            .filter((item): item is string => typeof item === 'string')
+            .map((item) => item.trim())
+            .filter(Boolean)
+            .slice(0, RECENT_SEARCHES_LIMIT);
+    } catch {
+        return [];
+    }
+};
+
 export default function Sidebar({notificationCount = 3, tasksCount = 0}: SidebarProps) {
+    useNotificationsSignalR();
+
     const {data: profile} = useGetProfileQuery();
     const {data: subscribedEvents} = useGetProfileEventsQuery();
     const {data: notifications, isLoading: notificationsLoading} = useGetNotificationsQuery({count: 100, offset: 0});
     const [createEventMutation] = useCreateEventMutation();
     const navigate = useNavigate();
-    const fallbackAvatar = 'https://api.dicebear.com/7.x/shapes/png?size=200&radius=12';
     const [eventsExpanded, setEventsExpanded] = useState(false);
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [recentSearches, setRecentSearches] = useState<string[]>(() => loadRecentSearches());
     const searchRef = useRef<HTMLDivElement>(null);
     const searchDropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        localStorage.setItem(RECENT_SEARCHES_STORAGE_KEY, JSON.stringify(recentSearches));
+    }, [recentSearches]);
 
     useEffect(() => {
         if (!isSearchModalOpen) {
@@ -74,7 +103,7 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
                 id: event.id,
                 title: event.name,
                 date,
-                avatarUrl: buildImageUrl(event.avatar) ?? fallbackAvatar,
+                avatarUrl: buildImageUrl(event.avatar),
             };
         });
     }, [subscribedEvents]);
@@ -88,7 +117,6 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
     }, [notifications, notificationCount, notificationsLoading]);
 
     const handleCreateAprilEvents = async () => {
-        // TODO REMOVE: кнопка нужна только для быстрого ручного теста.
         const shouldCreate = window.confirm(`Создать ${APRIL_TEST_EVENTS.length} тестовых мероприятий за апрель?`);
         if (!shouldCreate) return;
 
@@ -106,12 +134,22 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
         window.alert(`Создано мероприятий: ${createdCount} из ${APRIL_TEST_EVENTS.length}`);
     };
 
+    const trackRecentSearch = (query: string) => {
+        const normalized = query.trim();
+        if (!normalized) return;
+
+        setRecentSearches((prev) => {
+            const deduplicated = prev.filter((item) => item.toLowerCase() !== normalized.toLowerCase());
+            return [normalized, ...deduplicated].slice(0, RECENT_SEARCHES_LIMIT);
+        });
+    };
+
     return (
         <div className={styles.sidebar}>
             <div className={styles.userCard} onClick={handleProfileClick}>
                 <Card
                     title={`${profile?.lastName ?? ''} ${profile?.firstName ?? ''}`.trim() || '—'}
-                    avatarUrl={profile?.avatarUrl ? buildImageUrl(profile.avatarUrl)! : fallbackAvatar}
+                    avatarUrl={buildImageUrl(profile?.avatarUrl)}
                 />
             </div>
 
@@ -120,16 +158,33 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
             <div className={styles.search} ref={searchRef}>
                 <TextField
                     placeholder="Поиск..."
+                    value={searchQuery}
                     leftIcon={<SearchIcon />}
                     aria-label="Поиск"
+                    onChange={(event) => setSearchQuery(event.target.value)}
                     onClick={() => setIsSearchModalOpen(true)}
                     onFocus={() => setIsSearchModalOpen(true)}
+                    onKeyDown={(event) => {
+                        if (event.key === 'Enter' && searchQuery.trim()) {
+                            trackRecentSearch(searchQuery);
+                        }
+                    }}
                 />
 
                 <SearchModal
                     isOpen={isSearchModalOpen}
                     onClose={() => setIsSearchModalOpen(false)}
+                    query={searchQuery}
                     events={subscribedEvents ?? []}
+                    recentSearches={recentSearches}
+                    onRecentSelect={(query) => {
+                        setSearchQuery(query);
+                        setIsSearchModalOpen(true);
+                    }}
+                    onRecentRemove={(query) => {
+                        setRecentSearches((prev) => prev.filter((item) => item !== query));
+                    }}
+                    onTrackSearch={trackRecentSearch}
                     anchorRef={searchRef}
                     panelRef={searchDropdownRef}
                     onEventClick={(eventId) => {
@@ -193,16 +248,16 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
                                 />
                             ))}
 
-                             <Button
-                                 className={styles.createEventButton}
-                                 variant="Text"
-                                 color="default"
-                                 leftIcon={<PlusIcon />}
-                                 onClick={() => navigate('/editor')}
-                                 style={{justifyContent: 'flex-start'}}
-                             >
-                                 Создать новое
-                             </Button>
+                              <Button
+                                  className={styles.createEventButton}
+                                  variant="Text"
+                                  color="default"
+                                  leftIcon={<PlusIcon />}
+                                  onClick={() => navigate('/editor')}
+                                  style={{justifyContent: 'flex-start'}}
+                              >
+                                  Создать новое
+                              </Button>
 
                             {import.meta.env.DEV && (
                                 <Button
@@ -215,9 +270,10 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
                                     Создать 3 апрельских тестовых
                                 </Button>
                             )}
-                         </div>
-                     )}
-                 </div>
+
+                           </div>
+                       )}
+                   </div>
 
                 <NavItem
                     label="Архив"

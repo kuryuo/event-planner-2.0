@@ -1,6 +1,5 @@
 import styles from './PhotosGallery.module.scss';
 import {buildImageUrl} from '@/utils/buildImageUrl';
-import octopusImage from '@/assets/img/octopus.png';
 import PhotoViewer from './PhotoViewer';
 import Button from '@/ui/button/Button';
 import Checkbox from '@/ui/checkbox/Checkbox';
@@ -11,6 +10,11 @@ import {usePhotosGallery} from '@/hooks/ui/usePhotosGallery';
 interface PhotosGalleryProps {
     eventId: string;
 }
+
+const isVideoPath = (path?: string): boolean => {
+    if (!path) return false;
+    return /\.(mp4|webm|ogg|mov|m4v|avi|mkv)(\?|$)/i.test(path);
+};
 
 export default function PhotosGallery({eventId}: PhotosGalleryProps) {
     const {
@@ -33,6 +37,7 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
         handleFileChange,
         handleSelectModeToggle,
         handleDeleteSelected,
+        handleDeleteCurrent,
     } = usePhotosGallery(eventId);
 
     if (isLoading) {
@@ -85,24 +90,25 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
                 <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/*"
+                    accept="image/*,video/*"
+                    multiple
                     style={{display: 'none'}}
                     onChange={handleFileChange}
                 />
 
                 {error || !hasPhotos ? (
                     <div className={styles.emptyState}>
-                        <img src={octopusImage} alt="Осьминог" className={styles.octopusImage}/>
-                        <p className={styles.emptyText}>Пока фотографий нет</p>
+                        <h3 className={styles.emptyTitle}>Добавьте фото или видео</h3>
+                        <p className={styles.emptyText}>Перетащите файлы сюда или нажмите на кнопку ниже</p>
                         <Button
                             variant="Filled"
-                            color="gray"
+                            color="purple"
                             leftIcon={<PlusLgIcon className={styles.icon}/>}
                             onClick={handleUploadClick}
                             disabled={isUploading}
-                            className={styles.uploadButton}
+                            className={styles.emptyUploadButton}
                         >
-                            {isUploading ? 'Загрузка...' : 'Загрузить'}
+                            {isUploading ? 'Загрузка...' : 'Добавить документ'}
                         </Button>
                     </div>
                 ) : (
@@ -110,6 +116,8 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
                         {photos.map((photo, index) => {
                             const imageUrl = buildImageUrl(photo.filePath);
                             if (!imageUrl) return null;
+
+                            const isVideo = isVideoPath(photo.filePath);
                             
                             const isSelected = selectedPhotoIds.has(photo.id);
                             
@@ -127,12 +135,26 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
                                             />
                                         </div>
                                     )}
-                                    <img
-                                        src={imageUrl}
-                                        alt={`Фото ${index + 1}`}
-                                        className={styles.photo}
-                                        loading="lazy"
-                                    />
+                                    {isVideo ? (
+                                        <>
+                                            <video
+                                                src={imageUrl}
+                                                className={styles.photo}
+                                                preload="metadata"
+                                                muted
+                                            />
+                                            <div className={styles.videoBadge}>
+                                                <span>Видео</span>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <img
+                                            src={imageUrl}
+                                            alt={`Фото ${index + 1}`}
+                                            className={styles.photo}
+                                            loading="lazy"
+                                        />
+                                    )}
                                 </div>
                             );
                         })}
@@ -147,6 +169,7 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
                     onClose={handleCloseViewer}
                     onNext={handleNextPhoto}
                     onPrev={handlePrevPhoto}
+                    onDeleteCurrent={handleDeleteCurrent}
                 />
             )}
         </>

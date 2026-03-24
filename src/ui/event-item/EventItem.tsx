@@ -3,6 +3,7 @@ import styles from './EventItem.module.scss';
 import BoxArrowUpIcon from '@/assets/img/icon-m/box-arrow-up-right.svg';
 import {useNavigate} from "react-router-dom";
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
+import Avatar from '@/ui/avatar/Avatar.tsx';
 
 interface EventItemProps {
     eventId: string;
@@ -45,11 +46,7 @@ export default function EventItem({
         <div className={styles.eventItem}>
             <div className={styles.time}>{time}</div>
             <div className={styles.content}>
-                <img
-                    src={buildImageUrl(avatar) || "https://api.dicebear.com/7.x/shapes/png?size=200&radius=50"}
-                    alt={title}
-                    className={styles.avatar}
-                />
+                <Avatar size="L" fallbackType="event" avatarUrl={buildImageUrl(avatar)} name={title} className={styles.avatar}/>
                 <div className={styles.text}>
                     <div className={styles.title}>{title}</div>
                     <div className={styles.description}>{description}</div>
@@ -65,13 +62,7 @@ export default function EventItem({
                         {isSubscribed ? "Я не пойду" : "Я пойду"}
                     </Button>
                 )}
-                <img 
-                    src={BoxArrowUpIcon} 
-                    alt="icon" 
-                    className={styles.buttonIcon}
-                    onClick={handleIconClick}
-                    style={{cursor: 'pointer'}}
-                />
+                <img src={BoxArrowUpIcon} alt="icon" className={styles.buttonIcon} onClick={handleIconClick} style={{cursor: 'pointer'}}/>
             </div>
         </div>
     );

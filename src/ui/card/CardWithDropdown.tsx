@@ -21,6 +21,7 @@ export interface CardWithDropdownProps extends Omit<CardProps, 'subtitle'> {
 
 export function CardWithDropdown({
     size = 'M',
+    avatarShape = 'circle',
     title,
     subtitle,
     avatarUrl,
@@ -64,7 +65,7 @@ export function CardWithDropdown({
             role={onClick ? 'button' : undefined}
             tabIndex={onClick ? 0 : undefined}
         >
-            <Avatar size={size} avatarUrl={avatarUrl} name={title} />
+            <Avatar size={size} shape={avatarShape} avatarUrl={avatarUrl} name={title} />
             <div className={styles.content}>
                 <div className={styles.textBlock}>
                     <span className={clsx(styles.title, styles[size])}>{title}</span>
