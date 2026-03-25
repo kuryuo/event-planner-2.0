@@ -4,6 +4,7 @@ import authReducer from '@/store/authSlice';
 import eventReducer from '@/store/eventSlice';
 import profileReducer from '@/store/profileSlice';
 import dateTimeReducer from '@/store/dateTimeSlice';
+import realtimeReducer from '@/store/realtimeSlice';
 import {localStorageMiddleware} from '@/store/middleware/localStorageMiddleware';
 
 export const store = configureStore({
@@ -13,6 +14,7 @@ export const store = configureStore({
         event: eventReducer,
         profile: profileReducer,
         dateTime: dateTimeReducer,
+        realtime: realtimeReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware()

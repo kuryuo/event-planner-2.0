@@ -6,6 +6,10 @@ export interface NotificationItem {
     createdAt: string;
     invitationId?: string | null;
     eventId?: string | null;
+    type?: string | null;
+    senderName?: string | null;
+    communityName?: string | null;
+    messageText?: string | null;
 }
 
 export interface GetNotificationsPayload {

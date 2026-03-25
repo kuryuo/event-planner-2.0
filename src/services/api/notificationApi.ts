@@ -1,6 +1,49 @@
 import {baseApi} from '@/services/api/baseApi.ts';
 import type {GetNotificationsPayload, InvitationItem, NotificationItem} from '@/types/api/Notification.ts';
 
+const asRecord = (value: unknown): Record<string, unknown> | null => {
+    if (!value || typeof value !== 'object') return null;
+    return value as Record<string, unknown>;
+};
+
+const readString = (source: Record<string, unknown> | null, keys: string[]): string | null => {
+    if (!source) return null;
+
+    for (const key of keys) {
+        const value = source[key];
+        if (typeof value === 'string' && value.trim()) {
+            return value;
+        }
+    }
+
+    return null;
+};
+
+const parsePayload = (raw: unknown): Record<string, unknown> | null => {
+    if (typeof raw === 'string') {
+        try {
+            return asRecord(JSON.parse(raw));
+        } catch {
+            return null;
+        }
+    }
+
+    return asRecord(raw);
+};
+
+const resolveSenderName = (sender: Record<string, unknown> | null): string | null => {
+    if (!sender) return null;
+
+    const direct = readString(sender, ['name', 'fullName', 'senderName', 'authorName']);
+    if (direct) return direct;
+
+    const firstName = readString(sender, ['firstName', 'FirstName']) ?? '';
+    const lastName = readString(sender, ['lastName', 'LastName']) ?? '';
+    const full = `${firstName} ${lastName}`.trim();
+
+    return full || null;
+};
+
 const toArray = <T>(response: unknown): T[] => {
     if (Array.isArray(response)) {
         return response as T[];
@@ -26,14 +69,39 @@ const mapNotification = (item: unknown): NotificationItem | null => {
     const id = String(source.id ?? source.notificationId ?? '');
     if (!id) return null;
 
+    const type = readString(source, ['type', 'Type']);
+    const payload = parsePayload(source.payload);
+    const payloadMessage = asRecord(payload?.message);
+    const payloadSender = asRecord(payloadMessage?.sender ?? payloadMessage?.author);
+
+    const eventId =
+        readString(source, ['eventId', 'EventId'])
+        ?? readString(payload, ['community_id', 'communityId', 'eventId', 'EventId'])
+        ?? null;
+
+    const communityName = readString(payload, ['community_name', 'communityName', 'eventName', 'EventName']);
+    const messageText =
+        readString(source, ['text', 'message'])
+        ?? readString(payloadMessage, ['text', 'message'])
+        ?? null;
+    const senderName = resolveSenderName(payloadSender);
+
+    const title =
+        (source.title as string | null | undefined)
+        ?? ((type?.toLowerCase() === 'chatmessage' && senderName) ? `Новое сообщение от ${senderName}` : null);
+
     return {
         id,
-        title: (source.title as string | null | undefined) ?? null,
-        text: String(source.text ?? source.message ?? ''),
+        title,
+        text: messageText ?? '',
         isRead: Boolean(source.isRead ?? source.read),
         createdAt: String(source.createdAt ?? source.date ?? new Date().toISOString()),
         invitationId: (source.invitationId as string | null | undefined) ?? null,
-        eventId: (source.eventId as string | null | undefined) ?? null,
+        eventId,
+        type,
+        senderName,
+        communityName,
+        messageText,
     };
 };
 
