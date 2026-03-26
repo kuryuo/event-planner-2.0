@@ -12,10 +12,14 @@ import {useGetProfileEventsQuery, useGetProfileQuery} from "@/services/api/profi
 import {useCreateEventMutation} from '@/services/api/eventApi.ts';
 import {useNavigate} from "react-router-dom";
 import {useEffect, useMemo, useRef, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import type {AppDispatch, RootState} from '@/store/store.ts';
 import {format} from 'date-fns';
 import {ru} from 'date-fns/locale';
 import {useGetNotificationsQuery} from '@/services/api/notificationApi.ts';
 import {useNotificationsSignalR} from '@/hooks/realtime/useNotificationsSignalR.ts';
+import {useChatNotificationsSignalR} from '@/hooks/realtime/useChatNotificationsSignalR.ts';
+import {clearEventChatUnread} from '@/store/realtimeSlice.ts';
 import {APRIL_TEST_EVENTS} from '@/dev/aprilEventsSeed.ts';
 
 import SearchIcon from '@/assets/image/search.svg?react';
@@ -27,6 +31,7 @@ import ChevronIcon from '@/assets/image/chevron.svg?react';
 import PlusIcon from '@/assets/image/plus-lg.svg?react';
 import BoxArchiveIcon from '@/assets/image/box-archive.svg?react';
 import SearchModal from '@/components/sidebar/search-modal/SearchModal';
+import NotificationsDrawer from '@/components/notifications-drawer/NotificationsDrawer.tsx';
 
 interface SidebarProps {
     notificationCount?: number;
@@ -57,12 +62,15 @@ const loadRecentSearches = (): string[] => {
 export default function Sidebar({notificationCount = 3, tasksCount = 0}: SidebarProps) {
     useNotificationsSignalR();
 
+    const dispatch = useDispatch<AppDispatch>();
     const {data: profile} = useGetProfileQuery();
     const {data: subscribedEvents} = useGetProfileEventsQuery();
     const {data: notifications, isLoading: notificationsLoading} = useGetNotificationsQuery({count: 100, offset: 0});
+    const chatAlerts = useSelector((state: RootState) => state.realtime.chatAlerts);
     const [createEventMutation] = useCreateEventMutation();
     const navigate = useNavigate();
     const [eventsExpanded, setEventsExpanded] = useState(false);
+    const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [recentSearches, setRecentSearches] = useState<string[]>(() => loadRecentSearches());
@@ -108,13 +116,34 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
         });
     }, [subscribedEvents]);
 
+    const chatEventMetas = useMemo(
+        () => eventsList.map((event) => ({id: event.id, name: event.title})),
+        [eventsList]
+    );
+
+    useChatNotificationsSignalR(chatEventMetas);
+
+    const unreadChatEventIds = useMemo(() => {
+        const ids = new Set(chatAlerts.filter((alert) => !alert.isRead).map((alert) => alert.eventId));
+
+        (notifications ?? []).forEach((notification) => {
+            if (!notification.isRead && String(notification.type ?? '').toLowerCase() === 'chatmessage' && notification.eventId) {
+                ids.add(notification.eventId);
+            }
+        });
+
+        return ids;
+    }, [chatAlerts, notifications]);
+
+    const unreadChatCount = useMemo(() => chatAlerts.filter((alert) => !alert.isRead).length, [chatAlerts]);
+
     const unreadNotificationsCount = useMemo(() => {
         if (notificationsLoading || !notifications) {
             return notificationCount;
         }
 
-        return notifications.filter(notification => !notification.isRead).length;
-    }, [notifications, notificationCount, notificationsLoading]);
+        return notifications.filter(notification => !notification.isRead).length + unreadChatCount;
+    }, [notifications, notificationCount, notificationsLoading, unreadChatCount]);
 
     const handleCreateAprilEvents = async () => {
         const shouldCreate = window.confirm(`Создать ${APRIL_TEST_EVENTS.length} тестовых мероприятий за апрель?`);
@@ -202,7 +231,12 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
                         <Badge count={unreadNotificationsCount} variant="text" color="brand-green" />
                     ) : null
                 }
-                onClick={() => navigate('/notifications')}
+                onClick={() => setIsNotificationsOpen(true)}
+            />
+
+            <NotificationsDrawer
+                open={isNotificationsOpen}
+                onClose={() => setIsNotificationsOpen(false)}
             />
 
             <Divider />
@@ -244,7 +278,11 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
                                     title={event.title}
                                     date={event.date}
                                     avatarUrl={event.avatarUrl}
-                                    onClick={() => navigate(`/event?id=${event.id}`)}
+                                    showUnreadDot={unreadChatEventIds.has(event.id)}
+                                    onClick={() => {
+                                        dispatch(clearEventChatUnread(event.id));
+                                        navigate(`/event?id=${event.id}`);
+                                    }}
                                 />
                             ))}
 

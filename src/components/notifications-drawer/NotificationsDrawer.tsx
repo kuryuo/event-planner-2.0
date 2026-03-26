@@ -1,8 +1,7 @@
-import {useMemo} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useMemo, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+import {useNavigate} from 'react-router-dom';
 import type {AppDispatch, RootState} from '@/store/store.ts';
-import Sidebar from '@/components/sidebar/Sidebar.tsx';
 import Button from '@/ui/button/Button.tsx';
 import {
     useGetInvitationsQuery,
@@ -11,9 +10,14 @@ import {
     useMarkNotificationsReadMutation,
     useRespondInvitationMutation,
 } from '@/services/api/notificationApi.ts';
-import styles from './NotificationsPage.module.scss';
 import {markAllChatAlertsRead, markChatAlertRead} from '@/store/realtimeSlice.ts';
 import BellIcon from '@/assets/image/bell.svg?react';
+import styles from './NotificationsDrawer.module.scss';
+
+interface NotificationsDrawerProps {
+    open: boolean;
+    onClose: () => void;
+}
 
 type ViewNotification = {
     id: string;
@@ -38,19 +42,13 @@ const formatRelativeTime = (value: string): string => {
     const diffMs = Date.now() - date.getTime();
     const minutes = Math.max(1, Math.floor(diffMs / 60000));
 
-    if (minutes < 60) {
-        return `${minutes} мин назад`;
-    }
+    if (minutes < 60) return `${minutes} мин назад`;
 
     const hours = Math.floor(minutes / 60);
-    if (hours < 24) {
-        return `${hours} ч назад`;
-    }
+    if (hours < 24) return `${hours} ч назад`;
 
     const days = Math.floor(hours / 24);
-    if (days < 7) {
-        return `${days} дн назад`;
-    }
+    if (days < 7) return `${days} дн назад`;
 
     return new Intl.DateTimeFormat('ru-RU', {
         day: '2-digit',
@@ -58,15 +56,42 @@ const formatRelativeTime = (value: string): string => {
     }).format(date);
 };
 
-export default function NotificationsPage() {
+export default function NotificationsDrawer({open, onClose}: NotificationsDrawerProps) {
+    const [shouldRender, setShouldRender] = useState(open);
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
-    const {data: notifications = [], isLoading} = useGetNotificationsQuery({count: 100, offset: 0});
-    const {data: invitations = []} = useGetInvitationsQuery();
+    const {data: notifications = [], isLoading} = useGetNotificationsQuery({count: 100, offset: 0}, {skip: !open});
+    const {data: invitations = []} = useGetInvitationsQuery(undefined, {skip: !open});
     const chatAlerts = useSelector((state: RootState) => state.realtime.chatAlerts);
     const [markRead, {isLoading: isMarkingRead}] = useMarkNotificationsReadMutation();
     const [markAllRead, {isLoading: isMarkingAll}] = useMarkAllNotificationsReadMutation();
     const [respondInvitation, {isLoading: isResponding}] = useRespondInvitationMutation();
+
+    useEffect(() => {
+        if (!open) return;
+
+        const handleEscape = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                onClose();
+            }
+        };
+
+        window.addEventListener('keydown', handleEscape);
+        return () => window.removeEventListener('keydown', handleEscape);
+    }, [open, onClose]);
+
+    useEffect(() => {
+        if (open) {
+            setShouldRender(true);
+            return;
+        }
+
+        const timer = window.setTimeout(() => {
+            setShouldRender(false);
+        }, 220);
+
+        return () => window.clearTimeout(timer);
+    }, [open]);
 
     const mergedNotifications = useMemo<ViewNotification[]>(() => {
         const apiItems: ViewNotification[] = notifications.map((notification) => ({
@@ -96,13 +121,8 @@ export default function NotificationsPage() {
         return [...apiItems, ...chatItems];
     }, [notifications, chatAlerts]);
 
-    const unreadCount = useMemo(
-        () => mergedNotifications.filter(item => !item.isRead).length,
-        [mergedNotifications]
-    );
-
     const invitationById = useMemo(() => {
-        return new Map(invitations.map(invitation => [invitation.id, invitation]));
+        return new Map(invitations.map((invitation) => [invitation.id, invitation]));
     }, [invitations]);
 
     const sortedNotifications = useMemo(() => {
@@ -122,6 +142,8 @@ export default function NotificationsPage() {
         [sortedNotifications]
     );
 
+    const unreadCount = unreadNotifications.length;
+
     const handleRead = async (notification: ViewNotification) => {
         if (notification.isLocalChat) {
             dispatch(markChatAlertRead(notification.id));
@@ -130,53 +152,52 @@ export default function NotificationsPage() {
 
         try {
             await markRead([notification.id]).unwrap();
-        } catch (error) {
-            console.error('Не удалось отметить уведомление прочитанным', error);
+        } catch {
         }
     };
 
     const handleRespond = async (invitationId: string, accept: boolean) => {
         try {
             await respondInvitation({invitationId, accept}).unwrap();
-        } catch (error) {
-            console.error('Не удалось ответить на приглашение', error);
+        } catch {
         }
     };
 
-    const handleOpenChat = (notification: ViewNotification) => {
+    const handleOpenEvent = (notification: ViewNotification) => {
         if (!notification.eventId) return;
         if (notification.isLocalChat) {
             dispatch(markChatAlertRead(notification.id));
         }
         navigate(`/event?id=${notification.eventId}`);
+        onClose();
     };
 
-    return (
-        <div className={styles.pageWrapper}>
-            <div className={styles.sidebar}>
-                <Sidebar notificationCount={unreadCount}/>
-            </div>
+    if (!shouldRender) return null;
 
-            <div className={styles.contentArea}>
-                <div className={styles.content}>
+    return (
+        <div className={`${styles.root} ${open ? styles.open : styles.closing}`}>
+            <button type="button" className={styles.backdrop} aria-label="Закрыть уведомления" onClick={onClose} />
+            <aside className={styles.drawer} role="dialog" aria-modal="true" aria-label="Уведомления">
                 <div className={styles.header}>
-                    <h2>Уведомления</h2>
-                    <div className={styles.actions}>
-                        <Button variant="Text" color="default" onClick={() => navigate(-1)}>
-                            Назад
-                        </Button>
-                        <Button
-                            variant="Filled"
-                            color="gray"
-                            onClick={() => {
-                                dispatch(markAllChatAlertsRead());
-                                void markAllRead();
-                            }}
-                            disabled={unreadCount === 0 || isMarkingAll}
-                        >
-                            Прочитать все
-                        </Button>
-                    </div>
+                    <h2 className={styles.title}>Уведомления</h2>
+                    <button type="button" className={styles.closeButton} onClick={onClose} aria-label="Закрыть">
+                        ×
+                    </button>
+                </div>
+
+                <div className={styles.headerActions}>
+                    <span className={styles.counter}>Новые: {unreadCount}</span>
+                    <Button
+                        variant="Text"
+                        color="default"
+                        onClick={() => {
+                            dispatch(markAllChatAlertsRead());
+                            void markAllRead();
+                        }}
+                        disabled={unreadCount === 0 || isMarkingAll}
+                    >
+                        Прочитать все
+                    </Button>
                 </div>
 
                 {isLoading ? (
@@ -185,10 +206,7 @@ export default function NotificationsPage() {
                     <div className={styles.empty}>Уведомлений пока нет</div>
                 ) : (
                     <div className={styles.list}>
-                        {unreadNotifications.length > 0 && (
-                            <div className={styles.sectionTitle}>Новые</div>
-                        )}
-
+                        {unreadNotifications.length > 0 && <div className={styles.sectionTitle}>Новые</div>}
                         {unreadNotifications.map((notification) => {
                             const invitation = notification.invitationId
                                 ? invitationById.get(notification.invitationId)
@@ -200,12 +218,12 @@ export default function NotificationsPage() {
                                         className={styles.cardMain}
                                         role={notification.eventId ? 'button' : undefined}
                                         tabIndex={notification.eventId ? 0 : undefined}
-                                        onClick={() => notification.eventId && handleOpenChat(notification)}
+                                        onClick={() => notification.eventId && handleOpenEvent(notification)}
                                         onKeyDown={(event) => {
                                             if (!notification.eventId) return;
                                             if (event.key === 'Enter' || event.key === ' ') {
                                                 event.preventDefault();
-                                                handleOpenChat(notification);
+                                                handleOpenEvent(notification);
                                             }
                                         }}
                                     >
@@ -261,22 +279,19 @@ export default function NotificationsPage() {
                             );
                         })}
 
-                        {readNotifications.length > 0 && (
-                            <div className={styles.sectionTitle}>Прочитанные</div>
-                        )}
-
+                        {readNotifications.length > 0 && <div className={styles.sectionTitle}>Прочитанные</div>}
                         {readNotifications.map((notification) => (
                             <div key={notification.id} className={styles.card}>
                                 <div
                                     className={styles.cardMain}
                                     role={notification.eventId ? 'button' : undefined}
                                     tabIndex={notification.eventId ? 0 : undefined}
-                                    onClick={() => notification.eventId && handleOpenChat(notification)}
+                                    onClick={() => notification.eventId && handleOpenEvent(notification)}
                                     onKeyDown={(event) => {
                                         if (!notification.eventId) return;
                                         if (event.key === 'Enter' || event.key === ' ') {
                                             event.preventDefault();
-                                            handleOpenChat(notification);
+                                            handleOpenEvent(notification);
                                         }
                                     }}
                                 >
@@ -294,8 +309,7 @@ export default function NotificationsPage() {
                         ))}
                     </div>
                 )}
-            </div>
-            </div>
+            </aside>
         </div>
     );
 }

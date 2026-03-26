@@ -1,0 +1,259 @@
+@use '@/typography-variables' as ty;
+
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  pointer-events: none;
+}
+
+.open {
+  .backdrop {
+    animation: fadeIn 0.22s ease-out forwards;
+  }
+
+  .drawer {
+    animation: slideIn 0.22s ease-out forwards;
+  }
+}
+
+.closing {
+  .backdrop {
+    animation: fadeOut 0.22s ease-out forwards;
+  }
+
+  .drawer {
+    animation: slideOut 0.22s ease-out forwards;
+  }
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.drawer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(280px + var(--spacing-3));
+  width: min(420px, calc(100vw - 320px));
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 0;
+  box-shadow: none;
+  padding: var(--spacing-10) var(--spacing-6) var(--spacing-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  overflow-y: auto;
+  pointer-events: auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-2);
+}
+
+.title {
+  @include ty.font(title-s, semibold);
+  color: var(--content-primary);
+}
+
+.closeButton {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-2);
+  background: transparent;
+  color: var(--content-primary);
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--bg-secondary-subtle);
+  }
+}
+
+.headerActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.counter {
+  color: var(--content-secondary);
+  font-size: 14px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.sectionTitle {
+  color: var(--content-secondary);
+  font-weight: 500;
+  padding: var(--spacing-2) 0 var(--spacing-1);
+}
+
+.card {
+  border-radius: 0;
+  padding: var(--spacing-3) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  border-bottom: 1px solid var(--border-primary);
+  transition: background-color 0.16s ease;
+}
+
+.unread {
+  background-color: var(--bg-primary);
+}
+
+.cardMain {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-3);
+
+  &[role='button'] {
+    cursor: pointer;
+  }
+}
+
+.cardIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-2);
+  background-color: #fff6eb;
+  color: #f38720;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cardBody {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cardTitleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+.cardTitle {
+  @include ty.font(title-s, semibold);
+  color: var(--content-primary);
+}
+
+.cardText {
+  color: var(--content-secondary);
+  line-height: 1.3;
+}
+
+.cardDate {
+  color: var(--content-tertiary);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--content-brand-green);
+  flex-shrink: 0;
+}
+
+.cardArrow {
+  color: var(--content-secondary);
+  font-size: 20px;
+  line-height: 1;
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+
+.cardControls {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.invitationBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.actions {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: center;
+}
+
+.empty {
+  color: var(--content-secondary);
+  padding-top: var(--spacing-3);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-16px);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 1024px) {
+  .drawer {
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: min(420px, 100vw);
+    border-radius: 0;
+  }
+}

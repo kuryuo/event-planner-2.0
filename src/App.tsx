@@ -1,4 +1,4 @@
-import {MemoryRouter, Routes, Route, useLocation} from "react-router-dom";
+import {MemoryRouter, Routes, Route, useLocation, Navigate} from "react-router-dom";
 import MainPage from "@/pages/main/MainPage.tsx";
 import AuthPage from "@/pages/auth/AuthPage.tsx";
 import EventEditorPage from "@/pages/event-editor/EventEditorPage.tsx";
@@ -6,7 +6,6 @@ import EventPage from "@/pages/event/EventPage.tsx";
 import ProfilePage from "@/pages/profile/ProfilePage.tsx";
 import TasksPage from "@/pages/tasks/TasksPage.tsx";
 import ArchivePage from "@/pages/archive/ArchivePage.tsx";
-import NotificationsPage from '@/pages/notifications/NotificationsPage.tsx';
 import {useEffect, useState} from "react";
 
 function getInitialPath(): string {
@@ -34,7 +33,7 @@ function AppRoutes() {
             <Route path="/profile" element={<ProfilePage/>}/>
             <Route path="/tasks" element={<TasksPage/>}/>
             <Route path="/archive" element={<ArchivePage/>}/>
-            <Route path="/notifications" element={<NotificationsPage/>}/>
+            <Route path="/notifications" element={<Navigate to="/main" replace/>}/>
         </Routes>
     );
 }

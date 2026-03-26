@@ -6,17 +6,19 @@ interface EventPlateProps {
     title: string;
     date: string;
     avatarUrl?: string;
+    showUnreadDot?: boolean;
     className?: string;
     onClick?: () => void;
 }
 
 export default function EventPlate({
-                                      title,
-                                      date,
-                                      avatarUrl,
-                                      className,
-                                      onClick,
-                                  }: EventPlateProps) {
+                                       title,
+                                       date,
+                                       avatarUrl,
+                                      showUnreadDot = false,
+                                       className,
+                                       onClick,
+                                   }: EventPlateProps) {
     return (
         <button
             type="button"
@@ -28,6 +30,7 @@ export default function EventPlate({
                 <span className={styles.title}>{title}</span>
                 <span className={styles.date}>{date}</span>
             </span>
+            {showUnreadDot && <span className={styles.unreadDot} aria-hidden="true"/>}
         </button>
     );
 }

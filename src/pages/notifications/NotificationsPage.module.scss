@@ -10,15 +10,26 @@
   height: 100%;
 }
 
+.contentArea {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  padding-top: var(--spacing-5);
+}
+
 .content {
   background-color: var(--bg-primary);
-  padding: var(--spacing-8) var(--spacing-6);
+  padding: var(--spacing-6) var(--spacing-5);
   border-radius: var(--spacing-6);
-  flex: 1;
+  width: min(480px, calc(100vw - 340px));
+  min-height: calc(100vh - var(--spacing-10));
+  border: 1px solid var(--border-primary);
+  box-shadow: 0 14px 42px rgba(16, 24, 40, 0.08);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-4);
+  animation: slideIn 0.24s ease-out;
 }
 
 .header {
@@ -37,41 +48,95 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-3);
+  gap: var(--spacing-2);
 }
 
 .card {
-  border: 1px solid var(--border-primary);
   border-radius: var(--radius-3);
-  padding: var(--spacing-4);
+  padding: var(--spacing-3);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-3);
+  gap: var(--spacing-2);
+  border: 1px solid transparent;
+  transition: background-color 0.16s ease, border-color 0.16s ease;
 }
 
 .unread {
-  border-color: var(--border-pink);
-  background-color: var(--bg-pink);
+  background-color: var(--bg-primary);
+  border-color: var(--border-primary);
 }
 
-.cardTop {
+.cardMain {
   display: flex;
-  justify-content: space-between;
+  align-items: flex-start;
   gap: var(--spacing-3);
+
+  &[role='button'] {
+    cursor: pointer;
+  }
+}
+
+.cardIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-2);
+  background-color: #fff6eb;
+  color: #f38720;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cardBody {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cardTitleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
 }
 
 .cardTitle {
   font-weight: 600;
+  color: var(--content-primary);
 }
 
 .cardText {
   color: var(--content-secondary);
+  line-height: 1.3;
 }
 
 .cardDate {
   color: var(--content-tertiary);
   font-size: 12px;
   white-space: nowrap;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--content-brand-green);
+  flex-shrink: 0;
+}
+
+.cardArrow {
+  color: var(--content-secondary);
+  font-size: 20px;
+  line-height: 1;
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+
+.cardControls {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .invitationBlock {
@@ -84,10 +149,37 @@
   color: var(--content-secondary);
 }
 
+.sectionTitle {
+  color: var(--content-secondary);
+  font-weight: 500;
+  padding: var(--spacing-2) 0 var(--spacing-1);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 @media (max-width: 1024px) {
   .pageWrapper {
     flex-direction: column;
     height: auto;
     min-height: 100vh;
+  }
+
+  .contentArea {
+    padding-top: 0;
+  }
+
+  .content {
+    width: auto;
+    min-height: auto;
+    border-radius: var(--radius-3);
   }
 }
