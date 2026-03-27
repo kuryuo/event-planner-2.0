@@ -41,14 +41,13 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
     const datePickerRef = useRef<HTMLDivElement>(null);
     const {data: organizersData} = useGetOrganizersQuery();
 
-    const typeChips: Array<{label: string; value: EventTypeKind}> = [
+    const typeChips: Array<{ label: string; value: EventTypeKind }> = [
         {label: 'Хакатон', value: 'Hackathon'},
         {label: 'Лекция', value: 'Lecture'},
-        {label: 'Вебинар', value: 'Webinar'},
-        {label: 'УрФУ', value: 'UrFU'},
         {label: 'ПП', value: 'PP'},
         {label: 'Спецкурс', value: 'SpecialCourse'},
         {label: 'Практика', value: 'Practice'},
+        {label: 'Карьерные мероприятия', value: 'CereerEvent'},
     ];
 
     const toggleType = (value: EventTypeKind) => {
@@ -110,7 +109,7 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
             }
 
             if (appliedFilters.Organizators && organizersData) {
-                const organizers = organizersData.filter(org => 
+                const organizers = organizersData.filter(org =>
                     appliedFilters.Organizators!.includes(org.id)
                 );
                 setSelectedOrganizers(organizers);
@@ -180,127 +179,127 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
                     <img src={CloseIcon} alt="Закрыть" onClick={onClose} className={styles.closeIcon}/>
                 </div>
 
-            <div className={styles.dateSection}>
-                <label className={styles.dateLabel}>Дата</label>
-                <div className={styles.dateWrapper} ref={datePickerRef}>
-                    <CalendarIcon
-                        className={styles.calendarIcon}
-                        onClick={() => setShowDatePicker(!showDatePicker)}
-                    />
-                    <input
-                        type="text"
-                        placeholder="Выберите период"
-                        className={styles.dateInput}
-                        value={formatDateRange(dateRange)}
-                        onClick={() => setShowDatePicker(!showDatePicker)}
-                        readOnly
-                    />
-                    {showDatePicker && (
-                        <div className={styles.datePicker}>
-                            <DatePicker
-                                initialRange={dateRange}
-                                onRangeChange={(range) => {
-                                    setDateRange(range);
-                                }}
-                            />
-                        </div>
-                    )}
+                <div className={styles.dateSection}>
+                    <label className={styles.dateLabel}>Дата</label>
+                    <div className={styles.dateWrapper} ref={datePickerRef}>
+                        <CalendarIcon
+                            className={styles.calendarIcon}
+                            onClick={() => setShowDatePicker(!showDatePicker)}
+                        />
+                        <input
+                            type="text"
+                            placeholder="Выберите период"
+                            className={styles.dateInput}
+                            value={formatDateRange(dateRange)}
+                            onClick={() => setShowDatePicker(!showDatePicker)}
+                            readOnly
+                        />
+                        {showDatePicker && (
+                            <div className={styles.datePicker}>
+                                <DatePicker
+                                    initialRange={dateRange}
+                                    onRangeChange={(range) => {
+                                        setDateRange(range);
+                                    }}
+                                />
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </div>
 
-            <div className={styles.formatSection}>
-                <span className={styles.formatTitle}>Формат</span>
-                <div className={styles.formatList}>
-                    {Object.keys(formats).map(key => (
-                        <label key={key} className={styles.formatItem}>
-                            <Checkbox
-                                checked={formats[key as keyof typeof formats]}
-                                onChange={() => toggleFormat(key as keyof typeof formats)}
-                            />
-                            <span>
+                <div className={styles.formatSection}>
+                    <span className={styles.formatTitle}>Формат</span>
+                    <div className={styles.formatList}>
+                        {Object.keys(formats).map(key => (
+                            <label key={key} className={styles.formatItem}>
+                                <Checkbox
+                                    checked={formats[key as keyof typeof formats]}
+                                    onChange={() => toggleFormat(key as keyof typeof formats)}
+                                />
+                                <span>
                                 {key === 'inPerson'
                                     ? 'Очный'
                                     : key === 'hybrid'
                                         ? 'Гибридный'
                                         : 'Онлайн'}
                             </span>
-                        </label>
-                    ))}
+                            </label>
+                        ))}
+                    </div>
                 </div>
-            </div>
 
-            <div className={styles.typeSection}>
-                <span className={styles.typeTitle}>Тип</span>
-                <div className={styles.typeChips}>
-                    {typeChips.map((type) => (
-                        selectedTypes.includes(type.value) ? (
-                            <Chip
-                                key={type.value}
-                                text={type.label}
-                                size="S"
-                                closable
-                                onClose={() => toggleType(type.value)}
-                            />
-                        ) : (
-                            <button
-                                key={type.value}
-                                type="button"
-                                className={styles.typeChipButton}
-                                onClick={() => toggleType(type.value)}
-                            >
-                                <Chip text={type.label} size="S" />
-                            </button>
-                        )
-                    ))}
+                <div className={styles.typeSection}>
+                    <span className={styles.typeTitle}>Тип</span>
+                    <div className={styles.typeChips}>
+                        {typeChips.map((type) => (
+                            selectedTypes.includes(type.value) ? (
+                                <Chip
+                                    key={type.value}
+                                    text={type.label}
+                                    size="S"
+                                    closable
+                                    onClose={() => toggleType(type.value)}
+                                />
+                            ) : (
+                                <button
+                                    key={type.value}
+                                    type="button"
+                                    className={styles.typeChipButton}
+                                    onClick={() => toggleType(type.value)}
+                                >
+                                    <Chip text={type.label} size="S"/>
+                                </button>
+                            )
+                        ))}
+                    </div>
                 </div>
-            </div>
 
-            <div className={styles.selectSection}>
-                <Tags
-                    isOpen={openSelect === 'tags'}
-                    onOpenChange={(isOpen) => setOpenSelect(isOpen ? 'tags' : null)}
-                    onSelectedChange={setSelectedTags}
-                    initialCategories={selectedTags}
-                />
-            </div>
+                <div className={styles.selectSection}>
+                    <Tags
+                        isOpen={openSelect === 'tags'}
+                        onOpenChange={(isOpen) => setOpenSelect(isOpen ? 'tags' : null)}
+                        onSelectedChange={setSelectedTags}
+                        initialCategories={selectedTags}
+                    />
+                </div>
 
-            <div className={styles.selectSection}>
-                <Organizers
-                    isOpen={openSelect === 'organizers'}
-                    onOpenChange={(isOpen) => setOpenSelect(isOpen ? 'organizers' : null)}
-                    onSelectedChange={setSelectedOrganizers}
-                    initialOrganizers={selectedOrganizers}
-                />
-            </div>
+                <div className={styles.selectSection}>
+                    <Organizers
+                        isOpen={openSelect === 'organizers'}
+                        onOpenChange={(isOpen) => setOpenSelect(isOpen ? 'organizers' : null)}
+                        onSelectedChange={setSelectedOrganizers}
+                        initialOrganizers={selectedOrganizers}
+                    />
+                </div>
 
-            <Divider />
+                <Divider/>
 
-            <div className={styles.switchRow}>
-                <Switch
-                    checked={myEvents}
-                    onCheckedChange={setMyEvents}
-                    label="Мои мероприятия"
-                    labelPosition="left"
-                />
-            </div>
+                <div className={styles.switchRow}>
+                    <Switch
+                        checked={myEvents}
+                        onCheckedChange={setMyEvents}
+                        label="Мои мероприятия"
+                        labelPosition="left"
+                    />
+                </div>
 
-            <div className={styles.actions}>
-                <Button
-                    size="M"
-                    variant="Filled"
-                    onClick={handleApply}
-                >
-                    Применить
-                </Button>
+                <div className={styles.actions}>
+                    <Button
+                        size="M"
+                        variant="Filled"
+                        onClick={handleApply}
+                    >
+                        Применить
+                    </Button>
 
-                <Button
-                    size="M"
-                    variant="Text"
-                    onClick={handleClear}
-                >
-                    Очистить
-                </Button>
-            </div>
+                    <Button
+                        size="M"
+                        variant="Text"
+                        onClick={handleClear}
+                    >
+                        Очистить
+                    </Button>
+                </div>
             </div>
         </div>
     );

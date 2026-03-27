@@ -1,7 +1,13 @@
 import {useState, useEffect, useRef} from 'react';
 import {useDateTime} from '@/hooks/api/useDateTime.ts';
 import {useChips} from '@/hooks/ui/useChips.ts';
-import type {CreateEventPayload, EventResponse, EventTypeKind, UpdateEventPayload, VenueFormat} from '@/types/api/Event.ts';
+import type {
+    CreateEventPayload,
+    EventResponse,
+    EventTypeKind,
+    UpdateEventPayload,
+    VenueFormat
+} from '@/types/api/Event.ts';
 import {EVENT_FORMAT_MAP, FORMAT_REVERSE_MAP} from '@/const.ts';
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 import {combineDateTime, parseDateTime} from '@/utils/date';
@@ -9,11 +15,10 @@ import {combineDateTime, parseDateTime} from '@/utils/date';
 const EVENT_TYPE_OPTIONS: EventTypeKind[] = [
     'Hackathon',
     'Lecture',
-    'Webinar',
-    'UrFU',
     'PP',
     'SpecialCourse',
     'Practice',
+    'CereerEvent',
 ];
 
 const VENUE_FORMAT_MAP: Record<string, VenueFormat> = {

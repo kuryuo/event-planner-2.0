@@ -26,11 +26,10 @@ export type VenueFormat = 'InPerson' | 'Online' | 'Hybrid';
 export type EventTypeKind =
     | 'Hackathon'
     | 'Lecture'
-    | 'Webinar'
-    | 'UrFU'
     | 'PP'
     | 'SpecialCourse'
-    | 'Practice';
+    | 'Practice'
+    | 'CereerEvent';
 
 export type ParticipantRoleKind = 'Organizer' | 'Editor' | 'Assistant' | 'Observer';
 

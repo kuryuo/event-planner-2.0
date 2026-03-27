@@ -78,11 +78,10 @@ export default function EventForm({
     const EVENT_TYPE_LABELS = {
         Hackathon: 'Хакатон',
         Lecture: 'Лекция',
-        Webinar: 'Вебинар',
-        UrFU: 'УрФУ',
         PP: 'ПП',
         SpecialCourse: 'Спецкурс',
         Practice: 'Практика',
+        CereerEvent: 'Карьерные мероприятия',
     };
 
     const handleSubmit = () => {
@@ -106,10 +105,10 @@ export default function EventForm({
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                 />
-                    <button className={styles.closeButton} onClick={handleClose}>
-                        <img src={CloseIcon} alt="close"/>
-                    </button>
-                </div>
+                <button className={styles.closeButton} onClick={handleClose}>
+                    <img src={CloseIcon} alt="close"/>
+                </button>
+            </div>
             <div className={styles.contentGrid}>
                 <div className={styles.form}>
                     <div className={styles.section}>
@@ -159,7 +158,7 @@ export default function EventForm({
                         </div>
                     </div>
 
-                    <Divider />
+                    <Divider/>
 
                     <div className={styles.section}>
                         <span className={styles.title}>Участники</span>
@@ -182,7 +181,7 @@ export default function EventForm({
                         )}
                     </div>
 
-                    <Divider />
+                    <Divider/>
 
                     <div className={styles.section}>
                         <span className={styles.title}>Теги</span>
@@ -258,10 +257,10 @@ export default function EventForm({
                         onClick={() => fileInputRef.current?.click()}
                     >
                         {avatarPreview ? (
-                            <img src={avatarPreview} alt="Обложка" className={styles.coverPreview} />
+                            <img src={avatarPreview} alt="Обложка" className={styles.coverPreview}/>
                         ) : (
                             <div className={styles.coverUploadInner}>
-                                <ImageIcon />
+                                <ImageIcon/>
                                 <span>Загрузите изображение</span>
                             </div>
                         )}
