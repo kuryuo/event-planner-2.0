@@ -37,6 +37,15 @@ const mapMessage = (item: unknown): ChatMessage | null => {
         ? String((rawAuthor as Record<string, unknown>).id ?? '')
         : '';
 
+    const authorAvatarFromObject = rawAuthor && typeof rawAuthor === 'object'
+        ? String(
+            (rawAuthor as Record<string, unknown>).avatarUrl
+            ?? (rawAuthor as Record<string, unknown>).avatar
+            ?? (rawAuthor as Record<string, unknown>).photoUrl
+            ?? ''
+        ).trim()
+        : '';
+
     const rawAttachments = source.attachments;
     const attachments = Array.isArray(rawAttachments)
         ? rawAttachments
@@ -79,6 +88,11 @@ const mapMessage = (item: unknown): ChatMessage | null => {
             ?? (source.name as string | null | undefined)
             ?? authorFromObject
             ?? null
+        ),
+        authorAvatarUrl: (
+            (source.authorAvatarUrl as string | null | undefined)
+            ?? (source.avatarUrl as string | null | undefined)
+            ?? (authorAvatarFromObject || null)
         ),
         text: String(source.text ?? ''),
         createdAt: String(source.createdAt ?? new Date().toISOString()),
@@ -123,14 +137,7 @@ export const chatApi = baseApi.injectEndpoints({
                 method: 'GET',
                 params: {count, offset},
             }),
-            transformResponse: (response: unknown, _meta, arg) => {
-                if (import.meta.env.DEV) {
-                    console.group('[Chat][IN] getEventChatMessages response');
-                    console.log('request:', arg);
-                    console.log('raw response:', response);
-                    console.groupEnd();
-                }
-
+            transformResponse: (response: unknown) => {
                 return toMessagesArray(response);
             },
             providesTags: (_result, _error, {eventId}) => [{type: 'Chat', id: eventId}],
@@ -144,41 +151,18 @@ export const chatApi = baseApi.injectEndpoints({
             transformResponse: (response: unknown) => toMessagesArray(response),
         }),
         sendEventChatMessage: builder.mutation<void, SendChatMessagePayload>({
-            query: ({eventId, text, replyToMessageId}) => {
-                if (import.meta.env.DEV) {
-                    console.group('[Chat][OUT] sendEventChatMessage payload');
-                    console.log({eventId, text, replyToMessageId});
-                    console.groupEnd();
-                }
-
-                return {
-                    url: `/events/${eventId}/chat/messages`,
-                    method: 'POST',
-                    body: {
-                        text,
-                        replyToMessageId,
-                    },
-                };
-            },
+            query: ({eventId, text, replyToMessageId}) => ({
+                url: `/events/${eventId}/chat/messages`,
+                method: 'POST',
+                body: {
+                    text,
+                    replyToMessageId,
+                },
+            }),
             invalidatesTags: (_result, _error, {eventId}) => [{type: 'Chat', id: eventId}],
         }),
         sendEventChatMessageWithFiles: builder.mutation<void, SendChatMessageWithFilesPayload>({
             query: ({eventId, text, files = [], replyToMessageId}) => {
-                if (import.meta.env.DEV) {
-                    console.group('[Chat][OUT] sendEventChatMessageWithFiles payload');
-                    console.log({
-                        eventId,
-                        text,
-                        replyToMessageId,
-                        files: files.map((file) => ({
-                            name: file.name,
-                            size: file.size,
-                            type: file.type,
-                        })),
-                    });
-                    console.groupEnd();
-                }
-
                 const formData = new FormData();
 
                 if (text) {

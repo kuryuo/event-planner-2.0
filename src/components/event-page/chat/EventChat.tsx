@@ -8,6 +8,7 @@ import {
 } from 'react';
 import EmojiPicker, {type EmojiClickData} from 'emoji-picker-react';
 import clsx from 'clsx';
+import {useDispatch} from 'react-redux';
 import TextField from '@/ui/text-field/TextField.tsx';
 import Avatar from '@/ui/avatar/Avatar.tsx';
 import Chip from '@/ui/chip/Chip.tsx';
@@ -31,10 +32,12 @@ import TrashIcon from '@/assets/img/icon-m/trash.svg?react';
 import Check2Icon from '@/assets/img/icon-m/check2.svg?react';
 import XIcon from '@/assets/img/icon-s/x.svg?react';
 import DownloadIcon from '@/assets/img/icon-m/download.svg?react';
-import CircleIcon from '@/assets/img/icon-m/circle.svg?react';
 import FileLinesIcon from '@/assets/image/file-lines.svg?react';
 import styles from './EventChat.module.scss';
 import type {ChatAttachment, ChatMessage} from '@/types/api/Chat.ts';
+import {useChatSignalR} from '@/hooks/realtime/useChatSignalR.ts';
+import type {AppDispatch} from '@/store/store.ts';
+import {clearEventChatUnread} from '@/store/realtimeSlice.ts';
 
 interface EventChatProps {
     eventId: string;
@@ -136,6 +139,16 @@ const shortText = (text?: string | null): string => {
 };
 
 export default function EventChat({eventId}: EventChatProps) {
+    const dispatch = useDispatch<AppDispatch>();
+
+    useChatSignalR(eventId);
+
+    useEffect(() => {
+        if (eventId) {
+            dispatch(clearEventChatUnread(eventId));
+        }
+    }, [dispatch, eventId]);
+
     const {data: profile} = useGetProfileQuery();
 
     const {data: messages = [], isLoading, isFetching} = useGetEventChatMessagesQuery({
@@ -359,8 +372,7 @@ export default function EventChat({eventId}: EventChatProps) {
             }).unwrap();
 
             clearComposer();
-        } catch (error) {
-            console.error('Не удалось отправить сообщение', error);
+        } catch {
         }
     };
 
@@ -382,8 +394,7 @@ export default function EventChat({eventId}: EventChatProps) {
 
         try {
             await navigator.clipboard.writeText(value);
-        } catch (error) {
-            console.error('Не удалось скопировать текст', error);
+        } catch {
         }
     };
 
@@ -418,8 +429,7 @@ export default function EventChat({eventId}: EventChatProps) {
             if (editingMessageId === deleteCandidate.id) {
                 clearComposer();
             }
-        } catch (error) {
-            console.error('Не удалось удалить сообщение', error);
+        } catch {
         }
     };
 
@@ -530,6 +540,10 @@ export default function EventChat({eventId}: EventChatProps) {
                             <>
                                 {sortedMessages.map((message, index) => {
                                     const isOwn = Boolean(profile?.id && message.authorId === profile.id);
+                                    const prevIsOwn = index > 0
+                                        ? Boolean(profile?.id && sortedMessages[index - 1].authorId === profile.id)
+                                        : null;
+                                    const hasSideBreak = prevIsOwn !== null && prevIsOwn !== isOwn;
                                     const currentDate = formatDateLabel(message.createdAt);
                                     const prevDate = index > 0 ? formatDateLabel(sortedMessages[index - 1].createdAt) : null;
                                     const showDateDivider = Boolean(currentDate && currentDate !== prevDate);
@@ -556,10 +570,25 @@ export default function EventChat({eventId}: EventChatProps) {
                                                 className={clsx(
                                                     styles.messageRow,
                                                     isOwn && styles.own,
+                                                    hasSideBreak && styles.sideBreak,
                                                     selectedMessageId === message.id && styles.selected,
                                                 )}
                                             >
-                                                {!isOwn && <CircleIcon className={styles.stubAvatar}/>} 
+                                                {isOwn ? (
+                                                    <Avatar
+                                                        size="XS"
+                                                        avatarUrl={buildImageUrl(profile?.avatarUrl)}
+                                                        name={profile?.firstName || 'Вы'}
+                                                        className={styles.messageAvatar}
+                                                    />
+                                                ) : (
+                                                    <Avatar
+                                                        size="XS"
+                                                        avatarUrl={buildImageUrl(message.authorAvatarUrl)}
+                                                        name={message.authorName || 'Пользователь'}
+                                                        className={styles.messageAvatar}
+                                                    />
+                                                )}
 
                                                 <div
                                                     className={clsx(styles.bubble, isOwn && styles.ownBubble)}

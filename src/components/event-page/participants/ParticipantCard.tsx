@@ -1,4 +1,5 @@
-import {useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
+import clsx from 'clsx';
 import Avatar from '@/ui/avatar/Avatar.tsx';
 import Menu from '@/ui/menu/Menu.tsx';
 import Chip from '@/ui/chip/Chip.tsx';
@@ -62,7 +63,11 @@ export default function ParticipantCard({
     canEditRoles = true,
 }: ParticipantCardProps) {
     const [isRoleMenuOpen, setIsRoleMenuOpen] = useState(false);
+    const [openUpward, setOpenUpward] = useState(false);
+    const [alignRight, setAlignRight] = useState(false);
     const roleMenuRef = useRef<HTMLDivElement>(null);
+    const roleButtonRef = useRef<HTMLButtonElement>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
     const {data: rolesData, isLoading: isLoadingRoles} = useGetEventRolesQuery(
         {eventId, count: 100},
@@ -103,6 +108,39 @@ export default function ParticipantCard({
         setIsRoleMenuOpen(false);
     }, isRoleMenuOpen);
 
+    useEffect(() => {
+        if (!isRoleMenuOpen) return;
+
+        const updateDropdownPosition = () => {
+            const buttonEl = roleButtonRef.current;
+            const dropdownEl = dropdownRef.current;
+            if (!buttonEl || !dropdownEl) return;
+
+            const buttonRect = buttonEl.getBoundingClientRect();
+            const dropdownRect = dropdownEl.getBoundingClientRect();
+            const gap = 6;
+
+            const shouldOpenUp =
+                buttonRect.bottom + gap + dropdownRect.height > window.innerHeight
+                && buttonRect.top - gap - dropdownRect.height >= 0;
+
+            const shouldAlignRight =
+                buttonRect.left + dropdownRect.width > window.innerWidth - 8
+                && buttonRect.right - dropdownRect.width >= 8;
+
+            setOpenUpward(shouldOpenUp);
+            setAlignRight(shouldAlignRight);
+        };
+
+        const raf = window.requestAnimationFrame(updateDropdownPosition);
+        window.addEventListener('resize', updateDropdownPosition);
+
+        return () => {
+            window.cancelAnimationFrame(raf);
+            window.removeEventListener('resize', updateDropdownPosition);
+        };
+    }, [isRoleMenuOpen, roleOptions.length]);
+
     const isOrganizer = currentRoleValue === 'Organizer';
 
     return (
@@ -127,6 +165,7 @@ export default function ParticipantCard({
                 {canEditRoles && !isOrganizer && (
                     <div className={styles.roleSelector} ref={roleMenuRef}>
                         <button
+                            ref={roleButtonRef}
                             type="button"
                             className={styles.roleButtonAsSelect}
                             onClick={() => setIsRoleMenuOpen((prev) => !prev)}
@@ -137,7 +176,14 @@ export default function ParticipantCard({
                         </button>
 
                         {isRoleMenuOpen && !isOrganizer && (
-                            <div className={styles.rolesDropdown}>
+                            <div
+                                ref={dropdownRef}
+                                className={clsx(
+                                    styles.rolesDropdown,
+                                    openUpward && styles.rolesDropdownUp,
+                                    alignRight && styles.rolesDropdownAlignRight,
+                                )}
+                            >
                                 <Menu
                                     shape="square"
                                     options={(isLoadingRoles ? [] : roleOptions).map((option) => ({

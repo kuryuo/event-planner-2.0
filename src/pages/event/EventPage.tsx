@@ -1,4 +1,5 @@
 import {useState} from "react";
+import clsx from 'clsx';
 import Sidebar from "@/components/sidebar/Sidebar";
 import styles from "./EventPage.module.scss";
 import Header from "@/components/event-page/header/Header.tsx";
@@ -117,7 +118,7 @@ export default function EventPage() {
                 );
             case TAB_INDEX_CHAT:
                 return (
-                    <div className={styles.tabContent}>
+                    <div className={clsx(styles.tabContent, styles.chatTabContent)}>
                         <EventChat eventId={event.id}/>
                     </div>
                 );
@@ -139,7 +140,7 @@ export default function EventPage() {
                          notificationCount={5}
                      />
                  </div>
-            <div className={styles.content}>
+            <div className={clsx(styles.content, activeTab === TAB_INDEX_CHAT && styles.contentChatMode)}>
                 <div className={styles.headerWrapper}>
                     <Header
                         isAdmin={isAdmin}

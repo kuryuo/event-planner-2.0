@@ -22,6 +22,10 @@
   gap: var(--spacing-6);
 }
 
+.contentChatMode {
+  overflow: hidden;
+}
+
 .headerWrapper {
   width: 100%;
 }
@@ -53,6 +57,10 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+}
+
+.chatTabContent {
+  min-height: 0;
 }
 
 .archivedWrapper {

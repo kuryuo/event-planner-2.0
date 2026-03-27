@@ -17,6 +17,7 @@ export interface ChatMessage {
     eventId?: string;
     authorId?: string;
     authorName?: string | null;
+    authorAvatarUrl?: string | null;
     text: string;
     createdAt: string;
     isEdited?: boolean;
