@@ -18,7 +18,28 @@ import type {
     GetEventRolesResponse,
     GetEventBoardResponse,
     AssignUserRolePayload,
-    CreateEventRolePayload
+    CreateEventRolePayload,
+    EventAttachment,
+    UploadEventAttachmentFilePayload,
+    UploadEventAttachmentLinkPayload,
+    DeleteEventAttachmentPayload,
+    DownloadEventAttachmentPayload,
+    EventNote,
+    CreateEventNotePayload,
+    UpdateEventNotePayload,
+    EventTaskComment,
+    AddTaskCommentPayload,
+    EventTaskHistoryItem,
+    UpdateEventCancellationPayload,
+    UpdateEventLifecyclePayload,
+    CopyEventTemplatePayload,
+    CreateBoardColumnPayload,
+    UpdateBoardColumnPayload,
+    DeleteBoardColumnPayload,
+    CreateBoardTaskPayload,
+    UpdateBoardTaskPayload,
+    DeleteBoardTaskPayload,
+    MoveBoardTaskPayload
 } from "@/types/api/Event.ts";
 
 export const eventApi = baseApi.injectEndpoints({
@@ -41,6 +62,14 @@ export const eventApi = baseApi.injectEndpoints({
             }),
             providesTags: ['Event'],
         }),
+        getArchivedEvents: builder.query<GetEventsResponse, GetEventsPayload>({
+            query: (params) => ({
+                url: '/events/archive',
+                method: 'GET',
+                params,
+            }),
+            providesTags: ['Event'],
+        }),
         /**
          * Получить мероприятие по ID
          */
@@ -59,7 +88,7 @@ export const eventApi = baseApi.injectEndpoints({
                 method: 'GET',
             }),
             providesTags: (result, _error, eventId) =>
-                result ? [{type: 'Event', id: eventId}] : ['Event'],
+                result ? [{type: 'Event', id: eventId}, {type: 'Board', id: eventId}] : ['Event', 'Board'],
         }),
         /**
          * Создать мероприятие
@@ -185,12 +214,74 @@ export const eventApi = baseApi.injectEndpoints({
         /**
          * Отписаться от мероприятия
          */
-        unsubscribeFromEvent: builder.mutation<void, string>({
-            query: (eventId) => ({
-                url: `/events/${eventId}/unsubscribe`,
-                method: 'POST',
-            }),
+        unsubscribeFromEvent: builder.mutation<void, { eventId: string; transferToUserId?: string } | string>({
+            query: (payload) => {
+                const eventId = typeof payload === 'string' ? payload : payload.eventId;
+                const transferToUserId = typeof payload === 'string' ? undefined : payload.transferToUserId;
+                return {
+                    url: `/events/${eventId}/unsubscribe`,
+                    method: 'POST',
+                    params: transferToUserId ? {transferToUserId} : undefined,
+                };
+            },
             invalidatesTags: ['Profile', 'Event', 'Profile'],
+        }),
+        createBoardColumn: builder.mutation<void, CreateBoardColumnPayload>({
+            query: ({eventId, name}) => ({
+                url: `/events/${eventId}/board/columns`,
+                method: 'POST',
+                body: {name},
+            }),
+            invalidatesTags: (_result, _error, {eventId}) => [{type: 'Event', id: eventId}, {type: 'Board', id: eventId}, 'Event', 'Board'],
+        }),
+        updateBoardColumn: builder.mutation<void, UpdateBoardColumnPayload>({
+            query: ({eventId, columnId, name, order}) => ({
+                url: `/events/${eventId}/board/columns/${columnId}`,
+                method: 'PUT',
+                body: {
+                    ...(name !== undefined && {name}),
+                    ...(order !== undefined && {order}),
+                },
+            }),
+            invalidatesTags: (_result, _error, {eventId}) => [{type: 'Event', id: eventId}, {type: 'Board', id: eventId}, 'Event', 'Board'],
+        }),
+        deleteBoardColumn: builder.mutation<void, DeleteBoardColumnPayload>({
+            query: ({eventId, columnId}) => ({
+                url: `/events/${eventId}/board/columns/${columnId}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: (_result, _error, {eventId}) => [{type: 'Event', id: eventId}, {type: 'Board', id: eventId}, 'Event', 'Board'],
+        }),
+        createBoardTask: builder.mutation<void, CreateBoardTaskPayload>({
+            query: ({eventId, columnId, title, description, assignedUserId, dueDate}) => ({
+                url: `/events/${eventId}/board/columns/${columnId}/tasks`,
+                method: 'POST',
+                body: {title, description, assignedUserId, dueDate},
+            }),
+            invalidatesTags: (_result, _error, {eventId}) => [{type: 'Event', id: eventId}, {type: 'Board', id: eventId}, 'Event', 'Board'],
+        }),
+        updateBoardTask: builder.mutation<void, UpdateBoardTaskPayload>({
+            query: ({eventId, taskId, title, description, assigneeId, deadline}) => ({
+                url: `/events/${eventId}/board/tasks/${taskId}`,
+                method: 'PUT',
+                body: {title, description, assigneeId, deadline},
+            }),
+            invalidatesTags: (_result, _error, {eventId, taskId}) => [{type: 'Event', id: eventId}, {type: 'Board', id: eventId}, {type: 'BoardTask', id: taskId}, 'Event', 'Board', 'BoardTask'],
+        }),
+        deleteBoardTask: builder.mutation<void, DeleteBoardTaskPayload>({
+            query: ({eventId, taskId}) => ({
+                url: `/events/${eventId}/board/tasks/${taskId}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: (_result, _error, {eventId, taskId}) => [{type: 'Event', id: eventId}, {type: 'Board', id: eventId}, {type: 'BoardTask', id: taskId}, 'Event', 'Board', 'BoardTask'],
+        }),
+        moveBoardTask: builder.mutation<void, MoveBoardTaskPayload>({
+            query: ({eventId, taskId, targetColumnId, newOrder}) => ({
+                url: `/events/${eventId}/board/tasks/${taskId}/move`,
+                method: 'POST',
+                body: {targetColumnId, newOrder},
+            }),
+            invalidatesTags: (_result, _error, {eventId, taskId}) => [{type: 'Event', id: eventId}, {type: 'Board', id: eventId}, {type: 'BoardTask', id: taskId}, 'Event', 'Board', 'BoardTask'],
         }),
         /**
          * Загрузить аватар мероприятия
@@ -251,6 +342,120 @@ export const eventApi = baseApi.injectEndpoints({
             invalidatesTags: (result, _error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
         }),
+        getEventAttachments: builder.query<EventAttachment[], string>({
+            query: (eventId) => ({
+                url: `/events/${eventId}/attachments`,
+                method: 'GET',
+            }),
+            transformResponse: (response: any) => response?.result ?? response ?? [],
+            providesTags: (_result, _error, eventId) => [{type: 'Event', id: eventId}],
+        }),
+        uploadEventAttachmentFile: builder.mutation<void, UploadEventAttachmentFilePayload>({
+            query: ({eventId, file}) => {
+                const formData = new FormData();
+                formData.append('file', file);
+                return {
+                    url: `/events/${eventId}/attachments/file`,
+                    method: 'POST',
+                    body: formData,
+                };
+            },
+            invalidatesTags: (_result, _error, {eventId}) => [{type: 'Event', id: eventId}, 'Event'],
+        }),
+        uploadEventAttachmentLink: builder.mutation<void, UploadEventAttachmentLinkPayload>({
+            query: ({eventId, title, url}) => ({
+                url: `/events/${eventId}/attachments/link`,
+                method: 'POST',
+                body: {title, url},
+            }),
+            invalidatesTags: (_result, _error, {eventId}) => [{type: 'Event', id: eventId}, 'Event'],
+        }),
+        deleteEventAttachment: builder.mutation<void, DeleteEventAttachmentPayload>({
+            query: ({eventId, attachmentId}) => ({
+                url: `/events/${eventId}/attachments/${attachmentId}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: (_result, _error, {eventId}) => [{type: 'Event', id: eventId}, 'Event'],
+        }),
+        downloadEventAttachment: builder.query<Blob, DownloadEventAttachmentPayload>({
+            query: ({eventId, attachmentId}) => ({
+                url: `/events/${eventId}/attachments/${attachmentId}/download`,
+                method: 'GET',
+                responseHandler: async (response) => response.blob(),
+            }),
+        }),
+        getEventNotes: builder.query<EventNote[], string>({
+            query: (eventId) => ({
+                url: `/events/${eventId}/notes`,
+                method: 'GET',
+            }),
+            transformResponse: (response: any) => response?.result ?? response ?? [],
+            providesTags: (_result, _error, eventId) => [{type: 'Event', id: eventId}],
+        }),
+        createEventNote: builder.mutation<void, CreateEventNotePayload>({
+            query: ({eventId, text}) => ({
+                url: `/events/${eventId}/notes`,
+                method: 'POST',
+                body: {text},
+            }),
+            invalidatesTags: (_result, _error, {eventId}) => [{type: 'Event', id: eventId}, 'Event'],
+        }),
+        updateEventNote: builder.mutation<void, UpdateEventNotePayload>({
+            query: ({eventId, noteId, text}) => ({
+                url: `/events/${eventId}/notes/${noteId}`,
+                method: 'PUT',
+                body: {text},
+            }),
+            invalidatesTags: (_result, _error, {eventId}) => [{type: 'Event', id: eventId}, 'Event'],
+        }),
+        getTaskComments: builder.query<EventTaskComment[], { eventId: string; taskId: string }>({
+            query: ({eventId, taskId}) => ({
+                url: `/events/${eventId}/board/tasks/${taskId}/comments`,
+                method: 'GET',
+            }),
+            transformResponse: (response: any) => response?.result ?? response ?? [],
+            providesTags: (_result, _error, {taskId}) => [{type: 'BoardTask', id: taskId}],
+        }),
+        addTaskComment: builder.mutation<void, AddTaskCommentPayload>({
+            query: ({eventId, taskId, text}) => ({
+                url: `/events/${eventId}/board/tasks/${taskId}/comments`,
+                method: 'POST',
+                body: {text},
+            }),
+            invalidatesTags: (_result, _error, {eventId, taskId}) => [{type: 'Event', id: eventId}, {type: 'Board', id: eventId}, {type: 'BoardTask', id: taskId}, 'Event', 'Board', 'BoardTask'],
+        }),
+        getTaskHistory: builder.query<EventTaskHistoryItem[], { eventId: string; taskId: string }>({
+            query: ({eventId, taskId}) => ({
+                url: `/events/${eventId}/board/tasks/${taskId}/history`,
+                method: 'GET',
+            }),
+            transformResponse: (response: any) => response?.result ?? response ?? [],
+            providesTags: (_result, _error, {taskId}) => [{type: 'BoardTask', id: taskId}],
+        }),
+        updateEventCancellation: builder.mutation<void, UpdateEventCancellationPayload>({
+            query: ({eventId, isCancelled}) => ({
+                url: `/events/${eventId}/cancellation`,
+                method: 'PATCH',
+                body: {isCancelled},
+            }),
+            invalidatesTags: (_result, _error, {eventId}) => [{type: 'Event', id: eventId}, 'Event'],
+        }),
+        updateEventLifecycleState: builder.mutation<void, UpdateEventLifecyclePayload>({
+            query: ({eventId, lifecycleState}) => ({
+                url: `/events/${eventId}/lifecycle-state`,
+                method: 'PATCH',
+                body: {lifecycleState},
+            }),
+            invalidatesTags: (_result, _error, {eventId}) => [{type: 'Event', id: eventId}, 'Event'],
+        }),
+        copyEventToTemplate: builder.mutation<void, CopyEventTemplatePayload>({
+            query: ({eventId, name}) => ({
+                url: `/events/${eventId}/copy-template`,
+                method: 'POST',
+                params: {name},
+            }),
+            invalidatesTags: (_result, _error, {eventId}) => [{type: 'Event', id: eventId}, 'Event'],
+        }),
     }),
     overrideExisting: false,
 });
@@ -258,6 +463,7 @@ export const eventApi = baseApi.injectEndpoints({
 export const {
     useGetEventsQuery,
     useGetMyEventsQuery,
+    useGetArchivedEventsQuery,
     useGetEventByIdQuery,
     useGetEventBoardQuery,
     useCreateEventMutation,
@@ -269,8 +475,29 @@ export const {
     useDeleteEventPhotoMutation,
     useSubscribeToEventMutation,
     useUnsubscribeFromEventMutation,
+    useCreateBoardColumnMutation,
+    useUpdateBoardColumnMutation,
+    useDeleteBoardColumnMutation,
+    useCreateBoardTaskMutation,
+    useUpdateBoardTaskMutation,
+    useDeleteBoardTaskMutation,
+    useMoveBoardTaskMutation,
     useUploadEventAvatarMutation,
     useGetEventRolesQuery,
     useAssignUserRoleMutation,
-    useCreateEventRoleMutation
+    useCreateEventRoleMutation,
+    useGetEventAttachmentsQuery,
+    useUploadEventAttachmentFileMutation,
+    useUploadEventAttachmentLinkMutation,
+    useDeleteEventAttachmentMutation,
+    useLazyDownloadEventAttachmentQuery,
+    useGetEventNotesQuery,
+    useCreateEventNoteMutation,
+    useUpdateEventNoteMutation,
+    useGetTaskCommentsQuery,
+    useAddTaskCommentMutation,
+    useGetTaskHistoryQuery,
+    useUpdateEventCancellationMutation,
+    useUpdateEventLifecycleStateMutation,
+    useCopyEventToTemplateMutation
 } = eventApi;

@@ -262,3 +262,135 @@ export interface GetEventBoardResponse {
     columns?: EventBoardColumn[];
     boardColumns?: EventBoardColumn[];
 }
+
+export interface EventAttachment {
+    id: string;
+    title?: string | null;
+    fileName?: string | null;
+    filePath?: string | null;
+    url?: string | null;
+    createdAt?: string | null;
+    type?: string | null;
+}
+
+export interface EventNote {
+    id: string;
+    text: string;
+    createdAt?: string | null;
+    updatedAt?: string | null;
+}
+
+export interface EventTaskComment {
+    id: string;
+    text: string;
+    authorName?: string | null;
+    createdAt?: string | null;
+}
+
+export interface EventTaskHistoryItem {
+    id: string;
+    action?: string | null;
+    description?: string | null;
+    authorName?: string | null;
+    createdAt?: string | null;
+}
+
+export interface AddTaskCommentPayload {
+    eventId: string;
+    taskId: string;
+    text: string;
+}
+
+export interface CreateBoardColumnPayload {
+    eventId: string;
+    name: string;
+}
+
+export interface UpdateBoardColumnPayload {
+    eventId: string;
+    columnId: string;
+    name?: string;
+    order?: number;
+}
+
+export interface DeleteBoardColumnPayload {
+    eventId: string;
+    columnId: string;
+}
+
+export interface CreateBoardTaskPayload {
+    eventId: string;
+    columnId: string;
+    title: string;
+    description?: string;
+    assignedUserId?: string;
+    dueDate?: string;
+}
+
+export interface UpdateBoardTaskPayload {
+    eventId: string;
+    taskId: string;
+    title?: string;
+    description?: string;
+    assigneeId?: string;
+    deadline?: string;
+}
+
+export interface DeleteBoardTaskPayload {
+    eventId: string;
+    taskId: string;
+}
+
+export interface MoveBoardTaskPayload {
+    eventId: string;
+    taskId: string;
+    targetColumnId: string;
+    newOrder: number;
+}
+
+export interface UploadEventAttachmentFilePayload {
+    eventId: string;
+    file: File;
+}
+
+export interface UploadEventAttachmentLinkPayload {
+    eventId: string;
+    title?: string;
+    url: string;
+}
+
+export interface DeleteEventAttachmentPayload {
+    eventId: string;
+    attachmentId: string;
+}
+
+export interface DownloadEventAttachmentPayload {
+    eventId: string;
+    attachmentId: string;
+}
+
+export interface CreateEventNotePayload {
+    eventId: string;
+    text: string;
+}
+
+export interface UpdateEventNotePayload {
+    eventId: string;
+    noteId: string;
+    text: string;
+}
+
+export interface UpdateEventCancellationPayload {
+    eventId: string;
+    isCancelled: boolean;
+}
+
+export interface UpdateEventLifecyclePayload {
+    eventId: string;
+    lifecycleState: EventLifecycleState;
+}
+
+export interface CopyEventTemplatePayload {
+    eventId: string;
+    name: string;
+}
