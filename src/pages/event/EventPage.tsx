@@ -12,6 +12,7 @@ import EventChat from '@/components/event-page/chat/EventChat.tsx';
 import ArchivedEventOverview from '@/components/event-page/archived-overview/ArchivedEventOverview.tsx';
 import EventTasksOverview from '@/components/event-page/tasks-overview/EventTasksOverview.tsx';
 import {useGetEventSubscribersQuery} from '@/services/api/eventApi.ts';
+import EventDocumentsTab from '@/components/event-page/documents/EventDocumentsTab.tsx';
 
 const TAB_INDEX_OVERVIEW = 0;
 const TAB_INDEX_DOCUMENTS = 1;
@@ -75,8 +76,8 @@ export default function EventPage() {
                     );
                 case TAB_INDEX_ARCHIVED_DOCUMENTS:
                     return (
-                        <div className={styles.archivedPlaceholder}>
-                            Документы для архивного мероприятия в разработке
+                        <div className={styles.tabContent}>
+                            <EventDocumentsTab eventId={event.id}/>
                         </div>
                     );
                 case TAB_INDEX_ARCHIVED_MEDIA:
@@ -112,8 +113,8 @@ export default function EventPage() {
                 );
             case TAB_INDEX_DOCUMENTS:
                 return (
-                    <div className={styles.archivedPlaceholder}>
-                        Документы мероприятия в разработке
+                    <div className={styles.tabContent}>
+                        <EventDocumentsTab eventId={event.id}/>
                     </div>
                 );
             case TAB_INDEX_CHAT:

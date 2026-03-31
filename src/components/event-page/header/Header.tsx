@@ -12,7 +12,13 @@ import {useClickOutside} from '@/hooks/ui/useClickOutside.ts';
 import {useEventDeleter} from '@/hooks/ui/useEventDeleter.ts';
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 import {useGetProfileEventsQuery} from "@/services/api/profileApi.ts";
-import {useSubscribeToEventMutation, useUnsubscribeFromEventMutation, useUpdateEventMutation} from "@/services/api/eventApi.ts";
+import {
+    useCopyEventToTemplateMutation,
+    useSubscribeToEventMutation,
+    useUnsubscribeFromEventMutation,
+    useUpdateEventCancellationMutation,
+    useUpdateEventLifecycleStateMutation
+} from "@/services/api/eventApi.ts";
 import type {EventLifecycleState, EventTypeKind, VenueFormat} from '@/types/api/Event.ts';
 
 interface HeaderProps {
@@ -63,7 +69,7 @@ export default function Header({
     avatar,
     isArchived = false,
     status,
-    updateData,
+    updateData: _updateData,
     onTabChange,
 }: HeaderProps) {
     const navigate = useNavigate();
@@ -77,7 +83,9 @@ export default function Header({
     const {data: subscribedEvents} = useGetProfileEventsQuery();
     const [subscribeToEvent] = useSubscribeToEventMutation();
     const [unsubscribeFromEvent] = useUnsubscribeFromEventMutation();
-    const [updateEvent] = useUpdateEventMutation();
+    const [updateLifecycleState] = useUpdateEventLifecycleStateMutation();
+    const [updateCancellation, {isLoading: isUpdatingCancellation}] = useUpdateEventCancellationMutation();
+    const [copyToTemplate, {isLoading: isCopyingTemplate}] = useCopyEventToTemplateMutation();
     
     const isSubscribed = useMemo(() => {
         if (!eventId || !subscribedEvents) return false;
@@ -136,6 +144,8 @@ export default function Header({
         }
     };
 
+    const isCancelledNow = selectedStatus === 'Отменено';
+
     return (
         <header className={styles.header}>
             <div className={styles.summaryRow}>
@@ -175,7 +185,7 @@ export default function Header({
                                             type="button"
                                             className={styles.statusOption}
                                             onClick={async () => {
-                                                if (!eventId || !updateData || !isAdmin) {
+                                                if (!eventId || !isAdmin) {
                                                     setSelectedStatus(option);
                                                     setIsStatusOpen(false);
                                                     return;
@@ -186,21 +196,7 @@ export default function Header({
                                                 setIsStatusOpen(false);
 
                                                 try {
-                                                    await updateEvent({
-                                                        eventId,
-                                                        body: {
-                                                            name: updateData.name,
-                                                            description: updateData.description,
-                                                            startDate: updateData.startDate ?? null,
-                                                            endDate: updateData.endDate ?? null,
-                                                            location: updateData.location,
-                                                            venueFormat: updateData.venueFormat ?? 'InPerson',
-                                                            types: updateData.types,
-                                                            maxParticipants: updateData.maxParticipants ?? null,
-                                                            color: updateData.color ?? null,
-                                                            status: statusLabelToApiValue[option],
-                                                        },
-                                                    }).unwrap();
+                                                    await updateLifecycleState({eventId, lifecycleState: statusLabelToApiValue[option]}).unwrap();
                                                 } catch (error) {
                                                     console.error('Не удалось обновить статус мероприятия:', error);
                                                     setSelectedStatus(previousStatus);
@@ -230,10 +226,45 @@ export default function Header({
                                     <ThreeDotsVerticalIcon className={styles.menuIcon}/>
                                 </button>
                                 {isMenuOpen && (
-                                    <div className={styles.dropdown}>
-                                        <Button
-                                            variant="Text"
-                                            color="red"
+                                     <div className={styles.dropdown}>
+                                         <Button
+                                             variant="Text"
+                                             color="gray"
+                                             onClick={async () => {
+                                                 if (!eventId) return;
+                                                 try {
+                                                     await updateCancellation({eventId, isCancelled: !isCancelledNow}).unwrap();
+                                                     setSelectedStatus(!isCancelledNow ? 'Отменено' : 'В работе');
+                                                     setIsMenuOpen(false);
+                                                 } catch (error) {
+                                                     console.error('Не удалось обновить отмену:', error);
+                                                 }
+                                             }}
+                                             disabled={isUpdatingCancellation}
+                                         >
+                                             {isCancelledNow ? 'Снять отмену' : 'Отменить мероприятие'}
+                                         </Button>
+                                         <Button
+                                             variant="Text"
+                                             color="gray"
+                                             onClick={async () => {
+                                                 if (!eventId) return;
+                                                 const templateName = window.prompt('Название шаблона', `${name} шаблон`);
+                                                 if (!templateName?.trim()) return;
+                                                 try {
+                                                     await copyToTemplate({eventId, name: templateName.trim()}).unwrap();
+                                                     setIsMenuOpen(false);
+                                                 } catch (error) {
+                                                     console.error('Не удалось создать шаблон:', error);
+                                                 }
+                                             }}
+                                             disabled={isCopyingTemplate}
+                                         >
+                                             {isCopyingTemplate ? 'Создаем...' : 'Сохранить как шаблон'}
+                                         </Button>
+                                         <Button
+                                             variant="Text"
+                                             color="red"
                                             leftIcon={<TrashIcon className={styles.trashIcon}/>}
                                             onClick={handleDeleteClick}
                                             disabled={isDeleting}

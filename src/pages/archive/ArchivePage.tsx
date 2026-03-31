@@ -8,6 +8,7 @@ import FilterIcon from '@/assets/img/icon-m/filter.svg?react';
 import {useGetProfileEventsQuery} from '@/services/api/profileApi.ts';
 import type {UserEvent} from '@/types/api/Profile.ts';
 import styles from './ArchivePage.module.scss';
+import {useGetArchivedEventsQuery} from '@/services/api/eventApi.ts';
 
 const isArchivedEvent = (event: UserEvent): boolean => {
     const status = (event.status ?? '').toLowerCase();
@@ -27,19 +28,24 @@ const isArchivedEvent = (event: UserEvent): boolean => {
 
 export default function ArchivePage() {
     const navigate = useNavigate();
-    const {data: events = [], isLoading} = useGetProfileEventsQuery();
+    const {data: archivedResponse, isLoading, isError} = useGetArchivedEventsQuery({Name: undefined, Count: 50, Offset: 0});
+    const {data: profileEvents = []} = useGetProfileEventsQuery(undefined, {skip: !isError});
     const [query, setQuery] = useState('');
 
     const archivedEvents = useMemo(() => {
+        const events = isError
+            ? profileEvents
+            : ((archivedResponse?.result ?? []) as UserEvent[]);
+
         return events
-            .filter(isArchivedEvent)
+            .filter((event) => (isError ? isArchivedEvent(event) : true))
             .filter((event) => event.name.toLowerCase().includes(query.toLowerCase().trim()))
             .sort((a, b) => {
                 const firstDate = new Date(a.endDate || a.startDate).getTime();
                 const secondDate = new Date(b.endDate || b.startDate).getTime();
                 return secondDate - firstDate;
             });
-    }, [events, query]);
+    }, [archivedResponse?.result, isError, profileEvents, query]);
 
     return (
         <div className={styles.pageWrapper}>
@@ -83,18 +89,15 @@ export default function ArchivePage() {
                             <p className={styles.emptyHint}>Попробуйте изменить запрос</p>
                         </div>
                     ) : (
-                        <>
-                            {/* TODO: when backend adds dedicated archive endpoint, replace client-side archive filtering */}
-                            <div className={styles.grid}>
-                                {archivedEvents.map((event) => (
-                                    <ArchiveEventCard
-                                        key={event.id}
-                                        event={event}
-                                        onClick={(eventId) => navigate(`/event?id=${eventId}`)}
-                                    />
-                                ))}
-                            </div>
-                        </>
+                        <div className={styles.grid}>
+                            {archivedEvents.map((event) => (
+                                <ArchiveEventCard
+                                    key={event.id}
+                                    event={event}
+                                    onClick={(eventId) => navigate(`/event?id=${eventId}`)}
+                                />
+                            ))}
+                        </div>
                     )}
                 </section>
             </div>
