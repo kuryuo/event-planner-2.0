@@ -52,7 +52,8 @@ export default function EventTasksOverview({eventId}: EventTasksOverviewProps) {
     const {data, isLoading} = useGetEventBoardQuery(eventId, {skip: !eventId});
 
     const tasks = useMemo(() => {
-        const payload = data?.result ?? data;
+        const payloadRaw = data?.result ?? data;
+        const payload = Array.isArray(payloadRaw) ? (payloadRaw[0] ?? {}) : payloadRaw;
         const columns = payload?.columns ?? payload?.boardColumns ?? [];
         if (!Array.isArray(columns)) return [] as TaskCard[];
 
@@ -90,7 +91,7 @@ export default function EventTasksOverview({eventId}: EventTasksOverviewProps) {
             <div className={styles.headerRow}>
                 <h3 className={styles.title}>Задачи</h3>
                 {totalCount > 0 && (
-                    <button className={styles.linkButton} onClick={() => navigate('/tasks')} type="button">
+                    <button className={styles.linkButton} onClick={() => navigate(`/tasks?eventId=${eventId}`)} type="button">
                         Смотреть все
                     </button>
                 )}
@@ -102,7 +103,7 @@ export default function EventTasksOverview({eventId}: EventTasksOverviewProps) {
                 <div className={styles.emptyState}>
                     <FileLinesIcon className={styles.emptyIcon}/>
                     <p className={styles.emptyText}>Пока нет задач</p>
-                    <button className={styles.boardButton} type="button" onClick={() => navigate('/tasks')}>
+                    <button className={styles.boardButton} type="button" onClick={() => navigate(`/tasks?eventId=${eventId}`)}>
                         Перейти на доску
                     </button>
                 </div>
