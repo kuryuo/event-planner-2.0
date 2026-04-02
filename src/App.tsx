@@ -1,4 +1,4 @@
-import {MemoryRouter, Routes, Route, useLocation, Navigate} from "react-router-dom";
+import {MemoryRouter, Routes, Route, useLocation, Navigate, useNavigate} from "react-router-dom";
 import MainPage from "@/pages/main/MainPage.tsx";
 import AuthPage from "@/pages/auth/AuthPage.tsx";
 import EventEditorPage from "@/pages/event-editor/EventEditorPage.tsx";
@@ -7,6 +7,8 @@ import ProfilePage from "@/pages/profile/ProfilePage.tsx";
 import TasksPage from "@/pages/tasks/TasksPage.tsx";
 import ArchivePage from "@/pages/archive/ArchivePage.tsx";
 import {useEffect, useState} from "react";
+import {useSelector} from 'react-redux';
+import type {RootState} from '@/store/store.ts';
 
 function getInitialPath(): string {
     const saved = sessionStorage.getItem('currentPath');
@@ -15,6 +17,8 @@ function getInitialPath(): string {
 
 function AppRoutes() {
     const location = useLocation();
+    const navigate = useNavigate();
+    const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
     useEffect(() => {
         const path = location.pathname + location.search;
@@ -23,6 +27,18 @@ function AppRoutes() {
             sessionStorage.setItem('currentPath', path);
         }
     }, [location.pathname, location.search]);
+
+    useEffect(() => {
+        if (!accessToken && location.pathname !== '/') {
+            sessionStorage.removeItem('currentPath');
+            navigate('/', {replace: true});
+            return;
+        }
+
+        if (accessToken && location.pathname === '/') {
+            navigate('/main', {replace: true});
+        }
+    }, [accessToken, location.pathname, navigate]);
 
     return (
         <Routes>
