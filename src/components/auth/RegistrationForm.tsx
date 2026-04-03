@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {Controller, useForm} from 'react-hook-form';
 import TextField from "@/ui/text-field/TextField";
 import Button from "@/ui/button/Button";
 import styles from "./AuthForm.module.scss";
@@ -17,17 +17,25 @@ export default function RegistrationForm({
                                              error,
                                              onLoginClick
                                          }: RegistrationFormProps) {
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [passwordConfirm, setPasswordConfirm] = useState("");
+    const {
+        control,
+        handleSubmit,
+        watch,
+        formState: {errors}
+    } = useForm<{ firstName: string; lastName: string; email: string; password: string; passwordConfirm: string }>({
+        defaultValues: {
+            firstName: '',
+            lastName: '',
+            email: '',
+            password: '',
+            passwordConfirm: '',
+        }
+    });
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        const username = `${firstName} ${lastName}`.trim();
-        onSubmit({username, email, password});
-    };
+    const submitHandler = handleSubmit((values) => {
+        const username = `${values.firstName} ${values.lastName}`.trim();
+        onSubmit({username, email: values.email, password: values.password});
+    });
 
     return (
         <div className={styles.container}>
@@ -35,48 +43,78 @@ export default function RegistrationForm({
                 <img src={imageSrc} alt="Registration" className={styles.image}/>
             </div>
             <div className={styles.formSection}>
-                <form onSubmit={handleSubmit} className={styles.form}>
+                <form onSubmit={submitHandler} className={styles.form}>
                     <h2 className={styles.title}>Регистрация</h2>
 
                     <div className={styles.fieldsWrapper}>
                         <div className={styles.nameRow}>
-                            <TextField
-                                placeholder="Имя"
-                                value={firstName}
-                                onChange={(e) => setFirstName(e.target.value)}
+                            <Controller
+                                name="firstName"
+                                control={control}
+                                rules={{required: 'Имя обязательно'}}
+                                render={({field}) => (
+                                    <TextField placeholder="Имя" value={field.value} onChange={field.onChange}/>
+                                )}
                             />
-                            <TextField
-                                placeholder="Фамилия"
-                                value={lastName}
-                                onChange={(e) => setLastName(e.target.value)}
+                            <Controller
+                                name="lastName"
+                                control={control}
+                                rules={{required: 'Фамилия обязательна'}}
+                                render={({field}) => (
+                                    <TextField placeholder="Фамилия" value={field.value} onChange={field.onChange}/>
+                                )}
                             />
                         </div>
 
-                        <TextField
-                            placeholder="Email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                        <Controller
+                            name="email"
+                            control={control}
+                            rules={{required: 'Email обязателен'}}
+                            render={({field}) => (
+                                <TextField placeholder="Email" type="email" value={field.value} onChange={field.onChange}/>
+                            )}
                         />
 
-                        <TextField
-                            placeholder="Пароль"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            helperText="Минимум 6 символов"
+                        <Controller
+                            name="password"
+                            control={control}
+                            rules={{required: 'Пароль обязателен', minLength: {value: 6, message: 'Минимум 6 символов'}}}
+                            render={({field}) => (
+                                <TextField
+                                    placeholder="Пароль"
+                                    type="password"
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    helperText="Минимум 6 символов"
+                                />
+                            )}
                         />
 
-                        <TextField
-                            placeholder="Повторите пароль"
-                            type="password"
-                            value={passwordConfirm}
-                            onChange={(e) => setPasswordConfirm(e.target.value)}
+                        <Controller
+                            name="passwordConfirm"
+                            control={control}
+                            rules={{
+                                required: 'Повторите пароль',
+                                validate: (value) => value === watch('password') || 'Пароли не совпадают'
+                            }}
+                            render={({field}) => (
+                                <TextField
+                                    placeholder="Повторите пароль"
+                                    type="password"
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                />
+                            )}
                         />
 
                         {error && (
                             <div className={styles.error}>
                                 {error}
+                            </div>
+                        )}
+                        {(errors.firstName?.message || errors.lastName?.message || errors.email?.message || errors.password?.message || errors.passwordConfirm?.message) && (
+                            <div className={styles.error}>
+                                {errors.firstName?.message || errors.lastName?.message || errors.email?.message || errors.password?.message || errors.passwordConfirm?.message}
                             </div>
                         )}
                     </div>

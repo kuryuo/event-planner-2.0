@@ -1,4 +1,5 @@
-import {useEffect, useState} from "react";
+import {useEffect} from 'react';
+import {Controller, useForm} from 'react-hook-form';
 import styles from "./ProfileForm.module.scss";
 import TextField from "@/ui/text-field/TextField.tsx";
 import Button from "@/ui/button/Button.tsx";
@@ -28,34 +29,31 @@ export default function ProfileForm({
                                         loading = false,
                                         initialData,
                                     }: ProfileFormProps) {
-    const [firstName, setFirstName] = useState(initialData?.firstName ?? "");
-    const [lastName, setLastName] = useState(initialData?.lastName ?? "");
-    const [profession, setProfession] = useState(initialData?.profession ?? "");
-    const [city, setCity] = useState(initialData?.city ?? "");
-    // const [email, setEmail] = useState(initialData?.email ?? "");
-    const [phoneNumber, setPhoneNumber] = useState(initialData?.phoneNumber ?? "");
-    const [telegram, setTelegram] = useState(initialData?.telegram ?? "");
+    const {control, handleSubmit, reset, getValues} = useForm({
+        defaultValues: {
+            firstName: initialData?.firstName ?? '',
+            lastName: initialData?.lastName ?? '',
+            profession: initialData?.profession ?? '',
+            city: initialData?.city ?? '',
+            phoneNumber: initialData?.phoneNumber ?? '',
+            telegram: initialData?.telegram ?? '',
+        }
+    });
 
     useEffect(() => {
         if (!initialData) return;
-        setFirstName(initialData.firstName ?? "");
-        setLastName(initialData.lastName ?? "");
-        setProfession(initialData.profession ?? "");
-        setCity(initialData.city ?? "");
-        // setEmail(initialData.email ?? "");
-        setPhoneNumber(initialData.phoneNumber ?? "");
-        setTelegram(initialData.telegram ?? "");
-    }, [initialData]);
+        reset({
+            firstName: initialData.firstName ?? '',
+            lastName: initialData.lastName ?? '',
+            profession: initialData.profession ?? '',
+            city: initialData.city ?? '',
+            phoneNumber: initialData.phoneNumber ?? '',
+            telegram: initialData.telegram ?? '',
+        });
+    }, [initialData, reset]);
 
-    const handleSubmit = () => {
-        const formData = {
-            firstName,
-            lastName,
-            profession,
-            city,
-            phoneNumber,
-            telegram,
-        };
+    const submitForm = () => {
+        const formData = getValues();
         if (onSubmit) {
             onSubmit(formData);
         }
@@ -63,13 +61,14 @@ export default function ProfileForm({
 
     const handleCancel = () => {
         if (initialData) {
-            setFirstName(initialData.firstName ?? "");
-            setLastName(initialData.lastName ?? "");
-            setProfession(initialData.profession ?? "");
-            setCity(initialData.city ?? "");
-            // setEmail(initialData.email ?? "");
-            setPhoneNumber(initialData.phoneNumber ?? "");
-            setTelegram(initialData.telegram ?? "");
+            reset({
+                firstName: initialData.firstName ?? '',
+                lastName: initialData.lastName ?? '',
+                profession: initialData.profession ?? '',
+                city: initialData.city ?? '',
+                phoneNumber: initialData.phoneNumber ?? '',
+                telegram: initialData.telegram ?? '',
+            });
         }
         if (onCancel) {
             onCancel();
@@ -81,32 +80,25 @@ export default function ProfileForm({
             <div className={styles.section}>
                 <h3 className={styles.sectionTitle}>Личные данные</h3>
                 <div className={styles.nameRow}>
-                    <TextField
-                        placeholder="Имя"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        fieldSize="M"
-                    />
-                    <TextField
-                        placeholder="Фамилия"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        fieldSize="M"
-                    />
+                    <Controller name="firstName" control={control} render={({field}) => (
+                        <TextField placeholder="Имя" value={field.value} onChange={field.onChange} fieldSize="M"/>
+                    )}/>
+                    <Controller name="lastName" control={control} render={({field}) => (
+                        <TextField placeholder="Фамилия" value={field.value} onChange={field.onChange} fieldSize="M"/>
+                    )}/>
                 </div>
-                <TextField
-                    placeholder="Должность"
-                    value={profession}
-                    onChange={(e) => setProfession(e.target.value)}
-                    fieldSize="M"
-                />
-                <TextField
-                    placeholder="Город"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    leftIcon={<GeoAltIcon/>}
-                    fieldSize="M"
-                />
+                <Controller name="profession" control={control} render={({field}) => (
+                    <TextField placeholder="Должность" value={field.value} onChange={field.onChange} fieldSize="M"/>
+                )}/>
+                <Controller name="city" control={control} render={({field}) => (
+                    <TextField
+                        placeholder="Город"
+                        value={field.value}
+                        onChange={field.onChange}
+                        leftIcon={<GeoAltIcon/>}
+                        fieldSize="M"
+                    />
+                )}/>
             </div>
 
             <div className={styles.divider}></div>
@@ -122,28 +114,32 @@ export default function ProfileForm({
                     fieldSize="M"
                     disabled
                 /> */}
-                <TextField
-                    placeholder="Телефон"
-                    type="tel"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    leftIcon={<TelephoneIcon/>}
-                    fieldSize="M"
-                />
-                <TextField
-                    placeholder="Telegram"
-                    value={telegram}
-                    onChange={(e) => setTelegram(e.target.value)}
-                    leftIcon={<TelegramIcon/>}
-                    fieldSize="M"
-                />
+                <Controller name="phoneNumber" control={control} render={({field}) => (
+                    <TextField
+                        placeholder="Телефон"
+                        type="tel"
+                        value={field.value}
+                        onChange={field.onChange}
+                        leftIcon={<TelephoneIcon/>}
+                        fieldSize="M"
+                    />
+                )}/>
+                <Controller name="telegram" control={control} render={({field}) => (
+                    <TextField
+                        placeholder="Telegram"
+                        value={field.value}
+                        onChange={field.onChange}
+                        leftIcon={<TelegramIcon/>}
+                        fieldSize="M"
+                    />
+                )}/>
             </div>
 
             <div>
                 <Button
                     variant="Filled"
                     color="gray"
-                    onClick={handleSubmit}
+                    onClick={handleSubmit(submitForm)}
                     disabled={loading}
                 >
                     Сохранить изменения

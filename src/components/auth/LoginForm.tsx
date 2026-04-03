@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {Controller, useForm} from 'react-hook-form';
 import TextField from "@/ui/text-field/TextField";
 import Button from "@/ui/button/Button";
 import Checkbox from "@/ui/checkbox/Checkbox";
@@ -20,24 +20,21 @@ export default function LoginForm({
                                       onRegisterClick,
                                       onRecoverPasswordClick
                                   }: LoginFormProps) {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [rememberMe, setRememberMe] = useState(false);
-    const [validationError, setValidationError] = useState("");
+    const {
+        control,
+        handleSubmit,
+        formState: {errors}
+    } = useForm<{ email: string; password: string; rememberMe: boolean }>({
+        defaultValues: {
+            email: '',
+            password: '',
+            rememberMe: false,
+        }
+    });
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        setValidationError("");
-        if (!email.trim()) {
-            setValidationError("Email обязателен");
-            return;
-        }
-        if (!password.trim()) {
-            setValidationError("Пароль обязателен");
-            return;
-        }
-        onSubmit({email, password});
-    };
+    const submitHandler = handleSubmit((values) => {
+        onSubmit({email: values.email, password: values.password});
+    });
 
     return (
         <div className={styles.container}>
@@ -45,28 +42,50 @@ export default function LoginForm({
                 <img src={imageSrc} alt="Login" className={styles.image}/>
             </div>
             <div className={styles.formSection}>
-                <form onSubmit={handleSubmit} className={styles.form}>
+                <form onSubmit={submitHandler} className={styles.form}>
                     <h2 className={styles.title}>Вход</h2>
 
                     <div className={styles.fieldsWrapper}>
-                        <TextField
-                            placeholder="Email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                        <Controller
+                            name="email"
+                            control={control}
+                            rules={{required: 'Email обязателен'}}
+                            render={({field}) => (
+                                <TextField
+                                    placeholder="Email"
+                                    type="email"
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    onBlur={field.onBlur}
+                                />
+                            )}
                         />
 
-                        <TextField
-                            placeholder="Пароль"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                        <Controller
+                            name="password"
+                            control={control}
+                            rules={{required: 'Пароль обязателен'}}
+                            render={({field}) => (
+                                <TextField
+                                    placeholder="Пароль"
+                                    type="password"
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    onBlur={field.onBlur}
+                                />
+                            )}
                         />
 
                         <div className={styles.checkboxWrapper}>
-                            <Checkbox
-                                checked={rememberMe}
-                                onChange={() => setRememberMe(!rememberMe)}
+                            <Controller
+                                name="rememberMe"
+                                control={control}
+                                render={({field}) => (
+                                    <Checkbox
+                                        checked={field.value}
+                                        onChange={() => field.onChange(!field.value)}
+                                    />
+                                )}
                             />
                             <span className={styles.checkboxLabel}>Запомнить меня</span>
                         </div>
@@ -76,9 +95,14 @@ export default function LoginForm({
                                 {error}
                             </div>
                         )}
-                        {validationError && (
+                        {errors.email?.message && (
                             <div>
-                                {validationError}
+                                {errors.email.message}
+                            </div>
+                        )}
+                        {errors.password?.message && (
+                            <div>
+                                {errors.password.message}
                             </div>
                         )}
                     </div>

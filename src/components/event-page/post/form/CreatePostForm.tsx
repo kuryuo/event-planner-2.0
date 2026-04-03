@@ -1,4 +1,5 @@
-import {useState, useEffect} from "react";
+import {useEffect} from 'react';
+import {Controller, useForm} from 'react-hook-form';
 import styles from "./CreatePostForm.module.scss";
 import Button from "@/ui/button/Button";
 import TextField from "@/ui/text-field/TextField";
@@ -15,27 +16,27 @@ interface CreatePostFormProps {
 }
 
 export default function CreatePostForm({onClose, onSubmit, initialTitle, initialText, isEditMode = false, isLoading = false}: CreatePostFormProps) {
-    const [postTitle, setPostTitle] = useState(initialTitle || "");
-    const [postText, setPostText] = useState(initialText || "");
+    const {control, handleSubmit, reset} = useForm<{ postTitle: string; postText: string }>({
+        defaultValues: {
+            postTitle: initialTitle || '',
+            postText: initialText || '',
+        }
+    });
 
     useEffect(() => {
-        if (initialTitle !== undefined) {
-            setPostTitle(initialTitle);
-        }
-        if (initialText !== undefined) {
-            setPostText(initialText);
-        }
-    }, [initialTitle, initialText]);
+        reset({
+            postTitle: initialTitle || '',
+            postText: initialText || '',
+        });
+    }, [initialTitle, initialText, reset]);
 
-    const handlePublish = () => {
-        onSubmit(postTitle, postText);
-        setPostTitle("");
-        setPostText("");
-    };
+    const handlePublish = handleSubmit((values) => {
+        onSubmit(values.postTitle, values.postText);
+        reset({postTitle: '', postText: ''});
+    });
 
     const handleClose = () => {
-        setPostTitle("");
-        setPostText("");
+        reset({postTitle: '', postText: ''});
         onClose();
     };
 
@@ -52,16 +53,28 @@ export default function CreatePostForm({onClose, onSubmit, initialTitle, initial
                 </button>
             </div>
             <div className={styles.formContent}>
-                <TextField
-                    placeholder="Заголовок"
-                    value={postTitle}
-                    onChange={(e) => setPostTitle(e.target.value)}
-                    fieldSize="M"
+                <Controller
+                    name="postTitle"
+                    control={control}
+                    render={({field}) => (
+                        <TextField
+                            placeholder="Заголовок"
+                            value={field.value}
+                            onChange={field.onChange}
+                            fieldSize="M"
+                        />
+                    )}
                 />
-                <TextArea
-                    placeholder="Основной текст"
-                    value={postText}
-                    onChange={(e) => setPostText(e.target.value)}
+                <Controller
+                    name="postText"
+                    control={control}
+                    render={({field}) => (
+                        <TextArea
+                            placeholder="Основной текст"
+                            value={field.value}
+                            onChange={field.onChange}
+                        />
+                    )}
                 />
             </div>
             <Button
