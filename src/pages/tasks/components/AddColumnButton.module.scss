@@ -1,0 +1,23 @@
+.button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #d0d7df;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #2f3d49;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:hover {
+    background: #eef3f7;
+    border-color: #bcc7d1;
+  }
+
+  & svg {
+    width: 18px;
+    height: 18px;
+  }
+}

@@ -1,24 +1,23 @@
 import Sidebar from '@/components/sidebar/Sidebar';
-import {useEffect, useMemo, useState} from 'react';
-import {Controller, useForm} from 'react-hook-form';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
+import {useSelector} from 'react-redux';
 import {ControlledBoard, moveCard, type KanbanBoard, type Card, type Column} from '@caldwell619/react-kanban';
 import '@caldwell619/react-kanban/dist/styles.css';
 import {
-    useAddTaskCommentMutation,
-    useCreateBoardColumnMutation,
-    useCreateBoardTaskMutation,
-    useDeleteBoardColumnMutation,
-    useDeleteBoardTaskMutation,
     useGetEventBoardQuery,
     useGetMyEventsQuery,
-    useGetTaskCommentsQuery,
-    useGetTaskHistoryQuery,
     useMoveBoardTaskMutation,
-    useUpdateBoardColumnMutation,
-    useUpdateBoardTaskMutation,
 } from '@/services/api/eventApi.ts';
 import styles from './TasksPage.module.scss';
+import BoardColumnHeader from './components/BoardColumnHeader';
+import SearchIcon from '@/assets/img/icon-m/search.svg?react';
+import FilterIcon from '@/assets/img/icon-m/filter.svg?react';
+import ChevronDownIcon from '@/assets/img/icon-m/chevron-down.svg?react';
+import type {RootState} from '@/store/store.ts';
+import Checkbox from '@/ui/checkbox/Checkbox';
+import Switch from '@/ui/switch/Switch';
+import BoardTaskCard from '@/components/tasks/board-task-card/BoardTaskCard';
 
 type BoardCard = Card & {
     id: string;
@@ -26,6 +25,10 @@ type BoardCard = Card & {
     title: string;
     description?: string;
     dueDate?: string;
+    assigneeName: string;
+    assigneeAvatar?: string;
+    priority: 'Срочный' | 'Высокий' | 'Средний' | 'Низкий';
+    commentsCount: number;
 };
 
 type BoardColumn = Column<BoardCard> & {
@@ -34,22 +37,45 @@ type BoardColumn = Column<BoardCard> & {
     cards: BoardCard[];
 };
 
-const toBoard = (payload: any): KanbanBoard<BoardCard> => {
+const isTaskAssignedToCurrentUser = (task: any, currentUserId: string): boolean => {
+    if (!currentUserId) return true;
+
+    const candidateIds = [
+        task?.assignedUserId,
+        task?.assigneeId,
+        task?.assignedToUserId,
+        task?.userId,
+    ].filter(Boolean).map(String);
+
+    if (!candidateIds.length) return true;
+    return candidateIds.includes(String(currentUserId));
+};
+
+const toBoard = (payload: any, currentUserId: string, onlyMyTasks: boolean): KanbanBoard<BoardCard> => {
     const sourceRaw = payload?.result ?? payload ?? {};
     const source = Array.isArray(sourceRaw) ? (sourceRaw[0] ?? {}) : sourceRaw;
     const columns = source?.columns ?? source?.boardColumns ?? [];
     return {
         columns: (Array.isArray(columns) ? columns : []).map((column: any, columnIndex: number) => {
             const tasks = column?.tasks ?? column?.boardTasks ?? [];
+            const myTasks = (Array.isArray(tasks) ? tasks : []).filter((task: any) => {
+                if (!onlyMyTasks) return true;
+                return isTaskAssignedToCurrentUser(task, currentUserId);
+            });
+
             return {
                 id: String(column?.id ?? `column-${columnIndex}`),
                 title: String(column?.name ?? 'Колонка'),
-                cards: (Array.isArray(tasks) ? tasks : []).map((task: any, taskIndex: number) => ({
+                cards: myTasks.map((task: any, taskIndex: number) => ({
                     id: String(task?.id ?? `task-${taskIndex}`),
                     taskId: String(task?.id ?? `task-${taskIndex}`),
                     title: String(task?.title ?? 'Новая задача'),
                     description: String(task?.description ?? ''),
                     dueDate: task?.dueDate ?? task?.deadline ?? undefined,
+                    assigneeName: String(task?.assigneeName ?? task?.assignedUserName ?? 'Не назначено'),
+                    assigneeAvatar: task?.assigneeAvatar ?? undefined,
+                    priority: (['Срочный', 'Высокий', 'Средний', 'Низкий'] as const)[taskIndex % 4],
+                    commentsCount: Number(task?.commentsCount ?? task?.comments?.length ?? (taskIndex % 4)),
                 })),
             };
         }),
@@ -57,6 +83,7 @@ const toBoard = (payload: any): KanbanBoard<BoardCard> => {
 };
 
 export default function TasksPage() {
+    const currentUserId = useSelector((state: RootState) => state.profile.profile?.id ?? '');
     const [searchParams] = useSearchParams();
     const requestedEventId = searchParams.get('eventId');
     const {data: myEventsData} = useGetMyEventsQuery();
@@ -64,40 +91,126 @@ export default function TasksPage() {
 
     const {data: boardData, isLoading, refetch} = useGetEventBoardQuery(eventId, {skip: !eventId});
     const [moveTask] = useMoveBoardTaskMutation();
-    const [createColumn] = useCreateBoardColumnMutation();
-    const [updateColumn] = useUpdateBoardColumnMutation();
-    const [deleteColumn] = useDeleteBoardColumnMutation();
-    const [createTask] = useCreateBoardTaskMutation();
-    const [updateTask] = useUpdateBoardTaskMutation();
-    const [deleteTask] = useDeleteBoardTaskMutation();
-    const [addComment, {isLoading: isSavingComment}] = useAddTaskCommentMutation();
 
-    const hydratedBoard = useMemo(() => toBoard(boardData), [boardData]);
     const [boardState, setBoardState] = useState<KanbanBoard<BoardCard>>({columns: []});
-
-    const [selectedTaskId, setSelectedTaskId] = useState('');
-    const [selectedTaskColumnId, setSelectedTaskColumnId] = useState('');
-    const commentForm = useForm<{ commentText: string }>({defaultValues: {commentText: ''}});
+    const [searchValue, setSearchValue] = useState('');
+    const [mockFilter, setMockFilter] = useState<'all' | 'withDueDate' | 'withoutDueDate'>('all');
+    const [mockSort, setMockSort] = useState<'urgentFirst' | 'newestFirst' | 'oldestFirst' | 'assigneeAsc'>('urgentFirst');
+    const [isSortOpen, setIsSortOpen] = useState(false);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [filterDeadlineOverdue, setFilterDeadlineOverdue] = useState(false);
+    const [filterDeadlineToday, setFilterDeadlineToday] = useState(false);
+    const [filterDeadlineTomorrow, setFilterDeadlineTomorrow] = useState(false);
+    const [filterDeadlineThisWeek, setFilterDeadlineThisWeek] = useState(false);
+    const [filterPriorityUrgent, setFilterPriorityUrgent] = useState(false);
+    const [filterPriorityHigh, setFilterPriorityHigh] = useState(false);
+    const [filterPriorityMedium, setFilterPriorityMedium] = useState(false);
+    const [filterPriorityLow, setFilterPriorityLow] = useState(false);
+    const [onlyMyTasks, setOnlyMyTasks] = useState(true);
+    const sortRef = useRef<HTMLDivElement | null>(null);
+    const filterRef = useRef<HTMLDivElement | null>(null);
+    const hydratedBoard = useMemo(() => toBoard(boardData, currentUserId, onlyMyTasks), [boardData, currentUserId, onlyMyTasks]);
 
     useEffect(() => {
         setBoardState(hydratedBoard);
     }, [hydratedBoard]);
 
+    useEffect(() => {
+        const onDocumentClick = (event: MouseEvent) => {
+            const target = event.target as Node;
+            if (sortRef.current && !sortRef.current.contains(target)) setIsSortOpen(false);
+            if (filterRef.current && !filterRef.current.contains(target)) setIsFilterOpen(false);
+        };
+
+        document.addEventListener('mousedown', onDocumentClick);
+        return () => document.removeEventListener('mousedown', onDocumentClick);
+    }, []);
+
     const board = boardState.columns.length ? boardState : hydratedBoard;
 
-    const {data: comments = []} = useGetTaskCommentsQuery(
-        {eventId, taskId: selectedTaskId},
-        {skip: !eventId || !selectedTaskId}
-    );
-    const {data: history = []} = useGetTaskHistoryQuery(
-        {eventId, taskId: selectedTaskId},
-        {skip: !eventId || !selectedTaskId}
-    );
+    const preparedBoard = useMemo(() => {
+        const normalizedSearch = searchValue.trim().toLowerCase();
 
-    const handleCardSelect = (taskId: string, columnId: string) => {
-        setSelectedTaskId(taskId);
-        setSelectedTaskColumnId(columnId);
-    };
+        return {
+            columns: board.columns.map((column) => {
+                let cards = [...column.cards];
+
+                if (normalizedSearch) {
+                    cards = cards.filter((card) => card.title.toLowerCase().includes(normalizedSearch));
+                }
+
+                if (mockFilter === 'withDueDate') {
+                    cards = cards.filter((card) => Boolean(card.dueDate));
+                }
+
+                if (mockFilter === 'withoutDueDate') {
+                    cards = cards.filter((card) => !card.dueDate);
+                }
+
+                if (filterDeadlineOverdue) {
+                    const now = Date.now();
+                    cards = cards.filter((card) => card.dueDate && new Date(card.dueDate).getTime() < now);
+                }
+
+                if (filterDeadlineToday) {
+                    const today = new Date().toDateString();
+                    cards = cards.filter((card) => card.dueDate && new Date(card.dueDate).toDateString() === today);
+                }
+
+                if (filterDeadlineTomorrow) {
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    const tomorrowStr = tomorrow.toDateString();
+                    cards = cards.filter((card) => card.dueDate && new Date(card.dueDate).toDateString() === tomorrowStr);
+                }
+
+                if (filterDeadlineThisWeek) {
+                    const now = new Date();
+                    const weekEnd = new Date(now);
+                    weekEnd.setDate(now.getDate() + (7 - now.getDay()));
+                    cards = cards.filter((card) => {
+                        if (!card.dueDate) return false;
+                        const due = new Date(card.dueDate);
+                        return due >= now && due <= weekEnd;
+                    });
+                }
+
+                if (filterPriorityUrgent || filterPriorityHigh || filterPriorityMedium || filterPriorityLow) {
+                    cards = cards.filter((_, idx) => {
+                        if (filterPriorityUrgent && idx % 4 === 0) return true;
+                        if (filterPriorityHigh && idx % 4 === 1) return true;
+                        if (filterPriorityMedium && idx % 4 === 2) return true;
+                        if (filterPriorityLow && idx % 4 === 3) return true;
+                        return false;
+                    });
+                }
+
+                cards.sort((a, b) => {
+                    const aTime = a.dueDate ? new Date(a.dueDate).getTime() : Number.MAX_SAFE_INTEGER;
+                    const bTime = b.dueDate ? new Date(b.dueDate).getTime() : Number.MAX_SAFE_INTEGER;
+
+                    if (mockSort === 'urgentFirst') return aTime - bTime;
+                    if (mockSort === 'oldestFirst') return a.taskId.localeCompare(b.taskId);
+                    if (mockSort === 'assigneeAsc') return a.title.localeCompare(b.title);
+                    return b.taskId.localeCompare(a.taskId);
+                });
+
+                return {
+                    ...column,
+                    cards,
+                };
+            }),
+        } as KanbanBoard<BoardCard>;
+    }, [board, searchValue, mockFilter, mockSort, onlyMyTasks, filterDeadlineOverdue, filterDeadlineToday, filterDeadlineTomorrow, filterDeadlineThisWeek, filterPriorityUrgent, filterPriorityHigh, filterPriorityMedium, filterPriorityLow]);
+
+    const sortLabel =
+        mockSort === 'urgentFirst'
+            ? 'Сначала срочные'
+            : mockSort === 'newestFirst'
+                ? 'Сначала новые'
+                : mockSort === 'oldestFirst'
+                    ? 'Сначала старые'
+                    : 'Исполнитель: А -> Я';
 
     const handleMoveCard = async (card: BoardCard, source: any, destination: any) => {
         setBoardState((current) => moveCard(current, source, destination));
@@ -113,72 +226,6 @@ export default function TasksPage() {
         }
     };
 
-    const handleCreateColumn = async () => {
-        const name = window.prompt('Название новой колонки');
-        if (!name?.trim()) return;
-        await createColumn({eventId, name: name.trim()}).unwrap();
-        await refetch();
-    };
-
-    const handleRenameColumn = async (column: BoardColumn) => {
-        const name = window.prompt('Новое название колонки', column.title);
-        if (!name?.trim()) return;
-        await updateColumn({eventId, columnId: String(column.id), name: name.trim()}).unwrap();
-        await refetch();
-    };
-
-    const handleDeleteColumn = async (column: BoardColumn) => {
-        if (!window.confirm(`Удалить колонку "${column.title}"?`)) return;
-        await deleteColumn({eventId, columnId: String(column.id)}).unwrap();
-        await refetch();
-    };
-
-    const handleCreateTask = async (column: BoardColumn) => {
-        const title = window.prompt('Название задачи');
-        if (!title?.trim()) return;
-        const description = window.prompt('Описание задачи (опционально)') ?? '';
-        await createTask({
-            eventId,
-            columnId: String(column.id),
-            title: title.trim(),
-            description: description.trim() || undefined,
-        }).unwrap();
-        await refetch();
-    };
-
-    const handleEditTask = async () => {
-        if (!selectedTaskId) return;
-        const currentTask = board.columns
-            .flatMap((column) => column.cards)
-            .find((card) => card.taskId === selectedTaskId);
-        if (!currentTask) return;
-
-        const title = window.prompt('Название задачи', currentTask.title) ?? currentTask.title;
-        const description = window.prompt('Описание задачи', currentTask.description ?? '') ?? currentTask.description ?? '';
-        await updateTask({
-            eventId,
-            taskId: selectedTaskId,
-            title: title.trim(),
-            description: description.trim(),
-        }).unwrap();
-        await refetch();
-    };
-
-    const handleDeleteTask = async () => {
-        if (!selectedTaskId) return;
-        if (!window.confirm('Удалить задачу?')) return;
-        await deleteTask({eventId, taskId: selectedTaskId}).unwrap();
-        setSelectedTaskId('');
-        setSelectedTaskColumnId('');
-        await refetch();
-    };
-
-    const handleCommentSave = commentForm.handleSubmit(async ({commentText}) => {
-        if (!eventId || !selectedTaskId || !commentText.trim()) return;
-        await addComment({eventId, taskId: selectedTaskId, text: commentText.trim()}).unwrap();
-        commentForm.reset({commentText: ''});
-    });
-
     return (
         <div className={styles.pageWrapper}>
             <div className={styles.sidebar}>
@@ -186,12 +233,8 @@ export default function TasksPage() {
             </div>
 
             <div className={styles.content}>
-                <div className={styles.headerRow}>
-                    <div>
-                        <h1 className={styles.title}>Канбан доска</h1>
-                        <p className={styles.subtitle}>Полное управление колонками и задачами</p>
-                    </div>
-                    <button type="button" className={styles.actionBtn} onClick={handleCreateColumn}>+ Колонка</button>
+                <div className={styles.pageHeader}>
+                    <h1 className={styles.pageHeaderTitle}>Мои задачи</h1>
                 </div>
 
                 {isLoading ? (
@@ -199,87 +242,125 @@ export default function TasksPage() {
                 ) : !eventId ? (
                     <p className={styles.subtitle}>Нет мероприятия для отображения доски</p>
                 ) : (
-                    <div className={styles.boardLayout}>
-                        <section className={styles.boardWrap}>
-                            <ControlledBoard<BoardCard>
-                                renderCard={(card) => (
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            const parentColumn = board.columns.find((column) => column.cards.some((colCard) => colCard.taskId === card.taskId));
-                                            handleCardSelect(card.taskId, String(parentColumn?.id ?? ''));
-                                        }}
-                                        className={styles.taskCard}
-                                    >
-                                        <strong>{card.title}</strong>
-                                        <span>{card.description || 'Без описания'}</span>
+                    <section className={styles.boardSurface}>
+                        <div className={styles.boardControls}>
+                            <div className={styles.controlsLeft}>
+                                <label className={styles.searchControl}>
+                                    <SearchIcon/>
+                                    <input
+                                        type="text"
+                                        placeholder="Задача..."
+                                        value={searchValue}
+                                        onChange={(event) => setSearchValue(event.target.value)}
+                                    />
+                                </label>
+                                <div className={styles.controlDropdown} ref={filterRef}>
+                                    <button type="button" className={styles.filterControl} onClick={() => setIsFilterOpen((prev) => !prev)}>
+                                        <FilterIcon/>
+                                        <span>Фильтры</span>
+                                        <ChevronDownIcon className={isFilterOpen ? styles.chevronUp : ''}/>
                                     </button>
-                                )}
-                                renderColumnHeader={(column) => (
-                                    <div className={styles.columnHeader}>
-                                        <strong>{column.title}</strong>
-                                        <div className={styles.columnActions}>
-                                            <button type="button" onClick={() => handleCreateTask(column as BoardColumn)}>+ Задача</button>
-                                            <button type="button" onClick={() => handleRenameColumn(column as BoardColumn)}>Переим.</button>
-                                            <button type="button" onClick={() => handleDeleteColumn(column as BoardColumn)}>Удал.</button>
+
+                                    {isFilterOpen && (
+                                        <div className={styles.filterMenu}>
+                                            <h4>Дедлайн</h4>
+                                            <label><Checkbox checked={filterDeadlineOverdue} onChange={() => setFilterDeadlineOverdue((prev) => !prev)}/>Просрочен</label>
+                                            <label><Checkbox checked={filterDeadlineToday} onChange={() => setFilterDeadlineToday((prev) => !prev)}/>Сегодня</label>
+                                            <label><Checkbox checked={filterDeadlineTomorrow} onChange={() => setFilterDeadlineTomorrow((prev) => !prev)}/>Завтра</label>
+                                            <label><Checkbox checked={filterDeadlineThisWeek} onChange={() => setFilterDeadlineThisWeek((prev) => !prev)}/>На этой неделе</label>
+
+                                            <h4>Исполнитель</h4>
+                                            <button type="button" className={styles.assigneeMock}>
+                                                <span>Исполнитель</span>
+                                                <ChevronDownIcon className={styles.assigneeChevron}/>
+                                            </button>
+
+                                            <h4>Приоритет</h4>
+                                            <label><Checkbox checked={filterPriorityUrgent} onChange={() => setFilterPriorityUrgent((prev) => !prev)}/>Срочный</label>
+                                            <label><Checkbox checked={filterPriorityHigh} onChange={() => setFilterPriorityHigh((prev) => !prev)}/>Высокий</label>
+                                            <label><Checkbox checked={filterPriorityMedium} onChange={() => setFilterPriorityMedium((prev) => !prev)}/>Средний</label>
+                                            <label><Checkbox checked={filterPriorityLow} onChange={() => setFilterPriorityLow((prev) => !prev)}/>Низкий</label>
+
+                                            <div className={styles.onlyMyWrap}>
+                                                <Switch checked={onlyMyTasks} onCheckedChange={setOnlyMyTasks} size="M"/>
+                                                <span>Только мои задачи</span>
+                                            </div>
+
+                                            <button
+                                                type="button"
+                                                className={styles.resetFiltersBtn}
+                                                onClick={() => {
+                                                    setFilterDeadlineOverdue(false);
+                                                    setFilterDeadlineToday(false);
+                                                    setFilterDeadlineTomorrow(false);
+                                                    setFilterDeadlineThisWeek(false);
+                                                    setFilterPriorityUrgent(false);
+                                                    setFilterPriorityHigh(false);
+                                                    setFilterPriorityMedium(false);
+                                                    setFilterPriorityLow(false);
+                                                    setMockFilter('all');
+                                                }}
+                                            >
+                                                Сбросить
+                                            </button>
                                         </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className={styles.controlDropdown} ref={sortRef}>
+                                <button type="button" className={styles.sortControl} onClick={() => setIsSortOpen((prev) => !prev)}>
+                                    <ChevronDownIcon className={styles.sortIcon}/>
+                                    <span>{sortLabel}</span>
+                                </button>
+
+                                {isSortOpen && (
+                                    <div className={styles.sortMenu}>
+                                        <button type="button" onClick={() => { setMockSort('urgentFirst'); setIsSortOpen(false); }}>Сначала срочные</button>
+                                        <button type="button" onClick={() => { setMockSort('newestFirst'); setIsSortOpen(false); }}>Сначала новые</button>
+                                        <button type="button" onClick={() => { setMockSort('oldestFirst'); setIsSortOpen(false); }}>Сначала старые</button>
+                                        <button type="button" onClick={() => { setMockSort('assigneeAsc'); setIsSortOpen(false); }}>Исполнитель: А -&gt; Я</button>
                                     </div>
                                 )}
+                            </div>
+                        </div>
+
+                        <div className={styles.boardLayout}>
+                            <section className={styles.boardWrap}>
+                            <ControlledBoard<BoardCard>
+                                disableColumnDrag
+                                renderCard={(card) => (
+                                    <div className={styles.taskCard}>
+                                        <BoardTaskCard
+                                            title={card.title}
+                                            description={card.description}
+                                            dueDate={card.dueDate}
+                                            assigneeName={card.assigneeName}
+                                            assigneeAvatar={card.assigneeAvatar}
+                                            priority={card.priority}
+                                            commentsCount={card.commentsCount}
+                                        />
+                                    </div>
+                                )}
+                                renderColumnHeader={(column) => {
+                                    const boardColumn = column as BoardColumn;
+                                    const columnIndex = board.columns.findIndex((item) => String(item.id) === String(boardColumn.id));
+
+                                    return (
+                                        <BoardColumnHeader
+                                            title={boardColumn.title}
+                                            count={boardColumn.cards.length}
+                                            colorIndex={columnIndex >= 0 ? columnIndex : 0}
+                                            showActions={false}
+                                        />
+                                    );
+                                }}
                                 onCardDragEnd={handleMoveCard}
                             >
-                                {board}
+                                {preparedBoard}
                             </ControlledBoard>
-                        </section>
-
-                        <aside className={styles.detailsPane}>
-                            <h3>Задача</h3>
-                            {!selectedTaskId ? (
-                                <p className={styles.subtitle}>Выберите задачу на доске</p>
-                            ) : (
-                                <>
-                                    <div className={styles.selectedActions}>
-                                        <button type="button" className={styles.actionBtn} onClick={handleEditTask}>Редактировать</button>
-                                        <button type="button" className={styles.actionBtnDanger} onClick={handleDeleteTask}>Удалить</button>
-                                    </div>
-                                    <p className={styles.helperText}>Колонка: {selectedTaskColumnId || 'не определена'}</p>
-
-                                    <div className={styles.section}>
-                                        <h4>Комментарии</h4>
-                                        <div className={styles.commentForm}>
-                                            <Controller name="commentText" control={commentForm.control} render={({field}) => (
-                                                <textarea
-                                                    value={field.value}
-                                                    onChange={field.onChange}
-                                                    placeholder="Добавить комментарий"
-                                                />
-                                            )}/>
-                                            <button type="button" disabled={isSavingComment} onClick={handleCommentSave}>Отправить</button>
-                                        </div>
-                                        <div className={styles.list}>
-                                            {(comments as any[]).map((comment, index) => (
-                                                <article key={comment?.id ?? index} className={styles.listItem}>
-                                                    <p>{comment?.text ?? 'Без текста'}</p>
-                                                    <span>{comment?.authorName ?? 'Участник'}</span>
-                                                </article>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <div className={styles.section}>
-                                        <h4>История изменений</h4>
-                                        <div className={styles.list}>
-                                            {(history as any[]).map((item, index) => (
-                                                <article key={item?.id ?? index} className={styles.listItem}>
-                                                    <p>{item?.description ?? item?.action ?? 'Изменение'}</p>
-                                                    <span>{item?.authorName ?? 'Система'}</span>
-                                                </article>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </>
-                            )}
-                        </aside>
-                    </div>
+                            </section>
+                        </div>
+                    </section>
                 )}
             </div>
         </div>

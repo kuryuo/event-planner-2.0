@@ -1,0 +1,134 @@
+.header {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.left {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 18px;
+  line-height: 1.1;
+  font-weight: 500;
+  color: #22313d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.count {
+  font-size: 16px;
+  line-height: 1;
+  color: #7f8a93;
+  transform: translateY(1px);
+}
+
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.iconButton {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #6e7f8d;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(132, 146, 158, 0.16);
+  }
+
+  & svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.menuWrap {
+  position: relative;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 170px;
+  background: #fff;
+  border: 1px solid #d6dde3;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(34, 49, 61, 0.12);
+  padding: 4px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+}
+
+.menuItem {
+  width: 100%;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  text-align: left;
+  color: #22313d;
+  padding: 0 10px;
+  font-size: 14px;
+  line-height: 1.2;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &:hover {
+    background: #f1f4f7;
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+    color: #7a8893;
+    flex-shrink: 0;
+  }
+}
+
+.danger {
+  color: #ea3a3a;
+  border-top: 1px solid #e3e8ee;
+  border-radius: 0 0 8px 8px;
+  margin-top: 2px;
+
+  svg {
+    color: #ea3a3a;
+  }
+}
+
+:global(.react-kanban-column:hover) .actions,
+:global(.react-kanban-column:focus-within) .actions {
+  opacity: 1;
+  pointer-events: auto;
+}

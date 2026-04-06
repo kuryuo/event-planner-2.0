@@ -1,0 +1,133 @@
+.wrap {
+  border: 2px solid #86e8d2;
+  border-radius: 12px;
+  padding: 10px;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input {
+  width: 100%;
+  height: 48px;
+  border: 1px solid #d6dde3;
+  border-radius: 10px;
+  padding: 0 12px;
+  font-size: 20px;
+  color: #22313d;
+  background: #fff;
+}
+
+.bottomRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.leftActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.iconBtn,
+.submitBtn {
+  width: 42px;
+  height: 42px;
+  border: 1px solid #d6dde3;
+  border-radius: 10px;
+  background: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+}
+
+.iconBtn svg,
+.submitBtn svg {
+  width: 20px;
+  height: 20px;
+  color: #506371;
+}
+
+.popupWrap {
+  position: relative;
+}
+
+.dropdown,
+.dateDropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 320px;
+  background: #fff;
+  border: 1px solid #d6dde3;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(34, 49, 61, 0.12);
+  padding: 8px;
+  z-index: 5;
+}
+
+.searchField {
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  height: 42px;
+  border: 1px solid #d6dde3;
+  border-radius: 10px;
+  padding: 0 10px;
+  gap: 8px;
+
+  input {
+    width: 100%;
+    border: none;
+    outline: none;
+  }
+}
+
+.options {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.option {
+  height: 42px;
+  border: none;
+  background: transparent;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+}
+
+.radio,
+.radioActive {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #81909c;
+}
+
+.radioActive {
+  border-color: #2ed4af;
+}
+
+.selected {
+  font-size: 12px;
+  color: #5f707d;
+}
+
+.cancelBtn {
+  align-self: flex-start;
+  border: none;
+  background: transparent;
+  color: #6b7b88;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}

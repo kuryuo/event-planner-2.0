@@ -1,0 +1,68 @@
+.card {
+  width: 100%;
+  border: 1px solid #dfe5eb;
+  border-radius: 14px;
+  background: #fff;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: left;
+}
+
+.textBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  h4 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #122734;
+  }
+
+  p {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.3;
+    color: #6a7883;
+  }
+}
+
+.metaRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.assignee {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  span {
+    font-size: 18px;
+    color: #6a7883;
+  }
+}
+
+.extra {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #6a7883;
+    font-size: 16px;
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
