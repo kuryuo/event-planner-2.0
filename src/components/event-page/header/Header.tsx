@@ -41,6 +41,9 @@ interface HeaderProps {
         color?: string;
     };
     onTabChange?: (index: number) => void;
+    showSummary?: boolean;
+    showTabs?: boolean;
+    showMain?: boolean;
 }
 
 const STATUS_OPTIONS = ['Черновик', 'В работе', 'Завершено', 'Отменено'];
@@ -71,6 +74,9 @@ export default function Header({
     status,
     updateData: _updateData,
     onTabChange,
+    showSummary = true,
+    showTabs = true,
+    showMain = true,
 }: HeaderProps) {
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -118,7 +124,8 @@ export default function Header({
 
     const tabItems: TabItem[] = isArchived
         ? [{label: 'Обзор'}, {label: 'Документы'}, {label: 'Медиа'}]
-        : [{label: 'Обзор'}, {label: 'Документы'}, {label: 'Чат'}, {label: 'Медиа'}];
+        : [{label: 'Обзор'}, {label: 'Документы'}, {label: 'Kanban доска'}, {label: 'Чат'}, {label: 'Медиа'}];
+    const isOverviewTabActive = activeTab === 0;
 
     const handleTabChange = (index: number) => {
         if (onTabChange) {
@@ -148,20 +155,20 @@ export default function Header({
 
     return (
         <header className={styles.header}>
-            <div className={styles.summaryRow}>
+            {showSummary && <div className={styles.summaryRow}>
                 <div className={styles.summaryLeft}>
                     <Avatar size="S" shape="square" fallbackType="event" name={name} avatarUrl={buildImageUrl(avatar)}/>
                     <h2 className={styles.summaryTitle}>{name}</h2>
                     <span className={styles.summaryStatus}>{selectedStatus}</span>
                     <span className={styles.summaryRole}>{isAdmin ? 'Вы организатор' : 'Вы участник'}</span>
                 </div>
-            </div>
+            </div>}
 
-            <div className={styles.tabs}>
+            {showTabs && <div className={styles.tabs}>
                 <Tabs items={tabItems} activeIndex={activeTab} onChange={handleTabChange}/>
-            </div>
+            </div>}
 
-            {!isArchived && (
+            {showMain && !isArchived && isOverviewTabActive && (
                 <div className={styles.main}>
                     <div className={styles.left}>
                         <Avatar size="L" shape="square" fallbackType="event" name={name} avatarUrl={buildImageUrl(avatar)}/>

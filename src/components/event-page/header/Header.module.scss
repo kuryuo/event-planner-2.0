@@ -10,7 +10,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border: 1px solid var(--border-primary);
+  border: none;
+  background: #fff;
   border-radius: var(--radius-4);
   padding: var(--spacing-3) var(--spacing-4);
 }
@@ -46,9 +47,10 @@
 }
 
 .tabs {
-  border: 1px solid var(--border-primary);
-  border-radius: var(--radius-4);
-  padding: 0 var(--spacing-2);
+  border: none;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
 }
 
 .main {
