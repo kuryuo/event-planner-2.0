@@ -28,7 +28,7 @@ const isArchivedEvent = (event: UserEvent): boolean => {
 
 export default function ArchivePage() {
     const navigate = useNavigate();
-    const {data: archivedResponse, isLoading, isError} = useGetArchivedEventsQuery({Name: undefined, Count: 50, Offset: 0});
+    const {data: archivedResponse, isLoading, isError} = useGetArchivedEventsQuery({Count: 20, Offset: 0});
     const {data: profileEvents = []} = useGetProfileEventsQuery(undefined, {skip: !isError});
     const [query, setQuery] = useState('');
 

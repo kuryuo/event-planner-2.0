@@ -68,6 +68,25 @@ export const eventApi = baseApi.injectEndpoints({
                 method: 'GET',
                 params,
             }),
+            transformResponse: (response: any): GetEventsResponse => {
+                if (Array.isArray(response)) {
+                    return {result: response};
+                }
+
+                if (Array.isArray(response?.result)) {
+                    return {result: response.result};
+                }
+
+                if (Array.isArray(response?.res?.events)) {
+                    return {result: response.res.events};
+                }
+
+                if (Array.isArray(response?.events)) {
+                    return {result: response.events};
+                }
+
+                return {result: []};
+            },
             providesTags: ['Event'],
         }),
         /**
