@@ -17,10 +17,12 @@ import {
     useCreateBoardTaskMutation,
     useDeleteBoardColumnMutation,
     useGetEventBoardQuery,
+    useGetEventBoardFacetsQuery,
     useGetEventSubscribersQuery,
     useMoveBoardTaskMutation,
     useUpdateBoardColumnMutation,
 } from '@/services/api/eventApi.ts';
+import type {GetEventBoardPayload} from '@/types/api/Event.ts';
 import styles from './EventKanbanTab.module.scss';
 
 type BoardCard = Card & {
@@ -60,10 +62,16 @@ const toBoard = (payload: any): KanbanBoard<BoardCard> => {
                     title: String(task?.title ?? 'Новая задача'),
                     description: String(task?.description ?? ''),
                     dueDate: task?.dueDate ?? task?.deadline ?? undefined,
-                    assigneeName: String(task?.assigneeName ?? task?.assignedUserName ?? 'Не назначено'),
-                    assigneeAvatar: task?.assigneeAvatar ?? undefined,
-                    priority: (['Срочный', 'Высокий', 'Средний', 'Низкий'] as const)[taskIndex % 4],
-                    commentsCount: Number(task?.commentsCount ?? task?.comments?.length ?? (taskIndex % 4)),
+                    assigneeName: String(task?.assigneeDisplayName ?? task?.assigneeName ?? task?.assignedUserName ?? 'Не назначено'),
+                    assigneeAvatar: task?.assigneeAvatarUrl ?? task?.assigneeAvatar ?? undefined,
+                    priority: task?.priority === 'Urgent'
+                        ? 'Срочный'
+                        : task?.priority === 'High'
+                            ? 'Высокий'
+                            : task?.priority === 'Low'
+                                ? 'Низкий'
+                                : 'Средний',
+                    commentsCount: Number(task?.commentCount ?? task?.commentsCount ?? task?.comments?.length ?? 0),
                 })),
             };
         }),
@@ -75,22 +83,8 @@ interface Props {
 }
 
 export default function EventKanbanTab({eventId}: Props) {
-    const {data: boardData, refetch} = useGetEventBoardQuery(eventId, {skip: !eventId});
-    const {data: subscribersData} = useGetEventSubscribersQuery({eventId, count: 100, offset: 0}, {skip: !eventId});
-    const [moveTask] = useMoveBoardTaskMutation();
-    const [createColumn] = useCreateBoardColumnMutation();
-    const [updateColumn] = useUpdateBoardColumnMutation();
-    const [deleteColumn] = useDeleteBoardColumnMutation();
-    const [createTask] = useCreateBoardTaskMutation();
-
-    const hydratedBoard = useMemo(() => toBoard(boardData), [boardData]);
-    const [boardState, setBoardState] = useState<KanbanBoard<BoardCard>>({columns: []});
     const [searchValue, setSearchValue] = useState('');
-    const [creatingTaskColumnId, setCreatingTaskColumnId] = useState('');
-    const [columnToDelete, setColumnToDelete] = useState<BoardColumn | null>(null);
     const [mockSort, setMockSort] = useState<'urgentFirst' | 'newestFirst' | 'oldestFirst' | 'assigneeAsc'>('urgentFirst');
-    const [isSortOpen, setIsSortOpen] = useState(false);
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [filterDeadlineOverdue, setFilterDeadlineOverdue] = useState(false);
     const [filterDeadlineToday, setFilterDeadlineToday] = useState(false);
     const [filterDeadlineTomorrow, setFilterDeadlineTomorrow] = useState(false);
@@ -100,6 +94,58 @@ export default function EventKanbanTab({eventId}: Props) {
     const [filterPriorityMedium, setFilterPriorityMedium] = useState(false);
     const [filterPriorityLow, setFilterPriorityLow] = useState(false);
     const [onlyMyTasks, setOnlyMyTasks] = useState(false);
+    const [selectedAssigneeIds, setSelectedAssigneeIds] = useState<string[]>([]);
+
+    const boardQueryParams = useMemo<GetEventBoardPayload>(() => {
+        const deadlines = [
+            filterDeadlineOverdue && 'Overdue',
+            filterDeadlineToday && 'Today',
+            filterDeadlineTomorrow && 'Tomorrow',
+            filterDeadlineThisWeek && 'ThisWeek',
+        ].filter(Boolean).join(',');
+        const priorities = [
+            filterPriorityUrgent && 'Urgent',
+            filterPriorityHigh && 'High',
+            filterPriorityMedium && 'Medium',
+            filterPriorityLow && 'Low',
+        ].filter(Boolean).join(',');
+        return {
+            eventId,
+            q: searchValue.trim() || undefined,
+            deadlines: deadlines || undefined,
+            priorities: priorities || undefined,
+            assigneeIds: selectedAssigneeIds.length ? selectedAssigneeIds.join(',') : undefined,
+            mineOnly: onlyMyTasks || undefined,
+            sort: mockSort === 'urgentFirst'
+                ? 'UrgentFirst'
+                : mockSort === 'newestFirst'
+                    ? 'Newest'
+                    : mockSort === 'oldestFirst'
+                        ? 'Oldest'
+                        : 'AssigneeAsc',
+        };
+    }, [eventId, searchValue, filterDeadlineOverdue, filterDeadlineToday, filterDeadlineTomorrow, filterDeadlineThisWeek, filterPriorityUrgent, filterPriorityHigh, filterPriorityMedium, filterPriorityLow, selectedAssigneeIds, onlyMyTasks, mockSort]);
+
+    const {data: boardData, refetch} = useGetEventBoardQuery(boardQueryParams, {
+        skip: !eventId,
+        refetchOnFocus: true,
+        refetchOnReconnect: true,
+        pollingInterval: 120000,
+    });
+    const {data: boardFacets} = useGetEventBoardFacetsQuery(eventId, {skip: !eventId});
+    const {data: subscribersData} = useGetEventSubscribersQuery({eventId, count: 100, offset: 0}, {skip: !eventId});
+    const [moveTask] = useMoveBoardTaskMutation();
+    const [createColumn] = useCreateBoardColumnMutation();
+    const [updateColumn] = useUpdateBoardColumnMutation();
+    const [deleteColumn] = useDeleteBoardColumnMutation();
+    const [createTask] = useCreateBoardTaskMutation();
+
+    const hydratedBoard = useMemo(() => toBoard(boardData), [boardData]);
+    const [boardState, setBoardState] = useState<KanbanBoard<BoardCard>>({columns: []});
+    const [creatingTaskColumnId, setCreatingTaskColumnId] = useState('');
+    const [columnToDelete, setColumnToDelete] = useState<BoardColumn | null>(null);
+    const [isSortOpen, setIsSortOpen] = useState(false);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
     const sortRef = useRef<HTMLDivElement | null>(null);
     const filterRef = useRef<HTMLDivElement | null>(null);
 
@@ -121,54 +167,7 @@ export default function EventKanbanTab({eventId}: Props) {
     const board = boardState.columns.length ? boardState : hydratedBoard;
 
     const preparedBoard = useMemo(() => ({
-        columns: board.columns.map((column) => {
-            let cards = column.cards.filter((card) => card.title.toLowerCase().includes(searchValue.trim().toLowerCase()));
-
-            if (filterDeadlineOverdue) {
-                const now = Date.now();
-                cards = cards.filter((card) => card.dueDate && new Date(card.dueDate).getTime() < now);
-            }
-            if (filterDeadlineToday) {
-                const today = new Date().toDateString();
-                cards = cards.filter((card) => card.dueDate && new Date(card.dueDate).toDateString() === today);
-            }
-            if (filterDeadlineTomorrow) {
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                const tomorrowStr = tomorrow.toDateString();
-                cards = cards.filter((card) => card.dueDate && new Date(card.dueDate).toDateString() === tomorrowStr);
-            }
-            if (filterDeadlineThisWeek) {
-                const now = new Date();
-                const weekEnd = new Date(now);
-                weekEnd.setDate(now.getDate() + (7 - now.getDay()));
-                cards = cards.filter((card) => {
-                    if (!card.dueDate) return false;
-                    const due = new Date(card.dueDate);
-                    return due >= now && due <= weekEnd;
-                });
-            }
-
-            if (filterPriorityUrgent || filterPriorityHigh || filterPriorityMedium || filterPriorityLow) {
-                cards = cards.filter((_, idx) => {
-                    if (filterPriorityUrgent && idx % 4 === 0) return true;
-                    if (filterPriorityHigh && idx % 4 === 1) return true;
-                    if (filterPriorityMedium && idx % 4 === 2) return true;
-                    if (filterPriorityLow && idx % 4 === 3) return true;
-                    return false;
-                });
-            }
-
-            cards.sort((a, b) => {
-                const aTime = a.dueDate ? new Date(a.dueDate).getTime() : Number.MAX_SAFE_INTEGER;
-                const bTime = b.dueDate ? new Date(b.dueDate).getTime() : Number.MAX_SAFE_INTEGER;
-                if (mockSort === 'urgentFirst') return aTime - bTime;
-                if (mockSort === 'oldestFirst') return a.taskId.localeCompare(b.taskId);
-                if (mockSort === 'assigneeAsc') return a.title.localeCompare(b.title);
-                return b.taskId.localeCompare(a.taskId);
-            });
-
-            return {
+        columns: board.columns.map((column) => ({
                 ...column,
                 cards: creatingTaskColumnId === String(column.id)
                     ? [{
@@ -180,11 +179,10 @@ export default function EventKanbanTab({eventId}: Props) {
                         priority: 'Средний' as const,
                         commentsCount: 0,
                         isCreator: true,
-                    }, ...cards]
-                    : cards,
-            };
-        }),
-    }), [board, searchValue, mockSort, filterDeadlineOverdue, filterDeadlineToday, filterDeadlineTomorrow, filterDeadlineThisWeek, filterPriorityUrgent, filterPriorityHigh, filterPriorityMedium, filterPriorityLow, onlyMyTasks, creatingTaskColumnId]);
+                    }, ...column.cards]
+                    : column.cards,
+            })),
+    }), [board, creatingTaskColumnId]);
 
     const sortLabel =
         mockSort === 'urgentFirst'
@@ -266,6 +264,8 @@ export default function EventKanbanTab({eventId}: Props) {
             .filter((user, index, arr) => arr.findIndex((item) => item.id === user.id) === index);
     }, [subscribersData]);
 
+    const assigneeFacets = useMemo(() => Array.isArray(boardFacets?.result) ? boardFacets.result : [], [boardFacets]);
+
     return (
         <section className={styles.surface}>
             <div className={styles.controlsRow}>
@@ -295,10 +295,22 @@ export default function EventKanbanTab({eventId}: Props) {
                                 <label><Checkbox checked={filterDeadlineThisWeek} onChange={() => setFilterDeadlineThisWeek((prev) => !prev)}/>На этой неделе</label>
 
                                 <h4>Исполнитель</h4>
-                                <button type="button" className={styles.assigneeMock}>
-                                    <span>Исполнитель</span>
-                                    <ChevronDownIcon className={styles.assigneeChevron}/>
-                                </button>
+                                {assigneeFacets.length === 0 ? (
+                                    <button type="button" className={styles.assigneeMock}>
+                                        <span>Нет исполнителей</span>
+                                        <ChevronDownIcon className={styles.assigneeChevron}/>
+                                    </button>
+                                ) : assigneeFacets.map((assignee) => (
+                                    <label key={assignee.id}>
+                                        <Checkbox
+                                            checked={selectedAssigneeIds.includes(assignee.id)}
+                                            onChange={() => setSelectedAssigneeIds((prev) => prev.includes(assignee.id)
+                                                ? prev.filter((id) => id !== assignee.id)
+                                                : [...prev, assignee.id])}
+                                        />
+                                        {assignee.displayName || 'Участник'}
+                                    </label>
+                                ))}
 
                                 <h4>Приоритет</h4>
                                 <label><Checkbox checked={filterPriorityUrgent} onChange={() => setFilterPriorityUrgent((prev) => !prev)}/>Срочный</label>
@@ -310,6 +322,25 @@ export default function EventKanbanTab({eventId}: Props) {
                                     <Switch checked={onlyMyTasks} onCheckedChange={setOnlyMyTasks} size="M"/>
                                     <span>Только мои задачи</span>
                                 </div>
+                                <button
+                                    type="button"
+                                    className={styles.assigneeMock}
+                                    onClick={() => {
+                                        setFilterDeadlineOverdue(false);
+                                        setFilterDeadlineToday(false);
+                                        setFilterDeadlineTomorrow(false);
+                                        setFilterDeadlineThisWeek(false);
+                                        setFilterPriorityUrgent(false);
+                                        setFilterPriorityHigh(false);
+                                        setFilterPriorityMedium(false);
+                                        setFilterPriorityLow(false);
+                                        setOnlyMyTasks(false);
+                                        setSelectedAssigneeIds([]);
+                                        setSearchValue('');
+                                    }}
+                                >
+                                    <span>Сбросить фильтры</span>
+                                </button>
                             </div>
                         )}
                     </div>

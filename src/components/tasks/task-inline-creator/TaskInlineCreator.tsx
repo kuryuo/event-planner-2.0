@@ -1,4 +1,5 @@
 import {useMemo, useRef, useState} from 'react';
+import {useForm} from 'react-hook-form';
 import type {DateRange} from 'react-day-picker';
 import PersonIcon from '@/assets/img/icon-m/person.svg?react';
 import CalendarIcon from '@/assets/img/icon-m/calendar.svg?react';
@@ -20,12 +21,16 @@ type Props = {
 };
 
 export default function TaskInlineCreator({users, onSubmit, onClose}: Props) {
-    const [title, setTitle] = useState('');
     const [isUsersOpen, setIsUsersOpen] = useState(false);
     const [isDateOpen, setIsDateOpen] = useState(false);
-    const [query, setQuery] = useState('');
-    const [selectedUser, setSelectedUser] = useState<Assignee | null>(null);
-    const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+    const form = useForm<{ title: string; query: string; assignedUserId: string; dateRange?: DateRange }>({
+        defaultValues: {title: '', query: '', assignedUserId: ''},
+    });
+    const title = form.watch('title');
+    const query = form.watch('query');
+    const selectedUserId = form.watch('assignedUserId');
+    const dateRange = form.watch('dateRange');
+    const selectedUser = useMemo(() => users.find((user) => user.id === selectedUserId) ?? null, [users, selectedUserId]);
 
     const usersRef = useRef<HTMLDivElement | null>(null);
     const dateRef = useRef<HTMLDivElement | null>(null);
@@ -46,7 +51,7 @@ export default function TaskInlineCreator({users, onSubmit, onClose}: Props) {
             <input
                 className={styles.input}
                 value={title}
-                onChange={(event) => setTitle(event.target.value)}
+                onChange={(event) => form.setValue('title', event.target.value)}
                 placeholder="Задача"
             />
 
@@ -63,7 +68,7 @@ export default function TaskInlineCreator({users, onSubmit, onClose}: Props) {
                                     <SearchIcon/>
                                     <input
                                         value={query}
-                                        onChange={(event) => setQuery(event.target.value)}
+                                        onChange={(event) => form.setValue('query', event.target.value)}
                                         placeholder="Поиск..."
                                     />
                                 </label>
@@ -74,7 +79,7 @@ export default function TaskInlineCreator({users, onSubmit, onClose}: Props) {
                                             type="button"
                                             className={styles.option}
                                             onClick={() => {
-                                                setSelectedUser(user);
+                                                form.setValue('assignedUserId', user.id);
                                                 setIsUsersOpen(false);
                                             }}
                                         >
@@ -94,7 +99,7 @@ export default function TaskInlineCreator({users, onSubmit, onClose}: Props) {
 
                         {isDateOpen && (
                             <div className={styles.dateDropdown}>
-                                <DatePicker initialRange={dateRange} onRangeChange={setDateRange}/>
+                                <DatePicker initialRange={dateRange} onRangeChange={(range) => form.setValue('dateRange', range)}/>
                             </div>
                         )}
                     </div>
@@ -104,11 +109,11 @@ export default function TaskInlineCreator({users, onSubmit, onClose}: Props) {
                     type="button"
                     className={styles.submitBtn}
                     disabled={!title.trim()}
-                    onClick={() => onSubmit({
-                        title: title.trim(),
-                        assignedUserId: selectedUser?.id,
-                        dueDate: (dateRange?.to ?? dateRange?.from)?.toISOString(),
-                    })}
+                    onClick={form.handleSubmit((values) => onSubmit({
+                        title: values.title.trim(),
+                        assignedUserId: values.assignedUserId || undefined,
+                        dueDate: (values.dateRange?.to ?? values.dateRange?.from)?.toISOString(),
+                    }))}
                 >
                     <Check2Icon/>
                 </button>

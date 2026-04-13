@@ -6,9 +6,11 @@ import {ControlledBoard, moveCard, type KanbanBoard, type Card, type Column} fro
 import '@caldwell619/react-kanban/dist/styles.css';
 import {
     useGetEventBoardQuery,
+    useGetEventBoardFacetsQuery,
     useGetMyEventsQuery,
     useMoveBoardTaskMutation,
 } from '@/services/api/eventApi.ts';
+import type {GetEventBoardPayload} from '@/types/api/Event.ts';
 import styles from './TasksPage.module.scss';
 import BoardColumnHeader from './components/BoardColumnHeader';
 import SearchIcon from '@/assets/img/icon-m/search.svg?react';
@@ -72,10 +74,10 @@ const toBoard = (payload: any, currentUserId: string, onlyMyTasks: boolean): Kan
                     title: String(task?.title ?? 'Новая задача'),
                     description: String(task?.description ?? ''),
                     dueDate: task?.dueDate ?? task?.deadline ?? undefined,
-                    assigneeName: String(task?.assigneeName ?? task?.assignedUserName ?? 'Не назначено'),
-                    assigneeAvatar: task?.assigneeAvatar ?? undefined,
-                    priority: (['Срочный', 'Высокий', 'Средний', 'Низкий'] as const)[taskIndex % 4],
-                    commentsCount: Number(task?.commentsCount ?? task?.comments?.length ?? (taskIndex % 4)),
+                    assigneeName: String(task?.assigneeDisplayName ?? task?.assigneeName ?? task?.assignedUserName ?? 'Не назначено'),
+                    assigneeAvatar: task?.assigneeAvatarUrl ?? task?.assigneeAvatar ?? undefined,
+                    priority: task?.priority === 'Urgent' ? 'Срочный' : task?.priority === 'High' ? 'Высокий' : task?.priority === 'Low' ? 'Низкий' : 'Средний',
+                    commentsCount: Number(task?.commentCount ?? task?.commentsCount ?? task?.comments?.length ?? (taskIndex % 4)),
                 })),
             };
         }),
@@ -89,7 +91,7 @@ export default function TasksPage() {
     const {data: myEventsData} = useGetMyEventsQuery();
     const eventId = requestedEventId || myEventsData?.result?.[0]?.id || '';
 
-    const {data: boardData, isLoading, refetch} = useGetEventBoardQuery(eventId, {skip: !eventId});
+    const [selectedAssigneeIds, setSelectedAssigneeIds] = useState<string[]>([]);
     const [moveTask] = useMoveBoardTaskMutation();
 
     const [boardState, setBoardState] = useState<KanbanBoard<BoardCard>>({columns: []});
@@ -107,6 +109,36 @@ export default function TasksPage() {
     const [filterPriorityMedium, setFilterPriorityMedium] = useState(false);
     const [filterPriorityLow, setFilterPriorityLow] = useState(false);
     const [onlyMyTasks, setOnlyMyTasks] = useState(true);
+    const boardQueryParams = useMemo<GetEventBoardPayload>(() => {
+        const deadlines = [
+            filterDeadlineOverdue && 'Overdue',
+            filterDeadlineToday && 'Today',
+            filterDeadlineTomorrow && 'Tomorrow',
+            filterDeadlineThisWeek && 'ThisWeek',
+        ].filter(Boolean).join(',');
+        const priorities = [
+            filterPriorityUrgent && 'Urgent',
+            filterPriorityHigh && 'High',
+            filterPriorityMedium && 'Medium',
+            filterPriorityLow && 'Low',
+        ].filter(Boolean).join(',');
+        return {
+            eventId,
+            q: searchValue.trim() || undefined,
+            deadlines: deadlines || undefined,
+            assigneeIds: selectedAssigneeIds.length ? selectedAssigneeIds.join(',') : undefined,
+            priorities: priorities || undefined,
+            mineOnly: onlyMyTasks || undefined,
+            sort: mockSort === 'urgentFirst' ? 'UrgentFirst' : mockSort === 'newestFirst' ? 'Newest' : mockSort === 'oldestFirst' ? 'Oldest' : 'AssigneeAsc',
+        };
+    }, [eventId, searchValue, filterDeadlineOverdue, filterDeadlineToday, filterDeadlineTomorrow, filterDeadlineThisWeek, selectedAssigneeIds, filterPriorityUrgent, filterPriorityHigh, filterPriorityMedium, filterPriorityLow, onlyMyTasks, mockSort]);
+    const {data: boardData, isLoading, refetch} = useGetEventBoardQuery(boardQueryParams, {
+        skip: !eventId,
+        refetchOnFocus: true,
+        refetchOnReconnect: true,
+        pollingInterval: 120000,
+    });
+    const {data: boardFacets} = useGetEventBoardFacetsQuery(eventId, {skip: !eventId});
     const sortRef = useRef<HTMLDivElement | null>(null);
     const filterRef = useRef<HTMLDivElement | null>(null);
     const hydratedBoard = useMemo(() => toBoard(boardData, currentUserId, onlyMyTasks), [boardData, currentUserId, onlyMyTasks]);
@@ -211,6 +243,7 @@ export default function TasksPage() {
                 : mockSort === 'oldestFirst'
                     ? 'Сначала старые'
                     : 'Исполнитель: А -> Я';
+    const assigneeFacets = Array.isArray(boardFacets?.result) ? boardFacets.result : [];
 
     const handleMoveCard = async (card: BoardCard, source: any, destination: any) => {
         setBoardState((current) => moveCard(current, source, destination));
@@ -270,10 +303,22 @@ export default function TasksPage() {
                                             <label><Checkbox checked={filterDeadlineThisWeek} onChange={() => setFilterDeadlineThisWeek((prev) => !prev)}/>На этой неделе</label>
 
                                             <h4>Исполнитель</h4>
-                                            <button type="button" className={styles.assigneeMock}>
-                                                <span>Исполнитель</span>
-                                                <ChevronDownIcon className={styles.assigneeChevron}/>
-                                            </button>
+                                            {assigneeFacets.length === 0 ? (
+                                                <button type="button" className={styles.assigneeMock}>
+                                                    <span>Нет исполнителей</span>
+                                                    <ChevronDownIcon className={styles.assigneeChevron}/>
+                                                </button>
+                                            ) : assigneeFacets.map((assignee) => (
+                                                <label key={assignee.id}>
+                                                    <Checkbox
+                                                        checked={selectedAssigneeIds.includes(assignee.id)}
+                                                        onChange={() => setSelectedAssigneeIds((prev) => prev.includes(assignee.id)
+                                                            ? prev.filter((id) => id !== assignee.id)
+                                                            : [...prev, assignee.id])}
+                                                    />
+                                                    {assignee.displayName || 'Участник'}
+                                                </label>
+                                            ))}
 
                                             <h4>Приоритет</h4>
                                             <label><Checkbox checked={filterPriorityUrgent} onChange={() => setFilterPriorityUrgent((prev) => !prev)}/>Срочный</label>
@@ -298,6 +343,7 @@ export default function TasksPage() {
                                                     setFilterPriorityHigh(false);
                                                     setFilterPriorityMedium(false);
                                                     setFilterPriorityLow(false);
+                                                    setSelectedAssigneeIds([]);
                                                     setMockFilter('all');
                                                 }}
                                             >

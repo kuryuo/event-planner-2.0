@@ -17,9 +17,13 @@ import type {
     GetEventRolesPayload,
     GetEventRolesResponse,
     GetEventBoardResponse,
+    GetEventBoardPayload,
+    BoardFacetsResponse,
     AssignUserRolePayload,
     CreateEventRolePayload,
     EventAttachment,
+    GetEventAttachmentsPayload,
+    EventAttachmentFacetsResponse,
     UploadEventAttachmentFilePayload,
     UploadEventAttachmentLinkPayload,
     DeleteEventAttachmentPayload,
@@ -101,13 +105,35 @@ export const eventApi = baseApi.injectEndpoints({
             providesTags: (result, _error, eventId) =>
                 result ? [{type: 'Event', id: eventId}] : ['Event'],
         }),
-        getEventBoard: builder.query<GetEventBoardResponse, string>({
-            query: (eventId) => ({
+        getEventBoard: builder.query<GetEventBoardResponse, GetEventBoardPayload>({
+            query: ({eventId, ...params}) => ({
                 url: `/events/${eventId}/board`,
                 method: 'GET',
+                params,
             }),
-            providesTags: (result, _error, eventId) =>
+            providesTags: (result, _error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}, {type: 'Board', id: eventId}] : ['Event', 'Board'],
+        }),
+        getEventBoardFacets: builder.query<BoardFacetsResponse, string>({
+            query: (eventId) => ({
+                url: `/events/${eventId}/board/facets`,
+                method: 'GET',
+            }),
+            providesTags: (_result, _error, eventId) => [{type: 'Board', id: eventId}],
+        }),
+        getMyBoardTasks: builder.query<GetEventBoardResponse, string>({
+            query: (eventId) => ({
+                url: `/events/${eventId}/board/my-tasks`,
+                method: 'GET',
+            }),
+            providesTags: (_result, _error, eventId) => [{type: 'Board', id: eventId}],
+        }),
+        getEventMyBoardTasks: builder.query<GetEventBoardResponse, string>({
+            query: (eventId) => ({
+                url: `/events/${eventId}/board/event/my-tasks`,
+                method: 'GET',
+            }),
+            providesTags: (_result, _error, eventId) => [{type: 'Board', id: eventId}],
         }),
         /**
          * Создать мероприятие
@@ -272,18 +298,18 @@ export const eventApi = baseApi.injectEndpoints({
             invalidatesTags: (_result, _error, {eventId}) => [{type: 'Event', id: eventId}, {type: 'Board', id: eventId}, 'Event', 'Board'],
         }),
         createBoardTask: builder.mutation<void, CreateBoardTaskPayload>({
-            query: ({eventId, columnId, title, description, assignedUserId, dueDate}) => ({
+            query: ({eventId, columnId, title, description, assignedUserId, dueDate, priority}) => ({
                 url: `/events/${eventId}/board/columns/${columnId}/tasks`,
                 method: 'POST',
-                body: {title, description, assignedUserId, dueDate},
+                body: {title, description, assignedUserId, dueDate, priority},
             }),
             invalidatesTags: (_result, _error, {eventId}) => [{type: 'Event', id: eventId}, {type: 'Board', id: eventId}, 'Event', 'Board'],
         }),
         updateBoardTask: builder.mutation<void, UpdateBoardTaskPayload>({
-            query: ({eventId, taskId, title, description, assigneeId, deadline}) => ({
+            query: ({eventId, taskId, title, description, assigneeId, deadline, priority}) => ({
                 url: `/events/${eventId}/board/tasks/${taskId}`,
                 method: 'PUT',
-                body: {title, description, assigneeId, deadline},
+                body: {title, description, assigneeId, deadline, priority},
             }),
             invalidatesTags: (_result, _error, {eventId, taskId}) => [{type: 'Event', id: eventId}, {type: 'Board', id: eventId}, {type: 'BoardTask', id: taskId}, 'Event', 'Board', 'BoardTask'],
         }),
@@ -361,12 +387,20 @@ export const eventApi = baseApi.injectEndpoints({
             invalidatesTags: (result, _error, {eventId}) =>
                 result ? [{type: 'Event', id: eventId}, 'Event'] : ['Event'],
         }),
-        getEventAttachments: builder.query<EventAttachment[], string>({
-            query: (eventId) => ({
+        getEventAttachments: builder.query<EventAttachment[], GetEventAttachmentsPayload>({
+            query: ({eventId, ...params}) => ({
                 url: `/events/${eventId}/attachments`,
                 method: 'GET',
+                params,
             }),
             transformResponse: (response: any) => response?.result ?? response ?? [],
+            providesTags: (_result, _error, {eventId}) => [{type: 'Event', id: eventId}],
+        }),
+        getEventAttachmentsFacets: builder.query<EventAttachmentFacetsResponse, string>({
+            query: (eventId) => ({
+                url: `/events/${eventId}/attachments/facets`,
+                method: 'GET',
+            }),
             providesTags: (_result, _error, eventId) => [{type: 'Event', id: eventId}],
         }),
         uploadEventAttachmentFile: builder.mutation<void, UploadEventAttachmentFilePayload>({
@@ -485,6 +519,9 @@ export const {
     useGetArchivedEventsQuery,
     useGetEventByIdQuery,
     useGetEventBoardQuery,
+    useGetEventBoardFacetsQuery,
+    useGetMyBoardTasksQuery,
+    useGetEventMyBoardTasksQuery,
     useCreateEventMutation,
     useUpdateEventMutation,
     useDeleteEventMutation,
@@ -506,6 +543,7 @@ export const {
     useAssignUserRoleMutation,
     useCreateEventRoleMutation,
     useGetEventAttachmentsQuery,
+    useGetEventAttachmentsFacetsQuery,
     useUploadEventAttachmentFileMutation,
     useUploadEventAttachmentLinkMutation,
     useDeleteEventAttachmentMutation,

@@ -49,7 +49,12 @@ const isDoneColumn = (name?: string | null): boolean => {
 
 export default function EventTasksOverview({eventId}: EventTasksOverviewProps) {
     const navigate = useNavigate();
-    const {data, isLoading} = useGetEventBoardQuery(eventId, {skip: !eventId});
+    const {data, isLoading} = useGetEventBoardQuery({eventId}, {
+        skip: !eventId,
+        refetchOnFocus: true,
+        refetchOnReconnect: true,
+        pollingInterval: 120000,
+    });
 
     const tasks = useMemo(() => {
         const payloadRaw = data?.result ?? data;

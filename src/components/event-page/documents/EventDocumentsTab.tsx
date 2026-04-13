@@ -4,6 +4,7 @@ import {
     useCreateEventNoteMutation,
     useDeleteEventAttachmentMutation,
     useGetEventAttachmentsQuery,
+    useGetEventAttachmentsFacetsQuery,
     useGetEventNotesQuery,
     useLazyDownloadEventAttachmentQuery,
     useUpdateEventNoteMutation,
@@ -39,7 +40,43 @@ const getNotes = (rawNotes: EventNote[]): EventNote[] => {
 };
 
 export default function EventDocumentsTab({eventId}: EventDocumentsTabProps) {
-    const {data: attachments = [], isLoading: isAttachmentsLoading} = useGetEventAttachmentsQuery(eventId, {skip: !eventId});
+    const filterForm = useForm<{
+        searchValue: string;
+        kindFile: boolean;
+        kindLink: boolean;
+        selectedAuthorIds: string[];
+        selectedExtensions: string[];
+        selectedLinkSites: string[];
+        sort: 'Newest' | 'Oldest' | 'TitleAsc' | 'AuthorAsc';
+    }>({
+        defaultValues: {
+            searchValue: '',
+            kindFile: false,
+            kindLink: false,
+            selectedAuthorIds: [],
+            selectedExtensions: [],
+            selectedLinkSites: [],
+            sort: 'Newest',
+        },
+    });
+    const searchValue = filterForm.watch('searchValue');
+    const kindFile = filterForm.watch('kindFile');
+    const kindLink = filterForm.watch('kindLink');
+    const selectedAuthorIds = filterForm.watch('selectedAuthorIds');
+    const selectedExtensions = filterForm.watch('selectedExtensions');
+    const selectedLinkSites = filterForm.watch('selectedLinkSites');
+    const sort = filterForm.watch('sort');
+
+    const {data: attachments = [], isLoading: isAttachmentsLoading} = useGetEventAttachmentsQuery({
+        eventId,
+        q: searchValue.trim() || undefined,
+        kinds: [kindFile && 'File', kindLink && 'Link'].filter(Boolean).join(',') || undefined,
+        authorIds: selectedAuthorIds.length ? selectedAuthorIds.join(',') : undefined,
+        extensions: selectedExtensions.length ? selectedExtensions.join(',') : undefined,
+        linkSites: selectedLinkSites.length ? selectedLinkSites.join(',') : undefined,
+        sort,
+    }, {skip: !eventId});
+    const {data: attachmentFacets} = useGetEventAttachmentsFacetsQuery(eventId, {skip: !eventId});
     const {data: notesRaw = [], isLoading: isNotesLoading} = useGetEventNotesQuery(eventId, {skip: !eventId});
 
     const [uploadFile, {isLoading: isUploadingFile}] = useUploadEventAttachmentFileMutation();
@@ -56,6 +93,9 @@ export default function EventDocumentsTab({eventId}: EventDocumentsTabProps) {
     const editNoteForm = useForm<{ editingText: string }>({defaultValues: {editingText: ''}});
 
     const notes = useMemo(() => getNotes(notesRaw), [notesRaw]);
+    const fileExtensions = attachmentFacets?.result?.fileExtensions ?? [];
+    const linkSites = attachmentFacets?.result?.linkSites ?? [];
+    const authors = attachmentFacets?.result?.authors ?? [];
 
     const handleFileUpload = async (file: File | null) => {
         if (!file || !eventId) return;
@@ -101,6 +141,79 @@ export default function EventDocumentsTab({eventId}: EventDocumentsTabProps) {
         <div className={styles.layout}>
             <section className={styles.card}>
                 <h3 className={styles.title}>Документы и вложения</h3>
+                <input
+                    className={styles.fileLabel}
+                    value={searchValue}
+                    onChange={(event) => filterForm.setValue('searchValue', event.target.value)}
+                    placeholder="Поиск по вложениям"
+                />
+                <div className={styles.actions}>
+                    <label><input type="checkbox" checked={kindFile} onChange={() => filterForm.setValue('kindFile', !kindFile)}/>Файл</label>
+                    <label><input type="checkbox" checked={kindLink} onChange={() => filterForm.setValue('kindLink', !kindLink)}/>Ссылка</label>
+                </div>
+                <div className={styles.actions}>
+                    <Button onClick={() => filterForm.setValue('sort', 'Newest')}>Сначала новые</Button>
+                    <Button onClick={() => filterForm.setValue('sort', 'Oldest')}>Сначала старые</Button>
+                    <Button onClick={() => filterForm.setValue('sort', 'TitleAsc')}>По названию</Button>
+                    <Button onClick={() => filterForm.setValue('sort', 'AuthorAsc')}>По автору</Button>
+                </div>
+                {fileExtensions.length > 0 && (
+                    <div className={styles.actions}>
+                        {fileExtensions.map((item) => (
+                            <label key={item.extension}>
+                                <input
+                                    type="checkbox"
+                                    checked={selectedExtensions.includes(item.extension)}
+                                    onChange={() => filterForm.setValue(
+                                        'selectedExtensions',
+                                        selectedExtensions.includes(item.extension)
+                                            ? selectedExtensions.filter((v) => v !== item.extension)
+                                            : [...selectedExtensions, item.extension]
+                                    )}
+                                />
+                                {item.label}
+                            </label>
+                        ))}
+                    </div>
+                )}
+                {linkSites.length > 0 && (
+                    <div className={styles.actions}>
+                        {linkSites.map((site) => (
+                            <label key={site.siteKey}>
+                                <input
+                                    type="checkbox"
+                                    checked={selectedLinkSites.includes(site.siteKey)}
+                                    onChange={() => filterForm.setValue(
+                                        'selectedLinkSites',
+                                        selectedLinkSites.includes(site.siteKey)
+                                            ? selectedLinkSites.filter((v) => v !== site.siteKey)
+                                            : [...selectedLinkSites, site.siteKey]
+                                    )}
+                                />
+                                {site.label}
+                            </label>
+                        ))}
+                    </div>
+                )}
+                {authors.length > 0 && (
+                    <div className={styles.actions}>
+                        {authors.map((author) => (
+                            <label key={author.id}>
+                                <input
+                                    type="checkbox"
+                                    checked={selectedAuthorIds.includes(author.id)}
+                                    onChange={() => filterForm.setValue(
+                                        'selectedAuthorIds',
+                                        selectedAuthorIds.includes(author.id)
+                                            ? selectedAuthorIds.filter((v) => v !== author.id)
+                                            : [...selectedAuthorIds, author.id]
+                                    )}
+                                />
+                                {author.displayName || 'Участник'}
+                            </label>
+                        ))}
+                    </div>
+                )}
                 <div className={styles.uploadRow}>
                     <label className={styles.fileLabel}>
                         <input

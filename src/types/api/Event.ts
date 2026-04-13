@@ -263,6 +263,22 @@ export interface GetEventBoardResponse {
     boardColumns?: EventBoardColumn[];
 }
 
+export type BoardTaskPriority = 'Urgent' | 'High' | 'Medium' | 'Low';
+
+export interface GetEventBoardPayload {
+    eventId: string;
+    q?: string;
+    deadlines?: string;
+    assigneeIds?: string;
+    priorities?: string;
+    mineOnly?: boolean;
+    sort?: 'UrgentFirst' | 'Newest' | 'Oldest' | 'AssigneeAsc';
+}
+
+export interface BoardFacetsResponse {
+    result?: Array<{ id: string; displayName?: string | null; avatarUrl?: string | null }>;
+}
+
 export interface EventAttachment {
     id: string;
     title?: string | null;
@@ -271,6 +287,28 @@ export interface EventAttachment {
     url?: string | null;
     createdAt?: string | null;
     type?: string | null;
+    authorDisplayName?: string | null;
+    authorAvatarUrl?: string | null;
+    fileExtension?: string | null;
+    linkSiteKey?: string | null;
+}
+
+export interface GetEventAttachmentsPayload {
+    eventId: string;
+    q?: string;
+    kinds?: string;
+    authorIds?: string;
+    extensions?: string;
+    linkSites?: string;
+    sort?: 'Newest' | 'Oldest' | 'TitleAsc' | 'AuthorAsc';
+}
+
+export interface EventAttachmentFacetsResponse {
+    result?: {
+        fileExtensions?: Array<{ extension: string; label: string }>;
+        linkSites?: Array<{ siteKey: string; label: string }>;
+        authors?: Array<{ id: string; displayName?: string | null; avatarUrl?: string | null }>;
+    };
 }
 
 export interface EventNote {
@@ -325,6 +363,7 @@ export interface CreateBoardTaskPayload {
     description?: string;
     assignedUserId?: string;
     dueDate?: string;
+    priority?: BoardTaskPriority;
 }
 
 export interface UpdateBoardTaskPayload {
@@ -334,6 +373,7 @@ export interface UpdateBoardTaskPayload {
     description?: string;
     assigneeId?: string;
     deadline?: string;
+    priority?: BoardTaskPriority;
 }
 
 export interface DeleteBoardTaskPayload {
