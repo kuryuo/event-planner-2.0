@@ -29,7 +29,12 @@ export const useEventPage = (): UseEventPageOutput => {
     const [searchParams] = useSearchParams();
     const eventId = searchParams.get('id');
 
-    const {data, isLoading, error} = useGetEventByIdQuery(eventId ?? '', {skip: !eventId});
+    const {data, isLoading, error} = useGetEventByIdQuery(eventId ?? '', {
+        skip: !eventId,
+        refetchOnFocus: true,
+        refetchOnReconnect: true,
+        pollingInterval: 120000,
+    });
 
     const event = useMemo(() => {
         if (!data?.result) return null;

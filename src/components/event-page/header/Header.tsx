@@ -152,6 +152,8 @@ export default function Header({
     };
 
     const isCancelledNow = selectedStatus === 'Отменено';
+    const isCompletedNow = selectedStatus === 'Завершено';
+    const isReadOnlyLifecycle = isArchived || isCompletedNow;
 
     return (
         <header className={styles.header}>
@@ -178,6 +180,7 @@ export default function Header({
                             <button
                                 type="button"
                                 className={styles.statusButton}
+                                disabled={!isAdmin || isReadOnlyLifecycle}
                                 onClick={() => setIsStatusOpen((prev) => !prev)}
                             >
                                 {selectedStatus}
@@ -221,7 +224,7 @@ export default function Header({
                     <div className={styles.right}>
                         {isAdmin ? (
                         <div className={styles.adminActions} ref={menuRef}>
-                            <Button variant="Filled" color="gray" onClick={handleEdit}>
+                            <Button variant="Filled" color="gray" onClick={handleEdit} disabled={isReadOnlyLifecycle}>
                                 Редактировать
                             </Button>
                             <div className={styles.menuWrapper}>
@@ -237,18 +240,18 @@ export default function Header({
                                          <Button
                                              variant="Text"
                                              color="gray"
-                                             onClick={async () => {
-                                                 if (!eventId) return;
-                                                 try {
-                                                     await updateCancellation({eventId, isCancelled: !isCancelledNow}).unwrap();
-                                                     setSelectedStatus(!isCancelledNow ? 'Отменено' : 'В работе');
-                                                     setIsMenuOpen(false);
-                                                 } catch (error) {
-                                                     console.error('Не удалось обновить отмену:', error);
-                                                 }
-                                             }}
-                                             disabled={isUpdatingCancellation}
-                                         >
+                                              onClick={async () => {
+                                                  if (!eventId) return;
+                                                  try {
+                                                      await updateCancellation({eventId, isCancelled: !isCancelledNow}).unwrap();
+                                                      setSelectedStatus(!isCancelledNow ? 'Отменено' : 'В работе');
+                                                      setIsMenuOpen(false);
+                                                  } catch (error) {
+                                                      console.error('Не удалось обновить отмену:', error);
+                                                  }
+                                              }}
+                                              disabled={isUpdatingCancellation || isReadOnlyLifecycle}
+                                          >
                                              {isCancelledNow ? 'Снять отмену' : 'Отменить мероприятие'}
                                          </Button>
                                          <Button
@@ -286,6 +289,7 @@ export default function Header({
                         <Button 
                             variant="Filled" 
                             color={isSubscribed ? "gray" : "purple"}
+                            disabled={isReadOnlyLifecycle}
                             onClick={handleSubscribeClick}
                         >
                             {isSubscribed ? "Я не пойду" : "Я пойду"}
