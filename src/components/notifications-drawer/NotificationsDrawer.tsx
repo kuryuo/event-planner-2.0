@@ -35,6 +35,17 @@ const shortMessage = (value?: string): string => {
     return value.length > 120 ? `${value.slice(0, 120)}...` : value;
 };
 
+const resolveNotificationTitle = (type?: string | null, senderName?: string | null): string => {
+    const normalized = String(type ?? '').toLowerCase();
+    if (normalized === 'chatmessage') return `Новое сообщение${senderName ? ` от ${senderName}` : ''}`;
+    if (normalized === 'eventstart') return 'Скоро начало мероприятия';
+    if (normalized === 'bufferendingsoon') return 'Скоро завершится буферный период';
+    if (normalized === 'taskdeadline') return 'Срок задачи';
+    if (normalized === 'eventcancelled') return 'Мероприятие отменено';
+    if (normalized === 'eventpublished') return 'Мероприятие опубликовано';
+    return 'Уведомление';
+};
+
 const formatRelativeTime = (value: string): string => {
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return 'только что';
@@ -60,7 +71,10 @@ export default function NotificationsDrawer({open, onClose}: NotificationsDrawer
     const [shouldRender, setShouldRender] = useState(open);
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
-    const {data: notifications = [], isLoading} = useGetNotificationsQuery({count: 100, offset: 0}, {skip: !open});
+    const {data: notifications = [], isLoading} = useGetNotificationsQuery(
+        {count: 100, offset: 0},
+        {skip: !open, refetchOnFocus: true, refetchOnReconnect: true, pollingInterval: 30000}
+    );
     const {data: invitations = []} = useGetInvitationsQuery(undefined, {skip: !open});
     const chatAlerts = useSelector((state: RootState) => state.realtime.chatAlerts);
     const [markRead, {isLoading: isMarkingRead}] = useMarkNotificationsReadMutation();
@@ -96,9 +110,7 @@ export default function NotificationsDrawer({open, onClose}: NotificationsDrawer
     const mergedNotifications = useMemo<ViewNotification[]>(() => {
         const apiItems: ViewNotification[] = notifications.map((notification) => ({
             id: notification.id,
-            title: notification.title || (notification.type?.toLowerCase() === 'chatmessage'
-                ? `Новое сообщение${notification.senderName ? ` от ${notification.senderName}` : ''}`
-                : 'Уведомление'),
+            title: notification.title || resolveNotificationTitle(notification.type, notification.senderName),
             text: notification.type?.toLowerCase() === 'chatmessage'
                 ? `${shortMessage(notification.messageText ?? notification.text)}${notification.communityName ? ` • ${notification.communityName}` : ''}`
                 : notification.text,

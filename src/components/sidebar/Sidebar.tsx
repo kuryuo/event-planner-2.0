@@ -65,7 +65,10 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
     const dispatch = useDispatch<AppDispatch>();
     const {data: profile} = useGetProfileQuery();
     const {data: subscribedEvents} = useGetProfileEventsQuery();
-    const {data: notifications, isLoading: notificationsLoading} = useGetNotificationsQuery({count: 100, offset: 0});
+    const {data: notifications, isLoading: notificationsLoading} = useGetNotificationsQuery(
+        {count: 100, offset: 0},
+        {refetchOnFocus: true, refetchOnReconnect: true, pollingInterval: 60000}
+    );
     const chatAlerts = useSelector((state: RootState) => state.realtime.chatAlerts);
     const [createEventMutation] = useCreateEventMutation();
     const navigate = useNavigate();
