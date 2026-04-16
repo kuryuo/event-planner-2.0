@@ -65,7 +65,7 @@
 }
 
 :global(.fc.fc-theme-standard .fc-timegrid-col-border) {
-  border-left: 1px solid #e0e0e0;
+  border-left: 1px solid var(--border-primary);
 }
 
 :global(.fc.fc-theme-standard .fc-timegrid-col.fc-day-today) {

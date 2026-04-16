@@ -30,8 +30,12 @@ import FaceSmileIcon from '@/assets/image/face-smile.svg?react';
 import ChevronIcon from '@/assets/image/chevron.svg?react';
 import PlusIcon from '@/assets/image/plus-lg.svg?react';
 import BoxArchiveIcon from '@/assets/image/box-archive.svg?react';
+import DropletIcon from '@/assets/image/droplet.svg?react';
+import MoonIcon from '@/assets/image/moon.svg?react';
+import SunIcon from '@/assets/image/sun.svg?react';
 import SearchModal from '@/components/sidebar/search-modal/SearchModal';
 import NotificationsDrawer from '@/components/notifications-drawer/NotificationsDrawer.tsx';
+import {useTheme} from '@/hooks/ui/useTheme.ts';
 
 interface SidebarProps {
     notificationCount?: number;
@@ -71,6 +75,7 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
     );
     const chatAlerts = useSelector((state: RootState) => state.realtime.chatAlerts);
     const [createEventMutation] = useCreateEventMutation();
+    const {isDark, toggleTheme} = useTheme();
     const navigate = useNavigate();
     const [eventsExpanded, setEventsExpanded] = useState(false);
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -321,6 +326,20 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
                     leftIcon={<BoxArchiveIcon />}
                     onClick={() => navigate('/archive')}
                 />
+            </div>
+
+            <Divider />
+
+            <div className={styles.themeSection}>
+                <button type="button" className={styles.themeButton} onClick={toggleTheme}>
+                    <span className={styles.themeLeft}>
+                        <span className={styles.themeDropIcon} aria-hidden="true"><DropletIcon/></span>
+                        <span>Тема</span>
+                    </span>
+                    <span className={styles.themeActionIcon} aria-hidden="true">
+                        {isDark ? <MoonIcon/> : <SunIcon/>}
+                    </span>
+                </button>
             </div>
 
         </div>

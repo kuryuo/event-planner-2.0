@@ -10,6 +10,59 @@
   gap: var(--spacing-4);
 }
 
+.themeSection {
+  margin-top: auto;
+  padding-top: var(--spacing-2);
+}
+
+.themeButton {
+  width: 100%;
+  height: 64px;
+  border: none;
+  border-radius: 16px;
+  background: var(--bg-primary);
+  color: var(--content-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--spacing-4);
+  cursor: pointer;
+}
+
+.themeLeft {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  @include ty.font(body-m, regular);
+}
+
+.themeDropIcon,
+.themeActionIcon {
+  width: 24px;
+  height: 24px;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.themeActionIcon {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--content-secondary);
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
 .userCard {
   cursor: pointer;
 }
