@@ -1,10 +1,10 @@
-import CloseIcon from "@/assets/img/icon-m/x.svg";
+import CloseIcon from "@/assets/img/icon-m/x.svg?react";
 import DateTimeSection from "../../ui/date-time/DateTimeSection.tsx";
 import SegmentedControl from "../../ui/segmented-control/SegmentedControl.tsx";
 import styles from "./EventForm.module.scss";
 import TextField from "@/ui/text-field/TextField.tsx";
-import GeoAltIcon from "@/assets/img/icon-m/geo-alt.svg";
-import Plus from "@/assets/img/icon-s/plus-lg.svg";
+import GeoAltIcon from "@/assets/img/icon-m/geo-alt.svg?react";
+import Plus from "@/assets/img/icon-s/plus-lg.svg?react";
 import Select from "@/ui/select/Select.tsx";
 import Chip from "@/ui/chip/Chip.tsx";
 import TextArea from "@/ui/text-area/TextArea.tsx";
@@ -106,7 +106,7 @@ export default function EventForm({
                     onChange={(e) => setTitle(e.target.value)}
                 />
                 <button className={styles.closeButton} onClick={handleClose}>
-                    <img src={CloseIcon} alt="close"/>
+                    <CloseIcon/>
                 </button>
             </div>
             <div className={styles.contentGrid}>
@@ -127,7 +127,7 @@ export default function EventForm({
                             placeholder="Адрес"
                             value={location}
                             onChange={e => setLocation(e.target.value)}
-                            leftIcon={<img src={GeoAltIcon} alt="location"/>}
+                            leftIcon={<GeoAltIcon/>}
                             fieldSize="M"
                         />
                         <TextField
@@ -189,7 +189,7 @@ export default function EventForm({
                             className={styles.categoryButton}
                             onClick={() => setShowCategorySelect(prev => !prev)}
                         >
-                            <img src={Plus} alt="Добавить"/>
+                            <Plus/>
                         </button>
 
                         {showCategorySelect && (

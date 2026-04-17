@@ -1,10 +1,10 @@
 import styles from './CalendarToolbar.module.scss';
 import clsx from 'clsx';
-import ChevronLeft from '@/assets/img/icon-m/chevron-left.svg';
-import ChevronRight from '@/assets/img/icon-m/chevron-right.svg';
-import ViewStacked from '@/assets/img/icon-m/view-stacked.svg';
-import Calendar from '@/assets/img/icon-m/calendar.svg'
-import Filter from '@/assets/img/icon-m/filter.svg';
+import ChevronLeft from '@/assets/img/icon-m/chevron-left.svg?react';
+import ChevronRight from '@/assets/img/icon-m/chevron-right.svg?react';
+import ViewStacked from '@/assets/img/icon-m/view-stacked.svg?react';
+import Calendar from '@/assets/img/icon-m/calendar.svg?react'
+import Filter from '@/assets/img/icon-m/filter.svg?react';
 import {formatCalendarLabel} from '@/utils';
 
 type CalendarView = 'dayGridMonth' | 'timeGridWeek';
@@ -41,10 +41,10 @@ export default function CalendarToolbar({
                     }
                 </span>
                 <button className={styles.navBtn} onClick={onPrev}>
-                    <img src={ChevronLeft} alt="Предыдущая"/>
+                    <ChevronLeft/>
                 </button>
                 <button className={styles.navBtn} onClick={onNext}>
-                    <img src={ChevronRight} alt="Следующая"/>
+                    <ChevronRight/>
                 </button>
             </div>
 
@@ -71,15 +71,12 @@ export default function CalendarToolbar({
                 <div className={styles.iconButtons}>
                     {onViewStackedClick && (
                         <button className={styles.iconBtn} onClick={onViewStackedClick}>
-                            <img
-                                src={showingList ? Calendar : ViewStacked}
-                                alt="Вид"
-                            />
+                            {showingList ? <Calendar/> : <ViewStacked/>}
                         </button>
                     )}
                     {onFilterClick && (
                         <button className={styles.iconBtn} onClick={onFilterClick}>
-                            <img src={Filter} alt="Фильтр"/>
+                            <Filter/>
                         </button>
                     )}
                 </div>

@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import styles from './Avatar.module.scss';
-import PlusIcon from '@/assets/img/icon-l/plus-lg.svg';
+import PlusIcon from '@/assets/img/icon-l/plus-lg.svg?react';
 import UserFallbackAvatar from '@/assets/image/avatar.png';
 import EventFallbackAvatar from '@/assets/image/avatar_event.png';
 
@@ -58,7 +58,7 @@ export default function Avatar({
             )}
             {variant === 'update' && (
                 <div className={styles.overlay}>
-                    <img src={PlusIcon} alt="Add" className={styles.icon}/>
+                    <PlusIcon className={styles.icon}/>
                 </div>
             )}
         </div>

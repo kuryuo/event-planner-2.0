@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import styles from "./Chip.module.scss";
-import CloseImg from "@/assets/img/icon-s/x.svg";
+import CloseImg from "@/assets/img/icon-s/x.svg?react";
 import type {AppColor} from "@/const";
 
 interface ChipProps {
@@ -42,7 +42,7 @@ const Chip = ({
             <span className={styles.text}>{text}</span>
             {closable && (
                 <button type="button" className={styles.closeButton} onClick={onClose}>
-                    <img src={CloseImg} alt="Close"/>
+                    <CloseImg/>
                 </button>
             )}
         </div>

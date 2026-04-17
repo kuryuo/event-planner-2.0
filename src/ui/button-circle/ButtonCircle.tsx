@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import styles from './ButtonCircle.module.scss';
-import PlusIcon from '@/assets/img/icon-l/plus-lg.svg';
+import PlusIcon from '@/assets/img/icon-l/plus-lg.svg?react';
 
 type CircleButtonVariant = 'purple' | 'gray' | 'green';
 
@@ -23,7 +23,7 @@ export default function CircleButton({
             onClick={onClick}
             aria-label="Создать"
         >
-            <img src={PlusIcon} alt="+" className={styles.icon}/>
+            <PlusIcon className={styles.icon}/>
         </button>
     );
 }

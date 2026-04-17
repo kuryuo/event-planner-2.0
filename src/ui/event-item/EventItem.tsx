@@ -1,6 +1,6 @@
 import Button from '../button/Button';
 import styles from './EventItem.module.scss';
-import BoxArrowUpIcon from '@/assets/img/icon-m/box-arrow-up-right.svg';
+import BoxArrowUpIcon from '@/assets/img/icon-m/box-arrow-up-right.svg?react';
 import {useNavigate} from "react-router-dom";
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 import Avatar from '@/ui/avatar/Avatar.tsx';
@@ -62,7 +62,7 @@ export default function EventItem({
                         {isSubscribed ? "Я не пойду" : "Я пойду"}
                     </Button>
                 )}
-                <img src={BoxArrowUpIcon} alt="icon" className={styles.buttonIcon} onClick={handleIconClick} style={{cursor: 'pointer'}}/>
+                <BoxArrowUpIcon className={styles.buttonIcon} onClick={handleIconClick} style={{cursor: 'pointer'}}/>
             </div>
         </div>
     );

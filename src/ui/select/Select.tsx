@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import styles from './Select.module.scss';
-import ChevronDownImg from '../../assets/img/icon-m/chevron-down.svg';
+import ChevronDownImg from '../../assets/img/icon-m/chevron-down.svg?react';
 import Menu, { type MenuOption } from '../menu/Menu';
 
 export interface Option {
@@ -93,11 +93,7 @@ export default function Select({
                     style={{cursor: disabled ? 'not-allowed' : 'pointer'}}
                 >
                     {rightIcon ?? (
-                        <img
-                            src={ChevronDownImg}
-                            alt={isOpen ? 'chevron-up' : 'chevron-down'}
-                            className={`${styles.chevronIcon} ${isOpen ? styles.expanded : ''}`}
-                        />
+                        <ChevronDownImg className={`${styles.chevronIcon} ${isOpen ? styles.expanded : ''}`}/>
                     )}
                 </span>
             </div>

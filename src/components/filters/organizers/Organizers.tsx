@@ -4,7 +4,7 @@ import {Card} from "@/ui/card/Card.tsx";
 import {useGetOrganizersQuery} from "@/services/api/userApi.ts";
 import {buildImageUrl} from "@/utils/buildImageUrl.ts";
 import type {Organizer} from "@/types/api/User.ts";
-import CloseIcon from "@/assets/img/icon-s/x.svg";
+import CloseIcon from "@/assets/img/icon-s/x.svg?react";
 import styles from "./Organizers.module.scss";
 
 interface OrganizersProps {
@@ -100,7 +100,7 @@ export default function Organizers({isOpen, onOpenChange, onSelectedChange, init
                                 title={fullName}
                                 avatarUrl={buildImageUrl(organizer.avatarUrl) || ''}
                                 size="S"
-                                rightIcon={<img src={CloseIcon} alt="Удалить"/>}
+                                rightIcon={<CloseIcon/>}
                                 onRightIconClick={() => handleRemoveOrganizer(organizer.id)}
                             />
                         );

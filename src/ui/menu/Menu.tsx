@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import clsx from 'clsx';
 import styles from './Menu.module.scss';
 import TextField from '../text-field/TextField';
-import Check2Icon from '@/assets/img/icon-m/check2.svg';
+import Check2Icon from '@/assets/img/icon-m/check2.svg?react';
 import PlusLgIcon from '@/assets/img/icon-s/plus-lg.svg?react';
 
 export interface MenuOption {
@@ -144,7 +144,7 @@ export default function Menu({
                                 )}
                             </div>
                             {isSelected && (
-                                <img src={Check2Icon} alt="Выбрано" className={styles.checkIcon} />
+                                <Check2Icon className={styles.checkIcon} />
                             )}
                         </li>
                     );

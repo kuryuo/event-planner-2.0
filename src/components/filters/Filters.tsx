@@ -1,7 +1,7 @@
 import {useState, useRef, useEffect} from 'react';
 import styles from './Filters.module.scss';
 import Checkbox from '@/ui/checkbox/Checkbox';
-import CloseIcon from '@/assets/img/icon-m/x.svg';
+import CloseIcon from '@/assets/img/icon-m/x.svg?react';
 import CalendarIcon from '@/assets/img/icon-m/calendar.svg?react';
 import Organizers from "@/components/filters/organizers/Organizers";
 import Tags from "@/components/filters/сategory/Category";
@@ -176,7 +176,7 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
             <div className={styles.filters} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.header}>
                     <span className={styles.title}>Фильтры</span>
-                    <img src={CloseIcon} alt="Закрыть" onClick={onClose} className={styles.closeIcon}/>
+                    <CloseIcon onClick={onClose} className={styles.closeIcon}/>
                 </div>
 
                 <div className={styles.dateSection}>

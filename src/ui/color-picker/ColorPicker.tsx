@@ -1,7 +1,7 @@
 import {useState, useRef, useEffect} from "react";
 import styles from "./ColorPicker.module.scss";
-import ChevronDownImg from "../../assets/img/icon-m/chevron-down.svg";
-import ChevronUpImg from "../../assets/img/icon-m/chevron-up.svg";
+import ChevronDownImg from "../../assets/img/icon-m/chevron-down.svg?react";
+import ChevronUpImg from "../../assets/img/icon-m/chevron-up.svg?react";
 import {useClickOutside} from "@/hooks/ui/useClickOutside.ts";
 
 const PREDEFINED_COLORS = [
@@ -49,11 +49,10 @@ const ColorPicker = ({value, onChange}: ColorPickerProps) => {
         <div className={styles.colorPicker} ref={pickerRef}>
             <div className={styles.selected} onClick={toggleOpen}>
                 <div className={styles.color} style={{backgroundColor: selectedColor}}/>
-                <img
-                    src={open ? ChevronUpImg : ChevronDownImg}
-                    alt="Toggle"
-                    className={styles.icon}
-                />
+                {open
+                    ? <ChevronUpImg className={styles.icon}/>
+                    : <ChevronDownImg className={styles.icon}/>
+                }
             </div>
 
             {open && (
