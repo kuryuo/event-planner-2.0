@@ -1,0 +1,91 @@
+@use '@/typography-variables' as ty;
+
+.viewport {
+  position: fixed;
+  top: var(--spacing-6);
+  right: var(--spacing-6);
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  pointer-events: none;
+}
+
+.toast {
+  width: min(590px, calc(100vw - 48px));
+  min-height: 88px;
+  border-radius: 24px;
+  border: 1px solid var(--border-inverse);
+  background: linear-gradient(90deg, #001a24 0%, #002436 100%);
+  box-shadow: var(--lvl2);
+  padding: var(--spacing-4) var(--spacing-6);
+  display: grid;
+  grid-template-columns: 24px 1fr auto auto 24px;
+  gap: var(--spacing-4);
+  align-items: center;
+  color: var(--content-primary-inverse);
+  pointer-events: auto;
+}
+
+.leadingIcon {
+  width: 24px;
+  height: 24px;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.icon_info { color: var(--content-primary-inverse); }
+.icon_success { color: var(--content-positive); }
+.icon_warning { color: var(--content-notice); }
+.icon_error { color: var(--content-negative); }
+
+.message {
+  @include ty.font(body-s, regular);
+  color: var(--content-primary-inverse);
+}
+
+.actionButton {
+  @include ty.font(body-s, semibold);
+  color: var(--content-primary-inverse);
+  background: transparent;
+  cursor: pointer;
+}
+
+.counter {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border-radius: 50%;
+    background: #001a24;
+  }
+
+  span {
+    position: relative;
+    z-index: 1;
+    @include ty.font(body-s, semibold);
+    color: var(--content-primary-inverse);
+  }
+}
+
+.closeButton {
+  background: transparent;
+  color: var(--content-primary-inverse);
+  cursor: pointer;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
