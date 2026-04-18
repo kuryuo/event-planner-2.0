@@ -14,9 +14,10 @@ import type {CreateEventPayload, EventResponse} from "@/types/api/Event.ts";
 import {useNavigate} from "react-router-dom";
 import {useGetCategoriesQuery} from "@/services/api/categoryApi.ts";
 import Divider from "@/ui/divider/Divider";
-import {useRef} from "react";
+import {useRef, useState} from "react";
 import ImageIcon from "@/assets/img/icon-m/image.svg?react";
 import Checkbox from "@/ui/checkbox/Checkbox.tsx";
+import {isValidAddress, isValidUrl} from '@/utils/validation.ts';
 
 interface EventFormProps {
     eventData?: EventResponse | null;
@@ -34,6 +35,7 @@ export default function EventForm({
                                       isEditMode = false
                                   }: EventFormProps) {
     const navigate = useNavigate();
+    const [formError, setFormError] = useState<string>('');
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const {data: categoriesData, isLoading: isLoadingCategories} = useGetCategoriesQuery();
 
@@ -85,6 +87,31 @@ export default function EventForm({
     };
 
     const handleSubmit = () => {
+        if (!title.trim()) {
+            setFormError('Введите название мероприятия');
+            return;
+        }
+        if (!location.trim() || !isValidAddress(location)) {
+            setFormError('Введите корректный адрес');
+            return;
+        }
+        if (format !== 'Очно' && auditorium.trim() && !isValidUrl(auditorium)) {
+            setFormError('Для онлайн-формата укажите корректную ссылку (https://...)');
+            return;
+        }
+        if (!isParticipantsUnlimited) {
+            const parsed = Number(participants);
+            if (!Number.isInteger(parsed) || parsed <= 0) {
+                setFormError('Максимум участников должен быть целым числом больше 0');
+                return;
+            }
+        }
+        if (!description.trim() || description.trim().length < 10) {
+            setFormError('Описание должно содержать минимум 10 символов');
+            return;
+        }
+
+        setFormError('');
         const payload = preparePayload();
         if (payload) {
             onSubmit(payload);
@@ -233,6 +260,7 @@ export default function EventForm({
                     </div>
 
                     <div className={styles.actions}>
+                        {formError && <div className={styles.error}>{formError}</div>}
                         <Button variant="Filled" color="purple" type="button" onClick={handleSubmit}>
                             {isEditMode ? 'Сохранить изменения' : 'Создать'}
                         </Button>

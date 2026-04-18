@@ -114,6 +114,11 @@
   padding-top: var(--spacing-2);
 }
 
+.error {
+  color: var(--content-negative);
+  margin-bottom: var(--spacing-2);
+}
+
 .coverPanel {
   display: flex;
   flex-direction: column;

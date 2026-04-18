@@ -16,7 +16,7 @@ interface CreatePostFormProps {
 }
 
 export default function CreatePostForm({onClose, onSubmit, initialTitle, initialText, isEditMode = false, isLoading = false}: CreatePostFormProps) {
-    const {control, handleSubmit, reset} = useForm<{ postTitle: string; postText: string }>({
+    const {control, handleSubmit, reset, formState: {errors}} = useForm<{ postTitle: string; postText: string }>({
         defaultValues: {
             postTitle: initialTitle || '',
             postText: initialText || '',
@@ -56,6 +56,7 @@ export default function CreatePostForm({onClose, onSubmit, initialTitle, initial
                 <Controller
                     name="postTitle"
                     control={control}
+                    rules={{required: 'Введите заголовок', minLength: {value: 3, message: 'Минимум 3 символа'}}}
                     render={({field}) => (
                         <TextField
                             placeholder="Заголовок"
@@ -68,6 +69,7 @@ export default function CreatePostForm({onClose, onSubmit, initialTitle, initial
                 <Controller
                     name="postText"
                     control={control}
+                    rules={{required: 'Введите текст поста', minLength: {value: 10, message: 'Минимум 10 символов'}}}
                     render={({field}) => (
                         <TextArea
                             placeholder="Основной текст"
@@ -76,6 +78,9 @@ export default function CreatePostForm({onClose, onSubmit, initialTitle, initial
                         />
                     )}
                 />
+                {(errors.postTitle?.message || errors.postText?.message) && (
+                    <div className={styles.error}>{String(errors.postTitle?.message || errors.postText?.message)}</div>
+                )}
             </div>
             <Button
                 variant="Filled"

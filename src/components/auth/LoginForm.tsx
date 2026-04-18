@@ -4,6 +4,7 @@ import Button from "@/ui/button/Button";
 import Checkbox from "@/ui/checkbox/Checkbox";
 import styles from "./AuthForm.module.scss";
 import imageSrc from "@/assets/img/image.png";
+import {isValidEmail} from '@/utils/validation.ts';
 
 interface LoginFormProps {
     onSubmit: (data: { email: string; password: string }) => void;
@@ -49,7 +50,10 @@ export default function LoginForm({
                         <Controller
                             name="email"
                             control={control}
-                            rules={{required: 'Email обязателен'}}
+                            rules={{
+                                required: 'Email обязателен',
+                                validate: (value) => isValidEmail(value) || 'Введите корректный email',
+                            }}
                             render={({field}) => (
                                 <TextField
                                     placeholder="Email"
@@ -64,7 +68,10 @@ export default function LoginForm({
                         <Controller
                             name="password"
                             control={control}
-                            rules={{required: 'Пароль обязателен'}}
+                            rules={{
+                                required: 'Пароль обязателен',
+                                minLength: {value: 6, message: 'Минимум 6 символов'},
+                            }}
                             render={({field}) => (
                                 <TextField
                                     placeholder="Пароль"

@@ -3,6 +3,7 @@ import TextField from "@/ui/text-field/TextField";
 import Button from "@/ui/button/Button";
 import styles from "./AuthForm.module.scss";
 import imageSrc from "@/assets/img/image.png";
+import {isValidEmail} from '@/utils/validation.ts';
 
 interface RegistrationFormProps {
     onSubmit: (data: { username: string; email: string; password: string }) => void;
@@ -51,7 +52,10 @@ export default function RegistrationForm({
                             <Controller
                                 name="firstName"
                                 control={control}
-                                rules={{required: 'Имя обязательно'}}
+                                rules={{
+                                    required: 'Имя обязательно',
+                                    minLength: {value: 2, message: 'Минимум 2 символа'},
+                                }}
                                 render={({field}) => (
                                     <TextField placeholder="Имя" value={field.value} onChange={field.onChange}/>
                                 )}
@@ -59,7 +63,10 @@ export default function RegistrationForm({
                             <Controller
                                 name="lastName"
                                 control={control}
-                                rules={{required: 'Фамилия обязательна'}}
+                                rules={{
+                                    required: 'Фамилия обязательна',
+                                    minLength: {value: 2, message: 'Минимум 2 символа'},
+                                }}
                                 render={({field}) => (
                                     <TextField placeholder="Фамилия" value={field.value} onChange={field.onChange}/>
                                 )}
@@ -69,7 +76,10 @@ export default function RegistrationForm({
                         <Controller
                             name="email"
                             control={control}
-                            rules={{required: 'Email обязателен'}}
+                            rules={{
+                                required: 'Email обязателен',
+                                validate: (value) => isValidEmail(value) || 'Введите корректный email',
+                            }}
                             render={({field}) => (
                                 <TextField placeholder="Email" type="email" value={field.value} onChange={field.onChange}/>
                             )}

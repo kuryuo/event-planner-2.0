@@ -7,6 +7,7 @@ import GeoAltIcon from "@/assets/img/icon-m/geo-alt.svg?react";
 // import EnvelopeIcon from "@/assets/img/icon-m/envelope.svg?react";
 import TelephoneIcon from "@/assets/img/icon-m/telephone.svg?react";
 import TelegramIcon from "@/assets/img/icon-m/telegram.svg?react";
+import {isValidAddress, isValidPhone, isValidTelegram} from '@/utils/validation.ts';
 
 interface ProfileFormProps {
     onSubmit?: (data: any) => void;
@@ -29,7 +30,7 @@ export default function ProfileForm({
                                         loading = false,
                                         initialData,
                                     }: ProfileFormProps) {
-    const {control, handleSubmit, reset, getValues} = useForm({
+    const {control, handleSubmit, reset, formState: {errors}} = useForm({
         defaultValues: {
             firstName: initialData?.firstName ?? '',
             lastName: initialData?.lastName ?? '',
@@ -52,8 +53,7 @@ export default function ProfileForm({
         });
     }, [initialData, reset]);
 
-    const submitForm = () => {
-        const formData = getValues();
+    const submitForm = (formData: any) => {
         if (onSubmit) {
             onSubmit(formData);
         }
@@ -80,17 +80,20 @@ export default function ProfileForm({
             <div className={styles.section}>
                 <h3 className={styles.sectionTitle}>Личные данные</h3>
                 <div className={styles.nameRow}>
-                    <Controller name="firstName" control={control} render={({field}) => (
+                    <Controller name="firstName" control={control} rules={{required: 'Имя обязательно'}} render={({field}) => (
                         <TextField placeholder="Имя" value={field.value} onChange={field.onChange} fieldSize="M"/>
                     )}/>
-                    <Controller name="lastName" control={control} render={({field}) => (
+                    <Controller name="lastName" control={control} rules={{required: 'Фамилия обязательна'}} render={({field}) => (
                         <TextField placeholder="Фамилия" value={field.value} onChange={field.onChange} fieldSize="M"/>
                     )}/>
                 </div>
-                <Controller name="profession" control={control} render={({field}) => (
+                <Controller name="profession" control={control} rules={{required: 'Укажите должность'}} render={({field}) => (
                     <TextField placeholder="Должность" value={field.value} onChange={field.onChange} fieldSize="M"/>
                 )}/>
-                <Controller name="city" control={control} render={({field}) => (
+                <Controller name="city" control={control} rules={{
+                    required: 'Укажите адрес или город',
+                    validate: (value) => isValidAddress(value) || 'Введите корректный адрес',
+                }} render={({field}) => (
                     <TextField
                         placeholder="Город"
                         value={field.value}
@@ -114,7 +117,9 @@ export default function ProfileForm({
                     fieldSize="M"
                     disabled
                 /> */}
-                <Controller name="phoneNumber" control={control} render={({field}) => (
+                <Controller name="phoneNumber" control={control} rules={{
+                    validate: (value) => !value || isValidPhone(value) || 'Введите корректный телефон',
+                }} render={({field}) => (
                     <TextField
                         placeholder="Телефон"
                         type="tel"
@@ -124,7 +129,9 @@ export default function ProfileForm({
                         fieldSize="M"
                     />
                 )}/>
-                <Controller name="telegram" control={control} render={({field}) => (
+                <Controller name="telegram" control={control} rules={{
+                    validate: (value) => !value || isValidTelegram(value) || 'Некорректный Telegram (@username)',
+                }} render={({field}) => (
                     <TextField
                         placeholder="Telegram"
                         value={field.value}
@@ -134,6 +141,12 @@ export default function ProfileForm({
                     />
                 )}/>
             </div>
+
+            {(errors.firstName?.message || errors.lastName?.message || errors.profession?.message || errors.city?.message || errors.phoneNumber?.message || errors.telegram?.message) && (
+                <div className={styles.error}>
+                    {String(errors.firstName?.message || errors.lastName?.message || errors.profession?.message || errors.city?.message || errors.phoneNumber?.message || errors.telegram?.message)}
+                </div>
+            )}
 
             <div>
                 <Button

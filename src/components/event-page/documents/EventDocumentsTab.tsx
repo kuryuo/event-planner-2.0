@@ -16,6 +16,7 @@ import TextField from '@/ui/text-field/TextField.tsx';
 import TextArea from '@/ui/text-area/TextArea.tsx';
 import Button from '@/ui/button/Button.tsx';
 import styles from './EventDocumentsTab.module.scss';
+import {isValidUrl} from '@/utils/validation.ts';
 
 interface EventDocumentsTabProps {
     eventId: string;
@@ -87,6 +88,7 @@ export default function EventDocumentsTab({eventId}: EventDocumentsTabProps) {
     const [updateNote, {isLoading: isUpdatingNote}] = useUpdateEventNoteMutation();
 
     const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+    const [linkError, setLinkError] = useState('');
 
     const linkForm = useForm<{ linkTitle: string; linkUrl: string }>({defaultValues: {linkTitle: '', linkUrl: ''}});
     const noteForm = useForm<{ newNoteText: string }>({defaultValues: {newNoteText: ''}});
@@ -104,6 +106,11 @@ export default function EventDocumentsTab({eventId}: EventDocumentsTabProps) {
 
     const handleAddLink = linkForm.handleSubmit(async ({linkTitle, linkUrl}) => {
         if (!eventId || !linkUrl.trim()) return;
+        if (!isValidUrl(linkUrl)) {
+            setLinkError('Введите корректную ссылку (https://...)');
+            return;
+        }
+        setLinkError('');
         await uploadLink({eventId, title: linkTitle.trim(), url: linkUrl.trim()});
         linkForm.reset();
     });
@@ -236,6 +243,7 @@ export default function EventDocumentsTab({eventId}: EventDocumentsTabProps) {
                         Добавить ссылку
                     </Button>
                 </div>
+                {linkError && <p className={styles.empty}>{linkError}</p>}
 
                 {isAttachmentsLoading ? (
                     <p className={styles.empty}>Загрузка вложений...</p>
