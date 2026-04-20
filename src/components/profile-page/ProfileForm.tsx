@@ -31,6 +31,7 @@ export default function ProfileForm({
                                         initialData,
                                     }: ProfileFormProps) {
     const {control, handleSubmit, reset, formState: {errors}} = useForm({
+        mode: 'onBlur',
         defaultValues: {
             firstName: initialData?.firstName ?? '',
             lastName: initialData?.lastName ?? '',
@@ -80,15 +81,51 @@ export default function ProfileForm({
             <div className={styles.section}>
                 <h3 className={styles.sectionTitle}>Личные данные</h3>
                 <div className={styles.nameRow}>
-                    <Controller name="firstName" control={control} rules={{required: 'Имя обязательно'}} render={({field}) => (
-                        <TextField placeholder="Имя" value={field.value} onChange={field.onChange} fieldSize="M"/>
+                    <Controller name="firstName" control={control} rules={{
+                        required: 'Имя обязательно',
+                        minLength: {value: 2, message: 'Минимум 2 символа'},
+                        maxLength: {value: 40, message: 'Максимум 40 символов'},
+                    }} render={({field}) => (
+                        <TextField
+                            placeholder="Имя"
+                            value={field.value}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            fieldSize="M"
+                            error={Boolean(errors.firstName)}
+                            helperText={errors.firstName?.message as string | undefined}
+                        />
                     )}/>
-                    <Controller name="lastName" control={control} rules={{required: 'Фамилия обязательна'}} render={({field}) => (
-                        <TextField placeholder="Фамилия" value={field.value} onChange={field.onChange} fieldSize="M"/>
+                    <Controller name="lastName" control={control} rules={{
+                        required: 'Фамилия обязательна',
+                        minLength: {value: 2, message: 'Минимум 2 символа'},
+                        maxLength: {value: 50, message: 'Максимум 50 символов'},
+                    }} render={({field}) => (
+                        <TextField
+                            placeholder="Фамилия"
+                            value={field.value}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            fieldSize="M"
+                            error={Boolean(errors.lastName)}
+                            helperText={errors.lastName?.message as string | undefined}
+                        />
                     )}/>
                 </div>
-                <Controller name="profession" control={control} rules={{required: 'Укажите должность'}} render={({field}) => (
-                    <TextField placeholder="Должность" value={field.value} onChange={field.onChange} fieldSize="M"/>
+                <Controller name="profession" control={control} rules={{
+                    required: 'Укажите должность',
+                    minLength: {value: 2, message: 'Минимум 2 символа'},
+                    maxLength: {value: 80, message: 'Максимум 80 символов'},
+                }} render={({field}) => (
+                    <TextField
+                        placeholder="Должность"
+                        value={field.value}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        fieldSize="M"
+                        error={Boolean(errors.profession)}
+                        helperText={errors.profession?.message as string | undefined}
+                    />
                 )}/>
                 <Controller name="city" control={control} rules={{
                     required: 'Укажите адрес или город',
@@ -98,8 +135,11 @@ export default function ProfileForm({
                         placeholder="Город"
                         value={field.value}
                         onChange={field.onChange}
+                        onBlur={field.onBlur}
                         leftIcon={<GeoAltIcon/>}
                         fieldSize="M"
+                        error={Boolean(errors.city)}
+                        helperText={errors.city?.message as string | undefined}
                     />
                 )}/>
             </div>
@@ -118,35 +158,37 @@ export default function ProfileForm({
                     disabled
                 /> */}
                 <Controller name="phoneNumber" control={control} rules={{
-                    validate: (value) => !value || isValidPhone(value) || 'Введите корректный телефон',
+                    required: 'Укажите номер телефона',
+                    validate: (value) => isValidPhone(value) || 'Введите корректный телефон (+7XXXXXXXXXX)',
                 }} render={({field}) => (
                     <TextField
                         placeholder="Телефон"
                         type="tel"
                         value={field.value}
                         onChange={field.onChange}
+                        onBlur={field.onBlur}
                         leftIcon={<TelephoneIcon/>}
                         fieldSize="M"
+                        error={Boolean(errors.phoneNumber)}
+                        helperText={errors.phoneNumber?.message as string | undefined}
                     />
                 )}/>
                 <Controller name="telegram" control={control} rules={{
-                    validate: (value) => !value || isValidTelegram(value) || 'Некорректный Telegram (@username)',
+                    required: 'Укажите Telegram',
+                    validate: (value) => isValidTelegram(value) || 'Некорректный Telegram (@username)',
                 }} render={({field}) => (
                     <TextField
                         placeholder="Telegram"
                         value={field.value}
                         onChange={field.onChange}
+                        onBlur={field.onBlur}
                         leftIcon={<TelegramIcon/>}
                         fieldSize="M"
+                        error={Boolean(errors.telegram)}
+                        helperText={errors.telegram?.message as string | undefined}
                     />
                 )}/>
             </div>
-
-            {(errors.firstName?.message || errors.lastName?.message || errors.profession?.message || errors.city?.message || errors.phoneNumber?.message || errors.telegram?.message) && (
-                <div className={styles.error}>
-                    {String(errors.firstName?.message || errors.lastName?.message || errors.profession?.message || errors.city?.message || errors.phoneNumber?.message || errors.telegram?.message)}
-                </div>
-            )}
 
             <div>
                 <Button

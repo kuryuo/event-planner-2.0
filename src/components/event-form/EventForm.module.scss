@@ -96,6 +96,21 @@
   flex: 1;
 }
 
+.locationRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-2);
+}
+
+.addressField {
+  flex: 1;
+}
+
+.addAuditoriumButton {
+  height: 44px;
+  white-space: nowrap;
+}
+
 .typeButton {
   border: none;
   padding: 0;

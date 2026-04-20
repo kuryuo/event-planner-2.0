@@ -3,16 +3,18 @@
 .segmentedControl {
   position: relative;
   display: flex;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-primary);
   border-radius: var(--radius-2);
   overflow: hidden;
-  width: max-content;
+  width: 100%;
+  max-width: 440px;
   height: 44px;
   background-color: var(--bg-secondary);
 }
 
 .segment {
-  flex: 0 0 140px;
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   justify-content: center;
   align-items: center;

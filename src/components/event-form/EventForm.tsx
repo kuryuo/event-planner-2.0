@@ -14,7 +14,7 @@ import type {CreateEventPayload, EventResponse} from "@/types/api/Event.ts";
 import {useNavigate} from "react-router-dom";
 import {useGetCategoriesQuery} from "@/services/api/categoryApi.ts";
 import Divider from "@/ui/divider/Divider";
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import ImageIcon from "@/assets/img/icon-m/image.svg?react";
 import Checkbox from "@/ui/checkbox/Checkbox.tsx";
 import {isValidAddress, isValidUrl} from '@/utils/validation.ts';
@@ -36,6 +36,7 @@ export default function EventForm({
                                   }: EventFormProps) {
     const navigate = useNavigate();
     const [formError, setFormError] = useState<string>('');
+    const [isAuditoriumVisible, setIsAuditoriumVisible] = useState(Boolean(eventData?.auditorium));
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const {data: categoriesData, isLoading: isLoadingCategories} = useGetCategoriesQuery();
 
@@ -85,6 +86,12 @@ export default function EventForm({
         Practice: 'Практика',
         CereerEvent: 'Карьерные мероприятия',
     };
+
+    useEffect(() => {
+        if (auditorium.trim()) {
+            setIsAuditoriumVisible(true);
+        }
+    }, [auditorium]);
 
     const handleSubmit = () => {
         if (!title.trim()) {
@@ -150,19 +157,36 @@ export default function EventForm({
                             selected={format}
                             onChange={setFormat}
                         />
-                        <TextField
-                            placeholder="Адрес"
-                            value={location}
-                            onChange={e => setLocation(e.target.value)}
-                            leftIcon={<GeoAltIcon/>}
-                            fieldSize="M"
-                        />
-                        <TextField
-                            placeholder="Аудитория / ссылка"
-                            value={auditorium}
-                            onChange={e => setAuditorium(e.target.value)}
-                            fieldSize="M"
-                        />
+                        <div className={styles.locationRow}>
+                            <div className={styles.addressField}>
+                                <TextField
+                                    placeholder="Адрес"
+                                    value={location}
+                                    onChange={e => setLocation(e.target.value)}
+                                    leftIcon={<GeoAltIcon/>}
+                                    fieldSize="M"
+                                />
+                            </div>
+                            {!isAuditoriumVisible && (
+                                <Button
+                                    type="button"
+                                    variant="Filled"
+                                    color="gray"
+                                    className={styles.addAuditoriumButton}
+                                    onClick={() => setIsAuditoriumVisible(true)}
+                                >
+                                    Добавить аудиторию
+                                </Button>
+                            )}
+                        </div>
+                        {isAuditoriumVisible && (
+                            <TextField
+                                placeholder={format === 'Онлайн' ? 'Ссылка' : 'Аудитория'}
+                                value={auditorium}
+                                onChange={e => setAuditorium(e.target.value)}
+                                fieldSize="M"
+                            />
+                        )}
                     </div>
 
                     <div className={styles.section}>

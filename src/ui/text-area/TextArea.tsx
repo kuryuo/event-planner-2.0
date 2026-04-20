@@ -19,20 +19,30 @@ export default function TextArea({
                                      ...props
                                  }: TextAreaProps) {
     const MAX_LENGTH = 800;
-    const [value, setValue] = useState(props.value || '');
+    const isControlled = props.value !== undefined;
+    const [internalValue, setInternalValue] = useState(String(props.defaultValue ?? ''));
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const currentValue = isControlled ? String(props.value ?? '') : internalValue;
+
+    useEffect(() => {
+        if (isControlled) {
+            setInternalValue(String(props.value ?? ''));
+        }
+    }, [isControlled, props.value]);
 
     useEffect(() => {
         if (textareaRef.current) {
             textareaRef.current.style.height = 'auto';
             textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
         }
-    }, [value]);
+    }, [currentValue]);
 
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const newValue = e.target.value.slice(0, MAX_LENGTH);
-        setValue(newValue);
-        if (props.onChange) props.onChange(e);
+        const nextValue = e.target.value;
+        if (!isControlled) {
+            setInternalValue(nextValue);
+        }
+        props.onChange?.(e);
     };
 
     return (
@@ -43,7 +53,7 @@ export default function TextArea({
                         {label}
                     </label>
                     <span className={styles.charCounter}>
-                        {String(value).length}/{MAX_LENGTH}
+                        {currentValue.length}/{MAX_LENGTH}
                     </span>
                 </div>
             )}
@@ -54,9 +64,9 @@ export default function TextArea({
                     ref={textareaRef}
                     className={styles.textarea}
                     disabled={disabled}
-                    value={value}
+                    value={currentValue}
                     onChange={handleChange}
-                    placeholder="placeholder"
+                    maxLength={MAX_LENGTH}
                     {...props}
                 />
                 {rightIcon && <span className={styles.rightIcon}>{rightIcon}</span>}
