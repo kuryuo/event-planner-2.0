@@ -28,6 +28,7 @@ import {useGetUserEventsQuery, useGetUserProfileQuery} from '@/services/api/user
 import ProfileActionModal from '@/components/profile-page/ProfileActionModal.tsx';
 import ProfileSnackbar, {type ProfileSnackbarVariant} from '@/components/profile-page/ProfileSnackbar.tsx';
 import type {UserEvent} from '@/types/api/Profile.ts';
+import {isValidPhone, isValidTelegram} from '@/utils/validation.ts';
 
 type SortKey = 'deadline' | 'status' | 'event' | 'title';
 type ProfileModalType = 'email' | 'password' | 'logout' | 'delete' | null;
@@ -55,6 +56,14 @@ interface SettingsDraft {
     profession: string;
     telegram: string;
     phoneNumber: string;
+}
+
+interface SettingsDraftErrors {
+    firstName?: string;
+    lastName?: string;
+    profession?: string;
+    telegram?: string;
+    phoneNumber?: string;
 }
 
 interface ProfileTask {
@@ -174,6 +183,7 @@ export default function ProfilePage() {
         telegram: '',
         phoneNumber: '',
     });
+    const [draftErrors, setDraftErrors] = useState<SettingsDraftErrors>({});
 
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
     const [notificationChannels, setNotificationChannels] = useState({
@@ -301,6 +311,7 @@ export default function ProfilePage() {
     };
 
     const handleOpenSettings = () => {
+        setDraftErrors({});
         setIsEditMode(true);
     };
 
@@ -314,11 +325,45 @@ export default function ProfilePage() {
                 phoneNumber: displayProfile.phoneNumber,
             });
         }
+        setDraftErrors({});
         setIsEditMode(false);
+    };
+
+    const validateDraft = (value: SettingsDraft): SettingsDraftErrors => {
+        const nextErrors: SettingsDraftErrors = {};
+
+        if (!value.firstName.trim()) nextErrors.firstName = 'Введите имя';
+        else if (value.firstName.trim().length < 2) nextErrors.firstName = 'Минимум 2 символа';
+
+        if (!value.lastName.trim()) nextErrors.lastName = 'Введите фамилию';
+        else if (value.lastName.trim().length < 2) nextErrors.lastName = 'Минимум 2 символа';
+
+        if (!value.profession.trim()) nextErrors.profession = 'Введите должность';
+        else if (value.profession.trim().length < 2) nextErrors.profession = 'Минимум 2 символа';
+
+        if (!value.telegram.trim()) nextErrors.telegram = 'Введите Telegram';
+        else if (!isValidTelegram(value.telegram)) nextErrors.telegram = 'Некорректный Telegram (@username)';
+
+        if (!value.phoneNumber.trim()) nextErrors.phoneNumber = 'Введите номер телефона';
+        else if (!isValidPhone(value.phoneNumber)) nextErrors.phoneNumber = 'Некорректный телефон (+7XXXXXXXXXX)';
+
+        return nextErrors;
+    };
+
+    const handleDraftBlur = (field: keyof SettingsDraft) => {
+        const errors = validateDraft(draft);
+        setDraftErrors((prev) => ({...prev, [field]: errors[field]}));
     };
 
     const handleSaveSettings = async () => {
         if (isForeignProfile || !ownProfile) {
+            return;
+        }
+
+        const errors = validateDraft(draft);
+        setDraftErrors(errors);
+        if (Object.keys(errors).length > 0) {
+            pushToast('Исправьте ошибки в форме профиля', 'error');
             return;
         }
 
@@ -791,11 +836,17 @@ export default function ProfilePage() {
                                                 label="Имя"
                                                 value={draft.firstName}
                                                 onChange={(event) => setDraft((prev) => ({...prev, firstName: event.target.value}))}
+                                                onBlur={() => handleDraftBlur('firstName')}
+                                                error={Boolean(draftErrors.firstName)}
+                                                helperText={draftErrors.firstName}
                                             />
                                             <TextField
                                                 label="Фамилия"
                                                 value={draft.lastName}
                                                 onChange={(event) => setDraft((prev) => ({...prev, lastName: event.target.value}))}
+                                                onBlur={() => handleDraftBlur('lastName')}
+                                                error={Boolean(draftErrors.lastName)}
+                                                helperText={draftErrors.lastName}
                                             />
                                         </div>
 
@@ -803,6 +854,9 @@ export default function ProfilePage() {
                                             label="Должность"
                                             value={draft.profession}
                                             onChange={(event) => setDraft((prev) => ({...prev, profession: event.target.value}))}
+                                            onBlur={() => handleDraftBlur('profession')}
+                                            error={Boolean(draftErrors.profession)}
+                                            helperText={draftErrors.profession}
                                         />
 
                                         <TextField
@@ -810,6 +864,9 @@ export default function ProfilePage() {
                                             value={draft.telegram}
                                             leftIcon={<TelegramIcon/>}
                                             onChange={(event) => setDraft((prev) => ({...prev, telegram: event.target.value}))}
+                                            onBlur={() => handleDraftBlur('telegram')}
+                                            error={Boolean(draftErrors.telegram)}
+                                            helperText={draftErrors.telegram}
                                         />
 
                                         <TextField
@@ -817,6 +874,9 @@ export default function ProfilePage() {
                                             value={draft.phoneNumber}
                                             leftIcon={<TelephoneIcon/>}
                                             onChange={(event) => setDraft((prev) => ({...prev, phoneNumber: event.target.value}))}
+                                            onBlur={() => handleDraftBlur('phoneNumber')}
+                                            error={Boolean(draftErrors.phoneNumber)}
+                                            helperText={draftErrors.phoneNumber}
                                         />
                                     </div>
 
