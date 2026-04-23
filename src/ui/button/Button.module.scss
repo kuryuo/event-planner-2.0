@@ -50,6 +50,19 @@
       }
     }
 
+    &.Filled-green {
+      background-color: var(--bg-brand-green);
+      color: var(--content-primary-inverse);
+
+      &:hover {
+        background-color: var(--bg-brand-green-hover);
+      }
+
+      &:active {
+        background-color: var(--bg-brand-green-press);
+      }
+    }
+
     &.Filled-red {
       background-color: var(--bg-negative);
       color: var(--white);

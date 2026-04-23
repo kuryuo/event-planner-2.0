@@ -33,14 +33,33 @@
 
 .iconBtn,
 .submitBtn {
-  width: 42px;
-  height: 42px;
+  width: 56px;
+  height: 56px;
   border: 1px solid #d6dde3;
-  border-radius: 10px;
+  border-radius: 14px;
   background: #fff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.dateBtn {
+  min-width: 220px;
+  height: 56px;
+  border: 1px solid #d6dde3;
+  border-radius: 14px;
+  background: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 0 14px;
+
+  span {
+    font-size: 24px;
+    line-height: 1;
+    color: #22313d;
+  }
 }
 
 .submitBtn:disabled {
@@ -48,6 +67,7 @@
 }
 
 .iconBtn svg,
+.dateBtn svg,
 .submitBtn svg {
   width: 20px;
   height: 20px;

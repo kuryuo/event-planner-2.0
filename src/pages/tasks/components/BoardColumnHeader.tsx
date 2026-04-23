@@ -42,15 +42,17 @@ export default function BoardColumnHeader({
 
             {showActions && (
                 <div className={styles.actions}>
-                    <button
-                        type="button"
-                        className={styles.iconButton}
-                        onClick={onCreateTask}
-                        title="Создать задачу"
-                        aria-label="Создать задачу"
-                    >
-                        <PlusIcon/>
-                    </button>
+                    {onCreateTask && (
+                        <button
+                            type="button"
+                            className={styles.iconButton}
+                            onClick={onCreateTask}
+                            title="Создать задачу"
+                            aria-label="Создать задачу"
+                        >
+                            <PlusIcon/>
+                        </button>
+                    )}
 
                     <div className={styles.menuWrap} ref={menuRef}>
                         <button

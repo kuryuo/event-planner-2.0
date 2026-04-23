@@ -4,7 +4,7 @@ import clsx from 'clsx';
 
 type ButtonSize = 'M' | 'S' | 'XS';
 type ButtonVariant = 'Filled' | 'Text';
-type ButtonColor = 'purple' | 'red' | 'gray' | 'default';
+type ButtonColor = 'purple' | 'green' | 'red' | 'gray' | 'default';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     size?: ButtonSize;

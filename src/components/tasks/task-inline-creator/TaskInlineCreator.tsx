@@ -1,17 +1,18 @@
 import {useMemo, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
-import type {DateRange} from 'react-day-picker';
 import PersonIcon from '@/assets/img/icon-m/person.svg?react';
 import CalendarIcon from '@/assets/img/icon-m/calendar.svg?react';
 import Check2Icon from '@/assets/img/icon-m/check2.svg?react';
 import SearchIcon from '@/assets/img/icon-m/search.svg?react';
-import {DatePicker} from '@/ui/date-picker/DatePicker';
+import {SingleDatePicker} from '@/ui/date-picker/SingleDatePicker';
 import {useClickOutside} from '@/hooks/ui/useClickOutside';
 import styles from './TaskInlineCreator.module.scss';
+import Avatar from '@/ui/avatar/Avatar.tsx';
 
 type Assignee = {
     id: string;
     name: string;
+    avatarUrl?: string;
 };
 
 type Props = {
@@ -23,13 +24,13 @@ type Props = {
 export default function TaskInlineCreator({users, onSubmit, onClose}: Props) {
     const [isUsersOpen, setIsUsersOpen] = useState(false);
     const [isDateOpen, setIsDateOpen] = useState(false);
-    const form = useForm<{ title: string; query: string; assignedUserId: string; dateRange?: DateRange }>({
+    const form = useForm<{ title: string; query: string; assignedUserId: string; dueDate?: Date }>({
         defaultValues: {title: '', query: '', assignedUserId: ''},
     });
     const title = form.watch('title');
     const query = form.watch('query');
     const selectedUserId = form.watch('assignedUserId');
-    const dateRange = form.watch('dateRange');
+    const dueDate = form.watch('dueDate');
     const selectedUser = useMemo(() => users.find((user) => user.id === selectedUserId) ?? null, [users, selectedUserId]);
 
     const usersRef = useRef<HTMLDivElement | null>(null);
@@ -46,6 +47,15 @@ export default function TaskInlineCreator({users, onSubmit, onClose}: Props) {
         return users.filter((user) => user.name.toLowerCase().includes(normalized));
     }, [query, users]);
 
+    const formattedDueDate = useMemo(() => {
+        if (!dueDate) return 'Дата';
+        return new Intl.DateTimeFormat('ru-RU', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        }).format(dueDate);
+    }, [dueDate]);
+
     return (
         <div className={styles.wrap} ref={wrapRef}>
             <input
@@ -59,7 +69,7 @@ export default function TaskInlineCreator({users, onSubmit, onClose}: Props) {
                 <div className={styles.leftActions}>
                     <div className={styles.popupWrap} ref={usersRef}>
                         <button type="button" className={styles.iconBtn} onClick={() => setIsUsersOpen((prev) => !prev)}>
-                            <PersonIcon/>
+                            {selectedUser ? <Avatar size="L" avatarUrl={selectedUser.avatarUrl} name={selectedUser.name}/> : <PersonIcon/>}
                         </button>
 
                         {isUsersOpen && (
@@ -93,13 +103,20 @@ export default function TaskInlineCreator({users, onSubmit, onClose}: Props) {
                     </div>
 
                     <div className={styles.popupWrap} ref={dateRef}>
-                        <button type="button" className={styles.iconBtn} onClick={() => setIsDateOpen((prev) => !prev)}>
+                        <button type="button" className={styles.dateBtn} onClick={() => setIsDateOpen((prev) => !prev)}>
                             <CalendarIcon/>
+                            <span>{formattedDueDate}</span>
                         </button>
 
                         {isDateOpen && (
                             <div className={styles.dateDropdown}>
-                                <DatePicker initialRange={dateRange} onRangeChange={(range) => form.setValue('dateRange', range)}/>
+                                <SingleDatePicker
+                                    initialDate={dueDate}
+                                    onDateChange={(date) => {
+                                        form.setValue('dueDate', date);
+                                        if (date) setIsDateOpen(false);
+                                    }}
+                                />
                             </div>
                         )}
                     </div>
@@ -112,7 +129,7 @@ export default function TaskInlineCreator({users, onSubmit, onClose}: Props) {
                     onClick={form.handleSubmit((values) => onSubmit({
                         title: values.title.trim(),
                         assignedUserId: values.assignedUserId || undefined,
-                        dueDate: (values.dateRange?.to ?? values.dateRange?.from)?.toISOString(),
+                        dueDate: values.dueDate?.toISOString(),
                     }))}
                 >
                     <Check2Icon/>
