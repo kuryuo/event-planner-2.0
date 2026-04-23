@@ -4,25 +4,43 @@ import '@caldwell619/react-kanban/dist/styles.css';
 import SearchIcon from '@/assets/img/icon-m/search.svg?react';
 import FilterIcon from '@/assets/img/icon-m/filter.svg?react';
 import ChevronDownIcon from '@/assets/img/icon-m/chevron-down.svg?react';
+import PlusIcon from '@/assets/img/icon-s/plus-lg.svg?react';
+import CalendarIcon from '@/assets/img/icon-m/calendar.svg?react';
+import PersonIcon from '@/assets/img/icon-m/person.svg?react';
+import FlagIcon from '@/assets/image/flag.svg?react';
+import XLgIcon from '@/assets/img/icon-m/x.svg?react';
+import ThreeDotsVerticalIcon from '@/assets/img/icon-m/three-dots-vertical.svg?react';
+import StatusIcon from '@/assets/image/status.svg?react';
+import TextLeftIcon from '@/assets/image/text-left.svg?react';
+import SendIcon from '@/assets/image/send.svg?react';
+import FaceSmileIcon from '@/assets/image/face-smile.svg?react';
 import Button from '@/ui/button/Button';
 import Checkbox from '@/ui/checkbox/Checkbox';
 import Switch from '@/ui/switch/Switch';
+import Avatar from '@/ui/avatar/Avatar';
+import {useSelector} from 'react-redux';
 import BoardColumnHeader from '@/pages/tasks/components/BoardColumnHeader';
 import AddColumnButton from '@/pages/tasks/components/AddColumnButton';
 import BoardTaskCard from '@/components/tasks/board-task-card/BoardTaskCard';
-import TaskInlineCreator from '@/components/tasks/task-inline-creator/TaskInlineCreator';
 import ProfileActionModal from '@/components/profile-page/ProfileActionModal';
+import {SingleDatePicker} from '@/ui/date-picker/SingleDatePicker';
 import {
     useCreateBoardColumnMutation,
     useCreateBoardTaskMutation,
+    useUpdateBoardTaskMutation,
+    useDeleteBoardTaskMutation,
     useDeleteBoardColumnMutation,
     useGetEventBoardQuery,
     useGetEventBoardFacetsQuery,
     useGetEventSubscribersQuery,
     useMoveBoardTaskMutation,
+    useGetTaskCommentsQuery,
+    useGetTaskHistoryQuery,
+    useAddTaskCommentMutation,
     useUpdateBoardColumnMutation,
 } from '@/services/api/eventApi.ts';
 import type {GetEventBoardPayload} from '@/types/api/Event.ts';
+import type {RootState} from '@/store/store';
 import styles from './EventKanbanTab.module.scss';
 
 type BoardCard = Card & {
@@ -35,7 +53,8 @@ type BoardCard = Card & {
     assigneeAvatar?: string;
     priority: 'Срочный' | 'Высокий' | 'Средний' | 'Низкий';
     commentsCount: number;
-    isCreator?: boolean;
+    status: string;
+    assigneeId?: string;
 };
 
 type BoardColumn = Column<BoardCard> & {
@@ -72,6 +91,8 @@ const toBoard = (payload: any): KanbanBoard<BoardCard> => {
                                 ? 'Низкий'
                                 : 'Средний',
                     commentsCount: Number(task?.commentCount ?? task?.commentsCount ?? task?.comments?.length ?? 0),
+                    status: String(column?.name ?? 'Запланировано'),
+                    assigneeId: task?.assigneeId ?? task?.assignedUserId ?? undefined,
                 })),
             };
         }),
@@ -133,21 +154,51 @@ export default function EventKanbanTab({eventId}: Props) {
         pollingInterval: 120000,
     });
     const {data: boardFacets} = useGetEventBoardFacetsQuery(eventId, {skip: !eventId});
-    const {data: subscribersData} = useGetEventSubscribersQuery({eventId, count: 100, offset: 0}, {skip: !eventId});
+    const {data: subscribersData} = useGetEventSubscribersQuery({eventId, count: 200, offset: 0}, {skip: !eventId});
     const [moveTask] = useMoveBoardTaskMutation();
     const [createColumn] = useCreateBoardColumnMutation();
     const [updateColumn] = useUpdateBoardColumnMutation();
     const [deleteColumn] = useDeleteBoardColumnMutation();
     const [createTask] = useCreateBoardTaskMutation();
+    const [updateTask] = useUpdateBoardTaskMutation();
+    const [deleteTask] = useDeleteBoardTaskMutation();
+    const currentUserId = useSelector((state: RootState) => state.profile.profile?.id ?? '');
 
     const hydratedBoard = useMemo(() => toBoard(boardData), [boardData]);
     const [boardState, setBoardState] = useState<KanbanBoard<BoardCard>>({columns: []});
-    const [creatingTaskColumnId, setCreatingTaskColumnId] = useState('');
     const [columnToDelete, setColumnToDelete] = useState<BoardColumn | null>(null);
     const [isSortOpen, setIsSortOpen] = useState(false);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [isCreateTaskPanelOpen, setIsCreateTaskPanelOpen] = useState(false);
+    const [taskTitle, setTaskTitle] = useState('');
+    const [taskDescription, setTaskDescription] = useState('');
+    const [taskDeadline, setTaskDeadline] = useState<Date | undefined>(undefined);
+    const [selectedAssigneeId, setSelectedAssigneeId] = useState('');
+    const [selectedPriority, setSelectedPriority] = useState<'Urgent' | 'High' | 'Medium' | 'Low'>('Medium');
+    const [isAssigneeOpen, setIsAssigneeOpen] = useState(false);
+    const [isPriorityOpen, setIsPriorityOpen] = useState(false);
+    const [isDeadlineOpen, setIsDeadlineOpen] = useState(false);
+    const [selectedTask, setSelectedTask] = useState<BoardCard | null>(null);
+    const [editingTask, setEditingTask] = useState<BoardCard | null>(null);
+    const [isTaskMenuOpen, setIsTaskMenuOpen] = useState(false);
+    const [taskToDelete, setTaskToDelete] = useState<BoardCard | null>(null);
+    const [activeTaskTab, setActiveTaskTab] = useState<'comments' | 'history'>('comments');
+    const [commentText, setCommentText] = useState('');
     const sortRef = useRef<HTMLDivElement | null>(null);
     const filterRef = useRef<HTMLDivElement | null>(null);
+    const assigneeRef = useRef<HTMLDivElement | null>(null);
+    const priorityRef = useRef<HTMLDivElement | null>(null);
+    const deadlineRef = useRef<HTMLDivElement | null>(null);
+    const taskMenuRef = useRef<HTMLDivElement | null>(null);
+    const {data: taskComments = []} = useGetTaskCommentsQuery(
+        {eventId, taskId: selectedTask?.taskId ?? ''},
+        {skip: !eventId || !selectedTask}
+    );
+    const {data: taskHistory = []} = useGetTaskHistoryQuery(
+        {eventId, taskId: selectedTask?.taskId ?? ''},
+        {skip: !eventId || !selectedTask}
+    );
+    const [addTaskComment] = useAddTaskCommentMutation();
 
     useEffect(() => {
         setBoardState(hydratedBoard);
@@ -158,6 +209,10 @@ export default function EventKanbanTab({eventId}: Props) {
             const target = event.target as Node;
             if (sortRef.current && !sortRef.current.contains(target)) setIsSortOpen(false);
             if (filterRef.current && !filterRef.current.contains(target)) setIsFilterOpen(false);
+            if (assigneeRef.current && !assigneeRef.current.contains(target)) setIsAssigneeOpen(false);
+            if (priorityRef.current && !priorityRef.current.contains(target)) setIsPriorityOpen(false);
+            if (deadlineRef.current && !deadlineRef.current.contains(target)) setIsDeadlineOpen(false);
+            if (taskMenuRef.current && !taskMenuRef.current.contains(target)) setIsTaskMenuOpen(false);
         };
 
         document.addEventListener('mousedown', onDocumentClick);
@@ -166,23 +221,7 @@ export default function EventKanbanTab({eventId}: Props) {
 
     const board = boardState.columns.length ? boardState : hydratedBoard;
 
-    const preparedBoard = useMemo(() => ({
-        columns: board.columns.map((column) => ({
-                ...column,
-                cards: creatingTaskColumnId === String(column.id)
-                    ? [{
-                        id: `creator-${column.id}`,
-                        taskId: `creator-${column.id}`,
-                        title: '',
-                        description: '',
-                        assigneeName: '',
-                        priority: 'Средний' as const,
-                        commentsCount: 0,
-                        isCreator: true,
-                    }, ...column.cards]
-                    : column.cards,
-            })),
-    }), [board, creatingTaskColumnId]);
+    const preparedBoard = useMemo(() => ({columns: board.columns}), [board]);
 
     const sortLabel =
         mockSort === 'urgentFirst'
@@ -225,6 +264,67 @@ export default function EventKanbanTab({eventId}: Props) {
         setColumnToDelete(column);
     };
 
+    const handleCreateTaskGlobal = async () => {
+        setIsCreateTaskPanelOpen(true);
+    };
+
+    const handleSubmitTaskFromPanel = async () => {
+        if (!taskTitle.trim()) return;
+
+        if (editingTask) {
+            await updateTask({
+                eventId,
+                taskId: editingTask.taskId,
+                title: taskTitle.trim(),
+                description: taskDescription.trim() || undefined,
+                assigneeId: selectedAssigneeId || undefined,
+                deadline: taskDeadline?.toISOString(),
+                priority: selectedPriority,
+            }).unwrap();
+        } else {
+            const firstColumnId = board.columns[0]?.id;
+            if (!firstColumnId) {
+                window.alert('Сначала создайте колонку');
+                return;
+            }
+            await createTask({
+                eventId,
+                columnId: String(firstColumnId),
+                title: taskTitle.trim(),
+                description: taskDescription.trim() || undefined,
+                assignedUserId: selectedAssigneeId || undefined,
+                dueDate: taskDeadline?.toISOString(),
+                priority: selectedPriority,
+            }).unwrap();
+        }
+        setIsCreateTaskPanelOpen(false);
+        setEditingTask(null);
+        setTaskTitle('');
+        setTaskDescription('');
+        setTaskDeadline(undefined);
+        setSelectedAssigneeId('');
+        setSelectedPriority('Medium');
+        await refetch();
+    };
+
+    const handleSendComment = async () => {
+        if (!selectedTask || !commentText.trim()) return;
+        await addTaskComment({eventId, taskId: selectedTask.taskId, text: commentText.trim()}).unwrap();
+        setCommentText('');
+    };
+
+    const currentUserRole = useMemo(() => {
+        const users = subscribersData?.res?.users ?? [];
+        return users.find((user) => user.id === currentUserId)?.role ?? null;
+    }, [subscribersData, currentUserId]);
+    const normalizedRole = String(currentUserRole ?? '').toLowerCase();
+    const canManageTask =
+        !currentUserRole
+        || normalizedRole === 'organizer'
+        || normalizedRole === 'editor'
+        || normalizedRole === 'организатор'
+        || normalizedRole === 'редактор';
+
     const confirmDeleteColumn = async () => {
         if (!columnToDelete) return;
         await deleteColumn({eventId, columnId: String(columnToDelete.id)}).unwrap();
@@ -232,39 +332,22 @@ export default function EventKanbanTab({eventId}: Props) {
         await refetch();
     };
 
-    const handleCreateTaskInColumn = async (
-        columnId: string,
-        payload: { title: string; assignedUserId?: string; dueDate?: string; description?: string },
-    ) => {
-        await createTask({
-            eventId,
-            columnId,
-            title: payload.title.trim(),
-            description: payload.description?.trim() || undefined,
-            assignedUserId: payload.assignedUserId,
-            dueDate: payload.dueDate,
-        }).unwrap();
-        setCreatingTaskColumnId('');
-        await refetch();
-    };
-
-    const handleCreateTaskGlobal = async () => {
-        const firstColumnId = board.columns[0]?.id;
-        if (!firstColumnId) {
-            window.alert('Сначала создайте колонку');
-            return;
-        }
-        setCreatingTaskColumnId(String(firstColumnId));
-    };
-
+    const assigneeFacets = useMemo(() => Array.isArray(boardFacets?.result) ? boardFacets.result : [], [boardFacets]);
     const assigneeOptions = useMemo(() => {
         const users = subscribersData?.res?.users ?? [];
-        return users
-            .map((user) => ({id: user.id, name: user.name || 'Участник'}))
-            .filter((user, index, arr) => arr.findIndex((item) => item.id === user.id) === index);
+        return users.map((user) => ({id: user.id, name: user.name || 'Участник'}));
     }, [subscribersData]);
-
-    const assigneeFacets = useMemo(() => Array.isArray(boardFacets?.result) ? boardFacets.result : [], [boardFacets]);
+    const selectedAssigneeName = assigneeOptions.find((user) => user.id === selectedAssigneeId)?.name || 'Исполнитель';
+    const selectedPriorityLabel = selectedPriority === 'Urgent'
+        ? 'Срочный'
+        : selectedPriority === 'High'
+            ? 'Высокий'
+            : selectedPriority === 'Low'
+                ? 'Низкий'
+                : 'Средний';
+    const deadlineLabel = taskDeadline
+        ? new Intl.DateTimeFormat('ru-RU', {day: '2-digit', month: '2-digit', year: 'numeric'}).format(taskDeadline)
+        : 'Дедлайн';
 
     return (
         <section className={styles.surface}>
@@ -362,7 +445,9 @@ export default function EventKanbanTab({eventId}: Props) {
                             </div>
                         )}
                     </div>
-                    <Button variant="Filled" color="default" onClick={handleCreateTaskGlobal}>Создать задачу</Button>
+                    <Button size="S" variant="Filled" color="green" leftIcon={<PlusIcon/>} onClick={handleCreateTaskGlobal}>
+                        Создать задачу
+                    </Button>
                 </div>
             </div>
 
@@ -370,27 +455,16 @@ export default function EventKanbanTab({eventId}: Props) {
                 <ControlledBoard<BoardCard>
                     disableColumnDrag
                     renderCard={(card) => (
-                        <div className={styles.taskCard}>
-                            {card.isCreator ? (
-                                <TaskInlineCreator
-                                    users={assigneeOptions}
-                                    onClose={() => setCreatingTaskColumnId('')}
-                                    onSubmit={(payload) => {
-                                        const columnId = String(creatingTaskColumnId);
-                                        void handleCreateTaskInColumn(columnId, payload);
-                                    }}
-                                />
-                            ) : (
-                                <BoardTaskCard
-                                    title={card.title}
-                                    description={card.description}
-                                    dueDate={card.dueDate}
-                                    assigneeName={card.assigneeName}
-                                    assigneeAvatar={card.assigneeAvatar}
-                                    priority={card.priority}
-                                    commentsCount={card.commentsCount}
-                                />
-                            )}
+                        <div className={styles.taskCard} onClick={() => setSelectedTask(card as BoardCard)}>
+                            <BoardTaskCard
+                                title={card.title}
+                                description={card.description}
+                                dueDate={card.dueDate}
+                                assigneeName={card.assigneeName}
+                                assigneeAvatar={card.assigneeAvatar}
+                                priority={card.priority}
+                                commentsCount={card.commentsCount}
+                            />
                         </div>
                     )}
                     renderColumnHeader={(column) => {
@@ -403,7 +477,6 @@ export default function EventKanbanTab({eventId}: Props) {
                                 count={boardColumn.cards.length}
                                 colorIndex={columnIndex >= 0 ? columnIndex : 0}
                                 showActions
-                                onCreateTask={() => setCreatingTaskColumnId(String(boardColumn.id))}
                                 onRenameColumn={() => handleRenameColumn(boardColumn)}
                                 onDeleteColumn={() => handleDeleteColumn(boardColumn)}
                             />
@@ -425,6 +498,236 @@ export default function EventKanbanTab({eventId}: Props) {
                 description={`Все вложенные задачи (${columnToDelete?.cards.length ?? 0}) также будут безвозвратно удалены`}
                 onClose={() => setColumnToDelete(null)}
                 onConfirm={confirmDeleteColumn}
+                confirmText="Удалить"
+                cancelText="Отменить"
+                confirmTone="danger"
+            />
+
+            {isCreateTaskPanelOpen && (
+                <>
+                    <button type="button" className={styles.createTaskBackdrop} onClick={() => setIsCreateTaskPanelOpen(false)}/>
+                    <aside className={styles.createTaskPanel}>
+                        <div className={styles.createTaskHeader}>
+                            <input
+                                className={styles.createTaskTitle}
+                                value={taskTitle}
+                                onChange={(event) => setTaskTitle(event.target.value)}
+                                placeholder={editingTask ? 'Редактирование задачи' : 'Название'}
+                            />
+                            <button type="button" className={styles.createTaskClose} onClick={() => setIsCreateTaskPanelOpen(false)}>
+                                <XLgIcon/>
+                            </button>
+                        </div>
+
+                        <div className={styles.createTaskSection}>
+                            <h4>Дедлайн</h4>
+                            <div className={styles.dropdownWrap} ref={deadlineRef}>
+                                <button type="button" className={styles.createTaskField} onClick={() => setIsDeadlineOpen((prev) => !prev)}>
+                                    <CalendarIcon/>
+                                    <span>{deadlineLabel}</span>
+                                </button>
+                                {isDeadlineOpen && (
+                                    <div className={`${styles.createTaskMenu} ${styles.createTaskCalendarMenu}`}>
+                                        <SingleDatePicker
+                                            initialDate={taskDeadline}
+                                            onDateChange={(date) => {
+                                                setTaskDeadline(date);
+                                                if (date) setIsDeadlineOpen(false);
+                                            }}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className={styles.createTaskSection}>
+                            <h4>Исполнитель</h4>
+                            <div className={styles.dropdownWrap} ref={assigneeRef}>
+                                <button type="button" className={styles.createTaskField} onClick={() => setIsAssigneeOpen((prev) => !prev)}>
+                                    <PersonIcon/>
+                                    <span>{selectedAssigneeName}</span>
+                                    <ChevronDownIcon className={styles.fieldChevron}/>
+                                </button>
+                                {isAssigneeOpen && (
+                                    <div className={styles.createTaskMenu}>
+                                        {assigneeOptions.map((user) => (
+                                            <button
+                                                key={user.id}
+                                                type="button"
+                                                className={styles.createTaskMenuItem}
+                                                onClick={() => {
+                                                    setSelectedAssigneeId(user.id);
+                                                    setIsAssigneeOpen(false);
+                                                }}
+                                            >
+                                                {user.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className={styles.createTaskSection}>
+                            <h4>Приоритет</h4>
+                            <div className={styles.dropdownWrap} ref={priorityRef}>
+                                <button type="button" className={styles.createTaskField} onClick={() => setIsPriorityOpen((prev) => !prev)}>
+                                    <FlagIcon/>
+                                    <span>{selectedPriorityLabel}</span>
+                                    <ChevronDownIcon className={styles.fieldChevron}/>
+                                </button>
+                                {isPriorityOpen && (
+                                    <div className={styles.createTaskMenu}>
+                                        {[
+                                            {key: 'Urgent', label: 'Срочный'},
+                                            {key: 'High', label: 'Высокий'},
+                                            {key: 'Medium', label: 'Средний'},
+                                            {key: 'Low', label: 'Низкий'},
+                                        ].map((item) => (
+                                            <button
+                                                key={item.key}
+                                                type="button"
+                                                className={styles.createTaskMenuItem}
+                                                onClick={() => {
+                                                    setSelectedPriority(item.key as 'Urgent' | 'High' | 'Medium' | 'Low');
+                                                    setIsPriorityOpen(false);
+                                                }}
+                                            >
+                                                {item.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className={styles.createTaskSection}>
+                            <div className={styles.descriptionHead}>
+                                <h4>Описание</h4>
+                                <span>{taskDescription.length}/200</span>
+                            </div>
+                            <textarea
+                                className={styles.createTaskDescription}
+                                value={taskDescription}
+                                onChange={(event) => setTaskDescription(event.target.value.slice(0, 200))}
+                                placeholder="Описание"
+                            />
+                        </div>
+
+                        <div className={styles.createTaskActions}>
+                            <Button variant="Filled" color="gray" size="S" onClick={handleSubmitTaskFromPanel} disabled={!taskTitle.trim()}>
+                                {editingTask ? 'Сохранить' : 'Создать'}
+                            </Button>
+                            <Button variant="Text" color="default" size="S" onClick={() => setIsCreateTaskPanelOpen(false)}>
+                                Отменить
+                            </Button>
+                        </div>
+                    </aside>
+                </>
+            )}
+
+            {selectedTask && (
+                <>
+                    <button type="button" className={styles.createTaskBackdrop} onClick={() => setSelectedTask(null)}/>
+                    <aside className={styles.createTaskPanel}>
+                        <div className={styles.taskViewHeader}>
+                            <h3>{selectedTask.title}</h3>
+                            <div className={styles.taskViewActions}>
+                                {canManageTask && (
+                                    <div className={styles.taskMenuWrap} ref={taskMenuRef}>
+                                        <button type="button" className={styles.createTaskClose} onClick={() => setIsTaskMenuOpen((prev) => !prev)}>
+                                            <ThreeDotsVerticalIcon/>
+                                        </button>
+                                        {isTaskMenuOpen && (
+                                            <div className={styles.taskMenuDropdown}>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setTaskTitle(selectedTask.title);
+                                                        setTaskDescription(selectedTask.description || '');
+                                                        setTaskDeadline(selectedTask.dueDate ? new Date(selectedTask.dueDate) : undefined);
+                                                        setSelectedAssigneeId(selectedTask.assigneeId || '');
+                                                        setSelectedPriority(selectedTask.priority === 'Срочный' ? 'Urgent' : selectedTask.priority === 'Высокий' ? 'High' : selectedTask.priority === 'Низкий' ? 'Low' : 'Medium');
+                                                        setEditingTask(selectedTask);
+                                                        setIsTaskMenuOpen(false);
+                                                        setSelectedTask(null);
+                                                        setIsCreateTaskPanelOpen(true);
+                                                    }}
+                                                >
+                                                    Редактировать
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className={styles.taskMenuDanger}
+                                                    onClick={() => {
+                                                        setTaskToDelete(selectedTask);
+                                                        setIsTaskMenuOpen(false);
+                                                    }}
+                                                >
+                                                    Удалить
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                                <button type="button" className={styles.createTaskClose} onClick={() => setSelectedTask(null)}>
+                                    <XLgIcon/>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className={styles.taskMetaLine}><StatusIcon className={styles.metaIcon}/><span>Статус</span><strong>{selectedTask.status}</strong></div>
+                        <div className={styles.taskMetaLine}><FlagIcon className={styles.metaIcon}/><span>Приоритет</span><strong>{selectedTask.priority}</strong></div>
+                        <div className={styles.taskMetaLine}><CalendarIcon className={styles.metaIcon}/><span>Дедлайн</span><strong>{selectedTask.dueDate ? new Intl.DateTimeFormat('ru-RU', {day: '2-digit', month: 'long', year: 'numeric'}).format(new Date(selectedTask.dueDate)) : 'Без срока'}</strong></div>
+                        <div className={styles.taskMetaLine}><PersonIcon className={styles.metaIcon}/><span>Исполнитель</span><strong className={styles.assignee}><Avatar size="XS" avatarUrl={selectedTask.assigneeAvatar} name={selectedTask.assigneeName}/>{selectedTask.assigneeName}</strong></div>
+
+                        <div className={styles.taskDescription}>
+                            <div className={styles.taskDescriptionTitle}><TextLeftIcon className={styles.metaIcon}/><span>Описание</span></div>
+                            <p>{selectedTask.description || 'Описание отсутствует'}</p>
+                        </div>
+
+                        <div className={styles.taskTabs}>
+                            <button type="button" className={activeTaskTab === 'comments' ? styles.tabActive : ''} onClick={() => setActiveTaskTab('comments')}>Комментарии</button>
+                            <button type="button" className={activeTaskTab === 'history' ? styles.tabActive : ''} onClick={() => setActiveTaskTab('history')}>История</button>
+                        </div>
+
+                        <div className={styles.taskFeed}>
+                            {activeTaskTab === 'comments' ? taskComments.map((comment) => (
+                                <article key={comment.id} className={styles.feedItem}>
+                                    <div className={styles.feedHead}><strong>{comment.authorName || 'Пользователь'}</strong><span>{comment.createdAt ? new Intl.DateTimeFormat('ru-RU', {hour: '2-digit', minute: '2-digit'}).format(new Date(comment.createdAt)) : ''}</span></div>
+                                    <p>{comment.text}</p>
+                                </article>
+                            )) : taskHistory.map((item) => (
+                                <article key={item.id} className={styles.feedItem}>
+                                    <div className={styles.feedHead}><strong>{item.authorName || 'Система'}</strong><span>{item.createdAt ? new Intl.DateTimeFormat('ru-RU', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'}).format(new Date(item.createdAt)) : ''}</span></div>
+                                    <p>{item.description || item.action || 'Изменение задачи'}</p>
+                                </article>
+                            ))}
+                        </div>
+
+                        {activeTaskTab === 'comments' && (
+                            <div className={styles.commentComposer}>
+                                <input value={commentText} onChange={(event) => setCommentText(event.target.value)} placeholder="Комментарий..."/>
+                                <button type="button"><FaceSmileIcon/></button>
+                                <button type="button" onClick={() => void handleSendComment()}><SendIcon/></button>
+                            </div>
+                        )}
+                    </aside>
+                </>
+            )}
+
+            <ProfileActionModal
+                isOpen={Boolean(taskToDelete)}
+                title={`Удалить задачу «${taskToDelete?.title ?? ''}»?`}
+                description="Задача будет безвозвратно удалена"
+                onClose={() => setTaskToDelete(null)}
+                onConfirm={async () => {
+                    if (!taskToDelete) return;
+                    await deleteTask({eventId, taskId: taskToDelete.taskId}).unwrap();
+                    setTaskToDelete(null);
+                    setSelectedTask(null);
+                    await refetch();
+                }}
                 confirmText="Удалить"
                 cancelText="Отменить"
                 confirmTone="danger"

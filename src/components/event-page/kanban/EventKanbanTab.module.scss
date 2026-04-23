@@ -1,3 +1,5 @@
+@use '@/typography-variables' as ty;
+
 .surface {
   --kanban-columns-height: calc(100vh - 330px);
   border: none;
@@ -51,7 +53,7 @@
 
 .filterControl,
 .sortControl {
-  height: 40px;
+  height: 32px;
   border: 1px solid #d6dde3;
   border-radius: 8px;
   background: #fff;
@@ -185,6 +187,330 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+}
+
+.createTaskBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 20, 26, 0.28);
+  border: none;
+  z-index: 50;
+}
+
+.createTaskPanel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: min(460px, 100vw);
+  background: var(--white);
+  border-left: 1px solid var(--gray-10);
+  z-index: 51;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.createTaskHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.createTaskTitle {
+  flex: 1;
+  height: 44px;
+  border: 1px solid var(--gray-10);
+  border-radius: 10px;
+  background: var(--white);
+  padding: 0 14px;
+  font-size: 16px;
+  color: var(--content-primary);
+}
+
+.createTaskClose {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--content-secondary);
+}
+
+.createTaskSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  h4 {
+    margin: 0;
+    @include ty.font(subtitle-s, semibold);
+    color: var(--content-primary);
+  }
+}
+
+.descriptionHead h4 {
+  margin: 0;
+  @include ty.font(subtitle-s, semibold);
+  color: var(--content-primary);
+}
+
+.dropdownWrap {
+  position: relative;
+}
+
+.createTaskField {
+  width: 100%;
+  height: 44px;
+  border: 1px solid var(--gray-10);
+  border-radius: 8px;
+  background: var(--white);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  color: var(--gray-60);
+
+  span {
+    flex: 1;
+    text-align: left;
+    font-size: 16px;
+  }
+}
+
+.fieldChevron {
+  transform: rotate(-90deg);
+}
+
+.createTaskMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  max-height: 240px;
+  overflow: auto;
+  background: var(--white);
+  border: 1px solid var(--gray-10);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(34, 49, 61, 0.16);
+  z-index: 60;
+  padding: 6px;
+}
+
+.createTaskCalendarMenu {
+  width: auto;
+  max-height: none;
+  overflow: visible;
+  padding: 8px;
+}
+
+.createTaskMenuItem {
+  width: 100%;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  text-align: left;
+  padding: 0 10px;
+  color: var(--gray-100);
+
+  &:hover {
+    background: var(--gray-5);
+  }
+}
+
+.descriptionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  span {
+    font-size: 14px;
+    color: var(--gray-60);
+  }
+}
+
+.createTaskDescription {
+  width: 100%;
+  height: 320px;
+  border: 1px solid var(--gray-10);
+  border-radius: 8px;
+  background: var(--white);
+  resize: none;
+  padding: 12px;
+  color: var(--gray-100);
+}
+
+.createTaskActions {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.taskViewHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h3 {
+    margin: 0;
+    font-size: 34px;
+    color: var(--content-primary);
+  }
+}
+
+.taskViewActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.taskMenuWrap {
+  position: relative;
+}
+
+.taskMenuDropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  width: 170px;
+  background: var(--white);
+  border: 1px solid var(--gray-10);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(34, 49, 61, 0.14);
+  padding: 6px;
+  z-index: 80;
+
+  button {
+    width: 100%;
+    height: 34px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    text-align: left;
+    padding: 0 10px;
+    color: var(--content-primary);
+
+    &:hover {
+      background: var(--gray-5);
+    }
+  }
+}
+
+.taskMenuDanger {
+  color: var(--content-negative) !important;
+}
+
+.taskMetaLine {
+  display: grid;
+  grid-template-columns: 16px 120px 1fr;
+  align-items: center;
+  gap: 10px;
+  color: var(--content-secondary);
+
+  strong {
+    color: var(--content-primary);
+    font-weight: 500;
+  }
+}
+
+.metaIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.assignee {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.taskDescriptionTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--content-secondary);
+}
+
+.taskDescription p {
+  margin: 10px 0 0;
+  color: var(--content-primary);
+  line-height: 1.45;
+}
+
+.taskTabs {
+  display: inline-flex;
+  gap: 24px;
+  border-bottom: 1px solid var(--border-primary);
+
+  button {
+    border: none;
+    background: transparent;
+    padding: 10px 0;
+    color: var(--content-secondary);
+  }
+}
+
+.tabActive {
+  color: var(--content-primary) !important;
+  border-bottom: 2px solid var(--bg-brand-green);
+}
+
+.taskFeed {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.feedItem {
+  border-bottom: 1px solid var(--border-primary);
+  padding-bottom: 10px;
+
+  p {
+    margin: 4px 0 0;
+    color: var(--content-primary);
+  }
+}
+
+.feedHead {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  span {
+    color: var(--content-secondary);
+    font-size: 12px;
+  }
+}
+
+.commentComposer {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  padding: 0 8px;
+  min-height: 36px;
+
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+  }
+
+  button {
+    border: none;
+    background: transparent;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--content-secondary);
+  }
 }
 
 :global(.react-kanban-board .react-kanban-column) {
