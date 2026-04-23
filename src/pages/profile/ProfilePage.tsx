@@ -29,6 +29,7 @@ import ProfileActionModal from '@/components/profile-page/ProfileActionModal.tsx
 import ProfileSnackbar, {type ProfileSnackbarVariant} from '@/components/profile-page/ProfileSnackbar.tsx';
 import type {UserEvent} from '@/types/api/Profile.ts';
 import {isValidPhone, isValidTelegram} from '@/utils/validation.ts';
+import {useLazyGetMyBoardTasksQuery} from '@/services/api/eventApi.ts';
 
 type SortKey = 'deadline' | 'status' | 'event' | 'title';
 type ProfileModalType = 'email' | 'password' | 'logout' | 'delete' | null;
@@ -86,27 +87,6 @@ const SORT_OPTIONS: Array<{key: SortKey; label: string}> = [
     {key: 'title', label: 'А -> Я'},
 ];
 
-const PROFILE_TASKS: ProfileTask[] = [
-    {
-        id: '1',
-        title: 'Название задачи',
-        event: 'Вселенная ИРИТ-РТФ 2026',
-        eventCover: FALLBACK_EVENT,
-        deadline: '2025-02-16',
-        status: 'Запланировано',
-        priority: 'Средний',
-    },
-    {
-        id: '2',
-        title: 'Название задачи',
-        event: 'Вселенная ИРИТ-РТФ 2026',
-        eventCover: FALLBACK_EVENT,
-        deadline: '2025-02-16',
-        status: 'Запланировано',
-        priority: 'Средний',
-    },
-];
-
 const formatEventDate = (value: string): string => {
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) {
@@ -156,6 +136,7 @@ export default function ProfilePage() {
     });
     const {data: foreignEvents = []} = useGetUserEventsQuery(userId ?? '', {skip: !isForeignProfile});
     const [updateProfile, {isLoading: profileUpdating}] = useUpdateProfileMutation();
+    const [loadMyBoardTasks] = useLazyGetMyBoardTasksQuery();
 
     const {
         fileInputRef,
@@ -175,6 +156,7 @@ export default function ProfilePage() {
     const [sortKey, setSortKey] = useState<SortKey>('deadline');
     const [backgroundPreviewUrl, setBackgroundPreviewUrl] = useState<string | null>(null);
     const [toasts, setToasts] = useState<ToastMessage[]>([]);
+    const [profileTasks, setProfileTasks] = useState<ProfileTask[]>([]);
 
     const [draft, setDraft] = useState<SettingsDraft>({
         firstName: '',
@@ -277,6 +259,56 @@ export default function ProfilePage() {
 
     const subscribedEvents = isForeignProfile ? foreignEvents : ownEvents;
 
+    useEffect(() => {
+        let cancelled = false;
+
+        const loadTasks = async () => {
+            if (isForeignProfile || ownEvents.length === 0) {
+                setProfileTasks([]);
+                return;
+            }
+
+            const results = await Promise.allSettled(
+                ownEvents.map(async (event) => {
+                    const board = await loadMyBoardTasks(event.id).unwrap();
+                    const columns = board?.result?.columns ?? board?.result?.boardColumns ?? board?.columns ?? board?.boardColumns ?? [];
+                    return columns.flatMap((column: any) => {
+                        const tasks = column?.tasks ?? column?.boardTasks ?? [];
+                        return tasks.map((task: any): ProfileTask => ({
+                            id: String(task.id),
+                            title: task.title || 'Без названия',
+                            event: event.name,
+                            eventCover: buildImageUrl(event.avatar) ?? buildImageUrl(event.previewPhotos?.[0]) ?? FALLBACK_EVENT,
+                            deadline: task.deadline || task.dueDate || '',
+                            status: column?.name || 'Без статуса',
+                            priority: task.priority === 'Urgent'
+                                ? 'Срочный'
+                                : task.priority === 'High'
+                                    ? 'Высокий'
+                                    : task.priority === 'Low'
+                                        ? 'Низкий'
+                                        : 'Средний',
+                        }));
+                    });
+                })
+            );
+
+            if (cancelled) return;
+
+            const merged = results
+                .filter((result): result is PromiseFulfilledResult<ProfileTask[]> => result.status === 'fulfilled')
+                .flatMap((result) => result.value);
+
+            setProfileTasks(merged);
+        };
+
+        void loadTasks();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [isForeignProfile, ownEvents, loadMyBoardTasks]);
+
     const eventCards = useMemo(() => {
         return subscribedEvents.slice(0, 2).map((event: UserEvent) => ({
             id: event.id,
@@ -287,7 +319,7 @@ export default function ProfilePage() {
     }, [subscribedEvents]);
 
     const sortedTasks = useMemo(() => {
-        return [...PROFILE_TASKS].sort((first, second) => {
+        return [...profileTasks].sort((first, second) => {
             if (sortKey === 'deadline') {
                 return new Date(first.deadline).getTime() - new Date(second.deadline).getTime();
             }
@@ -299,7 +331,7 @@ export default function ProfilePage() {
             }
             return first.title.localeCompare(second.title, 'ru');
         });
-    }, [sortKey]);
+    }, [sortKey, profileTasks]);
 
     const fullName = `${displayProfile?.firstName ?? ''} ${displayProfile?.lastName ?? ''}`.trim() || 'Пользователь';
     const coverUrl = backgroundPreviewUrl ?? displayProfile?.backgroundUrl ?? FALLBACK_COVER;
@@ -767,7 +799,7 @@ export default function ProfilePage() {
 
                                     <section className={styles.section}>
                                         <div className={styles.tasksHeader}>
-                                            <h2 className={styles.sectionTitle}>Текущие задачи {PROFILE_TASKS.length}</h2>
+                                            <h2 className={styles.sectionTitle}>Текущие задачи {profileTasks.length}</h2>
                                             <div className={styles.sortWrapper} ref={sortMenuRef}>
                                                 <button
                                                     className={styles.sortButton}

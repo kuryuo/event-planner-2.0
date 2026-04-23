@@ -521,6 +521,7 @@ export const {
     useGetEventBoardQuery,
     useGetEventBoardFacetsQuery,
     useGetMyBoardTasksQuery,
+    useLazyGetMyBoardTasksQuery,
     useGetEventMyBoardTasksQuery,
     useCreateEventMutation,
     useUpdateEventMutation,
