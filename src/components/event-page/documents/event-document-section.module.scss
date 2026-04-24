@@ -1,0 +1,54 @@
+@use '@/typography-variables' as ty;
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  width: 100%;
+}
+
+.title {
+  margin: 0;
+  @include ty.font(subtitle-m, semibold);
+  color: var(--content-primary);
+}
+
+.description {
+  margin: 0;
+  width: 100%;
+  @include ty.font(caption-m, regular);
+  color: var(--content-secondary);
+}
+
+.body {
+  margin-top: var(--spacing-4);
+}
+
+.emptyWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  margin-top: var(--spacing-5);
+  padding: var(--spacing-6) var(--spacing-4);
+}
+
+.emptyBackdrop {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.emptyMessage {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  text-align: center;
+  @include ty.font(caption-m, regular);
+  color: var(--content-secondary);
+}
