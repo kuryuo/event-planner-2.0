@@ -3,11 +3,19 @@ import styles from './AddColumnButton.module.scss';
 
 type Props = {
     onClick: () => void;
+    disabled?: boolean;
 };
 
-export default function AddColumnButton({onClick}: Props) {
+export default function AddColumnButton({onClick, disabled = false}: Props) {
     return (
-        <button type="button" className={styles.button} onClick={onClick} aria-label="Добавить колонку" title="Добавить колонку">
+        <button
+            type="button"
+            className={styles.button}
+            onClick={onClick}
+            disabled={disabled}
+            aria-label="Добавить колонку"
+            title="Добавить колонку"
+        >
             <PlusIcon/>
         </button>
     );

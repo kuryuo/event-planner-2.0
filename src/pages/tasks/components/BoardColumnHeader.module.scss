@@ -29,6 +29,35 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  cursor: default;
+}
+
+.titleEditable {
+  cursor: text;
+}
+
+.titleInput {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid #d0d7df;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #22313d;
+  background: #fff;
+  outline: none;
+
+  &:focus {
+    border-color: #2b7fff;
+    box-shadow: 0 0 0 1px rgba(43, 127, 255, 0.2);
+  }
+
+  &::placeholder {
+    color: #9aa4ae;
+    font-weight: 400;
+  }
 }
 
 .count {
