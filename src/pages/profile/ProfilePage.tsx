@@ -79,6 +79,7 @@ interface ProfileTask {
 
 const FALLBACK_COVER = 'https://images.unsplash.com/photo-1470163395405-d2b80e7450ed?auto=format&fit=crop&w=1600&q=80';
 const FALLBACK_EVENT = '';
+const EMPTY_EVENTS: UserEvent[] = [];
 
 const SORT_OPTIONS: Array<{key: SortKey; label: string}> = [
     {key: 'deadline', label: 'По дедлайну'},
@@ -130,13 +131,20 @@ export default function ProfilePage() {
     const isForeignProfile = Boolean(userId);
 
     const {data: ownProfile, isLoading: ownProfileLoading} = useGetProfileQuery(undefined, {skip: isForeignProfile});
-    const {data: ownEvents = []} = useGetProfileEventsQuery(undefined, {skip: isForeignProfile});
+    const {data: ownEventsRaw} = useGetProfileEventsQuery(undefined, {skip: isForeignProfile});
     const {data: foreignProfile, isLoading: foreignProfileLoading} = useGetUserProfileQuery(userId ?? '', {
         skip: !isForeignProfile,
     });
-    const {data: foreignEvents = []} = useGetUserEventsQuery(userId ?? '', {skip: !isForeignProfile});
+    const {data: foreignEventsRaw} = useGetUserEventsQuery(userId ?? '', {skip: !isForeignProfile});
     const [updateProfile, {isLoading: profileUpdating}] = useUpdateProfileMutation();
     const [loadMyBoardTasks] = useLazyGetMyBoardTasksQuery();
+    const ownEvents = ownEventsRaw ?? EMPTY_EVENTS;
+    const foreignEvents = foreignEventsRaw ?? EMPTY_EVENTS;
+    const loadMyBoardTasksRef = useRef(loadMyBoardTasks);
+
+    useEffect(() => {
+        loadMyBoardTasksRef.current = loadMyBoardTasks;
+    }, [loadMyBoardTasks]);
 
     const {
         fileInputRef,
@@ -270,7 +278,7 @@ export default function ProfilePage() {
 
             const results = await Promise.allSettled(
                 ownEvents.map(async (event) => {
-                    const board = await loadMyBoardTasks(event.id).unwrap();
+                    const board = await loadMyBoardTasksRef.current(event.id).unwrap();
                     const columns = board?.result?.columns ?? board?.result?.boardColumns ?? board?.columns ?? board?.boardColumns ?? [];
                     return columns.flatMap((column: any) => {
                         const tasks = column?.tasks ?? column?.boardTasks ?? [];
@@ -307,7 +315,7 @@ export default function ProfilePage() {
         return () => {
             cancelled = true;
         };
-    }, [isForeignProfile, ownEvents, loadMyBoardTasks]);
+    }, [isForeignProfile, ownEvents]);
 
     const eventCards = useMemo(() => {
         return subscribedEvents.slice(0, 2).map((event: UserEvent) => ({
