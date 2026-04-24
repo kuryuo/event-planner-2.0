@@ -1,25 +1,36 @@
 import Sidebar from '@/components/sidebar/Sidebar';
 import {useEffect, useMemo, useRef, useState} from 'react';
-import {useSearchParams} from 'react-router-dom';
 import {useSelector} from 'react-redux';
 import {ControlledBoard, moveCard, type KanbanBoard, type Card, type Column} from '@caldwell619/react-kanban';
 import '@caldwell619/react-kanban/dist/styles.css';
 import {
-    useGetEventBoardQuery,
-    useGetEventBoardFacetsQuery,
-    useGetMyEventsQuery,
-    useMoveBoardTaskMutation,
+    useGetMyAssignedTasksQuery,
 } from '@/services/api/eventApi.ts';
-import type {GetEventBoardPayload} from '@/types/api/Event.ts';
+import type {MyAssignedTaskItem} from '@/types/api/Event.ts';
 import styles from './TasksPage.module.scss';
 import BoardColumnHeader from './components/BoardColumnHeader';
 import SearchIcon from '@/assets/img/icon-m/search.svg?react';
 import FilterIcon from '@/assets/img/icon-m/filter.svg?react';
 import ChevronDownIcon from '@/assets/img/icon-m/chevron-down.svg?react';
+import CalendarIcon from '@/assets/img/icon-m/calendar.svg?react';
+import PersonIcon from '@/assets/img/icon-m/person.svg?react';
+import FlagIcon from '@/assets/image/flag.svg?react';
+import StatusIcon from '@/assets/image/status.svg?react';
+import TextLeftIcon from '@/assets/image/text-left.svg?react';
+import SendIcon from '@/assets/image/send.svg?react';
+import FaceSmileIcon from '@/assets/image/face-smile.svg?react';
+import XLgIcon from '@/assets/img/icon-m/x.svg?react';
 import type {RootState} from '@/store/store.ts';
 import Checkbox from '@/ui/checkbox/Checkbox';
 import Switch from '@/ui/switch/Switch';
 import BoardTaskCard from '@/components/tasks/board-task-card/BoardTaskCard';
+import {buildImageUrl} from '@/utils/buildImageUrl.ts';
+import Avatar from '@/ui/avatar/Avatar';
+import {
+    useGetTaskCommentsQuery,
+    useGetTaskHistoryQuery,
+    useAddTaskCommentMutation,
+} from '@/services/api/eventApi.ts';
 
 type BoardCard = Card & {
     id: string;
@@ -29,8 +40,12 @@ type BoardCard = Card & {
     dueDate?: string;
     assigneeName: string;
     assigneeAvatar?: string;
+    assigneeId?: string;
     priority: 'Срочный' | 'Высокий' | 'Средний' | 'Низкий';
     commentsCount: number;
+    eventId: string;
+    eventName?: string;
+    status: string;
 };
 
 type BoardColumn = Column<BoardCard> & {
@@ -53,47 +68,47 @@ const isTaskAssignedToCurrentUser = (task: any, currentUserId: string): boolean 
     return candidateIds.includes(String(currentUserId));
 };
 
-const toBoard = (payload: any, currentUserId: string, onlyMyTasks: boolean): KanbanBoard<BoardCard> => {
-    const sourceRaw = payload?.result ?? payload ?? {};
-    const source = Array.isArray(sourceRaw) ? (sourceRaw[0] ?? {}) : sourceRaw;
-    const columns = source?.columns ?? source?.boardColumns ?? [];
-    return {
-        columns: (Array.isArray(columns) ? columns : []).map((column: any, columnIndex: number) => {
-            const tasks = column?.tasks ?? column?.boardTasks ?? [];
-            const myTasks = (Array.isArray(tasks) ? tasks : []).filter((task: any) => {
-                if (!onlyMyTasks) return true;
-                return isTaskAssignedToCurrentUser(task, currentUserId);
-            });
+const toBoard = (tasks: MyAssignedTaskItem[], currentUserId: string, onlyMyTasks: boolean): KanbanBoard<BoardCard> => {
+    const filtered = (tasks ?? []).filter((task) => {
+        if (!onlyMyTasks) return true;
+        return isTaskAssignedToCurrentUser(task, currentUserId);
+    });
 
-            return {
-                id: String(column?.id ?? `column-${columnIndex}`),
-                title: String(column?.name ?? 'Колонка'),
-                cards: myTasks.map((task: any, taskIndex: number) => ({
-                    id: String(task?.id ?? `task-${taskIndex}`),
-                    taskId: String(task?.id ?? `task-${taskIndex}`),
-                    title: String(task?.title ?? 'Новая задача'),
-                    description: String(task?.description ?? ''),
-                    dueDate: task?.dueDate ?? task?.deadline ?? undefined,
-                    assigneeName: String(task?.assigneeDisplayName ?? task?.assigneeName ?? task?.assignedUserName ?? 'Не назначено'),
-                    assigneeAvatar: task?.assigneeAvatarUrl ?? task?.assigneeAvatar ?? undefined,
-                    priority: task?.priority === 'Urgent' ? 'Срочный' : task?.priority === 'High' ? 'Высокий' : task?.priority === 'Low' ? 'Низкий' : 'Средний',
-                    commentsCount: Number(task?.commentCount ?? task?.commentsCount ?? task?.comments?.length ?? (taskIndex % 4)),
-                })),
-            };
-        }),
+    const byStatus = new Map<string, MyAssignedTaskItem[]>();
+    filtered.forEach((task) => {
+        const status = task.status?.trim() || 'Без статуса';
+        const bucket = byStatus.get(status) ?? [];
+        bucket.push(task);
+        byStatus.set(status, bucket);
+    });
+
+    return {
+        columns: Array.from(byStatus.entries()).map(([status, items], columnIndex) => ({
+            id: `status-${columnIndex}`,
+            title: status,
+            cards: items.map((task, taskIndex) => ({
+                id: String(task.id ?? `task-${taskIndex}`),
+                taskId: String(task.id ?? `task-${taskIndex}`),
+                title: String(task.title ?? 'Новая задача'),
+                description: String(task.description ?? ''),
+                dueDate: task.dueDate ?? undefined,
+                assigneeName: String(task.eventName ?? 'Мероприятие'),
+                assigneeAvatar: buildImageUrl(task.eventAvatarUrl) ?? undefined,
+                assigneeId: task.assignedUserId ?? undefined,
+                priority: task.priority === 'Urgent' ? 'Срочный' : task.priority === 'High' ? 'Высокий' : task.priority === 'Low' ? 'Низкий' : 'Средний',
+                commentsCount: 0,
+                eventId: task.eventId,
+                eventName: task.eventName ?? undefined,
+                status,
+            })),
+        })),
     };
 };
 
 export default function TasksPage() {
     const currentUserId = useSelector((state: RootState) => state.profile.profile?.id ?? '');
-    const [searchParams] = useSearchParams();
-    const requestedEventId = searchParams.get('eventId');
-    const {data: myEventsData} = useGetMyEventsQuery();
-    const eventId = requestedEventId || myEventsData?.result?.[0]?.id || '';
 
     const [selectedAssigneeIds, setSelectedAssigneeIds] = useState<string[]>([]);
-    const [moveTask] = useMoveBoardTaskMutation();
-
     const [boardState, setBoardState] = useState<KanbanBoard<BoardCard>>({columns: []});
     const [searchValue, setSearchValue] = useState('');
     const [mockFilter, setMockFilter] = useState<'all' | 'withDueDate' | 'withoutDueDate'>('all');
@@ -109,39 +124,26 @@ export default function TasksPage() {
     const [filterPriorityMedium, setFilterPriorityMedium] = useState(false);
     const [filterPriorityLow, setFilterPriorityLow] = useState(false);
     const [onlyMyTasks, setOnlyMyTasks] = useState(true);
-    const boardQueryParams = useMemo<GetEventBoardPayload>(() => {
-        const deadlines = [
-            filterDeadlineOverdue && 'Overdue',
-            filterDeadlineToday && 'Today',
-            filterDeadlineTomorrow && 'Tomorrow',
-            filterDeadlineThisWeek && 'ThisWeek',
-        ].filter(Boolean).join(',');
-        const priorities = [
-            filterPriorityUrgent && 'Urgent',
-            filterPriorityHigh && 'High',
-            filterPriorityMedium && 'Medium',
-            filterPriorityLow && 'Low',
-        ].filter(Boolean).join(',');
-        return {
-            eventId,
-            q: searchValue.trim() || undefined,
-            deadlines: deadlines || undefined,
-            assigneeIds: selectedAssigneeIds.length ? selectedAssigneeIds.join(',') : undefined,
-            priorities: priorities || undefined,
-            mineOnly: onlyMyTasks || undefined,
-            sort: mockSort === 'urgentFirst' ? 'UrgentFirst' : mockSort === 'newestFirst' ? 'Newest' : mockSort === 'oldestFirst' ? 'Oldest' : 'AssigneeAsc',
-        };
-    }, [eventId, searchValue, filterDeadlineOverdue, filterDeadlineToday, filterDeadlineTomorrow, filterDeadlineThisWeek, selectedAssigneeIds, filterPriorityUrgent, filterPriorityHigh, filterPriorityMedium, filterPriorityLow, onlyMyTasks, mockSort]);
-    const {data: boardData, isLoading, refetch} = useGetEventBoardQuery(boardQueryParams, {
-        skip: !eventId,
+    const [selectedTask, setSelectedTask] = useState<BoardCard | null>(null);
+    const [activeTaskTab, setActiveTaskTab] = useState<'comments' | 'history'>('comments');
+    const [commentText, setCommentText] = useState('');
+    const {data: myTasksData = [], isLoading} = useGetMyAssignedTasksQuery(undefined, {
         refetchOnFocus: true,
         refetchOnReconnect: true,
         pollingInterval: 120000,
     });
-    const {data: boardFacets} = useGetEventBoardFacetsQuery(eventId, {skip: !eventId});
     const sortRef = useRef<HTMLDivElement | null>(null);
     const filterRef = useRef<HTMLDivElement | null>(null);
-    const hydratedBoard = useMemo(() => toBoard(boardData, currentUserId, onlyMyTasks), [boardData, currentUserId, onlyMyTasks]);
+    const {data: taskComments = []} = useGetTaskCommentsQuery(
+        {eventId: selectedTask?.eventId ?? '', taskId: selectedTask?.taskId ?? ''},
+        {skip: !selectedTask}
+    );
+    const {data: taskHistory = []} = useGetTaskHistoryQuery(
+        {eventId: selectedTask?.eventId ?? '', taskId: selectedTask?.taskId ?? ''},
+        {skip: !selectedTask}
+    );
+    const [addTaskComment] = useAddTaskCommentMutation();
+    const hydratedBoard = useMemo(() => toBoard(myTasksData, currentUserId, onlyMyTasks), [myTasksData, currentUserId, onlyMyTasks]);
 
     useEffect(() => {
         setBoardState(hydratedBoard);
@@ -243,20 +245,19 @@ export default function TasksPage() {
                 : mockSort === 'oldestFirst'
                     ? 'Сначала старые'
                     : 'Исполнитель: А -> Я';
-    const assigneeFacets = Array.isArray(boardFacets?.result) ? boardFacets.result : [];
+    const assigneeFacets: Array<{id: string; displayName?: string | null}> = [];
 
     const handleMoveCard = async (card: BoardCard, source: any, destination: any) => {
         setBoardState((current) => moveCard(current, source, destination));
-        try {
-            await moveTask({
-                eventId,
-                taskId: card.taskId,
-                targetColumnId: String(destination.toColumnId),
-                newOrder: destination.toPosition,
-            }).unwrap();
-        } catch {
-            await refetch();
-        }
+        void card;
+        void source;
+        void destination;
+    };
+
+    const handleSendComment = async () => {
+        if (!selectedTask || !commentText.trim()) return;
+        await addTaskComment({eventId: selectedTask.eventId, taskId: selectedTask.taskId, text: commentText.trim()}).unwrap();
+        setCommentText('');
     };
 
     return (
@@ -272,8 +273,6 @@ export default function TasksPage() {
 
                 {isLoading ? (
                     <p className={styles.subtitle}>Загружаем доску...</p>
-                ) : !eventId ? (
-                    <p className={styles.subtitle}>Нет мероприятия для отображения доски</p>
                 ) : (
                     <section className={styles.boardSurface}>
                         <div className={styles.boardControls}>
@@ -375,7 +374,7 @@ export default function TasksPage() {
                             <ControlledBoard<BoardCard>
                                 disableColumnDrag
                                 renderCard={(card) => (
-                                    <div className={styles.taskCard}>
+                                    <div className={styles.taskCard} onClick={() => setSelectedTask(card)}>
                                         <BoardTaskCard
                                             title={card.title}
                                             description={card.description}
@@ -384,6 +383,7 @@ export default function TasksPage() {
                                             assigneeAvatar={card.assigneeAvatar}
                                             priority={card.priority}
                                             commentsCount={card.commentsCount}
+                                            avatarFallbackType="event"
                                         />
                                     </div>
                                 )}
@@ -407,6 +407,55 @@ export default function TasksPage() {
                             </section>
                         </div>
                     </section>
+                )}
+
+                {selectedTask && (
+                    <>
+                        <button type="button" className={styles.taskBackdrop} onClick={() => setSelectedTask(null)}/>
+                        <aside className={styles.taskPanel}>
+                            <div className={styles.taskPanelHeader}>
+                                <h3>{selectedTask.title}</h3>
+                                <button type="button" className={styles.taskClose} onClick={() => setSelectedTask(null)}><XLgIcon/></button>
+                            </div>
+
+                            <div className={styles.taskMeta}><StatusIcon className={styles.metaIcon}/><span>Статус</span><strong>{selectedTask.status}</strong></div>
+                            <div className={styles.taskMeta}><FlagIcon className={styles.metaIcon}/><span>Приоритет</span><strong>{selectedTask.priority}</strong></div>
+                            <div className={styles.taskMeta}><CalendarIcon className={styles.metaIcon}/><span>Дедлайн</span><strong>{selectedTask.dueDate ? new Intl.DateTimeFormat('ru-RU', {day: '2-digit', month: 'long', year: 'numeric'}).format(new Date(selectedTask.dueDate)) : 'Без срока'}</strong></div>
+                            <div className={styles.taskMeta}><PersonIcon className={styles.metaIcon}/><span>Исполнитель</span><strong className={styles.assignee}><Avatar size="XS" avatarUrl={selectedTask.assigneeAvatar} name={selectedTask.assigneeName}/>{selectedTask.assigneeName}</strong></div>
+
+                            <div className={styles.taskDescription}>
+                                <div className={styles.taskDescriptionTitle}><TextLeftIcon className={styles.metaIcon}/><span>Описание</span></div>
+                                <p>{selectedTask.description || 'Описание отсутствует'}</p>
+                            </div>
+
+                            <div className={styles.taskTabs}>
+                                <button type="button" className={activeTaskTab === 'comments' ? styles.tabActive : ''} onClick={() => setActiveTaskTab('comments')}>Комментарии</button>
+                                <button type="button" className={activeTaskTab === 'history' ? styles.tabActive : ''} onClick={() => setActiveTaskTab('history')}>История</button>
+                            </div>
+
+                            <div className={styles.taskFeed}>
+                                {activeTaskTab === 'comments' ? taskComments.map((comment) => (
+                                    <article key={comment.id} className={styles.feedItem}>
+                                        <div className={styles.feedHead}><strong>{comment.authorName || 'Пользователь'}</strong><span>{comment.createdAt ? new Intl.DateTimeFormat('ru-RU', {hour: '2-digit', minute: '2-digit'}).format(new Date(comment.createdAt)) : ''}</span></div>
+                                        <p>{comment.text}</p>
+                                    </article>
+                                )) : taskHistory.map((item) => (
+                                    <article key={item.id} className={styles.feedItem}>
+                                        <div className={styles.feedHead}><strong>{item.authorName || 'Система'}</strong><span>{item.createdAt ? new Intl.DateTimeFormat('ru-RU', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'}).format(new Date(item.createdAt)) : ''}</span></div>
+                                        <p>{item.description || item.action || 'Изменение задачи'}</p>
+                                    </article>
+                                ))}
+                            </div>
+
+                            {activeTaskTab === 'comments' && (
+                                <div className={styles.commentComposer}>
+                                    <input value={commentText} onChange={(event) => setCommentText(event.target.value)} placeholder="Комментарий..."/>
+                                    <button type="button"><FaceSmileIcon/></button>
+                                    <button type="button" onClick={() => void handleSendComment()}><SendIcon/></button>
+                                </div>
+                            )}
+                        </aside>
+                    </>
                 )}
             </div>
         </div>

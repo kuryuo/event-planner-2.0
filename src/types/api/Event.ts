@@ -277,6 +277,29 @@ export interface GetEventBoardPayload {
 
 export interface BoardFacetsResponse {
     result?: Array<{ id: string; displayName?: string | null; avatarUrl?: string | null }>;
+    assignees?: Array<{ id: string; displayName?: string | null; avatarUrl?: string | null }>;
+}
+
+export interface BoardAssigneesResponse {
+    result?: Array<{ id: string; displayName?: string | null; avatarUrl?: string | null; role?: string | null }>;
+}
+
+export interface MyAssignedTaskItem {
+    id: string;
+    eventId: string;
+    eventName?: string | null;
+    eventAvatarUrl?: string | null;
+    columnId?: string | null;
+    status?: string | null;
+    title?: string | null;
+    description?: string | null;
+    assignedUserId?: string | null;
+    creatorId?: string | null;
+    dueDate?: string | null;
+    priority?: 'Urgent' | 'High' | 'Medium' | 'Low' | string | null;
+    order?: number | null;
+    createdAt?: string | null;
+    updatedAt?: string | null;
 }
 
 export interface EventAttachment {

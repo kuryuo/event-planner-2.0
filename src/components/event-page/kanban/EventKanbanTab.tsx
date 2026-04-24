@@ -32,6 +32,7 @@ import {
     useDeleteBoardColumnMutation,
     useGetEventBoardQuery,
     useGetEventBoardFacetsQuery,
+    useGetEventBoardAssigneesQuery,
     useGetEventSubscribersQuery,
     useMoveBoardTaskMutation,
     useGetTaskCommentsQuery,
@@ -154,6 +155,7 @@ export default function EventKanbanTab({eventId}: Props) {
         pollingInterval: 120000,
     });
     const {data: boardFacets} = useGetEventBoardFacetsQuery(eventId, {skip: !eventId});
+    const {data: boardAssignees} = useGetEventBoardAssigneesQuery(eventId, {skip: !eventId});
     const {data: subscribersData} = useGetEventSubscribersQuery({eventId, count: 200, offset: 0}, {skip: !eventId});
     const [moveTask] = useMoveBoardTaskMutation();
     const [createColumn] = useCreateBoardColumnMutation();
@@ -332,11 +334,18 @@ export default function EventKanbanTab({eventId}: Props) {
         await refetch();
     };
 
-    const assigneeFacets = useMemo(() => Array.isArray(boardFacets?.result) ? boardFacets.result : [], [boardFacets]);
+    const assigneeFacets = useMemo(
+        () => Array.isArray(boardFacets?.result)
+            ? boardFacets.result
+            : Array.isArray(boardFacets?.assignees)
+                ? boardFacets.assignees
+                : [],
+        [boardFacets]
+    );
     const assigneeOptions = useMemo(() => {
-        const users = subscribersData?.res?.users ?? [];
-        return users.map((user) => ({id: user.id, name: user.name || 'Участник'}));
-    }, [subscribersData]);
+        const users = boardAssignees?.result ?? [];
+        return users.map((user: any) => ({id: user.id, name: user.name || user.displayName || 'Участник'}));
+    }, [boardAssignees]);
     const selectedAssigneeName = assigneeOptions.find((user) => user.id === selectedAssigneeId)?.name || 'Исполнитель';
     const selectedPriorityLabel = selectedPriority === 'Urgent'
         ? 'Срочный'

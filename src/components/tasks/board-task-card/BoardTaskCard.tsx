@@ -14,6 +14,7 @@ interface Props {
     assigneeAvatar?: string;
     priority: Priority;
     commentsCount: number;
+    avatarFallbackType?: 'user' | 'event';
 }
 
 const formatDeadline = (value?: string) => {
@@ -31,7 +32,7 @@ const priorityColorByValue = {
     'Низкий': 'green',
 } as const;
 
-export default function BoardTaskCard({title, description, dueDate, assigneeName, assigneeAvatar, priority, commentsCount}: Props) {
+export default function BoardTaskCard({title, description, dueDate, assigneeName, assigneeAvatar, priority, commentsCount, avatarFallbackType = 'user'}: Props) {
     return (
         <article className={styles.card}>
             <Chip text={priority} size="S" variant="filled" color={priorityColorByValue[priority]}/>
@@ -43,7 +44,7 @@ export default function BoardTaskCard({title, description, dueDate, assigneeName
 
             <div className={styles.metaRow}>
                 <div className={styles.assignee}>
-                    <Avatar size="S" avatarUrl={assigneeAvatar} name={assigneeName}/>
+                    <Avatar size="S" avatarUrl={assigneeAvatar} name={assigneeName} fallbackType={avatarFallbackType}/>
                     <span>{assigneeName}</span>
                 </div>
 

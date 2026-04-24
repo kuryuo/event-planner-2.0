@@ -19,6 +19,8 @@ import type {
     GetEventBoardResponse,
     GetEventBoardPayload,
     BoardFacetsResponse,
+    BoardAssigneesResponse,
+    MyAssignedTaskItem,
     AssignUserRolePayload,
     CreateEventRolePayload,
     EventAttachment,
@@ -121,12 +123,27 @@ export const eventApi = baseApi.injectEndpoints({
             }),
             providesTags: (_result, _error, eventId) => [{type: 'Board', id: eventId}],
         }),
+        getEventBoardAssignees: builder.query<BoardAssigneesResponse, string>({
+            query: (eventId) => ({
+                url: `/events/${eventId}/board/assignees`,
+                method: 'GET',
+            }),
+            providesTags: (_result, _error, eventId) => [{type: 'Board', id: eventId}],
+        }),
         getMyBoardTasks: builder.query<GetEventBoardResponse, string>({
             query: (eventId) => ({
                 url: `/events/${eventId}/board/my-tasks`,
                 method: 'GET',
             }),
             providesTags: (_result, _error, eventId) => [{type: 'Board', id: eventId}],
+        }),
+        getMyAssignedTasks: builder.query<MyAssignedTaskItem[], void>({
+            query: () => ({
+                url: '/users/me/board/my-tasks',
+                method: 'GET',
+            }),
+            transformResponse: (response: any) => Array.isArray(response) ? response : (response?.result ?? []),
+            providesTags: ['BoardTask', 'Board'],
         }),
         getEventMyBoardTasks: builder.query<GetEventBoardResponse, string>({
             query: (eventId) => ({
@@ -520,7 +537,9 @@ export const {
     useGetEventByIdQuery,
     useGetEventBoardQuery,
     useGetEventBoardFacetsQuery,
+    useGetEventBoardAssigneesQuery,
     useGetMyBoardTasksQuery,
+    useGetMyAssignedTasksQuery,
     useLazyGetMyBoardTasksQuery,
     useGetEventMyBoardTasksQuery,
     useCreateEventMutation,
