@@ -1,5 +1,8 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
+import {Input} from 'antd';
 import styles from './TextArea.module.scss';
+
+const {TextArea: AntTextArea} = Input;
 
 interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
     label?: string;
@@ -9,32 +12,39 @@ interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
     rightIcon?: React.ReactNode;
 }
 
+const MAX_LENGTH = 800;
+
 export default function TextArea({
-                                     label,
-                                     error,
-                                     helperText,
-                                     disabled,
-                                     leftIcon,
-                                     rightIcon,
-                                     ...props
-                                 }: TextAreaProps) {
-    const MAX_LENGTH = 800;
-    const isControlled = props.value !== undefined;
-    const [internalValue, setInternalValue] = useState(String(props.defaultValue ?? ''));
+    label,
+    error,
+    helperText,
+    disabled,
+    leftIcon,
+    rightIcon,
+    value,
+    defaultValue,
+    onChange,
+    className,
+    ...props
+}: TextAreaProps) {
+    const isControlled = value !== undefined;
+    const [internalValue, setInternalValue] = useState(String(defaultValue ?? ''));
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const currentValue = isControlled ? String(props.value ?? '') : internalValue;
+    const currentValue = isControlled ? String(value ?? '') : internalValue;
 
     useEffect(() => {
         if (isControlled) {
-            setInternalValue(String(props.value ?? ''));
+            setInternalValue(String(value ?? ''));
         }
-    }, [isControlled, props.value]);
+    }, [isControlled, value]);
 
     useEffect(() => {
-        if (textareaRef.current) {
-            textareaRef.current.style.height = 'auto';
-            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+        const el = textareaRef.current;
+        if (!el) {
+            return;
         }
+        el.style.height = 'auto';
+        el.style.height = `${el.scrollHeight}px`;
     }, [currentValue]);
 
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -42,31 +52,34 @@ export default function TextArea({
         if (!isControlled) {
             setInternalValue(nextValue);
         }
-        props.onChange?.(e);
+        onChange?.(e);
     };
 
     return (
         <div className={`${styles.container} ${disabled ? styles.disabled : ''}`}>
             {label && (
                 <div className={styles.labelWrapper}>
-                    <label className={styles.label}>
-                        {label}
-                    </label>
+                    <label className={styles.label}>{label}</label>
                     <span className={styles.charCounter}>
                         {currentValue.length}/{MAX_LENGTH}
                     </span>
                 </div>
             )}
 
-            <div className={`${styles.wrapper} ${error ? styles.error : ''} ${disabled ? styles.disabled : ''}`}>
+            <div className={`${styles.field} ${error ? styles.error : ''} ${disabled ? styles.fieldDisabled : ''}`}>
                 {leftIcon && <span className={styles.leftIcon}>{leftIcon}</span>}
-                <textarea
-                    ref={textareaRef}
-                    className={styles.textarea}
+                <AntTextArea
+                    ref={(instance) => {
+                        const ta = instance?.resizableTextArea?.textArea;
+                        (textareaRef as React.MutableRefObject<HTMLTextAreaElement | null>).current = ta ?? null;
+                    }}
+                    className={`${styles.textarea} ${className ?? ''}`}
                     disabled={disabled}
                     value={currentValue}
                     onChange={handleChange}
                     maxLength={MAX_LENGTH}
+                    status={error ? 'error' : undefined}
+                    autoSize={{minRows: 1}}
                     {...props}
                 />
                 {rightIcon && <span className={styles.rightIcon}>{rightIcon}</span>}

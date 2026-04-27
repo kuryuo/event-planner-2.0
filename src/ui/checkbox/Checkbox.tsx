@@ -1,4 +1,4 @@
-import styles from "./Checkbox.module.scss";
+import {Checkbox as AntCheckbox} from 'antd';
 
 interface CheckboxProps {
     checked?: boolean;
@@ -7,9 +7,11 @@ interface CheckboxProps {
 
 export default function Checkbox({checked = false, onChange}: CheckboxProps) {
     return (
-        <label className={styles.checkbox}>
-            <input type="checkbox" checked={checked} onChange={onChange}/>
-            <span className={styles.checkmark}></span>
-        </label>
+        <AntCheckbox
+            checked={checked}
+            onChange={() => {
+                onChange?.();
+            }}
+        />
     );
 }

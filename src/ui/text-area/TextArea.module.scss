@@ -22,11 +22,12 @@
   color: var(--content-secondary);
 }
 
-.wrapper {
+.field {
   display: flex;
   align-items: flex-start;
   position: relative;
   background-color: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
   border-radius: var(--radius-2);
   transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
   margin-bottom: 8px;
@@ -35,30 +36,39 @@
     border-color: var(--border-primary-hover);
   }
 
-  &:has(textarea:focus) {
+  &:focus-within {
     border-color: var(--border-primary-press);
   }
 
   &.error {
     border: 1px solid var(--border-negative);
 
-    &:has(textarea:focus) {
+    &:focus-within {
       border-color: var(--border-negative);
     }
   }
 
-  &.disabled {
+  &.fieldDisabled {
     border-color: var(--content-disabled);
     cursor: not-allowed;
+    opacity: 0.85;
+  }
+
+  :global(.ant-input) {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
+  :global(.ant-input:focus) {
+    box-shadow: none !important;
   }
 }
 
 .textarea {
   flex: 1;
   width: 100%;
-  border: none;
   outline: none;
-  background: transparent;
   padding: var(--spacing-2) var(--spacing-4);
   color: var(--content-primary);
   font-family: inherit;

@@ -1,12 +1,14 @@
 import type {ButtonHTMLAttributes, ReactNode} from 'react';
-import styles from './Button.module.scss';
+import {Button as AntButton} from 'antd';
+import type {ButtonProps as AntButtonProps} from 'antd';
 import clsx from 'clsx';
+import styles from './Button.module.scss';
 
 type ButtonSize = 'M' | 'S' | 'XS';
 type ButtonVariant = 'Filled' | 'Text';
 type ButtonColor = 'purple' | 'green' | 'red' | 'gray' | 'default';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'prefix'> {
     size?: ButtonSize;
     variant?: ButtonVariant;
     color?: ButtonColor;
@@ -16,28 +18,60 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export default function Button({
-                                   size = 'M',
-                                   variant = 'Filled',
-                                   color = 'purple',
-                                   leftIcon,
-                                   rightIcon,
-                                   children,
-                                   className,
-                                   ...props
-                               }: ButtonProps) {
-    const buttonClass = clsx(
-        styles.button,
-        styles[size],
-        styles[variant],
-        styles[`${variant}-${color}`],
-        className
+    size = 'M',
+    variant = 'Filled',
+    color = 'purple',
+    leftIcon,
+    rightIcon,
+    children,
+    className,
+    disabled,
+    type: nativeType = 'button',
+    ...rest
+}: ButtonProps) {
+    const filled = variant === 'Filled';
+    const text = variant === 'Text';
+
+    let antBtnType: AntButtonProps['type'] = 'default';
+    if (text) {
+        antBtnType = 'text';
+    } else if (filled && (color === 'purple' || color === 'green' || color === 'red')) {
+        antBtnType = 'primary';
+    } else if (filled && color === 'gray') {
+        antBtnType = 'default';
+    }
+
+    const danger = (filled && color === 'red') || (text && color === 'red');
+
+    const antSize: AntButtonProps['size'] = size === 'M' ? 'middle' : 'small';
+
+    const toneClass = clsx(
+        filled && color === 'purple' && styles.antFilledPurple,
+        filled && color === 'green' && styles.antFilledGreen,
+        filled && color === 'gray' && styles.antFilledGray,
+        text && styles.antText,
+        text && color === 'default' && styles.antTextDefault,
+    );
+
+    const sizeClass = clsx(
+        size === 'M' && styles.antSizeM,
+        size === 'S' && styles.antSizeS,
+        size === 'XS' && styles.antSizeXs,
     );
 
     return (
-        <button className={buttonClass} {...props}>
-            {leftIcon && <span className={styles.leftIcon}>{leftIcon}</span>}
-            <span className={styles.content}>{children}</span>
-            {rightIcon && <span className={styles.rightIcon}>{rightIcon}</span>}
-        </button>
+        <AntButton
+            type={antBtnType}
+            danger={danger}
+            size={antSize}
+            disabled={disabled}
+            htmlType={nativeType === 'submit' || nativeType === 'reset' || nativeType === 'button' ? nativeType : 'button'}
+            icon={leftIcon ?? undefined}
+            className={clsx(styles.antBtn, sizeClass, toneClass, className)}
+            {...(rest as Omit<AntButtonProps, 'type' | 'htmlType' | 'size' | 'danger' | 'icon' | 'children' | 'className' | 'disabled'>)}
+        >
+            {children}
+            {rightIcon ? <span className={styles.rightSlot}>{rightIcon}</span> : null}
+        </AntButton>
     );
 }

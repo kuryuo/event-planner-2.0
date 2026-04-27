@@ -6,57 +6,47 @@
   position: relative;
 }
 
-.wrapper {
-  display: flex;
-  align-items: center;
-  position: relative;
-  background-color: var(--bg-primary);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--radius-2);
-  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-  padding: var(--spacing-2) var(--spacing-4);
-  gap: var(--spacing-3);
+.inputWrap {
+  :global(.ant-input-affix-wrapper) {
+    background-color: var(--bg-primary);
+    border-color: var(--border-primary);
+    border-radius: var(--radius-2);
+    padding-block: var(--spacing-2);
+    padding-inline: var(--spacing-4);
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    box-shadow: none !important;
+  }
 
-  &:hover {
+  :global(.ant-input-affix-wrapper:not(.ant-input-affix-wrapper-disabled):hover) {
     border-color: var(--border-primary-hover);
   }
 
-  &:has(input:focus),
-  &:has(textarea:focus) {
+  :global(.ant-input-affix-wrapper-focused) {
     border-color: var(--border-primary-focus);
   }
 
-  &.error {
-    border: 1px solid var(--border-negative);
-
-    &:has(input:focus),
-    &:has(textarea:focus) {
-      border-color: var(--border-negative);
-    }
+  :global(.ant-input-affix-wrapper-status-error) {
+    border-color: var(--border-negative);
   }
 
-  &.disabled {
+  :global(.ant-input-affix-wrapper-disabled) {
     border-color: var(--border-disabled);
     background-color: var(--bg-disabled);
     cursor: not-allowed;
   }
-}
 
-.input {
-  flex: 1;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: var(--content-primary);
-  @include ty.font(body-m, regular);
+  :global(.ant-input) {
+    background: transparent;
+    color: var(--content-primary);
+    @include ty.font(body-m, regular);
 
-  &::placeholder {
-    color: var(--content-placeholder);
-    opacity: 1;
-    transition: color 0.2s ease;
+    &::placeholder {
+      color: var(--content-placeholder);
+      opacity: 1;
+    }
   }
 
-  &:disabled {
+  :global(.ant-input:disabled) {
     color: var(--content-disabled);
     cursor: not-allowed;
 
@@ -66,21 +56,25 @@
   }
 }
 
-.sizeM {
-  height: 44px;
+.affix {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-  .input {
-    @include ty.font(body-m, regular);
-    //padding: var(--spacing-2) var(--spacing-4);
+.sizeM {
+  :global(.ant-input-affix-wrapper) {
+    min-height: 44px;
   }
 }
 
 .sizeL {
-  height: 56px;
+  :global(.ant-input-affix-wrapper) {
+    min-height: 56px;
+  }
 
-  .input {
+  :global(.ant-input) {
     @include ty.font(title-m, semibold);
-    //padding: var(--spacing-3) var(--spacing-4);
 
     &::placeholder {
       @include ty.font(title-m, semibold);
@@ -94,16 +88,10 @@
   @include ty.font(subtitle-m, semibold);
 }
 
-.leftIcon,
-.rightIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .helperText {
   color: var(--content-secondary);
   @include ty.font(caption-m, regular);
+  margin-top: var(--spacing-2);
 }
 
 .helperTextError {
@@ -111,15 +99,6 @@
   @include ty.font(caption-m, semibold);
 }
 
-.input:-webkit-autofill,
-.input:-webkit-autofill:hover,
-.input:-webkit-autofill:focus,
-.input:-webkit-autofill:active {
-  box-shadow: 0 0 0 1000px transparent inset !important;
-  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
-
-  background-color: transparent !important;
-  -webkit-text-fill-color: inherit !important;
-
-  transition: background-color 9999s ease 0s !important;
+.disabled {
+  opacity: 0.85;
 }

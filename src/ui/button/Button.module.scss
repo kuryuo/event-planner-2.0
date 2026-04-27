@@ -1,112 +1,108 @@
 @use '@/typography-variables' as ty;
 
-.button {
-  display: inline-flex;
-  gap: var(--spacing-3);
+.antBtn {
+  display: inline-flex !important;
   align-items: center;
   justify-content: center;
-  border: none;
-  border-radius: var(--radius-2);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  padding: var(--spacing-2) var(--spacing-4);
+  gap: var(--spacing-3);
+  border-radius: var(--radius-2) !important;
+  box-shadow: none !important;
+  font-family: inherit;
 
-  .leftIcon,
-  .rightIcon {
+  .rightSlot {
     display: inline-flex;
-    width: 20px;
-    height: 20px;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    min-height: 20px;
+    margin-inline-start: var(--spacing-1);
+  }
+}
+
+.antSizeM {
+  @include ty.font(button-m, semibold);
+  min-height: 44px !important;
+  height: 44px !important;
+  padding-inline: var(--spacing-4) !important;
+}
+
+.antSizeS {
+  @include ty.font(button-s, semibold);
+  min-height: 32px !important;
+  height: 32px !important;
+  padding-inline: var(--spacing-3) !important;
+}
+
+.antSizeXs {
+  @include ty.font(caption-s, semibold);
+  min-height: 20px !important;
+  height: 20px !important;
+  padding: var(--spacing-05) var(--spacing-2) !important;
+  gap: var(--spacing-1);
+}
+
+.antFilledPurple.ant-btn-primary {
+  background: var(--bg-brand-purple) !important;
+  border-color: var(--bg-brand-purple) !important;
+  color: var(--white) !important;
+
+  &:not(:disabled):hover {
+    background: var(--bg-brand-purple-hover) !important;
+    border-color: var(--bg-brand-purple-hover) !important;
   }
 
-  &.M {
-    @include ty.font(button-m, semibold);
-    height: 44px;
+  &:not(:disabled):active {
+    background: var(--bg-brand-purple-press) !important;
+    border-color: var(--bg-brand-purple-press) !important;
+  }
+}
+
+.antFilledGreen.ant-btn-primary {
+  background: var(--bg-brand-green) !important;
+  border-color: var(--bg-brand-green) !important;
+  color: var(--content-primary-inverse) !important;
+
+  &:not(:disabled):hover {
+    background: var(--bg-brand-green-hover) !important;
+    border-color: var(--bg-brand-green-hover) !important;
   }
 
-  &.S {
-    @include ty.font(button-s, semibold);
-    height: 32px;
+  &:not(:disabled):active {
+    background: var(--bg-brand-green-press) !important;
+    border-color: var(--bg-brand-green-press) !important;
+  }
+}
+
+.antFilledGray.ant-btn-default {
+  background: var(--bg-secondary) !important;
+  color: var(--content-primary) !important;
+  border: none !important;
+  box-shadow: none !important;
+
+  &:not(:disabled):hover {
+    background: var(--bg-secondary-hover) !important;
+    color: var(--content-primary) !important;
   }
 
-  &.XS {
-    @include ty.font(caption-s, semibold);
-    height: 20px;
-    padding: var(--spacing-05);
+  &:not(:disabled):active {
+    background: var(--bg-secondary-press) !important;
+  }
+}
+
+.antText.ant-btn-text {
+  color: var(--content-primary);
+  padding-inline: var(--spacing-2) !important;
+
+  &:not(:disabled):hover {
+    color: var(--content-primary-hover);
+    background: transparent !important;
   }
 
-  &.Filled {
-    &.Filled-purple {
-      background-color: var(--bg-brand-purple);
-      color: var(--white);
-
-      &:hover {
-        background-color: var(--bg-brand-purple-hover);
-      }
-
-      &:active {
-        background-color: var(--bg-brand-purple-press);
-      }
-    }
-
-    &.Filled-green {
-      background-color: var(--bg-brand-green);
-      color: var(--content-primary-inverse);
-
-      &:hover {
-        background-color: var(--bg-brand-green-hover);
-      }
-
-      &:active {
-        background-color: var(--bg-brand-green-press);
-      }
-    }
-
-    &.Filled-red {
-      background-color: var(--bg-negative);
-      color: var(--white);
-
-      &:hover {
-        background-color: var(--bg-negative-hover, var(--bg-negative));
-      }
-    }
-
-    &.Filled-gray {
-      background-color: var(--bg-secondary);
-      color: var(--content-primary);
-
-      &:hover {
-        background-color: var(--bg-secondary-hover);
-      }
-
-      &:active {
-        background-color: var(--bg-secondary-press);
-      }
-    }
+  &:not(:disabled):active {
+    color: var(--content-primary-press);
   }
+}
 
-  &.Text {
-    background-color: transparent;
-
-    &.Text-default {
-      color: var(--content-primary);
-
-      &:hover {
-        color: var(--content-primary-hover);
-      }
-
-      &:active {
-        color: var(--content-primary-press);
-      }
-    }
-
-    &.Text-red {
-      color: var(--content-negative);
-
-      &:hover {
-        color: var(--content-negative-hover);
-      }
-    }
-  }
+.antTextDefault.ant-btn-text {
+  color: var(--content-primary);
 }
