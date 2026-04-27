@@ -304,7 +304,16 @@ export interface MyAssignedTaskItem {
 
 export interface EventAttachment {
     id: string;
+    eventId?: string | null;
+    authorId?: string | null;
+    kind?: 'File' | 'Link' | string | null;
     title?: string | null;
+    /** Путь к файлу или URL ссылки (в swagger4 это поле `resource`) */
+    resource?: string | null;
+    originalFileName?: string | null;
+    contentType?: string | null;
+    size?: number | null;
+    // Backward-compatible aliases used in older UI mappers
     fileName?: string | null;
     filePath?: string | null;
     url?: string | null;
@@ -336,6 +345,9 @@ export interface EventAttachmentFacetsResponse {
 
 export interface EventNote {
     id: string;
+    eventId?: string;
+    authorId?: string;
+    authorName?: string | null;
     text: string;
     createdAt?: string | null;
     updatedAt?: string | null;

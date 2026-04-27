@@ -460,7 +460,7 @@ export const eventApi = baseApi.injectEndpoints({
                 method: 'GET',
             }),
             transformResponse: (response: any) => response?.result ?? response ?? [],
-            providesTags: (_result, _error, eventId) => [{type: 'Event', id: eventId}],
+            providesTags: (_result, _error, eventId) => [{type: 'EventNotes', id: eventId}],
         }),
         createEventNote: builder.mutation<void, CreateEventNotePayload>({
             query: ({eventId, text}) => ({
@@ -468,7 +468,7 @@ export const eventApi = baseApi.injectEndpoints({
                 method: 'POST',
                 body: {text},
             }),
-            invalidatesTags: (_result, _error, {eventId}) => [{type: 'Event', id: eventId}, 'Event'],
+            invalidatesTags: (_result, _error, {eventId}) => [{type: 'EventNotes', id: eventId}],
         }),
         updateEventNote: builder.mutation<void, UpdateEventNotePayload>({
             query: ({eventId, noteId, text}) => ({
@@ -476,7 +476,7 @@ export const eventApi = baseApi.injectEndpoints({
                 method: 'PUT',
                 body: {text},
             }),
-            invalidatesTags: (_result, _error, {eventId}) => [{type: 'Event', id: eventId}, 'Event'],
+            invalidatesTags: (_result, _error, {eventId}) => [{type: 'EventNotes', id: eventId}],
         }),
         getTaskComments: builder.query<EventTaskComment[], { eventId: string; taskId: string }>({
             query: ({eventId, taskId}) => ({
