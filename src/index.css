@@ -369,10 +369,23 @@ ul, ol {
     list-style: none;
 }
 
-input, textarea, button, select {
+/* Ant Design: не сбрасываем border у контролов с классом ant-* */
+input:not([class*='ant-']),
+textarea:not([class*='ant-']),
+button:not([class*='ant-']),
+select:not([class*='ant-']) {
     font-family: inherit;
     font-size: inherit;
     border: none;
+    outline: none;
+}
+
+input[class*='ant-'],
+textarea[class*='ant-'],
+button[class*='ant-'],
+select[class*='ant-'] {
+    font-family: inherit;
+    font-size: inherit;
     outline: none;
 }
 
