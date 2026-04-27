@@ -1,11 +1,17 @@
-@use '@/typography-variables' as ty;
-
 .chip {
   display: inline-flex;
   align-items: center;
   border-radius: var(--radius-100);
-  font-weight: 500;
   cursor: default;
+  margin-inline-end: 0 !important;
+  font-family: inherit !important;
+  line-height: inherit !important;
+
+  :global(.ant-tag-close-icon) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
 
   &.outlined {
     background-color: transparent;
@@ -40,11 +46,9 @@
 }
 
 .size-S {
-  @include ty.font(body-s, regular);
   padding: var(--spacing-1) var(--spacing-3);
 }
 
 .size-M {
-  @include ty.font(caption-m, regular);
   padding: var(--spacing-1) var(--spacing-4);
 }

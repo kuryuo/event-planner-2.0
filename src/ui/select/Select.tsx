@@ -1,15 +1,14 @@
-import React, {useState} from 'react';
-import styles from './Select.module.scss';
+import React, {useMemo, useState} from 'react';
+import {AutoComplete} from 'antd';
+import type {AutoCompleteProps} from 'antd';
 import ChevronDownImg from '../../assets/img/icon-m/chevron-down.svg?react';
-import Menu, { type MenuOption } from '../menu/Menu';
+import Check2Icon from '@/assets/img/icon-m/check2.svg?react';
+import styles from './Select.module.scss';
+import type {Option} from './Select.types.ts';
 
-export interface Option {
-    label?: string;
-    description?: string;
-    content?: React.ReactNode;
-}
+export type {Option} from './Select.types.ts';
 
-interface SelectProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface SelectProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'prefix' | 'value' | 'onChange'> {
     label?: string;
     leftIcon?: React.ReactNode;
     rightIcon?: React.ReactNode;
@@ -21,106 +20,142 @@ interface SelectProps extends React.InputHTMLAttributes<HTMLInputElement> {
     onOptionClick?: (option: Option) => void;
     selectedValues?: string[];
     shape?: 'rounded' | 'square';
+    value?: string | number | readonly string[] | undefined;
+    onChange?: React.ChangeEventHandler<HTMLInputElement>;
 }
 
 export default function Select({
-                                    label,
-                                    leftIcon,
-                                    rightIcon,
-                                    error,
-                                    helperText,
-                                    disabled,
-                                    shape = 'rounded',
-                                    options = [
-                                        {label: 'Текст', description: 'Описание под текстом'},
-                                        {label: 'Текст 2', description: 'Описание под текстом'},
-                                    ],
-                                   isOpen: controlledIsOpen,
-                                   onOpenChange,
-                                   onOptionClick,
-                                   selectedValues = [],
-                                   ...props
-                               }: SelectProps) {
-    const [internalIsOpen, setInternalIsOpen] = useState(false);
-    const [value, setValue] = useState(props.value || '');
-    
-    const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
-    const setIsOpen = (newIsOpen: boolean) => {
-        if (onOpenChange) {
-            onOpenChange(newIsOpen);
+    label,
+    leftIcon,
+    rightIcon,
+    error,
+    helperText,
+    disabled,
+    shape = 'rounded',
+    options = [],
+    isOpen: controlledIsOpen,
+    onOpenChange,
+    onOptionClick,
+    selectedValues = [],
+    value,
+    onChange,
+    onFocus,
+    placeholder,
+    className,
+    ...rest
+}: SelectProps) {
+    const [internalOpen, setInternalOpen] = useState(false);
+    const isControlledOpen = controlledIsOpen !== undefined;
+    const open = isControlledOpen ? Boolean(controlledIsOpen) : internalOpen;
+
+    const setOpen = (next: boolean) => {
+        if (isControlledOpen) {
+            onOpenChange?.(next);
         } else {
-            setInternalIsOpen(newIsOpen);
+            setInternalOpen(next);
+            onOpenChange?.(next);
+        }
+    };
+
+    const searchText = String(value ?? '');
+
+    const antOptions: AutoCompleteProps['options'] = useMemo(() => {
+        return options
+            .filter((o) => !o.isDivider)
+            .map((o, idx) => {
+                const key = o.label ?? `opt-${idx}`;
+                const selected = o.label ? selectedValues.includes(o.label) : false;
+                return {
+                    value: key,
+                    label: (
+                        <div className={styles.optionRow}>
+                            <div className={styles.optionMain}>
+                                {o.content ?? (
+                                    <>
+                                        <div className={styles.optionLabel}>{o.label}</div>
+                                        {o.description ? (
+                                            <div className={styles.optionDescription}>{o.description}</div>
+                                        ) : null}
+                                    </>
+                                )}
+                            </div>
+                            {selected ? <Check2Icon className={styles.checkIcon}/> : null}
+                        </div>
+                    ),
+                };
+            });
+    }, [options, selectedValues]);
+
+    const handleSearch = (text: string) => {
+        onChange?.({target: {value: text}} as React.ChangeEvent<HTMLInputElement>);
+        if (text && options.length > 0) {
+            setOpen(true);
         }
     };
 
     return (
         <div className={`${styles.container} ${disabled ? styles.disabled : ''}`}>
-            {label && (
-                <label className={styles.label}>
-                    {label}
-                </label>
-            )}
+            {label ? <div className={styles.label}>{label}</div> : null}
 
             <div
                 className={`${styles.wrapper} ${shape === 'square' ? styles.square : ''} ${error ? styles.error : ''} ${disabled ? styles.disabled : ''}`}
             >
-                {leftIcon && <span className={styles.leftIcon}>{leftIcon}</span>}
-                <input
-                    placeholder="placeholder"
-                    className={styles.input}
+                <AutoComplete
+                    className={`${styles.autocomplete} ${className ?? ''}`}
                     disabled={disabled}
-                    value={value}
-                    onChange={(e) => {
-                        setValue(e.target.value);
-                        if (e.target.value && options.length > 0) {
-                            setIsOpen(true);
+                    value={searchText}
+                    options={antOptions}
+                    open={open && !disabled && options.length > 0}
+                    onOpenChange={(next) => {
+                        if (disabled) {
+                            return;
                         }
+                        setOpen(next);
+                    }}
+                    onSearch={handleSearch}
+                    onSelect={(selectedValue) => {
+                        const opt = options.find((o) => o.label === selectedValue);
+                        if (opt) {
+                            onOptionClick?.(opt);
+                        }
+                        setOpen(false);
                     }}
                     onFocus={(e) => {
                         if (options.length > 0) {
-                            setIsOpen(true);
+                            setOpen(true);
                         }
-                        props.onFocus?.(e);
+                        onFocus?.(e as React.FocusEvent<HTMLInputElement>);
                     }}
-                    {...props}
+                    placeholder={placeholder as string | undefined}
+                    popupClassName={styles.autocompletePopup}
+                    listHeight={200}
+                    notFoundContent={null}
+                    prefix={leftIcon ? <span className={styles.leftIcon}>{leftIcon}</span> : undefined}
+                    {...(rest as AutoCompleteProps)}
+                    suffixIcon={
+                        <span
+                            className={styles.rightIcon}
+                            onClick={(ev) => {
+                                ev.stopPropagation();
+                                if (!disabled) {
+                                    setOpen(!open);
+                                }
+                            }}
+                            style={{cursor: disabled ? 'not-allowed' : 'pointer'}}
+                        >
+                            {rightIcon ?? (
+                                <ChevronDownImg className={`${styles.chevronIcon} ${open ? styles.expanded : ''}`}/>
+                            )}
+                        </span>
+                    }
                 />
-                <span
-                    className={styles.rightIcon}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        if (!disabled) setIsOpen(!isOpen);
-                    }}
-                    style={{cursor: disabled ? 'not-allowed' : 'pointer'}}
-                >
-                    {rightIcon ?? (
-                        <ChevronDownImg className={`${styles.chevronIcon} ${isOpen ? styles.expanded : ''}`}/>
-                    )}
-                </span>
             </div>
 
-            {helperText && !isOpen && (
+            {helperText && !open ? (
                 <span className={`${styles.helperText} ${error ? styles.helperTextError : ''}`}>
                     {helperText}
                 </span>
-            )}
-
-            {isOpen && !disabled && (
-                <div className={styles.dropdownContainer}>
-                    <Menu
-                        options={options as MenuOption[]}
-                        selectedValues={selectedValues}
-                        shape={shape}
-                        onOptionClick={(option) => {
-                            if (onOptionClick) {
-                                onOptionClick(option);
-                            } else {
-                                setValue(option.label ?? '');
-                            }
-                            setIsOpen(false);
-                        }}
-                    />
-                </div>
-            )}
+            ) : null}
         </div>
     );
 }

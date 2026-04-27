@@ -1,5 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, {useMemo, useState} from 'react';
 import clsx from 'clsx';
+import {Menu as AntMenu} from 'antd';
+import type {MenuProps} from 'antd';
 import styles from './Menu.module.scss';
 import TextField from '../text-field/TextField';
 import Check2Icon from '@/assets/img/icon-m/check2.svg?react';
@@ -12,7 +14,7 @@ export interface MenuOption {
     isDivider?: boolean;
 }
 
-interface MenuProps {
+interface AppMenuProps {
     options: MenuOption[];
     onOptionClick?: (option: MenuOption, index: number) => void;
     withSearch?: boolean;
@@ -23,16 +25,16 @@ interface MenuProps {
     shape?: 'rounded' | 'square';
 }
 
-export default function Menu({ 
-    options, 
-    onOptionClick, 
-    withSearch = false, 
-    searchPlaceholder = 'Поиск...', 
+export default function Menu({
+    options,
+    onOptionClick,
+    withSearch = false,
+    searchPlaceholder = 'Поиск...',
     withNewRoleInput = false,
     onNewRoleCreate,
     selectedValues = [],
     shape = 'rounded',
-}: MenuProps) {
+}: AppMenuProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [newRoleName, setNewRoleName] = useState('');
 
@@ -41,8 +43,10 @@ export default function Menu({
             return options;
         }
         const query = searchQuery.toLowerCase().trim();
-        return options.filter(option => {
-            if (option.isDivider) return true;
+        return options.filter((option) => {
+            if (option.isDivider) {
+                return true;
+            }
             const labelMatch = option.label?.toLowerCase().includes(query);
             const descriptionMatch = option.description?.toLowerCase().includes(query);
             return labelMatch || descriptionMatch;
@@ -64,9 +68,48 @@ export default function Menu({
         }
     };
 
+    const menuItems: MenuProps['items'] = useMemo(() => {
+        const items: NonNullable<MenuProps['items']> = [];
+        filteredOptions.forEach((option, idx) => {
+            const originalIndex = options.findIndex(
+                (opt) =>
+                    opt === option ||
+                    (opt.label === option.label && opt.description === option.description),
+            );
+            const resolvedIndex = originalIndex >= 0 ? originalIndex : idx;
+
+            if (option.isDivider) {
+                items.push({type: 'divider', key: `divider-${idx}`});
+                return;
+            }
+
+            const isSelected = option.label ? selectedValues.includes(option.label) : false;
+
+            items.push({
+                key: String(resolvedIndex),
+                label: (
+                    <div className={styles.optionRow}>
+                        <div className={styles.optionMain}>
+                            {option.content ?? (
+                                <>
+                                    <div className={styles.optionLabel}>{option.label}</div>
+                                    {option.description ? (
+                                        <div className={styles.optionDescription}>{option.description}</div>
+                                    ) : null}
+                                </>
+                            )}
+                        </div>
+                        {isSelected ? <Check2Icon className={styles.checkIcon}/> : null}
+                    </div>
+                ),
+            });
+        });
+        return items;
+    }, [filteredOptions, options, selectedValues]);
+
     return (
         <div className={clsx(styles.menuContainer, shape === 'square' && styles.square)}>
-            {withSearch && (
+            {withSearch ? (
                 <>
                     <div className={styles.searchWrapper}>
                         <TextField
@@ -77,10 +120,10 @@ export default function Menu({
                             onKeyDown={(e) => e.stopPropagation()}
                         />
                     </div>
-                    <div className={styles.divider} />
+                    <div className={styles.divider}/>
                 </>
-            )}
-            {withNewRoleInput && (
+            ) : null}
+            {withNewRoleInput ? (
                 <>
                     <div className={styles.newRoleWrapper}>
                         <TextField
@@ -98,59 +141,30 @@ export default function Menu({
                                     }}
                                     className={styles.plusButton}
                                 >
-                                    <PlusLgIcon />
+                                    <PlusLgIcon/>
                                 </button>
                             }
                         />
                     </div>
-                    <div className={styles.divider} />
+                    <div className={styles.divider}/>
                 </>
-            )}
-            <ul className={styles.dropdown}>
-                {filteredOptions.map((option, idx) => {
-                    const originalIndex = options.findIndex(opt => 
-                        opt === option || 
-                        (opt.label === option.label && opt.description === option.description)
-                    );
-
-                    if (option.isDivider) {
-                        return (
-                            <li
-                                key={`divider-${idx}`}
-                                className={styles.dividerItem}
-                                onClick={(e) => e.stopPropagation()}
-                            />
-                        );
+            ) : null}
+            <AntMenu
+                mode="vertical"
+                selectable={false}
+                className={styles.antMenu}
+                items={menuItems}
+                onClick={({key}) => {
+                    const idx = Number(key);
+                    if (Number.isNaN(idx)) {
+                        return;
                     }
-
-                    const isSelected = option.label ? selectedValues.includes(option.label) : false;
-
-                    return (
-                        <li
-                            key={originalIndex >= 0 ? originalIndex : idx}
-                            className={styles.option}
-                            onClick={() => {
-                                onOptionClick?.(option, originalIndex >= 0 ? originalIndex : idx);
-                            }}
-                        >
-                            <div className={styles.optionContent}>
-                                {option.content ?? (
-                                    <>
-                                        <div className={styles.optionLabel}>{option.label}</div>
-                                        {option.description && (
-                                            <div className={styles.optionDescription}>{option.description}</div>
-                                        )}
-                                    </>
-                                )}
-                            </div>
-                            {isSelected && (
-                                <Check2Icon className={styles.checkIcon} />
-                            )}
-                        </li>
-                    );
-                })}
-            </ul>
+                    const opt = options[idx];
+                    if (opt && !opt.isDivider) {
+                        onOptionClick?.(opt, idx);
+                    }
+                }}
+            />
         </div>
     );
 }
-

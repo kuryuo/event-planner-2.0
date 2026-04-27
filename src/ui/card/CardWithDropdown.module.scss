@@ -81,10 +81,9 @@
 }
 
 .menuWrapper {
-  position: absolute;
-  top: 100%;
-  right: 170px;
-  margin-top: 4px;
-  z-index: 1001;
+  background: var(--white);
+  border-radius: var(--radius-4);
+  box-shadow: var(--lvl2);
+  min-width: 280px;
 }
 
