@@ -27,8 +27,8 @@ import Avatar from "@/ui/avatar/Avatar";
 import { useSelector } from "react-redux";
 import BoardColumnHeader from "@/pages/tasks/components/BoardColumnHeader";
 import AddColumnButton from "@/pages/tasks/components/AddColumnButton";
-import BoardTaskCard from "@/components/tasks/board-task-card/BoardTaskCard";
-import ProfileActionModal from "@/components/profile-page/ProfileActionModal";
+import BoardTaskCard from "@/pages/tasks/components/board-task-card/BoardTaskCard";
+import ProfileActionModal from "@/components/profile-action-modal/ProfileActionModal";
 import { SingleDatePicker } from "@/ui/date-picker/SingleDatePicker";
 import {
   useCreateBoardColumnMutation,

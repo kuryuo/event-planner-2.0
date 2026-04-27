@@ -2,7 +2,7 @@ import {useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import Sidebar from '@/components/sidebar/Sidebar';
 import TextField from '@/ui/text-field/TextField.tsx';
-import ArchiveEventCard from '@/components/archive-event-card/ArchiveEventCard.tsx';
+import ArchiveEventCard from '@/pages/archive/components/archive-event-card/ArchiveEventCard.tsx';
 import SearchIcon from '@/assets/img/icon-m/search.svg?react';
 import FilterIcon from '@/assets/img/icon-m/filter.svg?react';
 import {useGetProfileEventsQuery} from '@/services/api/profileApi.ts';

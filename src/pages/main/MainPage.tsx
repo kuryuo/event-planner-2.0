@@ -1,7 +1,7 @@
 import {useState} from "react";
-import Calendar from "@/components/calendar/Calendar";
+import Calendar from "@/pages/main/components/calendar/Calendar";
 import Sidebar from "@/components/sidebar/Sidebar";
-import Filters from "@/components/filters/Filters";
+import Filters from "@/pages/main/components/filters/Filters";
 import styles from "./MainPage.module.scss";
 import {useGetProfileQuery} from "@/services/api/profileApi.ts";
 import type {GetEventsPayload} from "@/types/api/Event.ts";

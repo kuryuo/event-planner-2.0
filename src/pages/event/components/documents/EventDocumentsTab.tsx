@@ -10,13 +10,13 @@ import JustifyIcon from '@/assets/img/icon-m/justify.svg?react';
 import StackedIcon from '@/assets/img/icon-m/view-stacked.svg?react';
 import Button from '@/ui/button/Button.tsx';
 import Checkbox from '@/ui/checkbox/Checkbox.tsx';
-import {AddDocumentMenu} from '@/components/event-page/documents/AddDocumentMenu.tsx';
-import {EventDocumentSection} from '@/components/event-page/documents/event-document-section.tsx';
-import {EventNewNoteCard} from '@/components/event-page/documents/EventNewNoteCard.tsx';
-import {EventNoteCard} from '@/components/event-page/documents/EventNoteCard.tsx';
+import {AddDocumentMenu} from './AddDocumentMenu.tsx';
+import {EventDocumentSection} from './EventDocumentSection.tsx';
+import {EventNewNoteCard} from './EventNewNoteCard.tsx';
+import {EventNoteCard} from './EventNoteCard.tsx';
 import FileIcon from '@/assets/image/file.svg?react';
 import LinkIcon from '@/assets/image/link.svg?react';
-import ProfileActionModal from '@/components/profile-page/ProfileActionModal.tsx';
+import ProfileActionModal from '@/components/profile-action-modal/ProfileActionModal.tsx';
 import {
     useGetEventAttachmentsQuery,
     useGetEventAttachmentsFacetsQuery,

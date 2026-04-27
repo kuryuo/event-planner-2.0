@@ -1,5 +1,5 @@
 import Sidebar from "@/components/sidebar/Sidebar";
-import EventForm from "@/components/event-form/EventForm";
+import EventForm from "@/pages/event-editor/components/event-form/EventForm";
 import styles from "./EventEditorPage.module.scss";
 import {useSearchParams} from "react-router-dom";
 import {useEventEditor} from "@/hooks/ui/useEventEditor.ts";

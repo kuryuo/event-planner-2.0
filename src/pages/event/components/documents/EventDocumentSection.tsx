@@ -1,7 +1,7 @@
 import type {ReactNode} from 'react';
 import {useId} from 'react';
 import pixelsArt from '@/assets/image/pixels.svg?url';
-import styles from './event-document-section.module.scss';
+import styles from './EventDocumentSection.module.scss';
 
 export interface EventDocumentSectionProps {
     title: string;

@@ -1,7 +1,7 @@
 import {useState, useEffect} from "react";
 import {useNavigate} from "react-router-dom";
-import LoginForm from "@/components/auth/LoginForm";
-import RegistrationForm from "@/components/auth/RegistrationForm";
+import LoginForm from "@/pages/auth/components/LoginForm";
+import RegistrationForm from "@/pages/auth/components/RegistrationForm";
 import {useAuth} from "@/hooks/api/useAuth.ts";
 
 export default function AuthPage() {

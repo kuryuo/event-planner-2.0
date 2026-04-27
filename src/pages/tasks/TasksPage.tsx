@@ -23,7 +23,7 @@ import XLgIcon from '@/assets/img/icon-m/x.svg?react';
 import type {RootState} from '@/store/store.ts';
 import Checkbox from '@/ui/checkbox/Checkbox';
 import Switch from '@/ui/switch/Switch';
-import BoardTaskCard from '@/components/tasks/board-task-card/BoardTaskCard';
+import BoardTaskCard from '@/pages/tasks/components/board-task-card/BoardTaskCard';
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 import Avatar from '@/ui/avatar/Avatar';
 import {

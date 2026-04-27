@@ -12,7 +12,7 @@ import {useDispatch} from 'react-redux';
 import TextField from '@/ui/text-field/TextField.tsx';
 import Avatar from '@/ui/avatar/Avatar.tsx';
 import Chip from '@/ui/chip/Chip.tsx';
-import ProfileActionModal from '@/components/profile-page/ProfileActionModal.tsx';
+import ProfileActionModal from '@/components/profile-action-modal/ProfileActionModal.tsx';
 import {useGetProfileQuery} from '@/services/api/profileApi.ts';
 import {
     useDeleteEventChatMessageMutation,
