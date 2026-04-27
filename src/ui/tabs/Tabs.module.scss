@@ -4,61 +4,59 @@
   border-bottom: 1px solid var(--border-primary);
 }
 
-.tabs {
-  display: flex;
-  position: relative;
+.antTabs {
+  :global(.ant-tabs-nav) {
+    margin: 0;
+  }
+
+  :global(.ant-tabs-nav::before) {
+    border-color: var(--border-primary);
+  }
+
+  :global(.ant-tabs-tab) {
+    padding: var(--spacing-3) var(--spacing-12) !important;
+    margin: 0 !important;
+  }
+
+  :global(.ant-tabs-tab-btn) {
+    color: var(--content-primary);
+  }
+
+  :global(.ant-tabs-tab-active .ant-tabs-tab-btn) {
+    color: var(--content-brand-green);
+  }
+
+  :global(.ant-tabs-ink-bar) {
+    height: 3px !important;
+    border-radius: var(--radius-1) var(--radius-1) 0 0;
+    background: var(--bg-brand-green) !important;
+  }
+
+  :global(.ant-tabs-tab:hover .ant-tabs-tab-btn) {
+    color: var(--content-brand-green);
+  }
 }
 
-.tabItem {
-  display: flex;
+.tabLabel {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-2);
-  padding: var(--spacing-3) var(--spacing-12);
-  cursor: pointer;
-  transition: color 0.2s;
-
-  &:hover {
-    color: var(--brand-color);
-  }
-
-  .icon {
-    display: inline-flex;
-    width: 24px;
-    height: 24px;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .iconPlaceholder {
-    visibility: hidden;
-  }
-
-  .label {
-    @include ty.font(subtitle-m, semibold);
-    white-space: nowrap;
-  }
 }
 
-.active {
-  color: var(--brand-color);
+.icon {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  justify-content: center;
+  align-items: center;
 }
 
-.indicator {
-  position: absolute;
-  bottom: 0;
-  height: 3px;
-  border-radius: var(--radius-1) var(--radius-1) 0 0;
-  background-color: var(--bg-brand-green);
-  transition: left 0.3s;
+.iconPlaceholder {
+  visibility: hidden;
 }
 
-.hoverIndicator {
-  position: absolute;
-  bottom: 0;
-  height: 3px;
-  border-radius: var(--radius-1) var(--radius-1) 0 0;
-  background-color: var(--bg-brand-green-bold);
-  transition: left 0.3s;
-  z-index: 1;
+.label {
+  @include ty.font(subtitle-m, semibold);
+  white-space: nowrap;
 }

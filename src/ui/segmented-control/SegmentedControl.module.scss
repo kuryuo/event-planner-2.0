@@ -1,46 +1,34 @@
 @use '@/typography-variables' as ty;
 
-.segmentedControl {
-  position: relative;
-  display: flex;
-  border: 1px solid var(--border-primary);
-  border-radius: var(--radius-2);
-  overflow: hidden;
+.segmented {
   width: 100%;
   max-width: 440px;
-  height: 44px;
-  background-color: var(--bg-secondary);
-}
 
-.segment {
-  flex: 1 1 0;
-  min-width: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  position: relative;
-  z-index: 1;
-  @include ty.font(body-s, regular);
-  transition: color 0.2s;
+  :global(.ant-segmented) {
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-2);
+    background: var(--bg-secondary);
+    padding: var(--spacing-05);
+  }
 
-  &:hover {
+  :global(.ant-segmented-item) {
+    @include ty.font(body-s, regular);
+    border-radius: var(--radius-2) !important;
+    color: var(--content-primary);
+  }
+
+  :global(.ant-segmented-item-selected) {
+    background: var(--bg-brand-purple) !important;
+    color: var(--white) !important;
+    font-weight: 600;
+  }
+
+  :global(.ant-segmented-item:hover:not(.ant-segmented-item-selected)) {
     color: var(--bg-brand-purple);
   }
 
-  &.active {
-    color: var(--white);
+  :global(.ant-segmented-thumb) {
+    background: var(--bg-brand-purple) !important;
+    border-radius: var(--radius-2) !important;
   }
-}
-
-.slider {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 140px;
-  left: 0;
-  border-radius: var(--radius-2);
-  background-color: var(--bg-brand-purple);
-  transition: left 0.3s ease;
-  z-index: 0;
 }

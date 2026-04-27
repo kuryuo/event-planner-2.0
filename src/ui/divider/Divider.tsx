@@ -1,9 +1,9 @@
-import styles from './Divider.module.scss';
+import {Divider as AntDivider} from 'antd';
 
 interface DividerProps {
     className?: string;
 }
 
 export default function Divider({className}: DividerProps) {
-    return <div className={className ? `${styles.divider} ${className}` : styles.divider} />;
+    return <AntDivider className={className} style={{margin: 0}}/>;
 }
