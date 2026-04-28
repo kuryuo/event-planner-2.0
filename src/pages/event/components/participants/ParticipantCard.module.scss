@@ -127,3 +127,17 @@
   height: 16px;
   color: var(--content-primary);
 }
+
+.roleMenuItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-2);
+  min-width: 160px;
+}
+
+.roleMenuCheck {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}

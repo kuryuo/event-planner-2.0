@@ -5,6 +5,11 @@
   display: inline-flex;
 }
 
+.trigger {
+  display: inline-flex;
+  cursor: pointer;
+}
+
 .menu {
   position: absolute;
   top: calc(100% + 8px);

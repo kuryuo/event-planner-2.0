@@ -1,14 +1,14 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
-import clsx from 'clsx';
+import {useMemo, useState} from 'react';
+import {Dropdown} from 'antd';
+import type {MenuProps} from 'antd';
 import Avatar from '@/ui/avatar/Avatar.tsx';
-import Menu from '@/ui/menu/Menu.tsx';
 import Chip from '@/ui/chip/Chip.tsx';
 import ChevronDownIcon from '@/assets/img/icon-m/chevron-down.svg?react';
 import XIcon from '@/assets/img/icon-s/x.svg?react';
 import OwnerIcon from '@/assets/image/owner-icon.svg?react';
-import {useClickOutside} from '@/hooks/ui/useClickOutside';
-import { 
-    useGetEventRolesQuery, 
+import Check2Icon from '@/assets/img/icon-m/check2.svg?react';
+import {
+    useGetEventRolesQuery,
     useAssignUserRoleMutation
 } from '@/services/api/eventApi';
 import styles from './ParticipantCard.module.scss';
@@ -63,11 +63,6 @@ export default function ParticipantCard({
     canEditRoles = true,
 }: ParticipantCardProps) {
     const [isRoleMenuOpen, setIsRoleMenuOpen] = useState(false);
-    const [openUpward, setOpenUpward] = useState(false);
-    const [alignRight, setAlignRight] = useState(false);
-    const roleMenuRef = useRef<HTMLDivElement>(null);
-    const roleButtonRef = useRef<HTMLButtonElement>(null);
-    const dropdownRef = useRef<HTMLDivElement>(null);
 
     const {data: rolesData, isLoading: isLoadingRoles} = useGetEventRolesQuery(
         {eventId, count: 100},
@@ -104,44 +99,23 @@ export default function ParticipantCard({
         }
     };
 
-    useClickOutside(roleMenuRef, () => {
-        setIsRoleMenuOpen(false);
-    }, isRoleMenuOpen);
-
-    useEffect(() => {
-        if (!isRoleMenuOpen) return;
-
-        const updateDropdownPosition = () => {
-            const buttonEl = roleButtonRef.current;
-            const dropdownEl = dropdownRef.current;
-            if (!buttonEl || !dropdownEl) return;
-
-            const buttonRect = buttonEl.getBoundingClientRect();
-            const dropdownRect = dropdownEl.getBoundingClientRect();
-            const gap = 6;
-
-            const shouldOpenUp =
-                buttonRect.bottom + gap + dropdownRect.height > window.innerHeight
-                && buttonRect.top - gap - dropdownRect.height >= 0;
-
-            const shouldAlignRight =
-                buttonRect.left + dropdownRect.width > window.innerWidth - 8
-                && buttonRect.right - dropdownRect.width >= 8;
-
-            setOpenUpward(shouldOpenUp);
-            setAlignRight(shouldAlignRight);
-        };
-
-        const raf = window.requestAnimationFrame(updateDropdownPosition);
-        window.addEventListener('resize', updateDropdownPosition);
-
-        return () => {
-            window.cancelAnimationFrame(raf);
-            window.removeEventListener('resize', updateDropdownPosition);
-        };
-    }, [isRoleMenuOpen, roleOptions.length]);
-
     const isOrganizer = currentRoleValue === 'Organizer';
+
+    const roleMenuItems: MenuProps['items'] = useMemo(
+        () =>
+            (isLoadingRoles ? [] : roleOptions).map((option) => ({
+                key: option.value,
+                label: (
+                    <span className={styles.roleMenuItem}>
+                        <span>{option.label}</span>
+                        {currentRoleLabel === option.label ? (
+                            <Check2Icon className={styles.roleMenuCheck}/>
+                        ) : null}
+                    </span>
+                ),
+            })),
+        [isLoadingRoles, roleOptions, currentRoleLabel],
+    );
 
     return (
         <div className={styles.participantCard}>
@@ -163,44 +137,29 @@ export default function ParticipantCard({
                 )}
 
                 {canEditRoles && !isOrganizer && (
-                    <div className={styles.roleSelector} ref={roleMenuRef}>
+                    <Dropdown
+                        trigger={['click']}
+                        disabled={isOrganizer}
+                        open={isRoleMenuOpen}
+                        onOpenChange={setIsRoleMenuOpen}
+                        placement="bottomRight"
+                        menu={{
+                            items: roleMenuItems,
+                            onClick: ({key}) => {
+                                void handleRoleClick(String(key));
+                                setIsRoleMenuOpen(false);
+                            },
+                        }}
+                    >
                         <button
-                            ref={roleButtonRef}
                             type="button"
                             className={styles.roleButtonAsSelect}
-                            onClick={() => setIsRoleMenuOpen((prev) => !prev)}
                             disabled={isOrganizer}
                         >
                             <span>{currentRoleLabel}</span>
-                            {!isOrganizer && <ChevronDownIcon className={styles.chevronIcon}/>} 
+                            {!isOrganizer ? <ChevronDownIcon className={styles.chevronIcon}/> : null}
                         </button>
-
-                        {isRoleMenuOpen && !isOrganizer && (
-                            <div
-                                ref={dropdownRef}
-                                className={clsx(
-                                    styles.rolesDropdown,
-                                    openUpward && styles.rolesDropdownUp,
-                                    alignRight && styles.rolesDropdownAlignRight,
-                                )}
-                            >
-                                <Menu
-                                    shape="square"
-                                    options={(isLoadingRoles ? [] : roleOptions).map((option) => ({
-                                        label: option.label,
-                                    }))}
-                                    selectedValues={[currentRoleLabel]}
-                                    onOptionClick={(_, index) => {
-                                        const selectedOption = roleOptions[index];
-                                        if (selectedOption) {
-                                            void handleRoleClick(selectedOption.value);
-                                        }
-                                        setIsRoleMenuOpen(false);
-                                    }}
-                                />
-                            </div>
-                        )}
-                    </div>
+                    </Dropdown>
                 )}
 
                 {!canEditRoles && !isOrganizer && (
@@ -221,4 +180,3 @@ export default function ParticipantCard({
         </div>
     );
 }
-

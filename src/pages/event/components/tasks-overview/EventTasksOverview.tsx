@@ -2,6 +2,8 @@ import {useMemo} from 'react';
 import {useNavigate} from 'react-router-dom';
 import FileLinesIcon from '@/assets/image/file-lines.svg?react';
 import {useGetEventBoardQuery} from '@/services/api/eventApi.ts';
+import BoardTaskCard, {type BoardTaskCardPriority} from '@/pages/tasks/components/board-task-card/BoardTaskCard.tsx';
+import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 import styles from './EventTasksOverview.module.scss';
 
 interface EventTasksOverviewProps {
@@ -12,28 +14,17 @@ interface TaskCard {
     id: string;
     title: string;
     description: string;
-    assignee: string;
+    assigneeName: string;
+    assigneeAvatar?: string;
+    dueDate?: string;
     commentsCount: number;
-    dueDateLabel: string;
-    priority: string;
+    priority: BoardTaskCardPriority;
     isCompleted: boolean;
 }
 
-const formatDueDate = (value?: string | null): string => {
-    if (!value) return 'Без срока';
-
-    const parsed = new Date(value);
-    if (Number.isNaN(parsed.getTime())) return 'Без срока';
-
-    const day = parsed.getDate();
-    const month = parsed.toLocaleString('ru-RU', {month: 'short'}).replace('.', '');
-    return `До ${day} ${month}`;
-};
-
-const normalizePriority = (value?: string | null): string => {
-    if (!value) return 'Средний';
-
-    const normalized = value.toLowerCase();
+const normalizePriority = (value?: string | null): BoardTaskCardPriority => {
+    const normalized = (value ?? '').toLowerCase();
+    if (normalized.includes('urgent') || normalized.includes('сроч')) return 'Срочный';
     if (normalized.includes('high') || normalized.includes('выс')) return 'Высокий';
     if (normalized.includes('low') || normalized.includes('низ')) return 'Низкий';
     return 'Средний';
@@ -70,13 +61,20 @@ export default function EventTasksOverview({eventId}: EventTasksOverviewProps) {
 
             columnTasks.forEach((task) => {
                 const id = String(task?.id ?? Math.random());
+                const rawAvatar = task?.assigneeAvatarUrl ?? task?.assigneeAvatar ?? null;
                 flattened.push({
                     id,
                     title: task?.title || 'Название задачи',
                     description: task?.description || 'Описание отсутствует',
-                    assignee: task?.assigneeName || task?.assignedUserName || 'Не назначено',
+                    assigneeName: String(
+                        task?.assigneeDisplayName
+                        ?? task?.assigneeName
+                        ?? task?.assignedUserName
+                        ?? 'Не назначено',
+                    ),
+                    assigneeAvatar: buildImageUrl(rawAvatar),
+                    dueDate: task?.dueDate ?? task?.deadline ?? undefined,
                     commentsCount: Number(task?.commentsCount ?? task?.commentCount ?? 0),
-                    dueDateLabel: formatDueDate(task?.dueDate ?? task?.deadline),
                     priority: normalizePriority(task?.priority),
                     isCompleted: isDoneColumn(column?.name),
                 });
@@ -126,16 +124,16 @@ export default function EventTasksOverview({eventId}: EventTasksOverviewProps) {
 
                     <div className={styles.tasksList}>
                         {visibleTasks.map((task) => (
-                            <article key={task.id} className={styles.taskCard}>
-                                <span className={styles.priorityChip}>{task.priority}</span>
-                                <h4 className={styles.taskTitle}>{task.title}</h4>
-                                <p className={styles.taskDescription}>{task.description}</p>
-                                <div className={styles.taskMeta}>
-                                    <span className={styles.assignee}>{task.assignee}</span>
-                                    <span className={styles.comments}>💬 {task.commentsCount}</span>
-                                    <span className={styles.deadline}>{task.dueDateLabel}</span>
-                                </div>
-                            </article>
+                            <BoardTaskCard
+                                key={task.id}
+                                title={task.title}
+                                description={task.description}
+                                dueDate={task.dueDate}
+                                assigneeName={task.assigneeName}
+                                assigneeAvatar={task.assigneeAvatar}
+                                priority={task.priority}
+                                commentsCount={task.commentsCount}
+                            />
                         ))}
                     </div>
                 </>

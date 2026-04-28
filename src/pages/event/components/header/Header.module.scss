@@ -95,38 +95,16 @@
   height: 18px;
 }
 
-.statusDropdown {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  min-width: 140px;
-  background-color: var(--bg-primary);
-  border-radius: var(--radius-3);
-  border: 1px solid var(--border-primary);
-  box-shadow: var(--lvl2);
-  padding: var(--spacing-1);
-  z-index: 1000;
+.statusCheck {
+  color: var(--content-brand-green);
 }
 
-.statusOption {
-  width: 100%;
-  border: none;
-  background: transparent;
+.statusMenuRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 10px;
-  border-radius: var(--radius-2);
-  cursor: pointer;
-  @include ty.font(body-m, regular);
-
-  &:hover {
-    background: var(--bg-secondary);
-  }
-}
-
-.statusCheck {
-  color: var(--content-brand-green);
+  gap: var(--spacing-2);
+  min-width: 120px;
 }
 
 .right {
@@ -165,16 +143,22 @@
 }
 
 .dropdown {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  min-width: 220px;
   background-color: var(--bg-primary);
   border-radius: var(--radius-3);
   border: 1px solid var(--border-primary);
   box-shadow: var(--lvl2);
-  z-index: 1000;
   padding: var(--spacing-1);
-  white-space: nowrap;
+}
+
+.dropdownAction {
+  width: 100%;
+  justify-content: flex-start !important;
 }
 
 .trashIcon {

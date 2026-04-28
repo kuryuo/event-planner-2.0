@@ -1,5 +1,7 @@
-import {useState, useRef, useMemo, useEffect} from "react";
+import {useState, useMemo, useEffect, useCallback} from "react";
 import {useNavigate} from 'react-router-dom';
+import {Dropdown} from 'antd';
+import type {MenuProps} from 'antd';
 import styles from './Header.module.scss';
 import ChevronDownIcon from '@/assets/img/icon-m/chevron-down.svg?react';
 import Check2Icon from '@/assets/img/icon-m/check2.svg?react';
@@ -8,7 +10,6 @@ import TrashIcon from '@/assets/img/icon-m/trash.svg?react';
 import Avatar from '@/ui/avatar/Avatar';
 import Button from '@/ui/button/Button';
 import Tabs, {type TabItem} from '@/ui/tabs/Tabs';
-import {useClickOutside} from '@/hooks/ui/useClickOutside.ts';
 import {useEventDeleter} from '@/hooks/ui/useEventDeleter.ts';
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 import {useGetProfileEventsQuery} from "@/services/api/profileApi.ts";
@@ -82,8 +83,6 @@ export default function Header({
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isStatusOpen, setIsStatusOpen] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState(() => normalizeStatusLabel(status));
-    const menuRef = useRef<HTMLDivElement>(null);
-    const statusRef = useRef<HTMLDivElement>(null);
     const {handleDelete, isLoading: isDeleting} = useEventDeleter();
     
     const {data: subscribedEvents} = useGetProfileEventsQuery();
@@ -104,10 +103,6 @@ export default function Header({
         }
     };
 
-    const handleMenuClick = () => {
-        setIsMenuOpen(!isMenuOpen);
-    };
-
     const handleDeleteClick = async () => {
         if (eventId) {
             try {
@@ -119,8 +114,41 @@ export default function Header({
         }
     };
 
-    useClickOutside(menuRef, () => setIsMenuOpen(false), isMenuOpen);
-    useClickOutside(statusRef, () => setIsStatusOpen(false), isStatusOpen);
+    const handleStatusPick = useCallback(
+        async (option: string) => {
+            if (!eventId || !isAdmin) {
+                setSelectedStatus(option);
+                setIsStatusOpen(false);
+                return;
+            }
+
+            const previousStatus = selectedStatus;
+            setSelectedStatus(option);
+            setIsStatusOpen(false);
+
+            try {
+                await updateLifecycleState({eventId, lifecycleState: statusLabelToApiValue[option]}).unwrap();
+            } catch (error) {
+                console.error('Не удалось обновить статус мероприятия:', error);
+                setSelectedStatus(previousStatus);
+            }
+        },
+        [eventId, isAdmin, selectedStatus, updateLifecycleState],
+    );
+
+    const statusMenuItems: MenuProps['items'] = useMemo(
+        () =>
+            STATUS_OPTIONS.map((option) => ({
+                key: option,
+                label: (
+                    <span className={styles.statusMenuRow}>
+                        <span>{option}</span>
+                        {option === selectedStatus ? <Check2Icon className={styles.statusCheck}/> : null}
+                    </span>
+                ),
+            })),
+        [selectedStatus],
+    );
 
     const tabItems: TabItem[] = isArchived
         ? [{label: 'Обзор'}, {label: 'Документы'}, {label: 'Медиа'}]
@@ -176,105 +204,84 @@ export default function Header({
                         <Avatar size="L" shape="square" fallbackType="event" name={name} avatarUrl={buildImageUrl(avatar)}/>
                         <h2 className={styles.title}>{name}</h2>
 
-                        <div className={styles.statusWrapper} ref={statusRef}>
-                            <button
-                                type="button"
-                                className={styles.statusButton}
+                        <div className={styles.statusWrapper}>
+                            <Dropdown
+                                trigger={['click']}
                                 disabled={!isAdmin || isReadOnlyLifecycle}
-                                onClick={() => setIsStatusOpen((prev) => !prev)}
+                                open={isStatusOpen}
+                                onOpenChange={setIsStatusOpen}
+                                menu={{
+                                    items: statusMenuItems,
+                                    onClick: ({key}) => {
+                                        void handleStatusPick(String(key));
+                                    },
+                                }}
                             >
-                                {selectedStatus}
-                                <ChevronDownIcon className={styles.statusChevron}/>
-                            </button>
-
-                            {isStatusOpen && (
-                                <div className={styles.statusDropdown}>
-                                    {STATUS_OPTIONS.map((option) => (
-                                        <button
-                                            key={option}
-                                            type="button"
-                                            className={styles.statusOption}
-                                            onClick={async () => {
-                                                if (!eventId || !isAdmin) {
-                                                    setSelectedStatus(option);
-                                                    setIsStatusOpen(false);
-                                                    return;
-                                                }
-
-                                                const previousStatus = selectedStatus;
-                                                setSelectedStatus(option);
-                                                setIsStatusOpen(false);
-
-                                                try {
-                                                    await updateLifecycleState({eventId, lifecycleState: statusLabelToApiValue[option]}).unwrap();
-                                                } catch (error) {
-                                                    console.error('Не удалось обновить статус мероприятия:', error);
-                                                    setSelectedStatus(previousStatus);
-                                                }
-                                            }}
-                                        >
-                                            <span>{option}</span>
-                                            {option === selectedStatus && <Check2Icon className={styles.statusCheck}/>}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
+                                <button
+                                    type="button"
+                                    className={styles.statusButton}
+                                    disabled={!isAdmin || isReadOnlyLifecycle}
+                                >
+                                    {selectedStatus}
+                                    <ChevronDownIcon className={styles.statusChevron}/>
+                                </button>
+                            </Dropdown>
                         </div>
                     </div>
                     <div className={styles.right}>
                         {isAdmin ? (
-                        <div className={styles.adminActions} ref={menuRef}>
+                        <div className={styles.adminActions}>
                             <Button variant="Filled" color="gray" onClick={handleEdit} disabled={isReadOnlyLifecycle}>
                                 Редактировать
                             </Button>
-                            <div className={styles.menuWrapper}>
-                                <button
-                                    className={styles.menuButton}
-                                    onClick={handleMenuClick}
-                                    aria-label="Меню"
-                                >
-                                    <ThreeDotsVerticalIcon className={styles.menuIcon}/>
-                                </button>
-                                {isMenuOpen && (
-                                     <div className={styles.dropdown}>
-                                         <Button
-                                             variant="Text"
-                                             color="gray"
-                                              onClick={async () => {
-                                                  if (!eventId) return;
-                                                  try {
-                                                      await updateCancellation({eventId, isCancelled: !isCancelledNow}).unwrap();
-                                                      setSelectedStatus(!isCancelledNow ? 'Отменено' : 'В работе');
-                                                      setIsMenuOpen(false);
-                                                  } catch (error) {
-                                                      console.error('Не удалось обновить отмену:', error);
-                                                  }
-                                              }}
-                                              disabled={isUpdatingCancellation || isReadOnlyLifecycle}
-                                          >
-                                             {isCancelledNow ? 'Снять отмену' : 'Отменить мероприятие'}
-                                         </Button>
-                                         <Button
-                                             variant="Text"
-                                             color="gray"
-                                             onClick={async () => {
-                                                 if (!eventId) return;
-                                                 const templateName = window.prompt('Название шаблона', `${name} шаблон`);
-                                                 if (!templateName?.trim()) return;
-                                                 try {
-                                                     await copyToTemplate({eventId, name: templateName.trim()}).unwrap();
-                                                     setIsMenuOpen(false);
-                                                 } catch (error) {
-                                                     console.error('Не удалось создать шаблон:', error);
-                                                 }
-                                             }}
-                                             disabled={isCopyingTemplate}
-                                         >
-                                             {isCopyingTemplate ? 'Создаем...' : 'Сохранить как шаблон'}
-                                         </Button>
-                                         <Button
-                                             variant="Text"
-                                             color="red"
+                            <Dropdown
+                                trigger={['click']}
+                                open={isMenuOpen}
+                                onOpenChange={setIsMenuOpen}
+                                placement="bottomRight"
+                                dropdownRender={() => (
+                                    <div className={styles.dropdown} onClick={(e) => e.stopPropagation()}>
+                                        <Button
+                                            className={styles.dropdownAction}
+                                            variant="Text"
+                                            color="gray"
+                                            onClick={async () => {
+                                                if (!eventId) return;
+                                                try {
+                                                    await updateCancellation({eventId, isCancelled: !isCancelledNow}).unwrap();
+                                                    setSelectedStatus(!isCancelledNow ? 'Отменено' : 'В работе');
+                                                    setIsMenuOpen(false);
+                                                } catch (error) {
+                                                    console.error('Не удалось обновить отмену:', error);
+                                                }
+                                            }}
+                                            disabled={isUpdatingCancellation || isReadOnlyLifecycle}
+                                        >
+                                            {isCancelledNow ? 'Снять отмену' : 'Отменить мероприятие'}
+                                        </Button>
+                                        <Button
+                                            className={styles.dropdownAction}
+                                            variant="Text"
+                                            color="gray"
+                                            onClick={async () => {
+                                                if (!eventId) return;
+                                                const templateName = window.prompt('Название шаблона', `${name} шаблон`);
+                                                if (!templateName?.trim()) return;
+                                                try {
+                                                    await copyToTemplate({eventId, name: templateName.trim()}).unwrap();
+                                                    setIsMenuOpen(false);
+                                                } catch (error) {
+                                                    console.error('Не удалось создать шаблон:', error);
+                                                }
+                                            }}
+                                            disabled={isCopyingTemplate}
+                                        >
+                                            {isCopyingTemplate ? 'Создаем...' : 'Сохранить как шаблон'}
+                                        </Button>
+                                        <Button
+                                            className={styles.dropdownAction}
+                                            variant="Text"
+                                            color="red"
                                             leftIcon={<TrashIcon className={styles.trashIcon}/>}
                                             onClick={handleDeleteClick}
                                             disabled={isDeleting}
@@ -283,7 +290,17 @@ export default function Header({
                                         </Button>
                                     </div>
                                 )}
-                            </div>
+                            >
+                                <div className={styles.menuWrapper}>
+                                    <button
+                                        type="button"
+                                        className={styles.menuButton}
+                                        aria-label="Меню"
+                                    >
+                                        <ThreeDotsVerticalIcon className={styles.menuIcon}/>
+                                    </button>
+                                </div>
+                            </Dropdown>
                         </div>
                     ) : (
                         <Button 

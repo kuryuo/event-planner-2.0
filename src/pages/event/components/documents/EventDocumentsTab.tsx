@@ -6,6 +6,7 @@ import XIcon from '@/assets/img/icon-m/x.svg?react';
 import SearchIcon from '@/assets/img/icon-m/search.svg?react';
 import FilterIcon from '@/assets/img/icon-m/filter.svg?react';
 import ChevronDownIcon from '@/assets/img/icon-m/chevron-down.svg?react';
+import ChevronRightIcon from '@/assets/img/icon-m/chevron-right.svg?react';
 import JustifyIcon from '@/assets/img/icon-m/justify.svg?react';
 import StackedIcon from '@/assets/img/icon-m/view-stacked.svg?react';
 import Button from '@/ui/button/Button.tsx';
@@ -77,6 +78,12 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
     const [showNewNoteForm, setShowNewNoteForm] = useState(false);
     useClickOutside(sortRef, () => setIsSortOpen(false), isSortOpen);
     useClickOutside(filterRef, () => { setIsFilterOpen(false); setIsAuthorPanelOpen(false); }, isFilterOpen || isAuthorPanelOpen);
+
+    useEffect(() => {
+        if (!isFilterOpen) {
+            setIsAuthorPanelOpen(false);
+        }
+    }, [isFilterOpen]);
 
     const {data: facetsData} = useGetEventAttachmentsFacetsQuery(eventId, {skip: !eventId});
     const fileExtensions = facetsData?.result?.fileExtensions ?? [];
@@ -299,17 +306,68 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
 
                                     <div>
                                         <h4>Автор</h4>
-                                        <button
-                                            type="button"
-                                            className={styles.authorSelect}
-                                            onClick={() => setIsAuthorPanelOpen(true)}
+                                        <div
+                                            className={styles.authorMenuWrap}
+                                            onMouseEnter={() => setIsAuthorPanelOpen(true)}
+                                            onMouseLeave={() => setIsAuthorPanelOpen(false)}
                                         >
-                                            <span>Автор</span>
-                                            <span>
-                                                {selectedAuthorIds.length > 0 && <span className={styles.authorBadge}>{selectedAuthorIds.length}</span>}
-                                                <ChevronDownIcon/>
-                                            </span>
-                                        </button>
+                                            <button
+                                                type="button"
+                                                className={styles.authorSelect}
+                                                onClick={(e) => e.stopPropagation()}
+                                                onTouchStart={() => setIsAuthorPanelOpen(true)}
+                                                aria-expanded={isAuthorPanelOpen}
+                                                aria-haspopup="dialog"
+                                            >
+                                                <span className={styles.authorLabel}>Автор</span>
+                                                <span className={styles.authorTrailing}>
+                                                    {selectedAuthorIds.length > 0 ? (
+                                                        <span className={styles.authorBadge}>{selectedAuthorIds.length}</span>
+                                                    ) : null}
+                                                    <ChevronRightIcon className={styles.authorChevron} aria-hidden/>
+                                                </span>
+                                            </button>
+
+                                            {isAuthorPanelOpen ? (
+                                                <div
+                                                    className={styles.filterSubPanel}
+                                                    role="dialog"
+                                                    aria-label="Выбор авторов"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <input
+                                                        className={styles.subSearch}
+                                                        placeholder="Имя..."
+                                                        value={authorSearch}
+                                                        onChange={(e) => setAuthorSearch(e.target.value)}
+                                                    />
+                                                    <div className={styles.subList}>
+                                                        {authors
+                                                            .filter((a) => (a.displayName || '').toLowerCase().includes(authorSearch.toLowerCase()))
+                                                            .map((a) => {
+                                                                const checked = selectedAuthorIds.includes(a.id);
+                                                                const toggleAuthor = () => {
+                                                                    setSelectedAuthorIds((prev) =>
+                                                                        prev.includes(a.id) ? prev.filter((v) => v !== a.id) : [...prev, a.id]
+                                                                    );
+                                                                };
+                                                                return (
+                                                                    <div key={a.id} className={styles.subItem}>
+                                                                        <button
+                                                                            type="button"
+                                                                            className={styles.subLeft}
+                                                                            onClick={toggleAuthor}
+                                                                        >
+                                                                            <span className={styles.subName}>{a.displayName || 'Пользователь'}</span>
+                                                                        </button>
+                                                                        <Checkbox checked={checked} onChange={toggleAuthor}/>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                    </div>
+                                                </div>
+                                            ) : null}
+                                        </div>
                                     </div>
 
                                     <div>
@@ -391,41 +449,6 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
                                     >
                                         Сбросить фильтр
                                     </button>
-                                </div>
-                            )}
-
-                            {isAuthorPanelOpen && (
-                                <div className={styles.filterSubPanel}>
-                                    <input
-                                        className={styles.subSearch}
-                                        placeholder="Имя..."
-                                        value={authorSearch}
-                                        onChange={(e) => setAuthorSearch(e.target.value)}
-                                    />
-                                    <div className={styles.subList}>
-                                        {authors
-                                            .filter((a) => (a.displayName || '').toLowerCase().includes(authorSearch.toLowerCase()))
-                                            .map((a) => {
-                                                const checked = selectedAuthorIds.includes(a.id);
-                                                const toggleAuthor = () => {
-                                                    setSelectedAuthorIds((prev) =>
-                                                        prev.includes(a.id) ? prev.filter((v) => v !== a.id) : [...prev, a.id]
-                                                    );
-                                                };
-                                                return (
-                                                    <div key={a.id} className={styles.subItem}>
-                                                        <button
-                                                            type="button"
-                                                            className={styles.subLeft}
-                                                            onClick={toggleAuthor}
-                                                        >
-                                                            <span className={styles.subName}>{a.displayName || 'Пользователь'}</span>
-                                                        </button>
-                                                        <Checkbox checked={checked} onChange={toggleAuthor}/>
-                                                    </div>
-                                                );
-                                            })}
-                                    </div>
                                 </div>
                             )}
                         </div>

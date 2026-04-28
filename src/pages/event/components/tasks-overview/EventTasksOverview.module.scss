@@ -90,43 +90,6 @@
   gap: var(--spacing-3);
 }
 
-.taskCard {
-  border-radius: var(--radius-3);
-  padding: var(--spacing-3);
-  background: var(--bg-primary);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
-.priorityChip {
-  @include ty.font(caption-m, semibold);
-  color: var(--content-blue);
-  background: var(--bg-blue);
-  border-radius: var(--radius-100);
-  padding: 2px 8px;
-  align-self: flex-start;
-}
-
-.taskTitle {
-  @include ty.font(subtitle-m, semibold);
-  color: var(--content-primary);
-}
-
-.taskDescription {
-  @include ty.font(body-s, regular);
-  color: var(--content-secondary);
-}
-
-.taskMeta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-2);
-  @include ty.font(caption-m, regular);
-  color: var(--content-secondary);
-}
-
 @media (max-width: 1240px) {
   .panel {
     width: 100%;

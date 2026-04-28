@@ -10,12 +10,13 @@
 .descriptionSection {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-5);
+  gap: var(--spacing-8);
 }
 
 .sectionTitle {
   @include ty.font(subtitle-m, semibold);
   color: var(--content-primary);
+  margin: 0;
 }
 
 .infoGrid {
