@@ -1,0 +1,91 @@
+@use '@/typography-variables' as ty;
+
+/* Ant Input (ep-input): принудительно Body M без inherit */
+.ep-input {
+  /* сам wrapper тоже задаёт базовую типографику */
+  :where(.ant-input-affix-wrapper) {
+    @include ty.font(body-m, regular);
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 18px !important;
+    font-weight: 450 !important;
+    line-height: 24px !important;
+  }
+
+  /* обычный Input */
+  :where(.ant-input) {
+    @include ty.font(body-m, regular);
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 18px !important;
+    font-weight: 450 !important;
+    line-height: 24px !important;
+  }
+
+  /* Input внутри affix-wrapper (prefix/suffix) */
+  :where(.ant-input-affix-wrapper) :where(input.ant-input) {
+    @include ty.font(body-m, regular);
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 18px !important;
+    font-weight: 450 !important;
+    line-height: 24px !important;
+  }
+
+  /* placeholder — у Ant бывает и на input, и на textarea */
+  :where(input.ant-input::placeholder),
+  :where(textarea.ant-input::placeholder),
+  :where(.ant-input-affix-wrapper) :where(input.ant-input::placeholder),
+  :where(.ant-input-affix-wrapper) :where(textarea.ant-input::placeholder),
+  :where(.ant-input:disabled::placeholder) {
+    @include ty.font(body-m, regular);
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 18px !important;
+    font-weight: 450 !important;
+    line-height: 24px !important;
+  }
+}
+
+/* Ant Modal: заголовок Subtitle M, текст Body M */
+:where(.ant-modal) :where(.ant-modal-title) {
+  @include ty.font(subtitle-m, semibold);
+  font-family: 'Manrope', sans-serif !important;
+  font-size: 18px !important;
+  font-weight: 650 !important;
+  line-height: 24px !important;
+  color: var(--content-primary) !important;
+}
+
+:where(.ant-modal) :where(.ant-modal-body) {
+  @include ty.font(body-m, regular);
+  font-family: 'Manrope', sans-serif !important;
+  font-size: 18px !important;
+  font-weight: 450 !important;
+  line-height: 24px !important;
+  color: var(--content-primary) !important;
+}
+
+:where(.ant-modal) :where(.ant-modal-body) :where(p),
+:where(.ant-modal) :where(.ant-modal-body) :where(div),
+:where(.ant-modal) :where(.ant-modal-body) :where(span) {
+  @include ty.font(body-m, regular);
+  font-family: 'Manrope', sans-serif !important;
+  font-size: 18px !important;
+  font-weight: 450 !important;
+  line-height: 24px !important;
+}
+
+/* Modal.confirm (если используется) */
+:where(.ant-modal-confirm) :where(.ant-modal-confirm-title) {
+  @include ty.font(subtitle-m, semibold);
+  font-family: 'Manrope', sans-serif !important;
+  font-size: 18px !important;
+  font-weight: 650 !important;
+  line-height: 24px !important;
+}
+
+:where(.ant-modal-confirm) :where(.ant-modal-confirm-content) {
+  @include ty.font(body-m, regular);
+  font-family: 'Manrope', sans-serif !important;
+  font-size: 18px !important;
+  font-weight: 450 !important;
+  line-height: 24px !important;
+}
+
