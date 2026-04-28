@@ -4,7 +4,7 @@ import ChatIcon from '@/assets/img/icon-m/chat.svg?react';
 import CalendarIcon from '@/assets/img/icon-m/calendar.svg?react';
 import styles from './BoardTaskCard.module.scss';
 
-type Priority = 'Срочный' | 'Высокий' | 'Средний' | 'Низкий';
+export type BoardTaskCardPriority = 'Срочный' | 'Высокий' | 'Средний' | 'Низкий';
 
 interface Props {
     title: string;
@@ -12,7 +12,7 @@ interface Props {
     dueDate?: string;
     assigneeName: string;
     assigneeAvatar?: string;
-    priority: Priority;
+    priority: BoardTaskCardPriority;
     commentsCount: number;
     avatarFallbackType?: 'user' | 'event';
 }

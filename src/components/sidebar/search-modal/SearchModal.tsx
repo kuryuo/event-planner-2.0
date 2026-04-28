@@ -5,6 +5,7 @@ import {ru} from 'date-fns/locale';
 import Divider from '@/ui/divider/Divider';
 import EventPlate from '@/ui/event-plate/EventPlate';
 import {Card} from '@/ui/card/Card';
+import Chip from '@/ui/chip/Chip';
 import {useGetOrganizersQuery} from '@/services/api/userApi';
 import {buildImageUrl} from '@/utils/buildImageUrl';
 import type {UserEvent} from '@/types/api/Profile';
@@ -198,23 +199,25 @@ export default function SearchModal({
                     {recentSearches.length > 0 ? (
                         <div className={styles.chips}>
                             {recentSearches.map((query) => (
-                                <div key={query} className={styles.recentChip}>
-                                    <button
-                                        type="button"
-                                        className={styles.recentChipSelect}
-                                        onClick={() => onRecentSelect(query)}
-                                    >
-                                        {query}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className={styles.recentChipRemove}
-                                        aria-label={`Удалить запрос ${query}`}
-                                        onClick={() => onRecentRemove(query)}
-                                    >
-                                        ×
-                                    </button>
-                                </div>
+                                <Chip
+                                    key={query}
+                                    text={query}
+                                    size="M"
+                                    variant="filled"
+                                    color="pink"
+                                    className={styles.recentSearchChip}
+                                    style={{
+                                        ['--chip-bg' as string]: 'var(--bg-secondary)',
+                                        ['--chip-color' as string]: 'var(--content-primary)',
+                                    }}
+                                    closable
+                                    onClick={() => onRecentSelect(query)}
+                                    onClose={(event) => {
+                                        event.preventDefault();
+                                        event.stopPropagation();
+                                        onRecentRemove(query);
+                                    }}
+                                />
                             ))}
                         </div>
                     ) : (

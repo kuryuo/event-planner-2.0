@@ -366,6 +366,7 @@
   padding: 0 var(--spacing-2);
   display: inline-flex;
   align-items: center;
+  margin-inline-end: 0 !important;
   @include ty.font(caption-m, regular);
 }
 

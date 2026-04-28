@@ -1,5 +1,6 @@
 import {type ChangeEvent, useEffect, useMemo, useRef, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
+import {Tag} from 'antd';
 import Sidebar from '@/components/sidebar/Sidebar';
 import styles from './ProfilePage.module.scss';
 import ChevronLeftIcon from '@/assets/img/icon-s/chevron-left.svg?react';
@@ -854,10 +855,14 @@ export default function ProfilePage() {
                                                     </span>
                                                     <span>{formatDeadline(task.deadline)}</span>
                                                     <span>
-                                                        <span className={styles.statusChip}>{task.status}</span>
+                                                        <Tag bordered={false} className={styles.statusChip}>
+                                                            {task.status}
+                                                        </Tag>
                                                     </span>
                                                     <span>
-                                                        <span className={styles.priorityChip}>{task.priority}</span>
+                                                        <Tag bordered={false} className={styles.priorityChip}>
+                                                            {task.priority}
+                                                        </Tag>
                                                     </span>
                                                 </div>
                                             ))}
