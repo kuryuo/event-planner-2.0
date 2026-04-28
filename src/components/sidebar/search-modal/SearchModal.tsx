@@ -2,10 +2,9 @@ import {useEffect, useMemo, useState, type RefObject} from 'react';
 import {createPortal} from 'react-dom';
 import {format} from 'date-fns';
 import {ru} from 'date-fns/locale';
-import Divider from '@/ui/divider/Divider';
-import EventPlate from '@/ui/event-plate/EventPlate';
-import {Card} from '@/ui/card/Card';
-import Chip from '@/ui/chip/Chip';
+import {Divider} from "antd";
+import {Avatar} from "antd";
+import {Tag} from 'antd';
 import {useGetOrganizersQuery} from '@/services/api/userApi';
 import {buildImageUrl} from '@/utils/buildImageUrl';
 import type {UserEvent} from '@/types/api/Profile';
@@ -199,16 +198,13 @@ export default function SearchModal({
                     {recentSearches.length > 0 ? (
                         <div className={styles.chips}>
                             {recentSearches.map((query) => (
-                                <Chip
+                                <Tag
                                     key={query}
-                                    text={query}
-                                    size="M"
-                                    variant="filled"
-                                    color="pink"
+                                    bordered={false}
                                     className={styles.recentSearchChip}
                                     style={{
-                                        ['--chip-bg' as string]: 'var(--bg-secondary)',
-                                        ['--chip-color' as string]: 'var(--content-primary)',
+                                        backgroundColor: 'var(--bg-secondary)',
+                                        color: 'var(--content-primary)',
                                     }}
                                     closable
                                     onClick={() => onRecentSelect(query)}
@@ -217,7 +213,9 @@ export default function SearchModal({
                                         event.stopPropagation();
                                         onRecentRemove(query);
                                     }}
-                                />
+                                >
+                                    {query}
+                                </Tag>
                             ))}
                         </div>
                     ) : (
@@ -231,16 +229,23 @@ export default function SearchModal({
                         <div className={styles.list}>
                             {upcomingEvents.map((event, index) => (
                                 <div key={event.id} className={styles.listItem}>
-                                    <EventPlate
-                                        title={event.title}
-                                        date={event.date}
-                                        avatarUrl={event.avatarUrl}
+                                    <button
+                                        type="button"
+                                        className={styles.eventPlate}
                                         onClick={() => {
                                             onTrackSearch(hasQuery ? searchQuery : event.title);
                                             onEventClick(event.id);
                                             onClose();
                                         }}
-                                    />
+                                    >
+                                        <Avatar className={`${styles.eventPlateAvatar} ep-avatar`} shape="square" size={36} src={event.avatarUrl}>
+                                            {(event.title?.[0] ?? "—").toUpperCase()}
+                                        </Avatar>
+                                        <span className={styles.eventPlateText}>
+                                            <span className={styles.eventPlateTitle}>{event.title}</span>
+                                            <span className={styles.eventPlateDate}>{event.date}</span>
+                                        </span>
+                                    </button>
                                     {index < upcomingEvents.length - 1 && <Divider />}
                                 </div>
                             ))}
@@ -256,13 +261,22 @@ export default function SearchModal({
                         <div className={styles.list}>
                             {people.map((person, index) => (
                                 <div key={person.id} className={styles.listItem}>
-                                    <Card
-                                        title={person.title}
-                                        subtitle={person.subtitle}
-                                        avatarUrl={person.avatarUrl}
-                                        size="S"
-                                    />
-                                    {index < people.length - 1 && <Divider />}
+                                    <div style={{display: "flex", alignItems: "center", gap: 12}}>
+                                        <Avatar className="ep-avatar" size={36} src={person.avatarUrl}>
+                                            {(person.title?.[0] ?? "—").toUpperCase()}
+                                        </Avatar>
+                                        <div style={{display: "flex", flexDirection: "column", minWidth: 0}}>
+                                            <span style={{fontWeight: 650, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"}}>
+                                                {person.title}
+                                            </span>
+                                            {person.subtitle ? (
+                                                <span style={{color: "var(--content-secondary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"}}>
+                                                    {person.subtitle}
+                                                </span>
+                                            ) : null}
+                                        </div>
+                                    </div>
+                                    {index < people.length - 1 && <Divider style={{margin: 0}} />}
                                 </div>
                             ))}
                         </div>
@@ -277,16 +291,23 @@ export default function SearchModal({
                         <div className={styles.list}>
                             {archivedEvents.map((event, index) => (
                                 <div key={event.id} className={styles.listItem}>
-                                    <EventPlate
-                                        title={event.title}
-                                        date={event.date}
-                                        avatarUrl={event.avatarUrl}
+                                    <button
+                                        type="button"
+                                        className={styles.eventPlate}
                                         onClick={() => {
                                             onTrackSearch(hasQuery ? searchQuery : event.title);
                                             onEventClick(event.id);
                                             onClose();
                                         }}
-                                    />
+                                    >
+                                        <Avatar className={`${styles.eventPlateAvatar} ep-avatar`} shape="square" size={36} src={event.avatarUrl}>
+                                            {(event.title?.[0] ?? "—").toUpperCase()}
+                                        </Avatar>
+                                        <span className={styles.eventPlateText}>
+                                            <span className={styles.eventPlateTitle}>{event.title}</span>
+                                            <span className={styles.eventPlateDate}>{event.date}</span>
+                                        </span>
+                                    </button>
                                     {index < archivedEvents.length - 1 && <Divider />}
                                 </div>
                             ))}

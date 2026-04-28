@@ -4,7 +4,7 @@
   position: relative;
   top: auto;
   left: auto;
-  background-color: var(--white);
+  background-color: var(--bg-primary);
   border-radius: var(--radius-4);
   box-shadow: var(--lvl2);
   display: flex;
@@ -123,7 +123,7 @@
   overflow-y: auto;
   max-height: 200px;
   scrollbar-width: thin;
-  scrollbar-color: var(--bg-tertiary) var(--white);
+  scrollbar-color: var(--bg-tertiary) var(--bg-primary);
   margin: 0;
   padding: 0;
 }

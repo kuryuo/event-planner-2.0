@@ -1,4 +1,4 @@
-@use '@/typography-variables' as ty;
+@use "@/typography-variables" as ty;
 
 .sidebar {
   display: flex;
@@ -67,6 +67,14 @@
   cursor: pointer;
 }
 
+.userName {
+  @include ty.font(body-m, semibold);
+  color: var(--content-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .search {
   position: relative;
   width: 100%;
@@ -126,4 +134,65 @@
   @include ty.font(caption-m, regular);
   color: var(--content-secondary);
   padding-left: var(--spacing-3);
+}
+
+.eventPlate {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  width: 100%;
+  padding: var(--spacing-2) var(--spacing-3);
+  background: transparent;
+  border-radius: var(--radius-2);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.2s ease;
+}
+
+.eventPlate:hover {
+  background-color: var(--bg-secondary-subtle);
+}
+
+.eventPlate:active {
+  background-color: var(--bg-secondary);
+}
+
+.eventPlateAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-2);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.eventPlateText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-05);
+  min-width: 0;
+  flex: 1;
+}
+
+.eventPlateTitle {
+  @include ty.font(body-m, regular);
+  color: var(--content-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eventPlateDate {
+  @include ty.font(caption-m, regular);
+  color: var(--content-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eventPlateUnreadDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--content-brand-green);
+  flex-shrink: 0;
 }

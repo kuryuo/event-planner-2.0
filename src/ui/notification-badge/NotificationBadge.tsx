@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import Badge from "@/ui/badge/Badge";
+import {Badge} from "antd";
 import styles from "./NotificationBadge.module.scss";
 
 interface NotificationBadgeProps {
@@ -15,9 +15,7 @@ export function NotificationBadge({icon, count, className}: NotificationBadgePro
             {count !== undefined && count > 0 && (
                 <Badge
                     count={count}
-                    variant="text"
-                    color="brand-green"
-                    className={styles.badge}
+                    className={`ep-badge--text ${styles.badge}`}
                 />
             )}
         </div>

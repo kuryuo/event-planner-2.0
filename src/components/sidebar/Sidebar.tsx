@@ -1,11 +1,6 @@
 import styles from './Sidebar.module.scss';
-import {Card} from '@/ui/card/Card.tsx';
-import Divider from '@/ui/divider/Divider.tsx';
-import TextField from '@/ui/text-field/TextField.tsx';
-import NavItem from '@/ui/nav-item/NavItem.tsx';
-import Badge from '@/ui/badge/Badge.tsx';
-import EventPlate from '@/ui/event-plate/EventPlate.tsx';
-import Button from '@/ui/button/Button.tsx';
+import {Avatar, Badge, Divider, Input} from "antd";
+import {Button} from "antd";
 import clsx from 'clsx';
 import {buildImageUrl} from "@/utils/buildImageUrl.ts";
 import {useGetProfileEventsQuery, useGetProfileQuery} from "@/services/api/profileApi.ts";
@@ -184,20 +179,31 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
     return (
         <div className={styles.sidebar}>
             <div className={styles.userCard} onClick={handleProfileClick}>
-                <Card
-                    title={`${profile?.lastName ?? ''} ${profile?.firstName ?? ''}`.trim() || '—'}
-                    avatarUrl={buildImageUrl(profile?.avatarUrl)}
-                />
+                <div style={{display: "flex", alignItems: "center", gap: 12}}>
+                    <Avatar
+                        className="ep-avatar"
+                        size={48}
+                        src={buildImageUrl(profile?.avatarUrl)}
+                    >
+                        {(profile?.firstName?.[0] ?? profile?.lastName?.[0] ?? "—").toUpperCase()}
+                    </Avatar>
+                    <div style={{display: "flex", flexDirection: "column", minWidth: 0}}>
+                        <span className={styles.userName}>
+                            {`${profile?.lastName ?? ''} ${profile?.firstName ?? ''}`.trim() || '—'}
+                        </span>
+                    </div>
+                </div>
             </div>
 
-            <Divider />
+            <Divider style={{margin: 0}} />
 
             <div className={styles.search} ref={searchRef}>
-                <TextField
+                <Input
                     placeholder="Поиск..."
                     value={searchQuery}
-                    leftIcon={<SearchIcon />}
+                    prefix={<SearchIcon />}
                     aria-label="Поиск"
+                    className="ep-input ep-input--m"
                     onChange={(event) => setSearchQuery(event.target.value)}
                     onClick={() => setIsSearchModalOpen(true)}
                     onFocus={() => setIsSearchModalOpen(true)}
@@ -231,74 +237,91 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
                 />
             </div>
 
-            <NavItem
-                label="Уведомления"
-                leftIcon={<BellIcon />}
-                rightIcon={
-                    unreadNotificationsCount > 0 ? (
-                        <Badge count={unreadNotificationsCount} variant="text" color="brand-green" />
-                    ) : null
-                }
+            <Button
+                type="text"
+                className="ep-nav-item"
                 onClick={() => setIsNotificationsOpen(true)}
-            />
+            >
+                <span className="ep-nav-item__left">
+                    <span className="ep-nav-item__icon"><BellIcon/></span>
+                    <span className="ep-nav-item__label">Уведомления</span>
+                </span>
+                <span className="ep-nav-item__icon" aria-hidden="true">
+                    {unreadNotificationsCount > 0 ? (
+                        <Badge count={unreadNotificationsCount} className="ep-badge--text" />
+                    ) : null}
+                </span>
+            </Button>
 
             <NotificationsDrawer
                 open={isNotificationsOpen}
                 onClose={() => setIsNotificationsOpen(false)}
             />
 
-            <Divider />
+            <Divider style={{margin: 0}} />
 
             <div className={styles.navGroup}>
-                <NavItem
-                    label="Календарь"
-                    leftIcon={<CalendarIcon />}
-                    onClick={() => navigate('/main')}
-                />
+                <Button type="text" className="ep-nav-item" onClick={() => navigate('/main')}>
+                    <span className="ep-nav-item__left">
+                        <span className="ep-nav-item__icon"><CalendarIcon/></span>
+                        <span className="ep-nav-item__label">Календарь</span>
+                    </span>
+                    <span className="ep-nav-item__icon" aria-hidden="true" />
+                </Button>
 
-                <NavItem
-                    label="Мои задачи"
-                    leftIcon={<FileLinesIcon />}
-                    rightIcon={<Badge variant="plain" count={tasksCount} />}
-                    onClick={() => navigate('/tasks')}
-                />
+                <Button type="text" className="ep-nav-item" onClick={() => navigate('/tasks')}>
+                    <span className="ep-nav-item__left">
+                        <span className="ep-nav-item__icon"><FileLinesIcon/></span>
+                        <span className="ep-nav-item__label">Мои задачи</span>
+                    </span>
+                    <span className="ep-nav-item__icon" aria-hidden="true">
+                        <span className="ep-badge--plain">{tasksCount}</span>
+                    </span>
+                </Button>
 
                 <div className={styles.eventsSection}>
-                    <NavItem
-                        label="Мои мероприятия"
-                        leftIcon={<FaceSmileIcon />}
-                        rightIcon={
+                    <Button type="text" className="ep-nav-item" onClick={() => setEventsExpanded((v) => !v)}>
+                        <span className="ep-nav-item__left">
+                            <span className="ep-nav-item__icon"><FaceSmileIcon/></span>
+                            <span className="ep-nav-item__label">Мои мероприятия</span>
+                        </span>
+                        <span className="ep-nav-item__icon" aria-hidden="true">
                             <ChevronIcon
                                 className={clsx(
                                     styles.chevron,
                                     eventsExpanded && styles.chevronExpanded
                                 )}
                             />
-                        }
-                        onClick={() => setEventsExpanded((v) => !v)}
-                    />
+                        </span>
+                    </Button>
 
                     {eventsExpanded && (
                         <div className={styles.eventsList}>
                             {eventsList.map((event) => (
-                                <EventPlate
+                                <Button
                                     key={event.id}
-                                    title={event.title}
-                                    date={event.date}
-                                    avatarUrl={event.avatarUrl}
-                                    showUnreadDot={unreadChatEventIds.has(event.id)}
+                                    type="text"
+                                    className={styles.eventPlate}
                                     onClick={() => {
                                         dispatch(clearEventChatUnread(event.id));
                                         navigate(`/event?id=${event.id}`);
                                     }}
-                                />
+                                >
+                                    <Avatar className={`ep-avatar ${styles.eventPlateAvatar}`} shape="square" size={36} src={event.avatarUrl}>
+                                        {(event.title?.[0] ?? "—").toUpperCase()}
+                                    </Avatar>
+                                    <span className={styles.eventPlateText}>
+                                        <span className={styles.eventPlateTitle}>{event.title}</span>
+                                        <span className={styles.eventPlateDate}>{event.date}</span>
+                                    </span>
+                                    {unreadChatEventIds.has(event.id) ? <span className={styles.eventPlateUnreadDot} aria-hidden="true"/> : null}
+                                </Button>
                             ))}
 
                               <Button
-                                  className={styles.createEventButton}
-                                  variant="Text"
-                                  color="default"
-                                  leftIcon={<PlusIcon />}
+                                  type="text"
+                                  className={`${styles.createEventButton} ep-btn ep-btn--m ep-btn--text`}
+                                  icon={<PlusIcon />}
                                   onClick={() => navigate('/editor')}
                                   style={{justifyContent: 'flex-start'}}
                               >
@@ -307,9 +330,8 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
 
                             {import.meta.env.DEV && (
                                 <Button
-                                    className={styles.seedEventsButton}
-                                    variant="Text"
-                                    color="default"
+                                    type="text"
+                                    className={`${styles.seedEventsButton} ep-btn ep-btn--m ep-btn--text`}
                                     onClick={handleCreateAprilEvents}
                                     style={{justifyContent: 'flex-start'}}
                                 >
@@ -321,14 +343,16 @@ export default function Sidebar({notificationCount = 3, tasksCount = 0}: Sidebar
                        )}
                    </div>
 
-                <NavItem
-                    label="Архив"
-                    leftIcon={<BoxArchiveIcon />}
-                    onClick={() => navigate('/archive')}
-                />
+                <Button type="text" className="ep-nav-item" onClick={() => navigate('/archive')}>
+                    <span className="ep-nav-item__left">
+                        <span className="ep-nav-item__icon"><BoxArchiveIcon/></span>
+                        <span className="ep-nav-item__label">Архив</span>
+                    </span>
+                    <span className="ep-nav-item__icon" aria-hidden="true" />
+                </Button>
             </div>
 
-            <Divider />
+            <Divider style={{margin: 0}} />
 
             <div className={styles.themeSection}>
                 <button type="button" className={styles.themeButton} onClick={toggleTheme}>

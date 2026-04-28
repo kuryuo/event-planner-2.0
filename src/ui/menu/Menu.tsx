@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import {Menu as AntMenu} from 'antd';
 import type {MenuProps} from 'antd';
 import styles from './Menu.module.scss';
-import TextField from '../text-field/TextField';
+import {Input} from "antd";
 import Check2Icon from '@/assets/img/icon-m/check2.svg?react';
 import PlusLgIcon from '@/assets/img/icon-s/plus-lg.svg?react';
 
@@ -112,12 +112,13 @@ export default function Menu({
             {withSearch ? (
                 <>
                     <div className={styles.searchWrapper}>
-                        <TextField
+                        <Input
                             placeholder={searchPlaceholder}
                             value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            onClick={(e) => e.stopPropagation()}
-                            onKeyDown={(e) => e.stopPropagation()}
+                            className="ep-input ep-input--m"
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                            onClick={(e: React.MouseEvent<HTMLInputElement>) => e.stopPropagation()}
+                            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.stopPropagation()}
                         />
                     </div>
                     <div className={styles.divider}/>
@@ -126,16 +127,17 @@ export default function Menu({
             {withNewRoleInput ? (
                 <>
                     <div className={styles.newRoleWrapper}>
-                        <TextField
+                        <Input
                             placeholder="новая роль"
                             value={newRoleName}
-                            onChange={(e) => setNewRoleName(e.target.value)}
+                            className="ep-input ep-input--m"
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewRoleName(e.target.value)}
                             onKeyDown={handleNewRoleKeyDown}
-                            onClick={(e) => e.stopPropagation()}
-                            rightIcon={
+                            onClick={(e: React.MouseEvent<HTMLInputElement>) => e.stopPropagation()}
+                            suffix={
                                 <button
                                     type="button"
-                                    onClick={(e) => {
+                                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                         e.stopPropagation();
                                         handleNewRoleCreate();
                                     }}

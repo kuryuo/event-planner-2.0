@@ -1,5 +1,5 @@
 import styles from "./NextEvent.module.scss";
-import Button from "@/ui/button/Button.tsx";
+import {Button} from "antd";
 
 interface NextEventProps {
     title: string;
@@ -26,15 +26,14 @@ export default function NextEvent({
             <div className={styles.actions}>
                 {!isOrganizer && (
                     <Button 
-                        size="M" 
-                        variant="Filled" 
-                        color={isSubscribed ? "gray" : "purple"}
+                        type={isSubscribed ? "default" : "primary"}
+                        className={`ep-btn ep-btn--m ${isSubscribed ? "ep-btn--filled-gray" : "ep-btn--filled-purple"}`}
                         onClick={onAttend}
                     >
                         {isSubscribed ? "Я не пойду" : "Я пойду"}
                     </Button>
                 )}
-                <Button size="M" variant="Text" onClick={onDetails}>
+                <Button type="text" className="ep-btn ep-btn--m ep-btn--text" onClick={onDetails}>
                     Подробнее
                 </Button>
             </div>

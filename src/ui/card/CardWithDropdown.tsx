@@ -1,14 +1,19 @@
 import {useState} from 'react';
 import clsx from 'clsx';
-import {Dropdown} from 'antd';
+import {Avatar, Dropdown} from 'antd';
 import styles from './CardWithDropdown.module.scss';
-import {type CardProps} from './Card.tsx';
-import Avatar from '../avatar/Avatar.tsx';
 import ChevronUpIcon from '@/assets/img/icon-m/chevron-up.svg?react';
 import Menu from '../menu/Menu.tsx';
 
-export interface CardWithDropdownProps extends Omit<CardProps, 'subtitle'> {
+export interface CardWithDropdownProps {
+    size?: 'M' | 'S';
+    avatarShape?: 'circle' | 'square';
+    title: string;
     subtitle: string;
+    avatarUrl?: string;
+    className?: string;
+    children?: React.ReactNode;
+    onClick?: () => void;
     selectOptions: Array<{label?: string; description?: string; content?: React.ReactNode; onClick?: () => void}>;
     rightIcon?: React.ReactNode;
     onRightIconClick?: () => void;
@@ -58,7 +63,14 @@ export function CardWithDropdown({
             role={onClick ? 'button' : undefined}
             tabIndex={onClick ? 0 : undefined}
         >
-            <Avatar size={size} shape={avatarShape} avatarUrl={avatarUrl} name={title}/>
+            <Avatar
+                className="ep-avatar"
+                size={size === 'M' ? 48 : 36}
+                shape={avatarShape}
+                src={avatarUrl}
+            >
+                {(title?.[0] ?? "—").toUpperCase()}
+            </Avatar>
             <div className={styles.content}>
                 <div className={styles.textBlock}>
                     <span className={clsx(styles.title, styles[size])}>{title}</span>
