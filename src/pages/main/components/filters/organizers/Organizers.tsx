@@ -1,6 +1,6 @@
 import {useState, useMemo, useEffect} from "react";
-import Select from "@/ui/select/Select.tsx";
-import {Card} from "@/ui/card/Card.tsx";
+import {Select} from "antd";
+import {Avatar} from "antd";
 import {useGetOrganizersQuery} from "@/services/api/userApi.ts";
 import {buildImageUrl} from "@/utils/buildImageUrl.ts";
 import type {Organizer} from "@/types/api/User.ts";
@@ -32,11 +32,12 @@ export default function Organizers({isOpen, onOpenChange, onSelectedChange, init
             label: fullName,
             description: organizer.city || undefined,
             content: (
-                <Card
-                    title={fullName}
-                    avatarUrl={buildImageUrl(organizer.avatarUrl) || ''}
-                    size="S"
-                />
+                <div style={{display: "flex", alignItems: "center", gap: 12}}>
+                    <Avatar className="ep-avatar" size={36} src={buildImageUrl(organizer.avatarUrl) || undefined}>
+                        {(fullName?.[0] ?? "—").toUpperCase()}
+                    </Avatar>
+                    <span style={{fontWeight: 650}}>{fullName}</span>
+                </div>
             ),
         };
     });
@@ -79,15 +80,23 @@ export default function Organizers({isOpen, onOpenChange, onSelectedChange, init
     return (
         <div>
             <Select
-                label="Организатор"
+                className="ep-select"
                 placeholder="Выберите организатора"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                isOpen={isOpen}
-                onOpenChange={onOpenChange}
+                showSearch
+                value={undefined}
+                searchValue={inputValue}
+                onSearch={(value) => setInputValue(value)}
+                open={isOpen}
+                onDropdownVisibleChange={onOpenChange}
                 disabled={isLoading}
-                options={organizerOptions}
-                onOptionClick={handleOrganizerSelect}
+                options={organizerOptions.map((opt) => ({
+                    value: opt.label,
+                    label: opt.content ?? opt.label,
+                }))}
+                onSelect={(value) => {
+                    handleOrganizerSelect({label: String(value)});
+                    onOpenChange?.(false);
+                }}
             />
             
             {selectedOrganizers.length > 0 && (
@@ -95,14 +104,20 @@ export default function Organizers({isOpen, onOpenChange, onSelectedChange, init
                     {selectedOrganizers.map(organizer => {
                         const fullName = `${organizer.lastName || ''} ${organizer.firstName || ''} ${organizer.middleName || ''}`.trim() || 'Без имени';
                         return (
-                            <Card
-                                key={organizer.id}
-                                title={fullName}
-                                avatarUrl={buildImageUrl(organizer.avatarUrl) || ''}
-                                size="S"
-                                rightIcon={<CloseIcon/>}
-                                onRightIconClick={() => handleRemoveOrganizer(organizer.id)}
-                            />
+                            <div key={organizer.id} className={styles.selectedRow}>
+                                <Avatar className="ep-avatar" size={36} src={buildImageUrl(organizer.avatarUrl) || undefined}>
+                                    {(fullName?.[0] ?? "—").toUpperCase()}
+                                </Avatar>
+                                <span className={styles.selectedName}>{fullName}</span>
+                                <button
+                                    type="button"
+                                    className={styles.removeButton}
+                                    onClick={() => handleRemoveOrganizer(organizer.id)}
+                                    aria-label="Удалить"
+                                >
+                                    <CloseIcon/>
+                                </button>
+                            </div>
                         );
                     })}
                 </div>

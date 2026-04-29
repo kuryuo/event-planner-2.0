@@ -1,9 +1,9 @@
 import {useState, useEffect} from "react";
-import Select from "@/ui/select/Select.tsx";
+import {Select} from "antd";
 import {useChips} from "@/hooks/ui/useChips.ts";
 import styles from "./Category.module.scss";
 import {useGetCategoriesQuery} from "@/services/api/categoryApi.ts";
-import Chip from "@/ui/chip/Chip.tsx";
+import {Tag} from "antd";
 
 interface CategorySelectProps {
     label?: string;
@@ -19,7 +19,6 @@ interface CategorySelectProps {
 
 export default function Tags({
                                       error,
-                                      helperText,
                                       disabled,
                                       isOpen,
                                       onOpenChange,
@@ -44,6 +43,17 @@ export default function Tags({
         )
         : categoryOptions;
 
+    const tagTextStyleM = {
+        fontFamily: "'Manrope', sans-serif",
+        fontSize: 14,
+        fontWeight: 450,
+        lineHeight: "18px",
+        padding: "2px 16px",
+        borderRadius: "999px",
+        marginInlineEnd: 0,
+        userSelect: "none",
+    } as const;
+
     const actualIsOpen = isOpen !== undefined ? isOpen : internalIsOpen;
     const handleOpenChange = (open: boolean) => {
         if (onOpenChange) {
@@ -67,59 +77,66 @@ export default function Tags({
 
     return (
         <div>
+            <div className={styles.label}>Теги</div>
             <Select
-                label="Теги"
+                className="ep-select"
                 placeholder="Выберите тег"
-                value={inputValue}
-                onChange={(e) => {
-                    setInputValue(e.target.value);
-                    if (e.target.value) {
+                mode="multiple"
+                showSearch
+                value={chips}
+                searchValue={inputValue}
+                onSearch={(value) => {
+                    setInputValue(value);
+                    if (value) {
                         handleOpenChange(true);
                     }
                 }}
-                onFocus={() => {
-                    if (categoryOptions.length > 0) {
-                        handleOpenChange(true);
-                    }
-                }}
-                error={error}
-                helperText={helperText}
+                open={actualIsOpen}
+                onDropdownVisibleChange={handleOpenChange}
                 disabled={disabled || isLoading}
-                isOpen={actualIsOpen}
-                onOpenChange={handleOpenChange}
-                options={filteredOptions}
-                selectedValues={chips}
-                onOptionClick={(option) => {
-                    if (option.label) {
-                        if (chips.includes(option.label)) {
-                            removeChip(option.label);
-                            const newChips = chips.filter(c => c !== option.label);
-                            onSelectedChange?.(newChips);
-                        } else {
-                            addChip(option.label);
-                            const newChips = [...chips, option.label];
-                            onSelectedChange?.(newChips);
-                        }
-                        setInputValue('');
-                        handleOpenChange(false);
+                options={filteredOptions.map((opt) => ({
+                    value: opt.label,
+                    label: opt.label,
+                }))}
+                onSelect={(value) => {
+                    const next = String(value);
+                    if (!chips.includes(next)) {
+                        addChip(next);
+                        onSelectedChange?.([...chips, next]);
+                    }
+                    setInputValue('');
+                    handleOpenChange(false);
+                }}
+                onDeselect={(value) => {
+                    const next = String(value);
+                    if (chips.includes(next)) {
+                        removeChip(next);
+                        onSelectedChange?.(chips.filter((c) => c !== next));
                     }
                 }}
+                status={error ? "error" : undefined}
             />
 
             {chips.length > 0 && (
                 <div className={styles.chipContainer}>
                     {chips.map((chip) => (
-                        <Chip
+                        <Tag
                             key={chip}
-                            text={chip}
                             closable
-                            variant="outlined"
                             onClose={() => {
                                 removeChip(chip);
                                 const newChips = chips.filter(c => c !== chip);
                                 onSelectedChange?.(newChips);
                             }}
-                        />
+                            style={{
+                                ...tagTextStyleM,
+                                backgroundColor: "transparent",
+                                color: "var(--content-primary)",
+                                borderColor: "var(--border-primary)",
+                            }}
+                        >
+                            {chip}
+                        </Tag>
                     ))}
                 </div>
             )}

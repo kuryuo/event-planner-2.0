@@ -1,28 +1,32 @@
 import {useState, useRef, useEffect} from 'react';
 import styles from './Filters.module.scss';
-import Checkbox from '@/ui/checkbox/Checkbox';
+import {Checkbox} from "antd";
 import CloseIcon from '@/assets/img/icon-m/x.svg?react';
 import CalendarIcon from '@/assets/img/icon-m/calendar.svg?react';
 import Organizers from "@/pages/main/components/filters/organizers/Organizers";
 import Tags from "@/pages/main/components/filters/category/Category";
-import Switch from "@/ui/switch/Switch.tsx";
-import Button from "@/ui/button/Button";
-import {DatePicker} from "@/ui/date-picker/DatePicker.tsx";
-import type {DateRange} from 'react-day-picker';
+import {Button} from "antd";
+import {DatePicker} from "antd";
+import dayjs from "dayjs";
 import {useClickOutside} from "@/hooks/ui/useClickOutside.ts";
 import {format} from "date-fns";
 import {ru} from "date-fns/locale";
 import type {Organizer} from "@/types/api/User.ts";
 import type {EventTypeKind, GetEventsPayload} from "@/types/api/Event.ts";
 import {useGetOrganizersQuery} from "@/services/api/userApi.ts";
-import Divider from "@/ui/divider/Divider";
-import Chip from "@/ui/chip/Chip";
+import {Divider, Switch} from "antd";
+import {Tag} from "antd";
 
 interface FiltersProps {
     onClose?: () => void;
     onApply?: (filters: GetEventsPayload) => void;
     appliedFilters?: GetEventsPayload;
 }
+
+type DateRangeValue = {
+    from?: Date;
+    to?: Date;
+};
 
 export default function Filters({onClose, onApply, appliedFilters}: FiltersProps) {
     const [formats, setFormats] = useState({
@@ -33,7 +37,7 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
 
     const [myEvents, setMyEvents] = useState(false);
     const [openSelect, setOpenSelect] = useState<'organizers' | 'tags' | null>(null);
-    const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+    const [dateRange, setDateRange] = useState<DateRangeValue | undefined>(undefined);
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [selectedOrganizers, setSelectedOrganizers] = useState<Organizer[]>([]);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -50,6 +54,17 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
         {label: 'Карьерные мероприятия', value: 'CereerEvent'},
     ];
 
+    const tagTextStyleS = {
+        fontFamily: "'Manrope', sans-serif",
+        fontSize: 16,
+        fontWeight: 450,
+        lineHeight: "22px",
+        padding: "2px 12px",
+        borderRadius: "999px",
+        marginInlineEnd: 0,
+        userSelect: "none",
+    } as const;
+
     const toggleType = (value: EventTypeKind) => {
         setSelectedTypes(prev => prev.includes(value)
             ? prev.filter(type => type !== value)
@@ -61,7 +76,7 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
         setFormats(prev => ({...prev, [key]: !prev[key]}));
     };
 
-    const formatDateRange = (range: DateRange | undefined): string => {
+    const formatDateRange = (range: DateRangeValue | undefined): string => {
         if (!range?.from) return '';
         if (!range.to) {
             return format(range.from, 'd MMM yyyy', {locale: ru});
@@ -196,11 +211,28 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
                         />
                         {showDatePicker && (
                             <div className={styles.datePicker}>
-                                <DatePicker
-                                    initialRange={dateRange}
-                                    onRangeChange={(range) => {
-                                        setDateRange(range);
+                                <DatePicker.RangePicker
+                                    value={
+                                        dateRange?.from
+                                            ? [
+                                                dayjs(dateRange.from),
+                                                dateRange.to ? dayjs(dateRange.to) : null,
+                                            ]
+                                            : null
+                                    }
+                                    onChange={(value) => {
+                                        if (!value || (!value[0] && !value[1])) {
+                                            setDateRange(undefined);
+                                            return;
+                                        }
+                                        const [from, to] = value;
+                                        setDateRange({
+                                            from: from ? from.toDate() : undefined,
+                                            to: to ? to.toDate() : undefined,
+                                        });
                                     }}
+                                    open
+                                    allowClear
                                 />
                             </div>
                         )}
@@ -214,6 +246,7 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
                             <label key={key} className={styles.formatItem}>
                                 <Checkbox
                                     checked={formats[key as keyof typeof formats]}
+                                    className="ep-checkbox"
                                     onChange={() => toggleFormat(key as keyof typeof formats)}
                                 />
                                 <span>
@@ -233,13 +266,18 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
                     <div className={styles.typeChips}>
                         {typeChips.map((type) => (
                             selectedTypes.includes(type.value) ? (
-                                <Chip
+                                <Tag
                                     key={type.value}
-                                    text={type.label}
-                                    size="S"
                                     closable
                                     onClose={() => toggleType(type.value)}
-                                />
+                                    style={{
+                                        ...tagTextStyleS,
+                                        backgroundColor: "var(--bg-secondary)",
+                                        color: "var(--content-primary)",
+                                    }}
+                                >
+                                    {type.label}
+                                </Tag>
                             ) : (
                                 <button
                                     key={type.value}
@@ -247,7 +285,17 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
                                     className={styles.typeChipButton}
                                     onClick={() => toggleType(type.value)}
                                 >
-                                    <Chip text={type.label} size="S"/>
+                                    <Tag
+                                        bordered
+                                        style={{
+                                            ...tagTextStyleS,
+                                            backgroundColor: "transparent",
+                                            color: "var(--content-primary)",
+                                            borderColor: "var(--border-primary)",
+                                        }}
+                                    >
+                                        {type.label}
+                                    </Tag>
                                 </button>
                             )
                         ))}
@@ -272,29 +320,27 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
                     />
                 </div>
 
-                <Divider/>
+                <Divider style={{margin: 0}}/>
 
                 <div className={styles.switchRow}>
-                    <Switch
-                        checked={myEvents}
-                        onCheckedChange={setMyEvents}
-                        label="Мои мероприятия"
-                        labelPosition="left"
-                    />
+                    <label>
+                        <span>Мои мероприятия</span>
+                        <Switch checked={myEvents} onChange={setMyEvents} className="ep-switch" />
+                    </label>
                 </div>
 
                 <div className={styles.actions}>
                     <Button
-                        size="M"
-                        variant="Filled"
+                        type="primary"
+                        className={`ep-btn ep-btn--m ep-btn--filled-purple ${styles.actionButton}`}
                         onClick={handleApply}
                     >
                         Применить
                     </Button>
 
                     <Button
-                        size="M"
-                        variant="Text"
+                        type="text"
+                        className={`ep-btn ep-btn--m ep-btn--text ${styles.actionButton}`}
                         onClick={handleClear}
                     >
                         Очистить

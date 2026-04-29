@@ -6,6 +6,36 @@
 :global(.fc) {
   border-radius: inherit;
   overflow: hidden;
+  background-color: var(--bg-primary);
+  --fc-now-indicator-color: var(--border-brand-green) !important;
+}
+
+:global(.fc .fc-scrollgrid),
+:global(.fc .fc-scrollgrid-section) {
+  background: var(--bg-primary);
+}
+
+:global(.fc-theme-standard .fc-scrollgrid-sync-table) {
+  background: var(--bg-primary);
+}
+
+/* Фон ячеек без переопределения вёрстки timeGrid (иначе ломается неделя) */
+:global(.fc-theme-standard .fc-daygrid-day) {
+  background: var(--bg-primary);
+}
+
+:global(.fc-timeGridWeek-view .fc-timegrid-body .fc-timegrid-col),
+:global(.fc-timeGridDay-view .fc-timegrid-body .fc-timegrid-col) {
+  background: var(--bg-primary);
+}
+
+:global(.fc-theme-standard .fc-scrollgrid td),
+:global(.fc-theme-standard .fc-scrollgrid th) {
+  border-color: var(--border-primary);
+}
+
+:global(.fc-theme-standard .fc-col-header-cell) {
+  background: var(--bg-primary);
 }
 
 :global(.fc.fc-theme-standard .fc-daygrid-day-top) {
@@ -57,11 +87,11 @@
 
 :global(.fc.fc-theme-standard .fc-timegrid-slot) {
   height: 32px;
-  border-top: none;
+  border-color: var(--border-primary);
 }
 
-:global(.fc.fc-theme-standard .fc-timegrid-slot-border) {
-  display: none;
+:global(.fc.fc-theme-standard .fc-timegrid-slot-minor) {
+  border-color: var(--border-primary);
 }
 
 :global(.fc.fc-theme-standard .fc-timegrid-col-border) {
@@ -70,10 +100,6 @@
 
 :global(.fc.fc-theme-standard .fc-timegrid-col.fc-day-today) {
   background-color: transparent;
-}
-
-:global(.fc) {
-  --fc-now-indicator-color: var(--border-brand-green) !important;
 }
 
 :global(.fc.fc-theme-standard .fc-timegrid-slot-label-cushion) {

@@ -5,3 +5,33 @@
   margin-top: var(--spacing-2);
 }
 
+.selectedRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.selectedName {
+  flex: 1;
+  min-width: 0;
+  color: var(--content-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.removeButton {
+  border: none;
+  background: transparent;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--content-secondary);
+}
+
+.removeButton:hover {
+  color: var(--content-primary);
+}
+

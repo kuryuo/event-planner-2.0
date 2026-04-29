@@ -1,4 +1,4 @@
-@use '@/typography-variables' as ty;
+@use "@/typography-variables" as ty;
 
 .formWrapper {
   display: flex;
@@ -25,6 +25,12 @@
   outline: none;
   border: none;
   background: transparent;
+
+  &::placeholder {
+    @include ty.font(title-s, semibold);
+    color: var(--content-placeholder);
+    opacity: 1;
+  }
 }
 
 .closeButton {
@@ -96,6 +102,12 @@
   flex: 1;
 }
 
+.venueFieldsStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
 .locationRow {
   display: flex;
   align-items: flex-start;
@@ -123,6 +135,218 @@
   align-items: center;
   gap: var(--spacing-2);
   color: var(--content-primary);
+}
+
+.participantsCreator {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.participantsAutoComplete {
+  flex: 1;
+  min-width: 0;
+}
+
+.participantsAutoComplete :global(.ant-select-selector) {
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.participantsAutoComplete :global(.ant-select-selection-search-input) {
+  @include ty.font(body-m, regular);
+  color: var(--content-primary);
+}
+
+.participantsAutoComplete
+  :global(.ant-select-selection-search-input::placeholder) {
+  @include ty.font(body-m, regular);
+  color: var(--content-placeholder);
+  opacity: 1;
+}
+
+.participantsAutoComplete :global(.ant-select-selection-placeholder) {
+  @include ty.font(body-m, regular);
+  color: var(--content-placeholder);
+}
+
+.participantsAutoComplete :global(input.ant-input) {
+  @include ty.font(body-m, regular);
+  font-family: "Manrope", sans-serif !important;
+  font-size: 18px !important;
+  font-weight: 450 !important;
+  line-height: 24px !important;
+  color: var(--content-primary) !important;
+}
+
+.participantsAutoComplete :global(input.ant-input::placeholder) {
+  @include ty.font(body-m, regular);
+  font-family: "Manrope", sans-serif !important;
+  font-size: 18px !important;
+  font-weight: 450 !important;
+  line-height: 24px !important;
+  color: var(--content-placeholder) !important;
+  opacity: 1;
+}
+
+.participantsAutoComplete :global(.ant-select-selection-placeholder),
+.participantsAutoComplete
+  :global(.ant-select-selection-search-input::placeholder) {
+  @include ty.font(body-m, regular);
+  font-family: "Manrope", sans-serif !important;
+  font-size: 18px !important;
+  font-weight: 450 !important;
+  line-height: 24px !important;
+  color: var(--content-placeholder) !important;
+  opacity: 1;
+}
+
+.participantsAddBtn {
+  height: 44px;
+  white-space: nowrap;
+}
+
+.participantsDropdown {
+  width: 360px;
+  padding: var(--spacing-2);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-2);
+  box-shadow: var(--lvl1);
+}
+
+.participantsOptions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.participantsOption {
+  width: 100%;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-2);
+  border-radius: var(--radius-2);
+  cursor: pointer;
+  text-align: left;
+}
+
+.participantsOption:hover {
+  background: var(--bg-secondary-subtle);
+}
+
+.participantsOptionName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--content-primary);
+  @include ty.font(body-m, regular);
+}
+
+.participantsEmpty {
+  padding: var(--spacing-2);
+  color: var(--content-secondary);
+  @include ty.font(caption-m, regular);
+}
+
+.participantsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.participantRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+}
+
+.participantLeft {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.participantName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--content-primary);
+  @include ty.font(body-m, regular);
+}
+
+.participantRight {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.roleButtonAsSelect {
+  min-width: 170px;
+  height: 40px;
+  border-radius: var(--radius-2);
+  border: 1px solid var(--border-primary);
+  background: var(--bg-primary);
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  color: var(--content-primary);
+  @include ty.font(body-m, regular);
+  cursor: pointer;
+}
+
+.chevronIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.roleMenuItem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: var(--spacing-2);
+}
+
+.roleMenuCheck {
+  width: 16px;
+  height: 16px;
+}
+
+.removeParticipantBtn {
+  border: none;
+  background: transparent;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--content-secondary);
+}
+
+.removeParticipantBtn:hover {
+  background: var(--bg-secondary-subtle);
+  color: var(--content-primary);
+}
+
+.removeParticipantIcon {
+  width: 16px;
+  height: 16px;
 }
 
 .actions {

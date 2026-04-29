@@ -1,9 +1,8 @@
 import {useEffect} from 'react';
 import {Controller, useForm} from 'react-hook-form';
 import styles from "./CreatePostForm.module.scss";
-import Button from "@/ui/button/Button";
-import TextField from "@/ui/text-field/TextField";
-import TextArea from "@/ui/text-area/TextArea";
+import {Button} from "antd";
+import {Input} from "antd";
 import CloseIcon from "@/assets/img/icon-m/x.svg?react";
 
 interface CreatePostFormProps {
@@ -58,11 +57,11 @@ export default function CreatePostForm({onClose, onSubmit, initialTitle, initial
                     control={control}
                     rules={{required: 'Введите заголовок', minLength: {value: 3, message: 'Минимум 3 символа'}}}
                     render={({field}) => (
-                        <TextField
+                        <Input
                             placeholder="Заголовок"
                             value={field.value}
                             onChange={field.onChange}
-                            fieldSize="M"
+                            className="ep-input ep-input--m"
                         />
                     )}
                 />
@@ -71,10 +70,13 @@ export default function CreatePostForm({onClose, onSubmit, initialTitle, initial
                     control={control}
                     rules={{required: 'Введите текст поста', minLength: {value: 10, message: 'Минимум 10 символов'}}}
                     render={({field}) => (
-                        <TextArea
+                        <Input.TextArea
+                            className="ep-textarea"
                             placeholder="Основной текст"
                             value={field.value}
                             onChange={field.onChange}
+                            autoSize={{minRows: 1}}
+                            maxLength={800}
                         />
                     )}
                 />
@@ -83,10 +85,9 @@ export default function CreatePostForm({onClose, onSubmit, initialTitle, initial
                 )}
             </div>
             <Button
-                variant="Filled"
-                color="purple"
+                type="primary"
+                className={`ep-btn ep-btn--m ep-btn--filled-purple ${styles.button}`}
                 onClick={handlePublish}
-                className={styles.button}
                 disabled={isLoading}
             >
                 {isLoading ? "Сохранение..." : (isEditMode ? "Сохранить" : "Опубликовать")}

@@ -31,6 +31,38 @@ export const userApi = baseApi.injectEndpoints({
                 method: 'GET',
             }),
         }),
+        /**
+         * Получить список пользователей (admin)
+         */
+        getAdminUsers: builder.query<
+            Organizer[],
+            {
+                firstName?: string;
+                lastName?: string;
+                profession?: string;
+                city?: string;
+                count?: number;
+                offset?: number;
+            }
+        >({
+            query: ({firstName, lastName, profession, city, count = 20, offset = 0} = {}) => ({
+                url: 'admin/users',
+                method: 'GET',
+                params: {
+                    ...(firstName ? {FirstName: firstName} : {}),
+                    ...(lastName ? {LastName: lastName} : {}),
+                    ...(profession ? {Profession: profession} : {}),
+                    ...(city ? {City: city} : {}),
+                    Count: count,
+                    Offset: offset,
+                },
+            }),
+            transformResponse: (response: any) => {
+                if (Array.isArray(response)) return response;
+                if (Array.isArray(response?.result)) return response.result;
+                return [];
+            },
+        }),
     })
 })
 
@@ -38,5 +70,6 @@ export const {
     useGetUserProfileQuery,
     useGetUserEventsQuery,
     useGetOrganizersQuery,
+    useGetAdminUsersQuery,
 } = userApi;
 

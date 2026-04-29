@@ -1,0 +1,79 @@
+@use '@/typography-variables' as ty;
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.wrapper {
+  height: 44px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: var(--border-disabled);
+  border-radius: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+}
+
+.wrapper[data-variant="time"] {
+  width: 160px;
+  padding: var(--spacing-2) var(--spacing-3);
+}
+
+.icon {
+  color: var(--content-secondary);
+  cursor: pointer;
+}
+
+.input {
+  min-width: 0;
+  height: 40px;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 var(--spacing-2) 0 var(--spacing-3) !important;
+  @include ty.font(body-m, regular);
+  color: var(--content-primary) !important;
+}
+
+.input::placeholder {
+  @include ty.font(body-m, regular);
+  color: var(--content-placeholder) !important;
+  opacity: 1;
+}
+
+.picker {
+  position: absolute;
+  padding: var(--spacing-2);
+  top: calc(100% + var(--spacing-2));
+  left: 0;
+  z-index: 1000;
+  background-color: var(--bg-primary);
+  border-radius: var(--spacing-2);
+  box-shadow: var(--lvl1);
+}
+
+.toggles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.toggleLabel {
+  @include ty.font(body-m, regular);
+  color: var(--content-primary);
+}
+

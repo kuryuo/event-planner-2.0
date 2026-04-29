@@ -3,7 +3,7 @@ import {parseISO, startOfMonth, endOfMonth, isWithinInterval} from 'date-fns';
 import {useNavigate} from 'react-router-dom';
 import {useGetOrganizersQuery} from '@/services/api/userApi.ts';
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
-import EventListCard from '@/ui/event-list-card/EventListCard.tsx';
+import EventListCard from './event-list-card/EventListCard';
 
 interface Event {
     id: string;

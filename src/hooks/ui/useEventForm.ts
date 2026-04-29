@@ -11,6 +11,8 @@ import type {
 import {EVENT_FORMAT_MAP, FORMAT_REVERSE_MAP} from '@/const.ts';
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 import {combineDateTime, parseDateTime} from '@/utils/date';
+import {isValidAddress, isValidUrl} from '@/utils/validation.ts';
+import type {EventParticipantAssignment} from '@/types/api/Event.ts';
 
 const EVENT_TYPE_OPTIONS: EventTypeKind[] = [
     'Hackathon',
@@ -41,8 +43,7 @@ export const useEventForm = (eventData?: EventResponse | null) => {
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const [showCategorySelect, setShowCategorySelect] = useState(false);
-    const [participants, setParticipants] = useState('');
-    const [isParticipantsUnlimited, setIsParticipantsUnlimited] = useState(true);
+    const [participants, setParticipants] = useState<EventParticipantAssignment[]>([]);
     const [description, setDescription] = useState('');
     const [selectedTypes, setSelectedTypes] = useState<EventTypeKind[]>([]);
 
@@ -67,18 +68,25 @@ export const useEventForm = (eventData?: EventResponse | null) => {
         if (eventData && (!isInitialized.current || initializedEventId.current !== eventData.id)) {
             setTitle(eventData.name);
             setDescription(eventData.description || '');
-            setLocation(eventData.location);
-            setAuditorium(eventData.auditorium || '');
 
             const rawVenueFormat = eventData.venueFormat || eventData.format || 'InPerson';
-            setFormat(FORMAT_REVERSE_MAP[rawVenueFormat] || 'Очно');
+            const displayFormat = FORMAT_REVERSE_MAP[rawVenueFormat] || 'Очно';
+            setFormat(displayFormat);
 
-            if (eventData.maxParticipants && eventData.maxParticipants < 999999) {
-                setParticipants(eventData.maxParticipants.toString());
-                setIsParticipantsUnlimited(false);
+            if (displayFormat === 'Онлайн') {
+                const loc = eventData.location?.trim() ?? '';
+                const aud = eventData.auditorium?.trim() ?? '';
+                if (aud) {
+                    setAuditorium(aud);
+                } else if (loc && isValidUrl(loc)) {
+                    setAuditorium(loc);
+                } else {
+                    setAuditorium(eventData.auditorium || '');
+                }
+                setLocation('');
             } else {
-                setParticipants('');
-                setIsParticipantsUnlimited(true);
+                setLocation(eventData.location);
+                setAuditorium(eventData.auditorium || '');
             }
 
             setCategories(eventData.categories ?? []);
@@ -107,6 +115,13 @@ export const useEventForm = (eventData?: EventResponse | null) => {
                 if (time) setEndTime(time);
             }
 
+            // участники (если backend отдаёт responsiblePersonId — назначаем организатором)
+            if (eventData.responsiblePersonId) {
+                setParticipants([{userId: eventData.responsiblePersonId, role: 'Organizer'}]);
+            } else {
+                setParticipants([]);
+            }
+
             isInitialized.current = true;
             initializedEventId.current = eventData.id;
             previousEventDataId.current = currentEventId;
@@ -116,8 +131,7 @@ export const useEventForm = (eventData?: EventResponse | null) => {
             setLocation('');
             setAuditorium('');
             setFormat('Очно');
-            setParticipants('');
-            setIsParticipantsUnlimited(true);
+            setParticipants([]);
             setCategories([]);
             setSelectedTypes([]);
             setAvatarColor('#C2298A');
@@ -137,16 +151,32 @@ export const useEventForm = (eventData?: EventResponse | null) => {
         setSelectedTypes(prev => prev.includes(type) ? prev.filter(item => item !== type) : [...prev, type]);
     };
 
-    const validate = (): string | null => {
-        if (!title.trim()) return 'Необходимо указать название';
-        if (!location.trim()) return 'Необходимо указать место';
+    const validateForm = (): string | null => {
+        if (!title.trim()) return 'Введите название мероприятия';
+        if (format === 'Очно') {
+            if (!location.trim() || !isValidAddress(location)) return 'Введите корректный адрес';
+        } else if (format === 'Онлайн') {
+            if (!auditorium.trim() || !isValidUrl(auditorium)) {
+                return 'Укажите корректную ссылку для подключения (https://...)';
+            }
+        } else if (format === 'Гибрид') {
+            if (!location.trim() || !isValidAddress(location)) return 'Введите корректный адрес';
+            if (!auditorium.trim() || !isValidUrl(auditorium)) {
+                return 'Укажите корректную ссылку для подключения (https://...)';
+            }
+        }
         if (!startDate || !startTime) return 'Необходимо указать дату и время начала';
         if (!endDate || !endTime) return 'Необходимо указать дату и время окончания';
+        if (participants.length === 0) return 'Добавьте хотя бы одного участника';
+        if (!participants.some((p) => p.role === 'Organizer')) return 'Назначьте хотя бы одного организатора';
+        if (!description.trim() || description.trim().length < 10) {
+            return 'Описание должно содержать минимум 10 символов';
+        }
         return null;
     };
 
     const preparePayload = (): CreateEventPayload | UpdateEventPayload | null => {
-        const validationError = validate();
+        const validationError = validateForm();
         if (validationError) {
             console.error(validationError);
             return null;
@@ -161,17 +191,20 @@ export const useEventForm = (eventData?: EventResponse | null) => {
 
         const venueFormat = VENUE_FORMAT_MAP[EVENT_FORMAT_MAP[format] || format] || 'InPerson';
 
+        const payloadLocation = format === 'Онлайн' ? '' : location;
+
         const basePayload = {
             name: title,
             description,
             startDate: startDateTime,
             endDate: endDateTime,
-            location,
+            location: payloadLocation,
             auditorium: auditorium.trim() || null,
             venueFormat,
             categories,
             types: selectedTypes,
-            maxParticipants: isParticipantsUnlimited ? 0 : Number(participants),
+            participants,
+            responsiblePersonId: participants.find((p) => p.role === 'Organizer')?.userId,
             color: avatarColor,
         };
 
@@ -217,8 +250,6 @@ export const useEventForm = (eventData?: EventResponse | null) => {
         setShowCategorySelect,
         participants,
         setParticipants,
-        isParticipantsUnlimited,
-        setIsParticipantsUnlimited,
         description,
         setDescription,
         categories,
@@ -231,6 +262,7 @@ export const useEventForm = (eventData?: EventResponse | null) => {
         toggleEventType,
         eventTypeOptions: EVENT_TYPE_OPTIONS,
         preparePayload,
+        validateForm,
         isEditMode: !!eventData,
     };
 };
