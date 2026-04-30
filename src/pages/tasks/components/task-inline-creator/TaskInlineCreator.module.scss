@@ -2,7 +2,7 @@
   border: 2px solid #86e8d2;
   border-radius: 12px;
   padding: 10px;
-  background: #f8fafc;
+  background: var(--bg-secondary-subtle);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -16,7 +16,7 @@
   padding: 0 12px;
   font-size: 20px;
   color: #22313d;
-  background: #fff;
+  background: var(--bg-primary);
 }
 
 .bottomRow {
@@ -37,7 +37,7 @@
   height: 56px;
   border: 1px solid #d6dde3;
   border-radius: 14px;
-  background: #fff;
+  background: var(--bg-primary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -48,7 +48,7 @@
   height: 56px;
   border: 1px solid #d6dde3;
   border-radius: 14px;
-  background: #fff;
+  background: var(--bg-primary);
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
@@ -84,7 +84,7 @@
   top: calc(100% + 8px);
   left: 0;
   width: 320px;
-  background: #fff;
+  background: var(--bg-primary);
   border: 1px solid #d6dde3;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(34, 49, 61, 0.12);

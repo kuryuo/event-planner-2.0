@@ -15,6 +15,12 @@ const applyTheme = (theme: ThemeMode) => {
     document.documentElement.setAttribute('data-theme', theme);
 };
 
+/** Вызов до React (например из main.tsx), чтобы :root и Ant совпадали с localStorage до первой отрисовки */
+export const applyThemeFromStorage = (): void => {
+    if (typeof window === 'undefined') return;
+    applyTheme(resolveInitialTheme());
+};
+
 export const useTheme = () => {
     const [theme, setTheme] = useState<ThemeMode>(() => resolveInitialTheme());
 

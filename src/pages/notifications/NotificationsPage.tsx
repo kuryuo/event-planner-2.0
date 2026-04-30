@@ -3,7 +3,7 @@ import {useNavigate} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import type {AppDispatch, RootState} from '@/store/store.ts';
 import Sidebar from '@/components/sidebar/Sidebar.tsx';
-import Button from '@/ui/button/Button.tsx';
+import {Button} from "antd";
 import {
     useGetInvitationsQuery,
     useGetNotificationsQuery,
@@ -174,12 +174,12 @@ export default function NotificationsPage() {
                 <div className={styles.header}>
                     <h2>Уведомления</h2>
                     <div className={styles.actions}>
-                        <Button variant="Text" color="default" onClick={() => navigate(-1)}>
+                        <Button type="text" className="ep-btn ep-btn--m ep-btn--text" onClick={() => navigate(-1)}>
                             Назад
                         </Button>
                         <Button
-                            variant="Filled"
-                            color="gray"
+                            type="default"
+                            className="ep-btn ep-btn--m ep-btn--filled-gray"
                             onClick={() => {
                                 dispatch(markAllChatAlertsRead());
                                 void markAllRead();
@@ -235,8 +235,8 @@ export default function NotificationsPage() {
 
                                     <div className={styles.cardControls}>
                                         <Button
-                                            variant="Text"
-                                            color="default"
+                                            type="text"
+                                            className="ep-btn ep-btn--m ep-btn--text"
                                             onClick={() => handleRead(notification)}
                                             disabled={isMarkingRead}
                                         >
@@ -251,16 +251,17 @@ export default function NotificationsPage() {
                                             </div>
                                             <div className={styles.actions}>
                                                 <Button
-                                                    variant="Filled"
-                                                    color="purple"
+                                                    type="primary"
+                                                    className="ep-btn ep-btn--m ep-btn--filled-purple"
                                                     onClick={() => handleRespond(invitation.id, true)}
                                                     disabled={isResponding}
                                                 >
                                                     Принять
                                                 </Button>
                                                 <Button
-                                                    variant="Text"
-                                                    color="red"
+                                                    type="text"
+                                                    danger
+                                                    className="ep-btn ep-btn--m ep-btn--text"
                                                     onClick={() => handleRespond(invitation.id, false)}
                                                     disabled={isResponding}
                                                 >

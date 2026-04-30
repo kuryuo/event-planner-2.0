@@ -57,28 +57,26 @@
   @include ty.font(subtitle-s, regular);
 }
 
-.cubesPlaceholder {
-  width: 240px;
-  display: grid;
-  grid-template-columns: repeat(6, 20px);
-  gap: var(--spacing-1);
-  margin-bottom: var(--spacing-3);
+.emptyState {
+  position: relative;
+  padding: var(--spacing-6) var(--spacing-4);
+  text-align: center;
+}
 
-  span {
-    width: 20px;
-    height: 20px;
-    border-radius: var(--radius-1);
-    background: var(--bg-secondary);
-    opacity: 0.3;
+.emptyPixelsBackdrop {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: min(280px, 70%) auto;
+  opacity: 0.5;
+  pointer-events: none;
+}
 
-    &:nth-child(2n) {
-      opacity: 0.2;
-    }
-
-    &:nth-child(3n) {
-      opacity: 0.5;
-    }
-  }
+.emptyStateMessage {
+  position: relative;
+  z-index: 1;
+  margin: 0;
 }
 
 .dayDivider {
@@ -144,8 +142,17 @@
 }
 
 .ownBubble {
-  background: linear-gradient(90deg, #022434 0%, #011b28 100%);
-  color: var(--content-primary-inverse);
+  background: var(--chat-own-bubble);
+  color: var(--chat-own-text);
+}
+
+.ownBubble .replyPreview {
+  background: var(--chat-own-reply-preview-bg);
+  color: var(--chat-own-reply-preview-text);
+}
+
+.ownBubble .time {
+  color: var(--chat-own-time);
 }
 
 .authorName {
@@ -172,10 +179,6 @@
   position: absolute;
   right: 0;
   bottom: 2px;
-}
-
-.ownBubble .time {
-  color: var(--white-alpha-50);
 }
 
 .replyPreview {
@@ -276,22 +279,22 @@
 }
 
 .ownBubble .fileAttachmentRow {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: var(--chat-own-file-row-bg);
+  border-color: var(--chat-own-file-row-border);
 }
 
 .ownBubble .fileIconWrap {
-  color: #9be6b1;
+  color: var(--chat-own-file-icon);
 }
 
 .ownBubble .fileMeta span:first-child {
-  color: var(--content-primary-inverse);
+  color: var(--chat-own-text);
 }
 
 .ownBubble .fileMeta span:last-child,
 .ownBubble .fileDownloadIcon,
 .ownBubble .fileRemoveRowButton {
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--chat-own-file-muted);
 }
 
 .fileMeta {
@@ -324,8 +327,8 @@
   max-width: 80%;
   height: 40px;
   border-radius: var(--radius-100);
-  background: linear-gradient(90deg, #022434 0%, #011b28 100%);
-  color: var(--content-primary-inverse);
+  background: var(--chat-own-banner);
+  color: var(--chat-own-text);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -340,8 +343,8 @@
     height: 28px;
     border-radius: var(--radius-100);
     padding: 0 var(--spacing-3);
-    border: 1px solid var(--white-alpha-18);
-    color: var(--content-primary-inverse);
+    border: 1px solid var(--chat-own-banner-border);
+    color: var(--chat-own-text);
     background: transparent;
     cursor: pointer;
   }

@@ -1,8 +1,8 @@
 import styles from './PhotosGallery.module.scss';
 import {buildImageUrl} from '@/utils/buildImageUrl';
 import PhotoViewer from './PhotoViewer';
-import Button from '@/ui/button/Button';
-import Checkbox from '@/ui/checkbox/Checkbox';
+import {Button} from "antd";
+import {Checkbox} from "antd";
 import PlusLgIcon from '@/assets/img/icon-m/plus-lg.svg?react';
 import TrashIcon from '@/assets/img/icon-m/trash.svg?react';
 import {usePhotosGallery} from '@/hooks/ui/usePhotosGallery';
@@ -55,17 +55,17 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
                     <div className={styles.controls}>
                         <div className={styles.leftControls}>
                             <Button
-                                variant="Filled"
-                                color="gray"
-                                leftIcon={<PlusLgIcon className={styles.icon}/>}
+                                type="default"
+                                icon={<PlusLgIcon className={styles.icon}/>}
+                                className="ep-btn ep-btn--m ep-btn--filled-gray"
                                 onClick={handleUploadClick}
                                 disabled={isUploading}
                             >
                                 {isUploading ? 'Загрузка...' : 'Загрузить'}
                             </Button>
                             <Button
-                                variant={isSelectionMode ? "Filled" : "Text"}
-                                color={isSelectionMode ? "purple" : "gray"}
+                                type={isSelectionMode ? "primary" : "text"}
+                                className={`ep-btn ep-btn--m ${isSelectionMode ? "ep-btn--filled-purple" : "ep-btn--text"}`}
                                 onClick={handleSelectModeToggle}
                             >
                                 Выбрать
@@ -74,9 +74,10 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
                         {hasSelectedPhotos && (
                             <div className={styles.rightControls}>
                                 <Button
-                                    variant="Filled"
-                                    color="red"
-                                    leftIcon={<TrashIcon className={styles.icon}/>}
+                                    type="primary"
+                                    danger
+                                    icon={<TrashIcon className={styles.icon}/>}
+                                    className="ep-btn ep-btn--m"
                                     onClick={handleDeleteSelected}
                                     disabled={isDeleting}
                                 >
@@ -101,12 +102,11 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
                         <h3 className={styles.emptyTitle}>Добавьте фото или видео</h3>
                         <p className={styles.emptyText}>Перетащите файлы сюда или нажмите на кнопку ниже</p>
                         <Button
-                            variant="Filled"
-                            color="purple"
-                            leftIcon={<PlusLgIcon className={styles.icon}/>}
+                            type="primary"
+                            icon={<PlusLgIcon className={styles.icon}/>}
+                            className={`ep-btn ep-btn--m ep-btn--filled-purple ${styles.emptyUploadButton}`}
                             onClick={handleUploadClick}
                             disabled={isUploading}
-                            className={styles.emptyUploadButton}
                         >
                             {isUploading ? 'Загрузка...' : 'Добавить документ'}
                         </Button>
@@ -131,6 +131,7 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
                                         <div className={styles.checkboxWrapper} onClick={(e) => e.stopPropagation()}>
                                             <Checkbox
                                                 checked={isSelected}
+                                                className="ep-checkbox"
                                                 onChange={() => handlePhotoClick(photo.id, index)}
                                             />
                                         </div>

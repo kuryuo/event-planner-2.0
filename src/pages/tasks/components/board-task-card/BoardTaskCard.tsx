@@ -1,8 +1,8 @@
-import Avatar from '@/ui/avatar/Avatar';
-import Chip from '@/ui/chip/Chip';
+import {Avatar} from "antd";
 import ChatIcon from '@/assets/img/icon-m/chat.svg?react';
 import CalendarIcon from '@/assets/img/icon-m/calendar.svg?react';
 import styles from './BoardTaskCard.module.scss';
+import {Tag} from "antd";
 
 export type BoardTaskCardPriority = 'Срочный' | 'Высокий' | 'Средний' | 'Низкий';
 
@@ -32,10 +32,31 @@ const priorityColorByValue = {
     'Низкий': 'green',
 } as const;
 
-export default function BoardTaskCard({title, description, dueDate, assigneeName, assigneeAvatar, priority, commentsCount, avatarFallbackType = 'user'}: Props) {
+export default function BoardTaskCard({title, description, dueDate, assigneeName, assigneeAvatar, priority, commentsCount}: Props) {
+    const tagTextStyleS = {
+        fontFamily: "'Manrope', sans-serif",
+        fontSize: 16,
+        fontWeight: 450,
+        lineHeight: "22px",
+        padding: "2px 12px",
+        borderRadius: "999px",
+        marginInlineEnd: 0,
+        userSelect: "none",
+    } as const;
+    const priorityColor = priorityColorByValue[priority];
+
     return (
         <article className={styles.card}>
-            <Chip text={priority} size="S" variant="filled" color={priorityColorByValue[priority]}/>
+            <Tag
+                bordered={false}
+                style={{
+                    ...tagTextStyleS,
+                    backgroundColor: `var(--bg-${priorityColor})`,
+                    color: `var(--content-${priorityColor})`,
+                }}
+            >
+                {priority}
+            </Tag>
 
             <div className={styles.textBlock}>
                 <h4>{title}</h4>
@@ -44,7 +65,9 @@ export default function BoardTaskCard({title, description, dueDate, assigneeName
 
             <div className={styles.metaRow}>
                 <div className={styles.assignee}>
-                    <Avatar size="S" avatarUrl={assigneeAvatar} name={assigneeName} fallbackType={avatarFallbackType}/>
+                    <Avatar className="ep-avatar" size={36} src={assigneeAvatar}>
+                        {(assigneeName?.[0] ?? "—").toUpperCase()}
+                    </Avatar>
                     <span>{assigneeName}</span>
                 </div>
 

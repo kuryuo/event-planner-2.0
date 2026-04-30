@@ -25,11 +25,10 @@ import SendIcon from "@/assets/image/send.svg?react";
 import FaceSmileIcon from "@/assets/image/face-smile.svg?react";
 import XLgIcon from "@/assets/img/icon-m/x.svg?react";
 import type { RootState } from "@/store/store.ts";
-import Checkbox from "@/ui/checkbox/Checkbox";
-import Switch from "@/ui/switch/Switch";
+import {Checkbox, Switch} from "antd";
 import BoardTaskCard from "@/pages/tasks/components/board-task-card/BoardTaskCard";
 import { buildImageUrl } from "@/utils/buildImageUrl.ts";
-import Avatar from "@/ui/avatar/Avatar";
+import {Avatar} from "antd";
 import {
   useGetTaskCommentsQuery,
   useGetTaskHistoryQuery,
@@ -394,6 +393,7 @@ export default function TasksPage() {
                       <label>
                         <Checkbox
                           checked={filterDeadlineOverdue}
+                          className="ep-checkbox"
                           onChange={() =>
                             setFilterDeadlineOverdue((prev) => !prev)
                           }
@@ -403,6 +403,7 @@ export default function TasksPage() {
                       <label>
                         <Checkbox
                           checked={filterDeadlineToday}
+                          className="ep-checkbox"
                           onChange={() =>
                             setFilterDeadlineToday((prev) => !prev)
                           }
@@ -412,6 +413,7 @@ export default function TasksPage() {
                       <label>
                         <Checkbox
                           checked={filterDeadlineTomorrow}
+                          className="ep-checkbox"
                           onChange={() =>
                             setFilterDeadlineTomorrow((prev) => !prev)
                           }
@@ -421,6 +423,7 @@ export default function TasksPage() {
                       <label>
                         <Checkbox
                           checked={filterDeadlineThisWeek}
+                          className="ep-checkbox"
                           onChange={() =>
                             setFilterDeadlineThisWeek((prev) => !prev)
                           }
@@ -441,6 +444,7 @@ export default function TasksPage() {
                               checked={selectedAssigneeIds.includes(
                                 assignee.id
                               )}
+                              className="ep-checkbox"
                               onChange={() =>
                                 setSelectedAssigneeIds((prev) =>
                                   prev.includes(assignee.id)
@@ -458,6 +462,7 @@ export default function TasksPage() {
                       <label>
                         <Checkbox
                           checked={filterPriorityUrgent}
+                          className="ep-checkbox"
                           onChange={() =>
                             setFilterPriorityUrgent((prev) => !prev)
                           }
@@ -467,6 +472,7 @@ export default function TasksPage() {
                       <label>
                         <Checkbox
                           checked={filterPriorityHigh}
+                          className="ep-checkbox"
                           onChange={() =>
                             setFilterPriorityHigh((prev) => !prev)
                           }
@@ -476,6 +482,7 @@ export default function TasksPage() {
                       <label>
                         <Checkbox
                           checked={filterPriorityMedium}
+                          className="ep-checkbox"
                           onChange={() =>
                             setFilterPriorityMedium((prev) => !prev)
                           }
@@ -485,6 +492,7 @@ export default function TasksPage() {
                       <label>
                         <Checkbox
                           checked={filterPriorityLow}
+                          className="ep-checkbox"
                           onChange={() => setFilterPriorityLow((prev) => !prev)}
                         />
                         Низкий
@@ -493,8 +501,8 @@ export default function TasksPage() {
                       <div className={styles.onlyMyWrap}>
                         <Switch
                           checked={onlyMyTasks}
-                          onCheckedChange={setOnlyMyTasks}
-                          size="M"
+                          onChange={setOnlyMyTasks}
+                          className="ep-switch"
                         />
                         <span>Только мои задачи</span>
                       </div>
@@ -666,10 +674,12 @@ export default function TasksPage() {
                 <span>Исполнитель</span>
                 <strong className={styles.assignee}>
                   <Avatar
-                    size="XS"
-                    avatarUrl={selectedTask.assigneeAvatar}
-                    name={selectedTask.assigneeName}
-                  />
+                    className="ep-avatar"
+                    size={24}
+                    src={selectedTask.assigneeAvatar}
+                  >
+                    {(selectedTask.assigneeName?.[0] ?? "—").toUpperCase()}
+                  </Avatar>
                   {selectedTask.assigneeName}
                 </strong>
               </div>

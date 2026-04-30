@@ -20,16 +20,16 @@ import StatusIcon from "@/assets/image/status.svg?react";
 import TextLeftIcon from "@/assets/image/text-left.svg?react";
 import SendIcon from "@/assets/image/send.svg?react";
 import FaceSmileIcon from "@/assets/image/face-smile.svg?react";
-import Button from "@/ui/button/Button";
-import Checkbox from "@/ui/checkbox/Checkbox";
-import Switch from "@/ui/switch/Switch";
-import Avatar from "@/ui/avatar/Avatar";
+import {Checkbox, Switch} from "antd";
+import {Avatar} from "antd";
+import {Calendar} from "antd";
+import dayjs from "dayjs";
 import { useSelector } from "react-redux";
 import BoardColumnHeader from "@/pages/tasks/components/BoardColumnHeader";
 import AddColumnButton from "@/pages/tasks/components/AddColumnButton";
 import BoardTaskCard from "@/pages/tasks/components/board-task-card/BoardTaskCard";
 import ProfileActionModal from "@/components/profile-action-modal/ProfileActionModal";
-import { SingleDatePicker } from "@/ui/date-picker/SingleDatePicker";
+import {Button as AntButton} from "antd";
 import {
   useCreateBoardColumnMutation,
   useCreateBoardTaskMutation,
@@ -553,6 +553,7 @@ export default function EventKanbanTab({ eventId }: Props) {
                 <label>
                   <Checkbox
                     checked={filterDeadlineOverdue}
+                    className="ep-checkbox"
                     onChange={() => setFilterDeadlineOverdue((prev) => !prev)}
                   />
                   Просрочен
@@ -560,6 +561,7 @@ export default function EventKanbanTab({ eventId }: Props) {
                 <label>
                   <Checkbox
                     checked={filterDeadlineToday}
+                    className="ep-checkbox"
                     onChange={() => setFilterDeadlineToday((prev) => !prev)}
                   />
                   Сегодня
@@ -567,6 +569,7 @@ export default function EventKanbanTab({ eventId }: Props) {
                 <label>
                   <Checkbox
                     checked={filterDeadlineTomorrow}
+                    className="ep-checkbox"
                     onChange={() => setFilterDeadlineTomorrow((prev) => !prev)}
                   />
                   Завтра
@@ -574,6 +577,7 @@ export default function EventKanbanTab({ eventId }: Props) {
                 <label>
                   <Checkbox
                     checked={filterDeadlineThisWeek}
+                    className="ep-checkbox"
                     onChange={() => setFilterDeadlineThisWeek((prev) => !prev)}
                   />
                   На этой неделе
@@ -590,6 +594,7 @@ export default function EventKanbanTab({ eventId }: Props) {
                     <label key={assignee.id}>
                       <Checkbox
                         checked={selectedAssigneeIds.includes(assignee.id)}
+                        className="ep-checkbox"
                         onChange={() =>
                           setSelectedAssigneeIds((prev) =>
                             prev.includes(assignee.id)
@@ -607,6 +612,7 @@ export default function EventKanbanTab({ eventId }: Props) {
                 <label>
                   <Checkbox
                     checked={filterPriorityUrgent}
+                    className="ep-checkbox"
                     onChange={() => setFilterPriorityUrgent((prev) => !prev)}
                   />
                   Срочный
@@ -614,6 +620,7 @@ export default function EventKanbanTab({ eventId }: Props) {
                 <label>
                   <Checkbox
                     checked={filterPriorityHigh}
+                    className="ep-checkbox"
                     onChange={() => setFilterPriorityHigh((prev) => !prev)}
                   />
                   Высокий
@@ -621,6 +628,7 @@ export default function EventKanbanTab({ eventId }: Props) {
                 <label>
                   <Checkbox
                     checked={filterPriorityMedium}
+                    className="ep-checkbox"
                     onChange={() => setFilterPriorityMedium((prev) => !prev)}
                   />
                   Средний
@@ -628,6 +636,7 @@ export default function EventKanbanTab({ eventId }: Props) {
                 <label>
                   <Checkbox
                     checked={filterPriorityLow}
+                    className="ep-checkbox"
                     onChange={() => setFilterPriorityLow((prev) => !prev)}
                   />
                   Низкий
@@ -636,8 +645,8 @@ export default function EventKanbanTab({ eventId }: Props) {
                 <div className={styles.onlyMyWrap}>
                   <Switch
                     checked={onlyMyTasks}
-                    onCheckedChange={setOnlyMyTasks}
-                    size="M"
+                    onChange={setOnlyMyTasks}
+                    className="ep-switch"
                   />
                   <span>Только мои задачи</span>
                 </div>
@@ -717,15 +726,14 @@ export default function EventKanbanTab({ eventId }: Props) {
               </div>
             )}
           </div>
-          <Button
-            size="S"
-            variant="Filled"
-            color="green"
-            leftIcon={<PlusIcon />}
+          <AntButton
+            type="primary"
+            icon={<PlusIcon />}
+            className="ep-btn ep-btn--s ep-btn--filled-green"
             onClick={handleCreateTaskGlobal}
           >
             Создать задачу
-          </Button>
+          </AntButton>
         </div>
       </div>
 
@@ -854,9 +862,11 @@ export default function EventKanbanTab({ eventId }: Props) {
                   <div
                     className={`${styles.createTaskMenu} ${styles.createTaskCalendarMenu}`}
                   >
-                    <SingleDatePicker
-                      initialDate={taskDeadline}
-                      onDateChange={(date) => {
+                    <Calendar
+                      fullscreen={false}
+                      value={taskDeadline ? dayjs(taskDeadline) : undefined}
+                      onSelect={(value) => {
+                        const date = value?.toDate();
                         setTaskDeadline(date);
                         if (date) setIsDeadlineOpen(false);
                       }}
@@ -953,23 +963,21 @@ export default function EventKanbanTab({ eventId }: Props) {
             </div>
 
             <div className={styles.createTaskActions}>
-              <Button
-                variant="Filled"
-                color="gray"
-                size="S"
+              <AntButton
+                type="default"
+                className="ep-btn ep-btn--s ep-btn--filled-gray"
                 onClick={handleSubmitTaskFromPanel}
                 disabled={!taskTitle.trim()}
               >
                 {editingTask ? "Сохранить" : "Создать"}
-              </Button>
-              <Button
-                variant="Text"
-                color="default"
-                size="S"
+              </AntButton>
+              <AntButton
+                type="text"
+                className="ep-btn ep-btn--s ep-btn--text"
                 onClick={() => setIsCreateTaskPanelOpen(false)}
               >
                 Отменить
-              </Button>
+              </AntButton>
             </div>
           </aside>
         </>
@@ -1079,10 +1087,12 @@ export default function EventKanbanTab({ eventId }: Props) {
               <span>Исполнитель</span>
               <strong className={styles.assignee}>
                 <Avatar
-                  size="XS"
-                  avatarUrl={selectedTask.assigneeAvatar}
-                  name={selectedTask.assigneeName}
-                />
+                  className="ep-avatar"
+                  size={24}
+                  src={selectedTask.assigneeAvatar}
+                >
+                  {(selectedTask.assigneeName?.[0] ?? "—").toUpperCase()}
+                </Avatar>
                 {selectedTask.assigneeName}
               </strong>
             </div>

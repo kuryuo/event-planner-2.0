@@ -1,6 +1,6 @@
 import {format} from 'date-fns';
 import {ru} from 'date-fns/locale';
-import Chip from '@/ui/chip/Chip.tsx';
+import {Tag} from "antd";
 import CalendarIcon from '@/assets/img/icon-m/calendar.svg?react';
 import GeoAltIcon from '@/assets/img/icon-m/geo-alt.svg?react';
 import styles from './ArchiveEventCard.module.scss';
@@ -24,14 +24,42 @@ export default function ArchiveEventCard({event, onClick}: ArchiveEventCardProps
     const date = format(new Date(event.startDate), 'd MMMM, HH:mm', {locale: ru});
     const category = event.categories?.[0] ?? 'Категория';
     const preview = buildImageUrl(event.avatar) ?? buildImageUrl(event.previewPhotos?.[0]) ?? FALLBACK_PREVIEW;
+    const tagTextStyleM = {
+        fontFamily: "'Manrope', sans-serif",
+        fontSize: 14,
+        fontWeight: 450,
+        lineHeight: "18px",
+        padding: "2px 16px",
+        borderRadius: "999px",
+        marginInlineEnd: 0,
+        userSelect: "none",
+    } as const;
 
     return (
         <article className={styles.card} onClick={() => onClick(event.id)}>
             <img className={styles.preview} src={preview} alt={event.name}/>
 
             <div className={styles.chipsRow}>
-                <Chip text={category} size="M" variant="filled" color="orange"/>
-                <Chip text="Вы редактор" size="M" variant="filled" color="cyan"/>
+                <Tag
+                    bordered={false}
+                    style={{
+                        ...tagTextStyleM,
+                        backgroundColor: "var(--bg-orange)",
+                        color: "var(--content-orange)",
+                    }}
+                >
+                    {category}
+                </Tag>
+                <Tag
+                    bordered={false}
+                    style={{
+                        ...tagTextStyleM,
+                        backgroundColor: "var(--bg-cyan)",
+                        color: "var(--content-cyan)",
+                    }}
+                >
+                    Вы редактор
+                </Tag>
             </div>
 
             <h3 className={styles.title}>{event.name}</h3>

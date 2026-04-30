@@ -7,9 +7,8 @@ import ChevronDownIcon from '@/assets/img/icon-m/chevron-down.svg?react';
 import Check2Icon from '@/assets/img/icon-m/check2.svg?react';
 import ThreeDotsVerticalIcon from '@/assets/img/icon-m/three-dots-vertical.svg?react';
 import TrashIcon from '@/assets/img/icon-m/trash.svg?react';
-import Avatar from '@/ui/avatar/Avatar';
-import Button from '@/ui/button/Button';
-import Tabs, {type TabItem} from '@/ui/tabs/Tabs';
+import {Avatar, Tabs} from "antd";
+import {Button} from "antd";
 import {useEventDeleter} from '@/hooks/ui/useEventDeleter.ts';
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 import {useGetProfileEventsQuery} from "@/services/api/profileApi.ts";
@@ -150,7 +149,7 @@ export default function Header({
         [selectedStatus],
     );
 
-    const tabItems: TabItem[] = isArchived
+    const tabItems = isArchived
         ? [{label: 'Обзор'}, {label: 'Документы'}, {label: 'Медиа'}]
         : [{label: 'Обзор'}, {label: 'Документы'}, {label: 'Kanban доска'}, {label: 'Чат'}, {label: 'Медиа'}];
     const isOverviewTabActive = activeTab === 0;
@@ -187,21 +186,34 @@ export default function Header({
         <header className={styles.header}>
             {showSummary && <div className={styles.summaryRow}>
                 <div className={styles.summaryLeft}>
-                    <Avatar size="S" shape="square" fallbackType="event" name={name} avatarUrl={buildImageUrl(avatar)}/>
+                    <Avatar className="ep-avatar" shape="square" size={36} src={buildImageUrl(avatar)}>
+                        {(name?.[0] ?? "—").toUpperCase()}
+                    </Avatar>
                     <h2 className={styles.summaryTitle}>{name}</h2>
                     <span className={styles.summaryStatus}>{selectedStatus}</span>
                     <span className={styles.summaryRole}>{isAdmin ? 'Вы организатор' : 'Вы участник'}</span>
                 </div>
             </div>}
 
-            {showTabs && <div className={styles.tabs}>
-                <Tabs items={tabItems} activeIndex={activeTab} onChange={handleTabChange}/>
-            </div>}
+            {showTabs && (
+                <div className={styles.tabs}>
+                    <Tabs
+                        activeKey={String(activeTab)}
+                        onChange={(key) => handleTabChange(Number(key))}
+                        items={tabItems.map((item, index) => ({
+                            key: String(index),
+                            label: item.label,
+                        }))}
+                    />
+                </div>
+            )}
 
             {showMain && !isArchived && isOverviewTabActive && (
                 <div className={styles.main}>
                     <div className={styles.left}>
-                        <Avatar size="L" shape="square" fallbackType="event" name={name} avatarUrl={buildImageUrl(avatar)}/>
+                        <Avatar className="ep-avatar" shape="square" size={64} src={buildImageUrl(avatar)}>
+                            {(name?.[0] ?? "—").toUpperCase()}
+                        </Avatar>
                         <h2 className={styles.title}>{name}</h2>
 
                         <div className={styles.statusWrapper}>
@@ -231,7 +243,12 @@ export default function Header({
                     <div className={styles.right}>
                         {isAdmin ? (
                         <div className={styles.adminActions}>
-                            <Button variant="Filled" color="gray" onClick={handleEdit} disabled={isReadOnlyLifecycle}>
+                            <Button
+                                type="default"
+                                className="ep-btn ep-btn--m ep-btn--filled-gray"
+                                onClick={handleEdit}
+                                disabled={isReadOnlyLifecycle}
+                            >
                                 Редактировать
                             </Button>
                             <Dropdown
@@ -242,9 +259,8 @@ export default function Header({
                                 dropdownRender={() => (
                                     <div className={styles.dropdown} onClick={(e) => e.stopPropagation()}>
                                         <Button
-                                            className={styles.dropdownAction}
-                                            variant="Text"
-                                            color="gray"
+                                            type="text"
+                                            className={`${styles.dropdownAction} ep-btn ep-btn--m ep-btn--text`}
                                             onClick={async () => {
                                                 if (!eventId) return;
                                                 try {
@@ -260,9 +276,8 @@ export default function Header({
                                             {isCancelledNow ? 'Снять отмену' : 'Отменить мероприятие'}
                                         </Button>
                                         <Button
-                                            className={styles.dropdownAction}
-                                            variant="Text"
-                                            color="gray"
+                                            type="text"
+                                            className={`${styles.dropdownAction} ep-btn ep-btn--m ep-btn--text`}
                                             onClick={async () => {
                                                 if (!eventId) return;
                                                 const templateName = window.prompt('Название шаблона', `${name} шаблон`);
@@ -279,10 +294,10 @@ export default function Header({
                                             {isCopyingTemplate ? 'Создаем...' : 'Сохранить как шаблон'}
                                         </Button>
                                         <Button
-                                            className={styles.dropdownAction}
-                                            variant="Text"
-                                            color="red"
-                                            leftIcon={<TrashIcon className={styles.trashIcon}/>}
+                                            type="text"
+                                            danger
+                                            icon={<TrashIcon className={styles.trashIcon}/>}
+                                            className={`${styles.dropdownAction} ep-btn ep-btn--m ep-btn--text`}
                                             onClick={handleDeleteClick}
                                             disabled={isDeleting}
                                         >
@@ -304,8 +319,8 @@ export default function Header({
                         </div>
                     ) : (
                         <Button 
-                            variant="Filled" 
-                            color={isSubscribed ? "gray" : "purple"}
+                            type={isSubscribed ? "default" : "primary"}
+                            className={`ep-btn ep-btn--m ${isSubscribed ? "ep-btn--filled-gray" : "ep-btn--filled-purple"}`}
                             disabled={isReadOnlyLifecycle}
                             onClick={handleSubscribeClick}
                         >

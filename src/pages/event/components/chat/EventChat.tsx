@@ -9,9 +9,8 @@ import {
 import EmojiPicker, {type EmojiClickData} from 'emoji-picker-react';
 import clsx from 'clsx';
 import {useDispatch} from 'react-redux';
-import TextField from '@/ui/text-field/TextField.tsx';
-import Avatar from '@/ui/avatar/Avatar.tsx';
-import Chip from '@/ui/chip/Chip.tsx';
+import {Input} from "antd";
+import {Avatar} from "antd";
 import ProfileActionModal from '@/components/profile-action-modal/ProfileActionModal.tsx';
 import {useGetProfileQuery} from '@/services/api/profileApi.ts';
 import {
@@ -33,11 +32,13 @@ import Check2Icon from '@/assets/img/icon-m/check2.svg?react';
 import XIcon from '@/assets/img/icon-s/x.svg?react';
 import DownloadIcon from '@/assets/img/icon-m/download.svg?react';
 import FileLinesIcon from '@/assets/image/file-lines.svg?react';
+import pixelsArt from '@/assets/image/pixels.svg?url';
 import styles from './EventChat.module.scss';
 import type {ChatAttachment, ChatMessage} from '@/types/api/Chat.ts';
 import {useChatSignalR} from '@/hooks/realtime/useChatSignalR.ts';
 import type {AppDispatch} from '@/store/store.ts';
 import {clearEventChatUnread} from '@/store/realtimeSlice.ts';
+import {Tag} from "antd";
 
 interface EventChatProps {
     eventId: string;
@@ -184,6 +185,17 @@ export default function EventChat({eventId}: EventChatProps) {
     const sortedMessages = useMemo(() => {
         return [...messages].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
     }, [messages]);
+
+    const tagTextStyleM = {
+        fontFamily: "'Manrope', sans-serif",
+        fontSize: 14,
+        fontWeight: 450,
+        lineHeight: "18px",
+        padding: "2px 16px",
+        borderRadius: "999px",
+        marginInlineEnd: 0,
+        userSelect: "none",
+    } as const;
 
     const messageById = useMemo(() => {
         return new Map(sortedMessages.map((message) => [message.id, message]));
@@ -531,10 +543,12 @@ export default function EventChat({eventId}: EventChatProps) {
                             <div className={styles.centerState}>Загрузка сообщений...</div>
                         ) : sortedMessages.length === 0 ? (
                             <div className={styles.emptyState}>
-                                <div className={styles.cubesPlaceholder}>
-                                    {Array.from({length: 18}, (_, index) => <span key={index}/>) }
-                                </div>
-                                <p>Напишите первое сообщение</p>
+                                <div
+                                    className={styles.emptyPixelsBackdrop}
+                                    style={{backgroundImage: `url(${pixelsArt})`}}
+                                    aria-hidden
+                                />
+                                <p className={styles.emptyStateMessage}>Напишите первое сообщение</p>
                             </div>
                         ) : (
                             <>
@@ -553,7 +567,16 @@ export default function EventChat({eventId}: EventChatProps) {
                                         <div key={message.id}>
                                             {showDateDivider && (
                                                 <div className={styles.dayDivider}>
-                                                    <Chip text={currentDate} size="M" variant="filled" color="cyan"/>
+                                                    <Tag
+                                                        bordered={false}
+                                                        style={{
+                                                            ...tagTextStyleM,
+                                                            backgroundColor: "var(--bg-cyan)",
+                                                            color: "var(--content-cyan)",
+                                                        }}
+                                                    >
+                                                        {currentDate}
+                                                    </Tag>
                                                 </div>
                                             )}
 
@@ -576,18 +599,20 @@ export default function EventChat({eventId}: EventChatProps) {
                                             >
                                                 {isOwn ? (
                                                     <Avatar
-                                                        size="XS"
-                                                        avatarUrl={buildImageUrl(profile?.avatarUrl)}
-                                                        name={profile?.firstName || 'Вы'}
-                                                        className={styles.messageAvatar}
-                                                    />
+                                                        className={`${styles.messageAvatar} ep-avatar`}
+                                                        size={24}
+                                                        src={buildImageUrl(profile?.avatarUrl)}
+                                                    >
+                                                        {(profile?.firstName?.[0] ?? "В").toUpperCase()}
+                                                    </Avatar>
                                                 ) : (
                                                     <Avatar
-                                                        size="XS"
-                                                        avatarUrl={buildImageUrl(message.authorAvatarUrl)}
-                                                        name={message.authorName || 'Пользователь'}
-                                                        className={styles.messageAvatar}
-                                                    />
+                                                        className={`${styles.messageAvatar} ep-avatar`}
+                                                        size={24}
+                                                        src={buildImageUrl(message.authorAvatarUrl)}
+                                                    >
+                                                        {(message.authorName?.[0] ?? "П").toUpperCase()}
+                                                    </Avatar>
                                                 )}
 
                                                 <div
@@ -597,7 +622,9 @@ export default function EventChat({eventId}: EventChatProps) {
                                                     {replyPreview && (
                                                         <div className={styles.replyPreview}>
                                                             <ArrowUpRightIcon/>
-                                                            <Avatar size="XS" name={replyPreview.authorName}/>
+                                                            <Avatar className="ep-avatar" size={24}>
+                                                                {(replyPreview.authorName?.[0] ?? "—").toUpperCase()}
+                                                            </Avatar>
                                                             <span>{replyPreview.authorName}</span>
                                                             <span>{replyPreview.text}</span>
                                                         </div>
@@ -715,7 +742,9 @@ export default function EventChat({eventId}: EventChatProps) {
                         {replyDraft && (
                             <div className={styles.replyBanner}>
                                 <ArrowUpRightIcon/>
-                                <Avatar size="S" name={replyDraft.authorName}/>
+                                <Avatar className="ep-avatar" size={36}>
+                                    {(replyDraft.authorName?.[0] ?? "—").toUpperCase()}
+                                </Avatar>
                                 <span>{replyDraft.authorName}</span>
                                 <span>{replyDraft.text}</span>
                                 <button onClick={() => setReplyDraft(null)}><XIcon/></button>
@@ -801,11 +830,12 @@ export default function EventChat({eventId}: EventChatProps) {
                 {isSearchOpen && (
                     <aside className={styles.searchPanel}>
                         <h3>Поиск в чате</h3>
-                        <TextField
+                        <Input
                             value={searchText}
                             onChange={(event) => setSearchText(event.target.value)}
                             placeholder="Текст сообщения..."
-                            leftIcon={<SearchIcon/>}
+                            prefix={<SearchIcon/>}
+                            className="ep-input ep-input--m"
                         />
 
                         {isSearchLoading && <p className={styles.searchState}>Ищем сообщения...</p>}
@@ -832,7 +862,9 @@ export default function EventChat({eventId}: EventChatProps) {
                                             onClick={() => handleSelectSearchMessage(item.id)}
                                         >
                                             <div className={styles.resultHeader}>
-                                                <Avatar size="S" name={item.authorName || 'Пользователь'}/>
+                                                <Avatar className="ep-avatar" size={36}>
+                                                    {(item.authorName?.[0] ?? "П").toUpperCase()}
+                                                </Avatar>
                                                 <span>{item.authorName || 'Пользователь'}</span>
                                                 <span>{formatTime(item.createdAt)}</span>
                                             </div>

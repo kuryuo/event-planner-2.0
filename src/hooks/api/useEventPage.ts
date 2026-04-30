@@ -10,6 +10,7 @@ export interface UseEventPageOutput {
         name: string;
         description: string;
         location: string;
+        auditorium?: string | null;
         formattedDate: string;
         startDate: string;
         endDate: string | null;
@@ -46,6 +47,7 @@ export const useEventPage = (): UseEventPageOutput => {
             name: eventData.name,
             description: eventData.description ?? '',
             location: eventData.location,
+            auditorium: eventData.auditorium ?? null,
             startDate: eventData.startDate,
             endDate: eventData.endDate,
             status: eventData.status,

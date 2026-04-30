@@ -1,10 +1,10 @@
 import {Controller, useForm} from 'react-hook-form';
-import TextField from "@/ui/text-field/TextField";
-import Button from "@/ui/button/Button";
-import Checkbox from "@/ui/checkbox/Checkbox";
+import {Button} from "antd";
+import {Checkbox} from "antd";
 import styles from "./AuthForm.module.scss";
 import imageSrc from "@/assets/img/image.png";
 import {isValidEmail} from '@/utils/validation.ts';
+import {Input} from "antd";
 
 interface LoginFormProps {
     onSubmit: (data: { email: string; password: string }) => void;
@@ -55,12 +55,13 @@ export default function LoginForm({
                                 validate: (value) => isValidEmail(value) || 'Введите корректный email',
                             }}
                             render={({field}) => (
-                                <TextField
+                                <Input
                                     placeholder="Email"
                                     type="email"
                                     value={field.value}
                                     onChange={field.onChange}
                                     onBlur={field.onBlur}
+                                    className="ep-input ep-input--m"
                                 />
                             )}
                         />
@@ -73,12 +74,12 @@ export default function LoginForm({
                                 minLength: {value: 6, message: 'Минимум 6 символов'},
                             }}
                             render={({field}) => (
-                                <TextField
+                                <Input.Password
                                     placeholder="Пароль"
-                                    type="password"
                                     value={field.value}
                                     onChange={field.onChange}
                                     onBlur={field.onBlur}
+                                    className="ep-input ep-input--m"
                                 />
                             )}
                         />
@@ -90,7 +91,8 @@ export default function LoginForm({
                                 render={({field}) => (
                                     <Checkbox
                                         checked={field.value}
-                                        onChange={() => field.onChange(!field.value)}
+                                        className="ep-checkbox"
+                                        onChange={(e) => field.onChange(e.target.checked)}
                                     />
                                 )}
                             />
@@ -114,7 +116,12 @@ export default function LoginForm({
                         )}
                     </div>
 
-                    <Button type="submit" disabled={loading} className={styles.submitButton}>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        disabled={loading}
+                        className={`ep-btn ep-btn--m ep-btn--filled-purple ${styles.submitButton}`}
+                    >
                         {loading ? "Вход..." : "Войти"}
                     </Button>
 

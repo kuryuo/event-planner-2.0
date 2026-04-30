@@ -15,7 +15,7 @@
 
 .content {
   flex: 1;
-  background-color: #f2f4f7;
+  background-color: var(--bg-secondary-subtle);
   border-radius: var(--radius-6);
   padding: 14px;
   display: flex;
@@ -30,7 +30,7 @@
 }
 
 .pageHeader {
-  background: #ffffff;
+  background: var(--bg-primary);
   border: 1px solid #e3e7ed;
   border-radius: 16px;
   padding: 18px 24px;
@@ -42,7 +42,7 @@
 }
 
 .boardSurface {
-  background: #ffffff;
+  background: var(--bg-primary);
   border: 1px solid #e3e7ed;
   border-radius: 16px;
   padding: 16px 12px 12px;
@@ -71,7 +71,7 @@
   height: 40px;
   border: 1px solid #d6dde3;
   border-radius: 8px;
-  background: #fff;
+  background: var(--bg-primary);
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -93,7 +93,7 @@
   height: 40px;
   border: 1px solid #d6dde3;
   border-radius: 8px;
-  background: #fff;
+  background: var(--bg-primary);
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -116,7 +116,7 @@
   top: calc(100% + 6px);
   right: 0;
   width: 230px;
-  background: #fff;
+  background: var(--bg-primary);
   border: 1px solid #d6dde3;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(34, 49, 61, 0.14);
@@ -135,7 +135,7 @@
     cursor: pointer;
 
     &:hover {
-      background: #f2f5f8;
+      background: var(--bg-secondary-hover);
     }
   }
 }
@@ -145,7 +145,7 @@
   top: calc(100% + 6px);
   left: 0;
   width: 320px;
-  background: #fff;
+  background: var(--bg-primary);
   border: 1px solid #d6dde3;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(34, 49, 61, 0.14);
@@ -175,7 +175,7 @@
   width: 100%;
   border: 1px solid #d6dde3;
   border-radius: 8px;
-  background: #fff;
+  background: var(--bg-primary);
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
@@ -203,7 +203,7 @@
   margin-top: 2px;
   border: 1px solid #d6dde3;
   border-radius: 8px;
-  background: #fff;
+  background: var(--bg-primary);
   height: 34px;
   cursor: pointer;
   color: #455866;
@@ -259,7 +259,7 @@
   right: 0;
   width: min(460px, 100vw);
   height: 100vh;
-  background: var(--white);
+  background: var(--bg-primary);
   border-left: 1px solid var(--gray-10);
   z-index: 61;
   padding: 28px;
@@ -357,7 +357,7 @@
 
 :global(.react-kanban-column) {
   border-radius: 14px;
-  background: #ffffff;
+  background: var(--bg-primary);
   width: 380px;
   min-width: 380px;
   max-width: 380px;

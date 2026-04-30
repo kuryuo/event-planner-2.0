@@ -1,9 +1,9 @@
 import {Controller, useForm} from 'react-hook-form';
-import TextField from "@/ui/text-field/TextField";
-import Button from "@/ui/button/Button";
+import {Button} from "antd";
 import styles from "./AuthForm.module.scss";
 import imageSrc from "@/assets/img/image.png";
 import {isValidEmail} from '@/utils/validation.ts';
+import {Input} from "antd";
 
 interface RegistrationFormProps {
     onSubmit: (data: { username: string; email: string; password: string }) => void;
@@ -57,7 +57,12 @@ export default function RegistrationForm({
                                     minLength: {value: 2, message: 'Минимум 2 символа'},
                                 }}
                                 render={({field}) => (
-                                    <TextField placeholder="Имя" value={field.value} onChange={field.onChange}/>
+                                    <Input
+                                        placeholder="Имя"
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                        className="ep-input ep-input--m"
+                                    />
                                 )}
                             />
                             <Controller
@@ -68,7 +73,12 @@ export default function RegistrationForm({
                                     minLength: {value: 2, message: 'Минимум 2 символа'},
                                 }}
                                 render={({field}) => (
-                                    <TextField placeholder="Фамилия" value={field.value} onChange={field.onChange}/>
+                                    <Input
+                                        placeholder="Фамилия"
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                        className="ep-input ep-input--m"
+                                    />
                                 )}
                             />
                         </div>
@@ -81,7 +91,13 @@ export default function RegistrationForm({
                                 validate: (value) => isValidEmail(value) || 'Введите корректный email',
                             }}
                             render={({field}) => (
-                                <TextField placeholder="Email" type="email" value={field.value} onChange={field.onChange}/>
+                                <Input
+                                    placeholder="Email"
+                                    type="email"
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    className="ep-input ep-input--m"
+                                />
                             )}
                         />
 
@@ -90,12 +106,11 @@ export default function RegistrationForm({
                             control={control}
                             rules={{required: 'Пароль обязателен', minLength: {value: 6, message: 'Минимум 6 символов'}}}
                             render={({field}) => (
-                                <TextField
+                                <Input.Password
                                     placeholder="Пароль"
-                                    type="password"
                                     value={field.value}
                                     onChange={field.onChange}
-                                    helperText="Минимум 6 символов"
+                                    className="ep-input ep-input--m"
                                 />
                             )}
                         />
@@ -108,11 +123,11 @@ export default function RegistrationForm({
                                 validate: (value) => value === watch('password') || 'Пароли не совпадают'
                             }}
                             render={({field}) => (
-                                <TextField
+                                <Input.Password
                                     placeholder="Повторите пароль"
-                                    type="password"
                                     value={field.value}
                                     onChange={field.onChange}
+                                    className="ep-input ep-input--m"
                                 />
                             )}
                         />
@@ -129,7 +144,12 @@ export default function RegistrationForm({
                         )}
                     </div>
 
-                    <Button type="submit" disabled={loading} className={styles.submitButton}>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        disabled={loading}
+                        className={`ep-btn ep-btn--m ep-btn--filled-purple ${styles.submitButton}`}
+                    >
                         {loading ? "Загрузка..." : "Зарегистрироваться"}
                     </Button>
 

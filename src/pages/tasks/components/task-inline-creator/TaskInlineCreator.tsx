@@ -4,10 +4,11 @@ import PersonIcon from '@/assets/img/icon-m/person.svg?react';
 import CalendarIcon from '@/assets/img/icon-m/calendar.svg?react';
 import Check2Icon from '@/assets/img/icon-m/check2.svg?react';
 import SearchIcon from '@/assets/img/icon-m/search.svg?react';
-import {SingleDatePicker} from '@/ui/date-picker/SingleDatePicker';
+import {Calendar} from "antd";
+import dayjs from "dayjs";
 import {useClickOutside} from '@/hooks/ui/useClickOutside';
 import styles from './TaskInlineCreator.module.scss';
-import Avatar from '@/ui/avatar/Avatar.tsx';
+import {Avatar} from "antd";
 
 type Assignee = {
     id: string;
@@ -69,7 +70,13 @@ export default function TaskInlineCreator({users, onSubmit, onClose}: Props) {
                 <div className={styles.leftActions}>
                     <div className={styles.popupWrap} ref={usersRef}>
                         <button type="button" className={styles.iconBtn} onClick={() => setIsUsersOpen((prev) => !prev)}>
-                            {selectedUser ? <Avatar size="L" avatarUrl={selectedUser.avatarUrl} name={selectedUser.name}/> : <PersonIcon/>}
+                            {selectedUser ? (
+                                <Avatar className="ep-avatar" size={36} src={selectedUser.avatarUrl}>
+                                    {(selectedUser.name?.[0] ?? "—").toUpperCase()}
+                                </Avatar>
+                            ) : (
+                                <PersonIcon/>
+                            )}
                         </button>
 
                         {isUsersOpen && (
@@ -110,9 +117,11 @@ export default function TaskInlineCreator({users, onSubmit, onClose}: Props) {
 
                         {isDateOpen && (
                             <div className={styles.dateDropdown}>
-                                <SingleDatePicker
-                                    initialDate={dueDate}
-                                    onDateChange={(date) => {
+                                <Calendar
+                                    fullscreen={false}
+                                    value={dueDate ? dayjs(dueDate) : undefined}
+                                    onSelect={(value) => {
+                                        const date = value?.toDate();
                                         form.setValue('dueDate', date);
                                         if (date) setIsDateOpen(false);
                                     }}

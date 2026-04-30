@@ -12,7 +12,7 @@
 }
 
 .content {
-  background-color: #f2f4f7;
+  background-color: var(--bg-secondary-subtle);
   padding: var(--spacing-3);
   border-radius: var(--spacing-6);
   flex: 1;
@@ -35,7 +35,7 @@
 }
 
 .contentPanel {
-  background: #fff;
+  background: var(--bg-primary);
   border-radius: var(--radius-4);
   padding: var(--spacing-4);
   display: flex;

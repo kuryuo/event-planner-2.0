@@ -1,6 +1,6 @@
 import {useState} from "react";
 import styles from "./AvatarMenu.module.scss";
-import Button from "@/ui/button/Button.tsx";
+import {Button} from "antd";
 import PlusLgIcon from '@/assets/img/icon-l/plus-lg.svg?react';
 import TrashIcon from '@/assets/img/icon-m/trash.svg?react';
 
@@ -30,20 +30,18 @@ export default function AvatarMenu({children, onUpload, onClear}: AvatarMenuProp
                     onMouseLeave={handleLeave}
                 >
                     <Button
-                        variant="Text"
-                        color="default"
-                        leftIcon={<PlusLgIcon/>}
+                        type="text"
+                        icon={<PlusLgIcon/>}
+                        className={`ep-btn ep-btn--m ep-btn--text ${styles.button}`}
                         onClick={onUpload}
-                        className={styles.button}
                     >
                         Загрузить аватар
                     </Button>
                     <Button
-                        variant="Text"
-                        color="default"
-                        leftIcon={<TrashIcon/>}
+                        type="text"
+                        icon={<TrashIcon/>}
+                        className={`ep-btn ep-btn--m ep-btn--text ${styles.button}`}
                         onClick={onClear}
-                        className={styles.button}
                     >
                         Очистить
                     </Button>

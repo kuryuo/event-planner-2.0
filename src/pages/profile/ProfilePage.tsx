@@ -14,12 +14,10 @@ import TrashIcon from '@/assets/img/icon-m/trash.svg?react';
 import BoxArrowLeftIcon from '@/assets/img/icon-m/box-arrow-left.svg?react';
 import EyeIcon from '@/assets/img/icon-m/eye.svg?react';
 import EyeSlashIcon from '@/assets/img/icon-m/eye-slash.svg?react';
-import Switch from '@/ui/switch/Switch.tsx';
-import TextField from '@/ui/text-field/TextField.tsx';
-import Button from '@/ui/button/Button.tsx';
-import Checkbox from '@/ui/checkbox/Checkbox.tsx';
-import EventPlate from '@/ui/event-plate/EventPlate.tsx';
-import Avatar from '@/ui/avatar/Avatar.tsx';
+import {Button} from "antd";
+import {Checkbox, Switch} from "antd";
+import {Avatar} from "antd";
+import {Input} from "antd";
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 import {useAuth} from '@/hooks/api/useAuth.ts';
 import {useAvatarUpload} from '@/hooks/api/useAvatarUpload.ts';
@@ -78,7 +76,6 @@ interface ProfileTask {
     priority: string;
 }
 
-const FALLBACK_COVER = 'https://images.unsplash.com/photo-1470163395405-d2b80e7450ed?auto=format&fit=crop&w=1600&q=80';
 const FALLBACK_EVENT = '';
 const EMPTY_EVENTS: UserEvent[] = [];
 
@@ -343,7 +340,8 @@ export default function ProfilePage() {
     }, [sortKey, profileTasks]);
 
     const fullName = `${displayProfile?.firstName ?? ''} ${displayProfile?.lastName ?? ''}`.trim() || 'Пользователь';
-    const coverUrl = backgroundPreviewUrl ?? displayProfile?.backgroundUrl ?? FALLBACK_COVER;
+    const coverImageSrc =
+        backgroundPreviewUrl ?? buildImageUrl(displayProfile?.backgroundUrl) ?? null;
     const avatarUrl = displayProfile?.avatarUrl;
     const loading = ownProfileLoading || foreignProfileLoading;
 
@@ -513,29 +511,36 @@ export default function ProfilePage() {
                     confirmText="Сменить"
                     confirmDisabled={!emailForm.password || !emailForm.email}
                 >
-                    <TextField
-                        label="Пароль"
-                        type={showPasswords.email ? 'text' : 'password'}
-                        placeholder="Пароль"
-                        value={emailForm.password}
-                        onChange={(event) => setEmailForm((prev) => ({...prev, password: event.target.value}))}
-                        rightIcon={(
-                            <button
-                                className={styles.iconButton}
-                                onClick={() => setShowPasswords((prev) => ({...prev, email: !prev.email}))}
-                                type="button"
-                            >
-                                {showPasswords.email ? <EyeSlashIcon/> : <EyeIcon/>}
-                            </button>
-                        )}
-                    />
-                    <TextField
-                        label="Новая почта"
-                        type="email"
-                        placeholder="Новая почта"
-                        value={emailForm.email}
-                        onChange={(event) => setEmailForm((prev) => ({...prev, email: event.target.value}))}
-                    />
+                    <div className="ep-field">
+                        <label className="ep-field__label">Пароль</label>
+                        <Input.Password
+                            placeholder="Пароль"
+                            value={emailForm.password}
+                            onChange={(event) => setEmailForm((prev) => ({...prev, password: event.target.value}))}
+                            className="ep-input ep-input--m"
+                            iconRender={() => null}
+                            type={showPasswords.email ? "text" : "password"}
+                            suffix={(
+                                <button
+                                    className={styles.iconButton}
+                                    onClick={() => setShowPasswords((prev) => ({...prev, email: !prev.email}))}
+                                    type="button"
+                                >
+                                    {showPasswords.email ? <EyeSlashIcon/> : <EyeIcon/>}
+                                </button>
+                            )}
+                        />
+                    </div>
+                    <div className="ep-field">
+                        <label className="ep-field__label">Новая почта</label>
+                        <Input
+                            type="email"
+                            placeholder="Новая почта"
+                            value={emailForm.email}
+                            onChange={(event) => setEmailForm((prev) => ({...prev, email: event.target.value}))}
+                            className="ep-input ep-input--m"
+                        />
+                    </div>
                 </ProfileActionModal>
             );
         }
@@ -554,57 +559,71 @@ export default function ProfilePage() {
                     confirmText="Сменить"
                     confirmDisabled={!passwordForm.currentPassword || !passwordForm.nextPassword || !passwordForm.repeatPassword}
                 >
-                    <TextField
-                        label="Текущий пароль"
-                        type={showPasswords.current ? 'text' : 'password'}
-                        placeholder="Пароль"
-                        error={Boolean(passwordForm.error)}
-                        helperText={passwordForm.error}
-                        value={passwordForm.currentPassword}
-                        onChange={(event) => setPasswordForm((prev) => ({...prev, currentPassword: event.target.value, error: ''}))}
-                        rightIcon={(
-                            <button
-                                className={styles.iconButton}
-                                onClick={() => setShowPasswords((prev) => ({...prev, current: !prev.current}))}
-                                type="button"
-                            >
-                                {showPasswords.current ? <EyeSlashIcon/> : <EyeIcon/>}
-                            </button>
+                    <div className="ep-field">
+                        <label className="ep-field__label">Текущий пароль</label>
+                        <Input.Password
+                            placeholder="Пароль"
+                            value={passwordForm.currentPassword}
+                            onChange={(event) => setPasswordForm((prev) => ({...prev, currentPassword: event.target.value, error: ''}))}
+                            status={passwordForm.error ? "error" : undefined}
+                            className="ep-input ep-input--m"
+                            iconRender={() => null}
+                            type={showPasswords.current ? "text" : "password"}
+                            suffix={(
+                                <button
+                                    className={styles.iconButton}
+                                    onClick={() => setShowPasswords((prev) => ({...prev, current: !prev.current}))}
+                                    type="button"
+                                >
+                                    {showPasswords.current ? <EyeSlashIcon/> : <EyeIcon/>}
+                                </button>
+                            )}
+                        />
+                        {passwordForm.error && (
+                            <span className="ep-field__helper ep-field__helper--error">{passwordForm.error}</span>
                         )}
-                    />
-                    <TextField
-                        label="Новый пароль"
-                        type={showPasswords.next ? 'text' : 'password'}
-                        placeholder="Новый пароль"
-                        helperText="Минимум 8 символов, 1 цифра и 1 специальный символ"
-                        value={passwordForm.nextPassword}
-                        onChange={(event) => setPasswordForm((prev) => ({...prev, nextPassword: event.target.value, error: ''}))}
-                        rightIcon={(
-                            <button
-                                className={styles.iconButton}
-                                onClick={() => setShowPasswords((prev) => ({...prev, next: !prev.next}))}
-                                type="button"
-                            >
-                                {showPasswords.next ? <EyeSlashIcon/> : <EyeIcon/>}
-                            </button>
-                        )}
-                    />
-                    <TextField
-                        label="Повторите новый пароль"
-                        type={showPasswords.repeat ? 'text' : 'password'}
-                        placeholder="Повторите пароль"
-                        value={passwordForm.repeatPassword}
-                        onChange={(event) => setPasswordForm((prev) => ({...prev, repeatPassword: event.target.value, error: ''}))}
-                        rightIcon={(
-                            <button
-                                className={styles.iconButton}
-                                onClick={() => setShowPasswords((prev) => ({...prev, repeat: !prev.repeat}))}
-                                type="button"
-                            >
-                                {showPasswords.repeat ? <EyeSlashIcon/> : <EyeIcon/>}
-                            </button>
-                        )}
-                    />
+                    </div>
+                    <div className="ep-field">
+                        <label className="ep-field__label">Новый пароль</label>
+                        <Input.Password
+                            placeholder="Новый пароль"
+                            value={passwordForm.nextPassword}
+                            onChange={(event) => setPasswordForm((prev) => ({...prev, nextPassword: event.target.value, error: ''}))}
+                            className="ep-input ep-input--m"
+                            iconRender={() => null}
+                            type={showPasswords.next ? "text" : "password"}
+                            suffix={(
+                                <button
+                                    className={styles.iconButton}
+                                    onClick={() => setShowPasswords((prev) => ({...prev, next: !prev.next}))}
+                                    type="button"
+                                >
+                                    {showPasswords.next ? <EyeSlashIcon/> : <EyeIcon/>}
+                                </button>
+                            )}
+                        />
+                        <span className="ep-field__helper">Минимум 8 символов, 1 цифра и 1 специальный символ</span>
+                    </div>
+                    <div className="ep-field">
+                        <label className="ep-field__label">Повторите новый пароль</label>
+                        <Input.Password
+                            placeholder="Повторите пароль"
+                            value={passwordForm.repeatPassword}
+                            onChange={(event) => setPasswordForm((prev) => ({...prev, repeatPassword: event.target.value, error: ''}))}
+                            className="ep-input ep-input--m"
+                            iconRender={() => null}
+                            type={showPasswords.repeat ? "text" : "password"}
+                            suffix={(
+                                <button
+                                    className={styles.iconButton}
+                                    onClick={() => setShowPasswords((prev) => ({...prev, repeat: !prev.repeat}))}
+                                    type="button"
+                                >
+                                    {showPasswords.repeat ? <EyeSlashIcon/> : <EyeIcon/>}
+                                </button>
+                            )}
+                        />
+                    </div>
                 </ProfileActionModal>
             );
         }
@@ -635,22 +654,26 @@ export default function ProfilePage() {
                     confirmTone="danger"
                     confirmDisabled={!deletePassword}
                 >
-                    <TextField
-                        label="Пароль"
-                        type={showPasswords.delete ? 'text' : 'password'}
-                        placeholder="Пароль"
-                        value={deletePassword}
-                        onChange={(event) => setDeletePassword(event.target.value)}
-                        rightIcon={(
-                            <button
-                                className={styles.iconButton}
-                                onClick={() => setShowPasswords((prev) => ({...prev, delete: !prev.delete}))}
-                                type="button"
-                            >
-                                {showPasswords.delete ? <EyeSlashIcon/> : <EyeIcon/>}
-                            </button>
-                        )}
-                    />
+                    <div className="ep-field">
+                        <label className="ep-field__label">Пароль</label>
+                        <Input.Password
+                            placeholder="Пароль"
+                            value={deletePassword}
+                            onChange={(event) => setDeletePassword(event.target.value)}
+                            className="ep-input ep-input--m"
+                            iconRender={() => null}
+                            type={showPasswords.delete ? "text" : "password"}
+                            suffix={(
+                                <button
+                                    className={styles.iconButton}
+                                    onClick={() => setShowPasswords((prev) => ({...prev, delete: !prev.delete}))}
+                                    type="button"
+                                >
+                                    {showPasswords.delete ? <EyeSlashIcon/> : <EyeIcon/>}
+                                </button>
+                            )}
+                        />
+                    </div>
                 </ProfileActionModal>
             );
         }
@@ -669,13 +692,19 @@ export default function ProfilePage() {
                     <button className={styles.backButton} onClick={handleBack}>
                         <ChevronLeftIcon/>
                     </button>
-                    <Avatar className={styles.topAvatar} size="S" avatarUrl={avatarUrl} name={fullName}/>
+                    <Avatar className={`${styles.topAvatar} ep-avatar`} size={36} src={avatarUrl || undefined}>
+                        {(fullName?.[0] ?? "—").toUpperCase()}
+                    </Avatar>
                     <span className={styles.topTitle}>{isForeignProfile ? fullName : 'Вы'}</span>
                 </div>
 
                 <div className={styles.profileCard}>
                     <div className={styles.coverSection}>
-                        <img className={styles.coverImage} src={coverUrl} alt="Обложка профиля"/>
+                        {coverImageSrc ? (
+                            <img className={styles.coverImage} src={coverImageSrc} alt="Обложка профиля"/>
+                        ) : (
+                            <div className={styles.coverPlaceholder} aria-hidden/>
+                        )}
 
                         {!isForeignProfile && isEditMode && (
                             <div className={styles.coverActions}>
@@ -691,7 +720,9 @@ export default function ProfilePage() {
 
                     <div className={styles.avatarRow}>
                         <div className={styles.avatarWrapper}>
-                            <Avatar className={styles.profileAvatar} size="XL" avatarUrl={avatarUrl} name={fullName}/>
+                            <Avatar className={`${styles.profileAvatar} ep-avatar`} size={96} src={avatarUrl || undefined}>
+                                {(fullName?.[0] ?? "—").toUpperCase()}
+                            </Avatar>
 
                             {!isForeignProfile && isEditMode && (
                                 <div className={styles.avatarMenuWrapper} ref={avatarMenuRef}>
@@ -736,7 +767,11 @@ export default function ProfilePage() {
                             </div>
 
                             {!isForeignProfile && !isEditMode && (
-                                <Button variant="Filled" color="gray" onClick={handleOpenSettings}>
+                                <Button
+                                    type="default"
+                                    className="ep-btn ep-btn--m ep-btn--filled-gray"
+                                    onClick={handleOpenSettings}
+                                >
                                     Настройки
                                 </Button>
                             )}
@@ -744,15 +779,19 @@ export default function ProfilePage() {
                             {!isForeignProfile && isEditMode && (
                                 <div className={styles.editActions}>
                                     <Button
-                                        variant="Filled"
-                                        color="gray"
-                                        leftIcon={<Check2AllIcon/>}
+                                        type="default"
+                                        icon={<Check2AllIcon/>}
+                                        className="ep-btn ep-btn--m ep-btn--filled-gray"
                                         onClick={handleSaveSettings}
                                         disabled={profileUpdating}
                                     >
                                         Сохранить
                                     </Button>
-                                    <Button variant="Text" color="default" onClick={handleCancelSettings}>
+                                    <Button
+                                        type="text"
+                                        className="ep-btn ep-btn--m ep-btn--text"
+                                        onClick={handleCancelSettings}
+                                    >
                                         Отменить
                                     </Button>
                                 </div>
@@ -792,13 +831,20 @@ export default function ProfilePage() {
                                         {eventCards.length > 0 ? (
                                             <div className={styles.eventsList}>
                                                 {eventCards.map((event) => (
-                                                    <EventPlate
+                                                    <button
                                                         key={event.id}
-                                                        title={event.title}
-                                                        date={event.date}
-                                                        avatarUrl={event.cover}
+                                                        type="button"
+                                                        className={styles.eventPlate}
                                                         onClick={() => navigate(`/event?id=${event.id}`)}
-                                                    />
+                                                    >
+                                                        <Avatar className={`${styles.eventPlateAvatar} ep-avatar`} shape="square" size={36} src={event.cover}>
+                                                            {(event.title?.[0] ?? "—").toUpperCase()}
+                                                        </Avatar>
+                                                        <span className={styles.eventPlateText}>
+                                                            <span className={styles.eventPlateTitle}>{event.title}</span>
+                                                            <span className={styles.eventPlateDate}>{event.date}</span>
+                                                        </span>
+                                                    </button>
                                                 ))}
                                             </div>
                                         ) : (
@@ -877,52 +923,77 @@ export default function ProfilePage() {
 
                                     <div className={styles.settingsGrid}>
                                         <div className={styles.nameRow}>
-                                            <TextField
-                                                label="Имя"
-                                                value={draft.firstName}
-                                                onChange={(event) => setDraft((prev) => ({...prev, firstName: event.target.value}))}
-                                                onBlur={() => handleDraftBlur('firstName')}
-                                                error={Boolean(draftErrors.firstName)}
-                                                helperText={draftErrors.firstName}
-                                            />
-                                            <TextField
-                                                label="Фамилия"
-                                                value={draft.lastName}
-                                                onChange={(event) => setDraft((prev) => ({...prev, lastName: event.target.value}))}
-                                                onBlur={() => handleDraftBlur('lastName')}
-                                                error={Boolean(draftErrors.lastName)}
-                                                helperText={draftErrors.lastName}
-                                            />
+                                            <div className="ep-field">
+                                                <label className="ep-field__label">Имя</label>
+                                                <Input
+                                                    value={draft.firstName}
+                                                    onChange={(event) => setDraft((prev) => ({...prev, firstName: event.target.value}))}
+                                                    onBlur={() => handleDraftBlur('firstName')}
+                                                    status={draftErrors.firstName ? "error" : undefined}
+                                                    className="ep-input ep-input--m"
+                                                />
+                                                {draftErrors.firstName && (
+                                                    <span className="ep-field__helper ep-field__helper--error">{draftErrors.firstName}</span>
+                                                )}
+                                            </div>
+                                            <div className="ep-field">
+                                                <label className="ep-field__label">Фамилия</label>
+                                                <Input
+                                                    value={draft.lastName}
+                                                    onChange={(event) => setDraft((prev) => ({...prev, lastName: event.target.value}))}
+                                                    onBlur={() => handleDraftBlur('lastName')}
+                                                    status={draftErrors.lastName ? "error" : undefined}
+                                                    className="ep-input ep-input--m"
+                                                />
+                                                {draftErrors.lastName && (
+                                                    <span className="ep-field__helper ep-field__helper--error">{draftErrors.lastName}</span>
+                                                )}
+                                            </div>
                                         </div>
 
-                                        <TextField
-                                            label="Должность"
-                                            value={draft.profession}
-                                            onChange={(event) => setDraft((prev) => ({...prev, profession: event.target.value}))}
-                                            onBlur={() => handleDraftBlur('profession')}
-                                            error={Boolean(draftErrors.profession)}
-                                            helperText={draftErrors.profession}
-                                        />
+                                        <div className="ep-field">
+                                            <label className="ep-field__label">Должность</label>
+                                            <Input
+                                                value={draft.profession}
+                                                onChange={(event) => setDraft((prev) => ({...prev, profession: event.target.value}))}
+                                                onBlur={() => handleDraftBlur('profession')}
+                                                status={draftErrors.profession ? "error" : undefined}
+                                                className="ep-input ep-input--m"
+                                            />
+                                            {draftErrors.profession && (
+                                                <span className="ep-field__helper ep-field__helper--error">{draftErrors.profession}</span>
+                                            )}
+                                        </div>
 
-                                        <TextField
-                                            label="Telegram"
-                                            value={draft.telegram}
-                                            leftIcon={<TelegramIcon/>}
-                                            onChange={(event) => setDraft((prev) => ({...prev, telegram: event.target.value}))}
-                                            onBlur={() => handleDraftBlur('telegram')}
-                                            error={Boolean(draftErrors.telegram)}
-                                            helperText={draftErrors.telegram}
-                                        />
+                                        <div className="ep-field">
+                                            <label className="ep-field__label">Telegram</label>
+                                            <Input
+                                                value={draft.telegram}
+                                                prefix={<TelegramIcon/>}
+                                                onChange={(event) => setDraft((prev) => ({...prev, telegram: event.target.value}))}
+                                                onBlur={() => handleDraftBlur('telegram')}
+                                                status={draftErrors.telegram ? "error" : undefined}
+                                                className="ep-input ep-input--m"
+                                            />
+                                            {draftErrors.telegram && (
+                                                <span className="ep-field__helper ep-field__helper--error">{draftErrors.telegram}</span>
+                                            )}
+                                        </div>
 
-                                        <TextField
-                                            label="Телефон"
-                                            value={draft.phoneNumber}
-                                            leftIcon={<TelephoneIcon/>}
-                                            onChange={(event) => setDraft((prev) => ({...prev, phoneNumber: event.target.value}))}
-                                            onBlur={() => handleDraftBlur('phoneNumber')}
-                                            error={Boolean(draftErrors.phoneNumber)}
-                                            helperText={draftErrors.phoneNumber}
-                                        />
+                                        <div className="ep-field">
+                                            <label className="ep-field__label">Телефон</label>
+                                            <Input
+                                                value={draft.phoneNumber}
+                                                prefix={<TelephoneIcon/>}
+                                                onChange={(event) => setDraft((prev) => ({...prev, phoneNumber: event.target.value}))}
+                                                onBlur={() => handleDraftBlur('phoneNumber')}
+                                                status={draftErrors.phoneNumber ? "error" : undefined}
+                                                className="ep-input ep-input--m"
+                                            />
+                                            {draftErrors.phoneNumber && (
+                                                <span className="ep-field__helper ep-field__helper--error">{draftErrors.phoneNumber}</span>
+                                            )}
+                                        </div>
                                     </div>
 
                                     <div className={styles.settingsRow}>
@@ -930,7 +1001,7 @@ export default function ProfilePage() {
                                             <h3 className={styles.settingsRowTitle}>Уведомления</h3>
                                             <p className={styles.settingsRowText}>Включите, чтобы получать уведомления там, где вам удобно</p>
                                         </div>
-                                        <Switch checked={notificationsEnabled} onCheckedChange={setNotificationsEnabled}/>
+                                        <Switch checked={notificationsEnabled} onChange={setNotificationsEnabled} className="ep-switch"/>
                                     </div>
 
                                     {notificationsEnabled && (
@@ -942,7 +1013,8 @@ export default function ProfilePage() {
                                                     <span>Telegram</span>
                                                     <Checkbox
                                                         checked={notificationChannels.telegram}
-                                                        onChange={() => setNotificationChannels((prev) => ({...prev, telegram: !prev.telegram}))}
+                                                        className="ep-checkbox"
+                                                        onChange={(e) => setNotificationChannels((prev) => ({...prev, telegram: e.target.checked}))}
                                                     />
                                                 </label>
                                                 <label className={styles.channelItem}>
@@ -950,7 +1022,8 @@ export default function ProfilePage() {
                                                     <span>Почта</span>
                                                     <Checkbox
                                                         checked={notificationChannels.email}
-                                                        onChange={() => setNotificationChannels((prev) => ({...prev, email: !prev.email}))}
+                                                        className="ep-checkbox"
+                                                        onChange={(e) => setNotificationChannels((prev) => ({...prev, email: e.target.checked}))}
                                                     />
                                                 </label>
                                                 <label className={styles.channelItem}>
@@ -958,7 +1031,8 @@ export default function ProfilePage() {
                                                     <span>SMS</span>
                                                     <Checkbox
                                                         checked={notificationChannels.sms}
-                                                        onChange={() => setNotificationChannels((prev) => ({...prev, sms: !prev.sms}))}
+                                                        className="ep-checkbox"
+                                                        onChange={(e) => setNotificationChannels((prev) => ({...prev, sms: e.target.checked}))}
                                                     />
                                                 </label>
                                             </div>
@@ -971,7 +1045,11 @@ export default function ProfilePage() {
                                                 <h3 className={styles.settingsRowTitle}>Почта</h3>
                                                 <p className={styles.settingsRowText}>{displayProfile?.email || 'Не указано'}</p>
                                             </div>
-                                            <Button variant="Filled" color="gray" onClick={() => setActiveModal('email')}>
+                                            <Button
+                                                type="default"
+                                                className="ep-btn ep-btn--m ep-btn--filled-gray"
+                                                onClick={() => setActiveModal('email')}
+                                            >
                                                 Сменить почту
                                             </Button>
                                         </div>
@@ -981,7 +1059,11 @@ export default function ProfilePage() {
                                                 <h3 className={styles.settingsRowTitle}>Пароль</h3>
                                                 <p className={styles.settingsRowText}>Отправим на почту ссылку для смены пароля</p>
                                             </div>
-                                            <Button variant="Filled" color="gray" onClick={() => setActiveModal('password')}>
+                                            <Button
+                                                type="default"
+                                                className="ep-btn ep-btn--m ep-btn--filled-gray"
+                                                onClick={() => setActiveModal('password')}
+                                            >
                                                 Сменить пароль
                                             </Button>
                                         </div>
@@ -992,9 +1074,9 @@ export default function ProfilePage() {
                                                 <p className={styles.settingsRowText}>Будет произведен выход на данном устройстве</p>
                                             </div>
                                             <Button
-                                                variant="Text"
-                                                color="default"
-                                                leftIcon={<BoxArrowLeftIcon/>}
+                                                type="text"
+                                                icon={<BoxArrowLeftIcon/>}
+                                                className="ep-btn ep-btn--m ep-btn--text"
                                                 onClick={() => setActiveModal('logout')}
                                             >
                                                 Выйти
@@ -1006,7 +1088,12 @@ export default function ProfilePage() {
                                                 <h3 className={styles.deleteTitle}>Удалить аккаунт</h3>
                                                 <p className={styles.settingsRowText}>Аккаунт будет удален без возможности восстановления</p>
                                             </div>
-                                            <Button variant="Text" color="red" onClick={() => setActiveModal('delete')}>
+                                            <Button
+                                                type="text"
+                                                danger
+                                                className="ep-btn ep-btn--m ep-btn--text"
+                                                onClick={() => setActiveModal('delete')}
+                                            >
                                                 Удалить аккаунт
                                             </Button>
                                         </div>

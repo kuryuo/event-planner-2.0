@@ -2,7 +2,7 @@ import {useMemo, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import type {AppDispatch, RootState} from '@/store/store.ts';
-import Button from '@/ui/button/Button.tsx';
+import {Button} from "antd";
 import {
     useGetInvitationsQuery,
     useGetNotificationsQuery,
@@ -12,6 +12,7 @@ import {
 } from '@/services/api/notificationApi.ts';
 import {markAllChatAlertsRead, markChatAlertRead} from '@/store/realtimeSlice.ts';
 import BellIcon from '@/assets/image/bell.svg?react';
+import CloseIcon from '@/assets/img/icon-m/x.svg?react';
 import styles from './NotificationsDrawer.module.scss';
 
 interface NotificationsDrawerProps {
@@ -193,15 +194,15 @@ export default function NotificationsDrawer({open, onClose}: NotificationsDrawer
                 <div className={styles.header}>
                     <h2 className={styles.title}>Уведомления</h2>
                     <button type="button" className={styles.closeButton} onClick={onClose} aria-label="Закрыть">
-                        ×
+                        <CloseIcon aria-hidden/>
                     </button>
                 </div>
 
                 <div className={styles.headerActions}>
                     <span className={styles.counter}>Новые: {unreadCount}</span>
                     <Button
-                        variant="Text"
-                        color="default"
+                        type="text"
+                        className="ep-btn ep-btn--m ep-btn--text"
                         onClick={() => {
                             dispatch(markAllChatAlertsRead());
                             void markAllRead();
@@ -253,8 +254,8 @@ export default function NotificationsDrawer({open, onClose}: NotificationsDrawer
 
                                     <div className={styles.cardControls}>
                                         <Button
-                                            variant="Text"
-                                            color="default"
+                                            type="text"
+                                            className="ep-btn ep-btn--m ep-btn--text"
                                             onClick={() => handleRead(notification)}
                                             disabled={isMarkingRead}
                                         >
@@ -269,16 +270,17 @@ export default function NotificationsDrawer({open, onClose}: NotificationsDrawer
                                             </div>
                                             <div className={styles.actions}>
                                                 <Button
-                                                    variant="Filled"
-                                                    color="purple"
+                                                    type="primary"
+                                                    className="ep-btn ep-btn--m ep-btn--filled-purple"
                                                     onClick={() => handleRespond(invitation.id, true)}
                                                     disabled={isResponding}
                                                 >
                                                     Принять
                                                 </Button>
                                                 <Button
-                                                    variant="Text"
-                                                    color="red"
+                                                    type="text"
+                                                    danger
+                                                    className="ep-btn ep-btn--m ep-btn--text"
                                                     onClick={() => handleRespond(invitation.id, false)}
                                                     disabled={isResponding}
                                                 >

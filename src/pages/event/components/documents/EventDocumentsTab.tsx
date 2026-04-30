@@ -9,8 +9,8 @@ import ChevronDownIcon from '@/assets/img/icon-m/chevron-down.svg?react';
 import ChevronRightIcon from '@/assets/img/icon-m/chevron-right.svg?react';
 import JustifyIcon from '@/assets/img/icon-m/justify.svg?react';
 import StackedIcon from '@/assets/img/icon-m/view-stacked.svg?react';
-import Button from '@/ui/button/Button.tsx';
-import Checkbox from '@/ui/checkbox/Checkbox.tsx';
+import {Button} from "antd";
+import {Checkbox} from "antd";
 import {AddDocumentMenu} from './AddDocumentMenu.tsx';
 import {EventDocumentSection} from './EventDocumentSection.tsx';
 import {EventNewNoteCard} from './EventNewNoteCard.tsx';
@@ -257,7 +257,7 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
                         onPickFile={handlePickFile}
                         onAddLink={handleAddLink}
                         trigger={(
-                            <Button size="S" variant="Filled" color="gray" type="button">
+                            <Button type="default" className="ep-btn ep-btn--s ep-btn--filled-gray">
                                 Добавить
                             </Button>
                         )}
@@ -268,7 +268,11 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
                         onPickFile={handlePickFile}
                         onAddLink={handleAddLink}
                         trigger={(
-                            <Button size="S" variant="Filled" color="green" leftIcon={<PlusIcon/>} type="button">
+                            <Button
+                                type="primary"
+                                icon={<PlusIcon/>}
+                                className="ep-btn ep-btn--s ep-btn--filled-green"
+                            >
                                 Добавить документ
                             </Button>
                         )}
@@ -360,7 +364,7 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
                                                                         >
                                                                             <span className={styles.subName}>{a.displayName || 'Пользователь'}</span>
                                                                         </button>
-                                                                        <Checkbox checked={checked} onChange={toggleAuthor}/>
+                                                                        <Checkbox checked={checked} className="ep-checkbox" onChange={toggleAuthor}/>
                                                                     </div>
                                                                 );
                                                             })}
@@ -376,6 +380,7 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
                                             <div key={ext.extension} className={styles.filterCheckRow}>
                                                 <Checkbox
                                                     checked={selectedExtensions.includes(ext.extension)}
+                                                    className="ep-checkbox"
                                                     onChange={() => {
                                                         setSelectedExtensions((prev) =>
                                                             prev.includes(ext.extension)
@@ -408,6 +413,7 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
                                                 <div key={site.siteKey} className={styles.filterCheckRow}>
                                                     <Checkbox
                                                         checked={selectedLinkSites.includes(site.siteKey)}
+                                                        className="ep-checkbox"
                                                         onChange={() => {
                                                             setSelectedLinkSites((prev) =>
                                                                 prev.includes(site.siteKey)
@@ -609,10 +615,8 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
                 emptyMessage="Пока нет заметок"
                 headerAction={canManageDocuments ? (
                     <Button
-                        size="S"
-                        variant="Filled"
-                        color="gray"
-                        type="button"
+                        type="default"
+                        className="ep-btn ep-btn--s ep-btn--filled-gray"
                         onClick={() => {
                             setShowNewNoteForm(true);
                             requestAnimationFrame(() => newNoteTextareaRef.current?.focus());

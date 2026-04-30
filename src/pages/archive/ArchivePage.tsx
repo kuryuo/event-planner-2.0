@@ -1,12 +1,13 @@
 import {useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import Sidebar from '@/components/sidebar/Sidebar';
-import TextField from '@/ui/text-field/TextField.tsx';
+import {Input} from "antd";
 import ArchiveEventCard from '@/pages/archive/components/archive-event-card/ArchiveEventCard.tsx';
 import SearchIcon from '@/assets/img/icon-m/search.svg?react';
 import FilterIcon from '@/assets/img/icon-m/filter.svg?react';
 import {useGetProfileEventsQuery} from '@/services/api/profileApi.ts';
 import type {UserEvent} from '@/types/api/Profile.ts';
+import pixelsArt from '@/assets/image/pixels.svg?url';
 import styles from './ArchivePage.module.scss';
 import {useGetArchivedEventsQuery} from '@/services/api/eventApi.ts';
 
@@ -61,11 +62,12 @@ export default function ArchivePage() {
                     </div>
 
                     <div className={styles.searchRow}>
-                        <TextField
+                        <Input
                             value={query}
                             onChange={(event) => setQuery(event.target.value)}
                             placeholder="Название мероприятия..."
-                            leftIcon={<SearchIcon/>}
+                            prefix={<SearchIcon/>}
+                            className="ep-input ep-input--m"
                         />
                         <button className={styles.filterButton} aria-label="Фильтры">
                             <FilterIcon/>
@@ -80,13 +82,15 @@ export default function ArchivePage() {
                         </div>
                     ) : archivedEvents.length === 0 ? (
                         <div className={styles.emptyState}>
-                            <div className={styles.cubesPlaceholder}>
-                                {Array.from({length: 18}, (_, index) => (
-                                    <span key={index}/>
-                                ))}
+                            <div
+                                className={styles.emptyPixelsBackdrop}
+                                style={{backgroundImage: `url(${pixelsArt})`}}
+                                aria-hidden
+                            />
+                            <div className={styles.emptyStateContent}>
+                                <p>Ничего не найдено</p>
+                                <p className={styles.emptyHint}>Попробуйте изменить запрос</p>
                             </div>
-                            <p>Ничего не найдено</p>
-                            <p className={styles.emptyHint}>Попробуйте изменить запрос</p>
                         </div>
                     ) : (
                         <div className={styles.grid}>

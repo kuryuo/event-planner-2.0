@@ -1,8 +1,7 @@
 import {useMemo, useState} from 'react';
 import {Dropdown} from 'antd';
 import type {MenuProps} from 'antd';
-import Avatar from '@/ui/avatar/Avatar.tsx';
-import Chip from '@/ui/chip/Chip.tsx';
+import {Avatar} from "antd";
 import ChevronDownIcon from '@/assets/img/icon-m/chevron-down.svg?react';
 import XIcon from '@/assets/img/icon-s/x.svg?react';
 import OwnerIcon from '@/assets/image/owner-icon.svg?react';
@@ -12,6 +11,7 @@ import {
     useAssignUserRoleMutation
 } from '@/services/api/eventApi';
 import styles from './ParticipantCard.module.scss';
+import {Tag} from "antd";
 
 const ROLE_MAP = {
     Организатор: 'Organizer',
@@ -100,6 +100,16 @@ export default function ParticipantCard({
     };
 
     const isOrganizer = currentRoleValue === 'Organizer';
+    const tagTextStyleM = {
+        fontFamily: "'Manrope', sans-serif",
+        fontSize: 14,
+        fontWeight: 450,
+        lineHeight: "18px",
+        padding: "2px 16px",
+        borderRadius: "999px",
+        marginInlineEnd: 0,
+        userSelect: "none",
+    } as const;
 
     const roleMenuItems: MenuProps['items'] = useMemo(
         () =>
@@ -120,7 +130,9 @@ export default function ParticipantCard({
     return (
         <div className={styles.participantCard}>
             <div className={styles.leftSection}>
-                <Avatar size="M" avatarUrl={avatarUrl || ''} name={name}/>
+                <Avatar className="ep-avatar" size={48} src={avatarUrl || undefined}>
+                    {(name?.[0] ?? "—").toUpperCase()}
+                </Avatar>
                 <div className={styles.mainInfo}>
                     <span className={styles.name}>{name}</span>
                     {!canEditRoles && (
@@ -163,7 +175,16 @@ export default function ParticipantCard({
                 )}
 
                 {!canEditRoles && !isOrganizer && (
-                    <Chip text={currentRoleLabel} size="M" variant="filled" color="purple"/>
+                    <Tag
+                        bordered={false}
+                        style={{
+                            ...tagTextStyleM,
+                            backgroundColor: "var(--bg-purple)",
+                            color: "var(--content-purple)",
+                        }}
+                    >
+                        {currentRoleLabel}
+                    </Tag>
                 )}
 
                 {showActions && !isOrganizer && (

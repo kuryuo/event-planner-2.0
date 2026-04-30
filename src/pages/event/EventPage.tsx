@@ -72,6 +72,8 @@ export default function EventPage() {
                                 categories={event.categories}
                                 formattedDate={event.formattedDate}
                                 location={event.location}
+                                auditorium={event.auditorium}
+                                venueFormat={event.venueFormat}
                                 description={event.description}
                             />
                         </div>
@@ -101,6 +103,8 @@ export default function EventPage() {
                             <EventInfo
                                 date={event.formattedDate}
                                 location={event.location}
+                                auditorium={event.auditorium}
+                                venueFormat={event.venueFormat}
                                 description={event.description}
                                 categories={event.categories}
                                 color={event.color}

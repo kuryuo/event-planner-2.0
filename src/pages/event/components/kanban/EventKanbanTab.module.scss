@@ -56,7 +56,7 @@
   height: 32px;
   border: 1px solid #d6dde3;
   border-radius: 8px;
-  background: #fff;
+  background: var(--bg-primary);
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -74,7 +74,7 @@
   top: calc(100% + 6px);
   right: 0;
   width: 230px;
-  background: #fff;
+  background: var(--bg-primary);
   border: 1px solid #d6dde3;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(34, 49, 61, 0.14);
@@ -93,7 +93,7 @@
     cursor: pointer;
 
     &:hover {
-      background: #f2f5f8;
+      background: var(--bg-secondary-subtle);
     }
   }
 }
@@ -103,7 +103,7 @@
   top: calc(100% + 6px);
   left: 0;
   width: 320px;
-  background: #fff;
+  background: var(--bg-primary);
   border: 1px solid #d6dde3;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(34, 49, 61, 0.14);
@@ -133,7 +133,7 @@
   width: 100%;
   border: 1px solid #d6dde3;
   border-radius: 8px;
-  background: #fff;
+  background: var(--bg-primary);
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
@@ -203,7 +203,7 @@
   right: 0;
   height: 100vh;
   width: min(460px, 100vw);
-  background: var(--white);
+  background: var(--bg-primary);
   border-left: 1px solid var(--gray-10);
   z-index: 51;
   padding: 32px;
@@ -223,7 +223,7 @@
   height: 44px;
   border: 1px solid var(--gray-10);
   border-radius: 10px;
-  background: var(--white);
+  background: var(--bg-primary);
   padding: 0 14px;
   font-size: 16px;
   color: var(--content-primary);
@@ -264,7 +264,7 @@
   height: 44px;
   border: 1px solid var(--gray-10);
   border-radius: 8px;
-  background: var(--white);
+  background: var(--bg-primary);
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -289,7 +289,7 @@
   width: 100%;
   max-height: 240px;
   overflow: auto;
-  background: var(--white);
+  background: var(--bg-primary);
   border: 1px solid var(--gray-10);
   border-radius: 10px;
   box-shadow: 0 8px 24px rgba(34, 49, 61, 0.16);
@@ -315,7 +315,7 @@
   color: var(--gray-100);
 
   &:hover {
-    background: var(--gray-5);
+    background: var(--bg-secondary-subtle);
   }
 }
 
@@ -335,7 +335,7 @@
   height: 320px;
   border: 1px solid var(--gray-10);
   border-radius: 8px;
-  background: var(--white);
+  background: var(--bg-primary);
   resize: none;
   padding: 12px;
   color: var(--gray-100);
@@ -375,7 +375,7 @@
   top: calc(100% + 4px);
   right: 0;
   width: 170px;
-  background: var(--white);
+  background: var(--bg-primary);
   border: 1px solid var(--gray-10);
   border-radius: 10px;
   box-shadow: 0 8px 24px rgba(34, 49, 61, 0.14);
@@ -393,7 +393,7 @@
     color: var(--content-primary);
 
     &:hover {
-      background: var(--gray-5);
+      background: var(--bg-secondary-subtle);
     }
   }
 }
@@ -515,7 +515,7 @@
 
 :global(.react-kanban-board .react-kanban-column) {
   border-radius: 14px;
-  background: #eef0f4 !important;
+  background: var(--bg-secondary-subtle) !important;
   width: 380px;
   min-width: 380px;
   max-width: 380px;

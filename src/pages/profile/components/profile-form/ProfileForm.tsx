@@ -1,8 +1,8 @@
 import {useEffect} from 'react';
 import {Controller, useForm} from 'react-hook-form';
 import styles from "./ProfileForm.module.scss";
-import TextField from "@/ui/text-field/TextField.tsx";
-import Button from "@/ui/button/Button.tsx";
+import {Input} from "antd";
+import {Button} from "antd";
 import GeoAltIcon from "@/assets/img/icon-m/geo-alt.svg?react";
 // import EnvelopeIcon from "@/assets/img/icon-m/envelope.svg?react";
 import TelephoneIcon from "@/assets/img/icon-m/telephone.svg?react";
@@ -86,30 +86,42 @@ export default function ProfileForm({
                         minLength: {value: 2, message: 'Минимум 2 символа'},
                         maxLength: {value: 40, message: 'Максимум 40 символов'},
                     }} render={({field}) => (
-                        <TextField
-                            placeholder="Имя"
-                            value={field.value}
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
-                            fieldSize="M"
-                            error={Boolean(errors.firstName)}
-                            helperText={errors.firstName?.message as string | undefined}
-                        />
+                        <div className="ep-field">
+                            <Input
+                                placeholder="Имя"
+                                value={field.value}
+                                onChange={field.onChange}
+                                onBlur={field.onBlur}
+                                status={errors.firstName ? "error" : undefined}
+                                className="ep-input ep-input--m"
+                            />
+                            {errors.firstName?.message && (
+                                <span className="ep-field__helper ep-field__helper--error">
+                                    {String(errors.firstName.message)}
+                                </span>
+                            )}
+                        </div>
                     )}/>
                     <Controller name="lastName" control={control} rules={{
                         required: 'Фамилия обязательна',
                         minLength: {value: 2, message: 'Минимум 2 символа'},
                         maxLength: {value: 50, message: 'Максимум 50 символов'},
                     }} render={({field}) => (
-                        <TextField
-                            placeholder="Фамилия"
-                            value={field.value}
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
-                            fieldSize="M"
-                            error={Boolean(errors.lastName)}
-                            helperText={errors.lastName?.message as string | undefined}
-                        />
+                        <div className="ep-field">
+                            <Input
+                                placeholder="Фамилия"
+                                value={field.value}
+                                onChange={field.onChange}
+                                onBlur={field.onBlur}
+                                status={errors.lastName ? "error" : undefined}
+                                className="ep-input ep-input--m"
+                            />
+                            {errors.lastName?.message && (
+                                <span className="ep-field__helper ep-field__helper--error">
+                                    {String(errors.lastName.message)}
+                                </span>
+                            )}
+                        </div>
                     )}/>
                 </div>
                 <Controller name="profession" control={control} rules={{
@@ -117,30 +129,42 @@ export default function ProfileForm({
                     minLength: {value: 2, message: 'Минимум 2 символа'},
                     maxLength: {value: 80, message: 'Максимум 80 символов'},
                 }} render={({field}) => (
-                    <TextField
-                        placeholder="Должность"
-                        value={field.value}
-                        onChange={field.onChange}
-                        onBlur={field.onBlur}
-                        fieldSize="M"
-                        error={Boolean(errors.profession)}
-                        helperText={errors.profession?.message as string | undefined}
-                    />
+                    <div className="ep-field">
+                        <Input
+                            placeholder="Должность"
+                            value={field.value}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            status={errors.profession ? "error" : undefined}
+                            className="ep-input ep-input--m"
+                        />
+                        {errors.profession?.message && (
+                            <span className="ep-field__helper ep-field__helper--error">
+                                {String(errors.profession.message)}
+                            </span>
+                        )}
+                    </div>
                 )}/>
                 <Controller name="city" control={control} rules={{
                     required: 'Укажите адрес или город',
                     validate: (value) => isValidAddress(value) || 'Введите корректный адрес',
                 }} render={({field}) => (
-                    <TextField
-                        placeholder="Город"
-                        value={field.value}
-                        onChange={field.onChange}
-                        onBlur={field.onBlur}
-                        leftIcon={<GeoAltIcon/>}
-                        fieldSize="M"
-                        error={Boolean(errors.city)}
-                        helperText={errors.city?.message as string | undefined}
-                    />
+                    <div className="ep-field">
+                        <Input
+                            placeholder="Город"
+                            value={field.value}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            prefix={<GeoAltIcon/>}
+                            status={errors.city ? "error" : undefined}
+                            className="ep-input ep-input--m"
+                        />
+                        {errors.city?.message && (
+                            <span className="ep-field__helper ep-field__helper--error">
+                                {String(errors.city.message)}
+                            </span>
+                        )}
+                    </div>
                 )}/>
             </div>
 
@@ -161,47 +185,59 @@ export default function ProfileForm({
                     required: 'Укажите номер телефона',
                     validate: (value) => isValidPhone(value) || 'Введите корректный телефон (+7XXXXXXXXXX)',
                 }} render={({field}) => (
-                    <TextField
-                        placeholder="Телефон"
-                        type="tel"
-                        value={field.value}
-                        onChange={field.onChange}
-                        onBlur={field.onBlur}
-                        leftIcon={<TelephoneIcon/>}
-                        fieldSize="M"
-                        error={Boolean(errors.phoneNumber)}
-                        helperText={errors.phoneNumber?.message as string | undefined}
-                    />
+                    <div className="ep-field">
+                        <Input
+                            placeholder="Телефон"
+                            type="tel"
+                            value={field.value}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            prefix={<TelephoneIcon/>}
+                            status={errors.phoneNumber ? "error" : undefined}
+                            className="ep-input ep-input--m"
+                        />
+                        {errors.phoneNumber?.message && (
+                            <span className="ep-field__helper ep-field__helper--error">
+                                {String(errors.phoneNumber.message)}
+                            </span>
+                        )}
+                    </div>
                 )}/>
                 <Controller name="telegram" control={control} rules={{
                     required: 'Укажите Telegram',
                     validate: (value) => isValidTelegram(value) || 'Некорректный Telegram (@username)',
                 }} render={({field}) => (
-                    <TextField
-                        placeholder="Telegram"
-                        value={field.value}
-                        onChange={field.onChange}
-                        onBlur={field.onBlur}
-                        leftIcon={<TelegramIcon/>}
-                        fieldSize="M"
-                        error={Boolean(errors.telegram)}
-                        helperText={errors.telegram?.message as string | undefined}
-                    />
+                    <div className="ep-field">
+                        <Input
+                            placeholder="Telegram"
+                            value={field.value}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            prefix={<TelegramIcon/>}
+                            status={errors.telegram ? "error" : undefined}
+                            className="ep-input ep-input--m"
+                        />
+                        {errors.telegram?.message && (
+                            <span className="ep-field__helper ep-field__helper--error">
+                                {String(errors.telegram.message)}
+                            </span>
+                        )}
+                    </div>
                 )}/>
             </div>
 
             <div>
                 <Button
-                    variant="Filled"
-                    color="gray"
+                    type="default"
+                    className="ep-btn ep-btn--m ep-btn--filled-gray"
                     onClick={handleSubmit(submitForm)}
                     disabled={loading}
                 >
                     Сохранить изменения
                 </Button>
                 <Button
-                    variant="Text"
-                    color="default"
+                    type="text"
+                    className="ep-btn ep-btn--m ep-btn--text"
                     onClick={handleCancel}
                     disabled={loading}
                 >

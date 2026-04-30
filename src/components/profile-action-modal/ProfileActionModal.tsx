@@ -1,6 +1,6 @@
 import type {ReactNode} from 'react';
 import styles from './ProfileActionModal.module.scss';
-import Button from '@/ui/button/Button.tsx';
+import {Button} from "antd";
 import XIcon from '@/assets/img/icon-s/x.svg?react';
 
 type ConfirmTone = 'default' | 'danger';
@@ -48,13 +48,14 @@ export default function ProfileActionModal({
                 {children && <div className={styles.body}>{children}</div>}
 
                 <div className={styles.actions}>
-                    <Button variant="Text" color="default" onClick={onClose}>
+                    <Button type="text" className="ep-btn ep-btn--m ep-btn--text" onClick={onClose}>
                         {cancelText}
                     </Button>
                     {onConfirm && (
                         <Button
-                            variant="Filled"
-                            color={confirmTone === 'danger' ? 'red' : 'gray'}
+                            type={confirmTone === 'danger' ? "primary" : "default"}
+                            danger={confirmTone === 'danger'}
+                            className={`ep-btn ep-btn--m ${confirmTone === 'danger' ? '' : 'ep-btn--filled-gray'}`}
                             onClick={onConfirm}
                             disabled={confirmDisabled}
                         >

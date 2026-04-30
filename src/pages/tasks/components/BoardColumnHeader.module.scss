@@ -46,7 +46,7 @@
   font-size: 16px;
   font-weight: 500;
   color: #22313d;
-  background: #fff;
+  background: var(--bg-primary);
   outline: none;
 
   &:focus {
@@ -107,7 +107,7 @@
   top: calc(100% + 6px);
   right: 0;
   width: 170px;
-  background: #fff;
+  background: var(--bg-primary);
   border: 1px solid #d6dde3;
   border-radius: 10px;
   box-shadow: 0 8px 20px rgba(34, 49, 61, 0.12);
@@ -134,7 +134,7 @@
   gap: 8px;
 
   &:hover {
-    background: #f1f4f7;
+    background: var(--bg-secondary-subtle);
   }
 
   svg {

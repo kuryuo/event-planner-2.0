@@ -1,8 +1,8 @@
 import {useMemo, useState} from 'react';
 import styles from './Participants.module.scss';
-import TextField from '@/ui/text-field/TextField.tsx';
+import {Input} from "antd";
 import SearchIcon from '@/assets/img/icon-m/search.svg?react';
-import Button from '@/ui/button/Button.tsx';
+import {Button} from "antd";
 import ParticipantCard from './ParticipantCard.tsx';
 import {useGetEventSubscribersQuery} from '@/services/api/eventApi.ts';
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
@@ -40,15 +40,16 @@ export default function Participants({eventId, maxParticipants, isAdmin = false}
             </div>
 
             <div className={styles.controls}>
-                <TextField
+                <Input
                     placeholder="Имя"
                     value={searchName}
-                    leftIcon={<SearchIcon/>}
+                    prefix={<SearchIcon/>}
+                    className="ep-input ep-input--m"
                     onChange={(event) => setSearchName(event.target.value)}
                 />
 
                 {isAdmin && (
-                    <Button variant="Filled" color="gray" disabled>
+                    <Button type="default" className="ep-btn ep-btn--m ep-btn--filled-gray" disabled>
                         Добавить
                     </Button>
                 )}

@@ -2,7 +2,7 @@ import {useRef, useState} from "react";
 import styles from "./Post.module.scss";
 import OctopusImg from "@/assets/img/octopus.png";
 import {formatDate} from "@/utils/date.ts";
-import Button from "@/ui/button/Button";
+import {Button} from "antd";
 import CreatePostForm from "./form/CreatePostForm";
 import PenIcon from "@/assets/img/icon-m/pen.svg?react";
 import TrashIcon from "@/assets/img/icon-m/trash.svg?react";
@@ -96,7 +96,11 @@ export default function Post({eventId, isAdmin = false}: PostsProps) {
             </div>
 
             {isAdmin && !isFormOpen && (
-                <Button variant="Filled" color="gray" onClick={handleCreatePost}>
+                <Button
+                    type="default"
+                    className="ep-btn ep-btn--m ep-btn--filled-gray"
+                    onClick={handleCreatePost}
+                >
                     Создать пост
                 </Button>
             )}
@@ -146,9 +150,10 @@ export default function Post({eventId, isAdmin = false}: PostsProps) {
                                             {openDeleteMenuId === post.id && (
                                                 <div className={styles.dropdown}>
                                                     <Button
-                                                        variant="Text"
-                                                        color="red"
-                                                        leftIcon={<TrashIcon className={styles.trashIcon}/>}
+                                                        type="text"
+                                                        danger
+                                                        icon={<TrashIcon className={styles.trashIcon}/>}
+                                                        className="ep-btn ep-btn--m ep-btn--text"
                                                         onClick={() => handleDeletePost(post.id)}
                                                     >
                                                         Удалить пост
