@@ -3,6 +3,7 @@ import CalendarIcon from "@/assets/img/icon-m/calendar.svg?react";
 import {Calendar} from "antd";
 import {Switch} from "antd";
 import {Input} from "antd";
+import {TimePicker} from "antd";
 import dayjs from "dayjs";
 import {useDateTime} from "@/hooks/api/useDateTime.ts";
 import {useClickOutside} from "@/hooks/ui/useClickOutside.ts";
@@ -48,7 +49,7 @@ export default function DateTimeSection() {
     return (
         <div className={styles.section}>
             <div className={styles.row}>
-                <div className={styles.wrapper} ref={startDatePickerRef}>
+                <div className={styles.wrapper} data-variant="date" ref={startDatePickerRef}>
                     <CalendarIcon className={styles.icon} onClick={toggleStartDatePicker}/>
                     <Input
                         placeholder="Дата начала"
@@ -79,11 +80,16 @@ export default function DateTimeSection() {
                         pointerEvents: isTimeEnabled ? "auto" : "none",
                     }}
                 >
-                    <Input
+                    <TimePicker
+                        className={styles.timePicker}
                         placeholder="Время"
-                        value={startTime}
-                        onChange={(e) => setStartTime(e.target.value)}
-                        className={styles.input}
+                        value={startTime ? dayjs(startTime, "HH:mm") : null}
+                        format="HH:mm"
+                        minuteStep={5}
+                        allowClear={false}
+                        needConfirm={false}
+                        onChange={(value) => setStartTime(value ? value.format("HH:mm") : "")}
+                        inputReadOnly
                     />
                 </div>
             </div>
@@ -110,7 +116,7 @@ export default function DateTimeSection() {
 
             {isEndDateEnabled ? (
                 <div className={styles.row}>
-                    <div className={styles.wrapper} ref={endDatePickerRef}>
+                    <div className={styles.wrapper} data-variant="date" ref={endDatePickerRef}>
                         <CalendarIcon className={styles.icon} onClick={toggleEndDatePicker}/>
                         <Input
                             placeholder="Дата окончания"
@@ -141,11 +147,16 @@ export default function DateTimeSection() {
                             pointerEvents: isTimeEnabled ? "auto" : "none",
                         }}
                     >
-                        <Input
+                        <TimePicker
+                            className={styles.timePicker}
                             placeholder="Время"
-                            value={endTime}
-                            onChange={(e) => setEndTime(e.target.value)}
-                            className={styles.input}
+                            value={endTime ? dayjs(endTime, "HH:mm") : null}
+                            format="HH:mm"
+                            minuteStep={5}
+                            allowClear={false}
+                            needConfirm={false}
+                            onChange={(value) => setEndTime(value ? value.format("HH:mm") : "")}
+                            inputReadOnly
                         />
                     </div>
                 </div>

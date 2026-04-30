@@ -80,6 +80,11 @@
   gap: var(--spacing-2);
 }
 
+.categoriesAutocomplete {
+  width: 100%;
+  max-width: 560px;
+}
+
 .categoryButton {
   width: 32px;
   height: 32px;

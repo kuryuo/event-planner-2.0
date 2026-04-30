@@ -15,6 +15,7 @@ export interface UseEventPageOutput {
         startDate: string;
         endDate: string | null;
         status: string | null;
+        lifecycleState?: string | null;
         categories: Array<{ text: string }>;
         avatar?: string | null;
         color?: string;
@@ -51,6 +52,7 @@ export const useEventPage = (): UseEventPageOutput => {
             startDate: eventData.startDate,
             endDate: eventData.endDate,
             status: eventData.status,
+            lifecycleState: eventData.lifecycleState ?? null,
             formattedDate: eventData.startDate && eventData.endDate
                 ? formatDateTimeRange(eventData.startDate, eventData.endDate)
                 : '',

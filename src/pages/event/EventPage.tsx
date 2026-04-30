@@ -38,7 +38,7 @@ export default function EventPage() {
         ? profile.id === event.responsiblePersonId 
         : false;
 
-    const normalizedStatus = (event?.status ?? '').toLowerCase();
+    const normalizedStatus = (event?.lifecycleState ?? event?.status ?? '').toLowerCase();
     const isStatusArchived =
         normalizedStatus.includes('finish')
         || normalizedStatus.includes('complete')
@@ -167,7 +167,7 @@ export default function EventPage() {
                         eventId={event.id}
                         avatar={event.avatar}
                         isArchived={isArchivedEvent}
-                        status={event.status}
+                        status={event.lifecycleState ?? event.status}
                         updateData={{
                             name: event.name,
                             description: event.description,
@@ -192,7 +192,7 @@ export default function EventPage() {
                         eventId={event.id}
                         avatar={event.avatar}
                         isArchived={isArchivedEvent}
-                        status={event.status}
+                        status={event.lifecycleState ?? event.status}
                         updateData={{
                             name: event.name,
                             description: event.description,

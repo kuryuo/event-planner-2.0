@@ -1,6 +1,7 @@
 import {useState, useEffect, useRef} from 'react';
 import {useDateTime} from '@/hooks/api/useDateTime.ts';
 import {useChips} from '@/hooks/ui/useChips.ts';
+import {useGetProfileQuery} from '@/services/api/profileApi.ts';
 import type {
     CreateEventPayload,
     EventResponse,
@@ -33,6 +34,7 @@ const VENUE_FORMAT_MAP: Record<string, VenueFormat> = {
 };
 
 export const useEventForm = (eventData?: EventResponse | null) => {
+    const {data: profile} = useGetProfileQuery();
     const {startDate, endDate, startTime, endTime, setStartDate, setEndDate, setStartTime, setEndTime} = useDateTime();
 
     const [title, setTitle] = useState('');
@@ -76,12 +78,13 @@ export const useEventForm = (eventData?: EventResponse | null) => {
             if (displayFormat === 'Онлайн') {
                 const loc = eventData.location?.trim() ?? '';
                 const aud = eventData.auditorium?.trim() ?? '';
-                if (aud) {
-                    setAuditorium(aud);
-                } else if (loc && isValidUrl(loc)) {
+                // для онлайна ссылка приходит в location; auditorium — запасной вариант
+                if (loc && isValidUrl(loc)) {
                     setAuditorium(loc);
+                } else if (aud) {
+                    setAuditorium(aud);
                 } else {
-                    setAuditorium(eventData.auditorium || '');
+                    setAuditorium(loc || aud || '');
                 }
                 setLocation('');
             } else {
@@ -147,6 +150,21 @@ export const useEventForm = (eventData?: EventResponse | null) => {
         }
     }, [eventData?.id, eventData, setCategories, setEndDate, setEndTime, setStartDate, setStartTime]);
 
+    /** Создание: в UI подставляем себя организатором, если список ещё пуст */
+    useEffect(() => {
+        if (eventData || !profile?.id) return;
+        setParticipants((prev) => {
+            if (prev.length > 0) return prev;
+            return [{userId: profile.id, role: 'Organizer'}];
+        });
+    }, [eventData, profile?.id]);
+
+    const buildParticipantsForApi = (): EventParticipantAssignment[] => {
+        if (!profile?.id) return participants;
+        const others = participants.filter((p) => p.userId !== profile.id);
+        return [{userId: profile.id, role: 'Organizer'}, ...others];
+    };
+
     const toggleEventType = (type: EventTypeKind) => {
         setSelectedTypes(prev => prev.includes(type) ? prev.filter(item => item !== type) : [...prev, type]);
     };
@@ -167,15 +185,19 @@ export const useEventForm = (eventData?: EventResponse | null) => {
         }
         if (!startDate || !startTime) return 'Необходимо указать дату и время начала';
         if (!endDate || !endTime) return 'Необходимо указать дату и время окончания';
-        if (participants.length === 0) return 'Добавьте хотя бы одного участника';
-        if (!participants.some((p) => p.role === 'Organizer')) return 'Назначьте хотя бы одного организатора';
+        if (participants.length === 0 && !profile?.id) {
+            return 'Добавьте хотя бы одного участника';
+        }
+        if (!profile?.id && !participants.some((p) => p.role === 'Organizer')) {
+            return 'Назначьте хотя бы одного организатора';
+        }
         if (!description.trim() || description.trim().length < 10) {
             return 'Описание должно содержать минимум 10 символов';
         }
         return null;
     };
 
-    const preparePayload = (): CreateEventPayload | UpdateEventPayload | null => {
+    const preparePayload = ({publish}: {publish?: boolean} = {}): CreateEventPayload | UpdateEventPayload | null => {
         const validationError = validateForm();
         if (validationError) {
             console.error(validationError);
@@ -191,7 +213,13 @@ export const useEventForm = (eventData?: EventResponse | null) => {
 
         const venueFormat = VENUE_FORMAT_MAP[EVENT_FORMAT_MAP[format] || format] || 'InPerson';
 
-        const payloadLocation = format === 'Онлайн' ? '' : location;
+        const linkTrimmed = auditorium.trim();
+        const payloadLocation =
+            format === 'Онлайн' ? linkTrimmed : location;
+        const payloadAuditorium =
+            format === 'Онлайн' ? null : linkTrimmed || null;
+
+        const participantsForApi = buildParticipantsForApi();
 
         const basePayload = {
             name: title,
@@ -199,12 +227,12 @@ export const useEventForm = (eventData?: EventResponse | null) => {
             startDate: startDateTime,
             endDate: endDateTime,
             location: payloadLocation,
-            auditorium: auditorium.trim() || null,
+            auditorium: payloadAuditorium,
             venueFormat,
             categories,
             types: selectedTypes,
-            participants,
-            responsiblePersonId: participants.find((p) => p.role === 'Organizer')?.userId,
+            participants: participantsForApi,
+            responsiblePersonId: profile?.id ?? participantsForApi.find((p) => p.role === 'Organizer')?.userId,
             color: avatarColor,
         };
 
@@ -212,6 +240,7 @@ export const useEventForm = (eventData?: EventResponse | null) => {
             return {
                 ...basePayload,
                 avatar: avatarFile,
+                publish: publish ?? true,
             };
         }
 

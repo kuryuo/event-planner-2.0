@@ -15,7 +15,7 @@ export const useChips = (initial: string[] = []) => {
     }, []);
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === ' ' && inputValue.trim()) {
+        if ((event.key === ' ' || event.key === 'Enter') && inputValue.trim()) {
             event.preventDefault();
             addChip(inputValue);
             setInputValue('');

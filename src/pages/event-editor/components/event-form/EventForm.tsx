@@ -1,7 +1,7 @@
 import CloseIcon from "@/assets/img/icon-m/x.svg?react";
 import DateTimeSection from "./date-time-section/DateTimeSection";
 import styles from "./EventForm.module.scss";
-import {Input, Select} from "antd";
+import {Input} from "antd";
 import {Segmented} from "antd";
 import GeoAltIcon from "@/assets/img/icon-m/geo-alt.svg?react";
 import Link45Icon from "@/assets/img/icon-m/link-45deg.svg?react";
@@ -12,7 +12,7 @@ import type {CreateEventPayload, EventResponse} from "@/types/api/Event.ts";
 import {useNavigate} from "react-router-dom";
 import {useGetCategoriesQuery} from "@/services/api/categoryApi.ts";
 import {Divider} from "antd";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import ImageIcon from "@/assets/img/icon-m/image.svg?react";
 import {Tag} from "antd";
 import {Dropdown} from "antd";
@@ -85,6 +85,15 @@ export default function EventForm({
         preparePayload,
         validateForm,
     } = useEventForm(eventData);
+
+    const tagAutocompleteOptions = useMemo(() => {
+        const q = inputValue.trim().toLowerCase();
+        return categoryOptions
+            .map((o) => o.label)
+            .filter((label) => !categories.includes(label))
+            .filter((label) => !q || label.toLowerCase().includes(q))
+            .map((label) => ({value: label}));
+    }, [categoryOptions, categories, inputValue]);
 
     const [participantsQuery, setParticipantsQuery] = useState('');
     const [selectedUserCandidate, setSelectedUserCandidate] = useState<Organizer | null>(null);
@@ -178,7 +187,7 @@ export default function EventForm({
         }
     }, [auditorium]);
 
-    const handleSubmit = () => {
+    const handleSubmit = ({publish}: {publish?: boolean} = {}) => {
         const validationError = validateForm();
         if (validationError) {
             setFormError(validationError);
@@ -186,7 +195,7 @@ export default function EventForm({
         }
 
         setFormError('');
-        const payload = preparePayload();
+        const payload = preparePayload({publish});
         if (payload) {
             onSubmit(payload);
         }
@@ -201,9 +210,28 @@ export default function EventForm({
             <Modal
                 open={isExitModalOpen}
                 onCancel={() => setIsExitModalOpen(false)}
-                onOk={() => navigate(-1)}
-                okText="Выйти"
-                cancelText="Вернуться к созданию"
+                footer={[
+                    <Button key="back" onClick={() => setIsExitModalOpen(false)}>
+                        Вернуться к созданию
+                    </Button>,
+                    <Button
+                        key="draft"
+                        type="default"
+                        onClick={() => {
+                            if (isEditMode) {
+                                setIsExitModalOpen(false);
+                                navigate(-1);
+                                return;
+                            }
+                            handleSubmit({publish: false});
+                        }}
+                    >
+                        Сохранить черновик
+                    </Button>,
+                    <Button key="exit" type="primary" danger onClick={() => navigate(-1)}>
+                        Выйти
+                    </Button>,
+                ]}
                 closable
                 centered
                 title="Выйти из создания мероприятия?"
@@ -462,25 +490,19 @@ export default function EventForm({
 
                         {showCategorySelect && (
                             <>
-                                <Select
-                                    className="ep-select"
-                                    placeholder="Выберите тег"
-                                    mode="multiple"
-                                    showSearch
-                                    value={categories}
-                                    searchValue={inputValue}
-                                    onSearch={(value) => setInputValue(value)}
-                                    onInputKeyDown={handleKeyDown}
-                                    disabled={isLoadingCategories}
-                                    options={categoryOptions.map((opt) => ({
-                                        value: opt.label,
-                                        label: opt.label,
-                                    }))}
+                                <AutoComplete
+                                    className={`${styles.categoriesAutocomplete} ep-input ep-input--m`}
+                                    value={inputValue}
+                                    options={tagAutocompleteOptions}
+                                    onChange={(v) => setInputValue(String(v))}
                                     onSelect={(value) => {
                                         addChip(String(value));
                                         setInputValue('');
                                     }}
-                                    onDeselect={(value) => removeChip(String(value))}
+                                    onKeyDown={handleKeyDown}
+                                    disabled={isLoadingCategories}
+                                    placeholder="Введите тег или выберите из списка"
+                                    allowClear
                                 />
 
                                 <div className={styles.chipContainer}>
@@ -526,7 +548,7 @@ export default function EventForm({
                         <Button
                             type="primary"
                             className="ep-btn ep-btn--m ep-btn--filled-purple"
-                            onClick={handleSubmit}
+                            onClick={() => handleSubmit({publish: true})}
                         >
                             {isEditMode ? 'Сохранить изменения' : 'Создать'}
                         </Button>

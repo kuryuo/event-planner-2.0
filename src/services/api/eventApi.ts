@@ -158,8 +158,12 @@ export const eventApi = baseApi.injectEndpoints({
         createEvent: builder.mutation<CreateEventResponse, CreateEventPayload>({
             query: (payload) => {
                 const {avatar, ...jsonPayload} = payload;
+                const normalizedPayload: Record<string, unknown> = {
+                    publish: payload.publish ?? true,
+                    ...jsonPayload,
+                };
                 const cleanedPayload = Object.fromEntries(
-                    Object.entries(jsonPayload).map(([key, value]) => [
+                    Object.entries(normalizedPayload).map(([key, value]) => [
                         key,
                         value === '' ? null : value
                     ])

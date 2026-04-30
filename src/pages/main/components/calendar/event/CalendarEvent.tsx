@@ -10,8 +10,12 @@ interface CalendarEventProps {
 export default function CalendarEvent({arg, viewType}: CalendarEventProps) {
     const {event, timeText} = arg;
 
+    const props = event.extendedProps as {realStart?: Date; realEnd?: Date} | undefined;
+    const rangeStart = props?.realStart ?? event.start;
+    const rangeEnd = props?.realEnd ?? event.end;
+
     const displayTime = viewType === 'dayGridMonth'
-        ? formatTimeRange(event.start, event.end)
+        ? formatTimeRange(rangeStart, rangeEnd)
         : timeText;
 
     return (

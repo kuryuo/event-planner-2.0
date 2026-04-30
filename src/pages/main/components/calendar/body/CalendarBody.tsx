@@ -1,3 +1,4 @@
+import {useMemo} from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -13,6 +14,37 @@ import type {GetEventsPayload} from '@/types/api/Event.ts';
 
 import {SLOT_LABEL_FORMAT, CALENDAR_SLOT_TIMES, CALENDAR_OPTIONS, hexToAppColor} from '@/const';
 
+/** В месячном виде FullCalendar тянет «полосой» только all-day; для timed — отрывки по дням. */
+const toMonthAllDaySpan = (
+    ev: {id: string; title: string; start: Date; end: Date; extendedProps?: {color?: string}},
+) => {
+    const start = ev.start instanceof Date ? ev.start : new Date(ev.start);
+    const end = ev.end instanceof Date ? ev.end : new Date(ev.end);
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+        return {...ev, allDay: false as const};
+    }
+    if (end.getTime() < start.getTime()) {
+        return {...ev, allDay: false as const};
+    }
+
+    const startDay = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    const endDay = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+    const exclusiveEnd = new Date(endDay);
+    exclusiveEnd.setDate(exclusiveEnd.getDate() + 1);
+
+    return {
+        ...ev,
+        allDay: true as const,
+        start: startDay,
+        end: exclusiveEnd,
+        extendedProps: {
+            ...ev.extendedProps,
+            realStart: new Date(start.getTime()),
+            realEnd: new Date(end.getTime()),
+        },
+    };
+};
+
 interface CalendarBodyProps {
     calendarRef: React.RefObject<FullCalendar | null>;
     currentView: 'dayGridMonth' | 'timeGridWeek';
@@ -22,6 +54,11 @@ interface CalendarBodyProps {
 export default function CalendarBody({calendarRef, currentView, filters}: CalendarBodyProps) {
     const navigate = useNavigate();
     const {calendarEvents} = useEventsData(filters);
+
+    const eventsForCalendar = useMemo(() => {
+        if (currentView !== 'dayGridMonth') return calendarEvents;
+        return calendarEvents.map(toMonthAllDaySpan);
+    }, [calendarEvents, currentView]);
 
     const handleClick = (event: EventClickArg) => {
         navigate('/event?id=' + event.event.id)
@@ -58,11 +95,12 @@ export default function CalendarBody({calendarRef, currentView, filters}: Calend
                 slotLabelFormat={SLOT_LABEL_FORMAT}
                 dayHeaderContent={(args) => <CalendarHeader {...args} currentView={currentView}/>}
                 eventContent={(arg) => <CalendarEvent arg={arg} viewType={currentView}/>}
-                events={calendarEvents}
+                events={eventsForCalendar}
                 eventClick={handleClick}
                 datesSet={handleDatesSet}
                 eventDidMount={handleEventDidMount}
                 {...CALENDAR_OPTIONS}
+                {...(currentView === 'dayGridMonth' ? {eventDisplay: 'block' as const} : {})}
             />
         </div>
     );

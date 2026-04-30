@@ -15,6 +15,7 @@ export interface EventResponse {
     types?: EventTypeKind[];
     previewPhotos: string[];
     status: string | null;
+    lifecycleState?: EventLifecycleState;
     avatar?: string | null;
     color?: string;
 }
@@ -53,6 +54,7 @@ export interface CreateEventPayload {
     maxParticipants?: number | null;
     color?: string | null;
     avatar?: File | null;
+    publish?: boolean;
 }
 
 export interface GetEventsPayload {

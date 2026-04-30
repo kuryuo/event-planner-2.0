@@ -131,3 +131,28 @@
 :global(div.fc.fc-theme-standard.weeks-6 .fc-daygrid-day-events) {
   height: 90px;
 }
+
+/*
+ * Месяц: многодневные полосы рисуются шире ячейки (harness из первого дня ряда).
+ * flex + overflow:hidden на .fc-daygrid-day-events обрезали полосу — оставались только «крошки» по понедельникам рядов.
+ */
+:global(.fc.fc-theme-standard .fc-dayGridMonth-view .fc-daygrid-day-events) {
+  display: block !important;
+  flex-direction: unset !important;
+  overflow: visible !important;
+  gap: 0 !important;
+}
+
+:global(.fc.fc-theme-standard .fc-dayGridMonth-view .fc-daygrid-day-bottom) {
+  overflow: visible;
+}
+
+:global(div.fc.fc-theme-standard.weeks-4 .fc-dayGridMonth-view .fc-daygrid-day-events),
+:global(div.fc.fc-theme-standard.weeks-5 .fc-dayGridMonth-view .fc-daygrid-day-events),
+:global(div.fc.fc-theme-standard.weeks-6 .fc-dayGridMonth-view .fc-daygrid-day-events) {
+  overflow: visible !important;
+}
+
+:global(.fc.fc-theme-standard:has(.fc-dayGridMonth-view)) {
+  overflow: visible;
+}
