@@ -1,6 +1,6 @@
 import {useState} from "react";
 import clsx from 'clsx';
-import Sidebar from "@/components/sidebar/Sidebar";
+import { AppShell } from "@/components/app-shell/AppShell";
 import styles from "./EventPage.module.scss";
 import Header from "@/pages/event/components/header/Header.tsx";
 import EventInfo from "@/pages/event/components/event-info/EventInfo.tsx";
@@ -147,12 +147,11 @@ export default function EventPage() {
     };
 
     return (
-             <div className={styles.pageWrapper}>
-                 <div className={styles.sidebar}>
-                     <Sidebar
-                         notificationCount={5}
-                     />
-                 </div>
+        <AppShell
+            pageWrapperClassName={styles.pageWrapper}
+            sidebarColumnClassName={styles.sidebar}
+            sidebarProps={{ notificationCount: 5 }}
+        >
             <div
                 className={clsx(
                     styles.content,
@@ -210,6 +209,6 @@ export default function EventPage() {
                     {renderContent()}
                 </section>
             </div>
-        </div>
+        </AppShell>
     );
 }

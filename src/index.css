@@ -239,6 +239,10 @@
     --spacing-12: 48px;
     --spacing-16: 64px;
 
+    /* Адаптив: ориентиры для медиазапросов (в CSS @media числа дублируются — см. комментарий) */
+    --layout-break-tablet: 1024px;
+    --layout-break-mobile: 768px;
+    --layout-break-compact-phone: 414px;
 
     --lvl1: 0px 4px 8px 0px var(--surface-primary);
     --lvl2: 0px 10px 16px 0px var(--surface-primary), 0px 6px 8px 0px var(--surface-primary);
@@ -450,6 +454,7 @@ body {
     font-family: 'Manrope', sans-serif;
     background-color: var(--bg-secondary-subtle);
     color: var(--content-primary);
+    -webkit-text-size-adjust: 100%;
 }
 
 /* FullCalendar: тема через переменные (v6) */
@@ -955,4 +960,29 @@ body {
 .ep-nav-item__icon > svg {
     width: 20px;
     height: 20px;
+}
+
+/* Узкие телефоны (~iPhone Plus): компактнее отступы и типографика на базе токенов */
+@media (max-width: 414px) {
+    :root {
+        --spacing-2: 6px;
+        --spacing-3: 8px;
+        --spacing-4: 12px;
+        --spacing-6: 16px;
+        --spacing-8: 22px;
+        --spacing-10: 28px;
+        --spacing-12: 36px;
+        --radius-4: 12px;
+        --radius-6: 16px;
+    }
+
+    .ep-nav-item.ant-btn {
+        height: 40px;
+        padding: 0 var(--spacing-2);
+    }
+
+    .ep-nav-item__label {
+        font-size: 15px;
+        line-height: 20px;
+    }
 }

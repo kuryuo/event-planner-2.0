@@ -196,3 +196,13 @@
   background: var(--content-brand-green);
   flex-shrink: 0;
 }
+
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: var(--spacing-4) var(--spacing-3);
+  }
+}

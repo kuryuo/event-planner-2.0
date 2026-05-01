@@ -60,3 +60,18 @@
     margin-top: var(--spacing-1);
   }
 }
+
+@media (max-width: 768px) {
+  .eventInfo {
+    gap: var(--spacing-6);
+  }
+
+  .infoSection,
+  .descriptionSection {
+    gap: var(--spacing-4);
+  }
+
+  .descriptionText {
+    max-width: 100%;
+  }
+}

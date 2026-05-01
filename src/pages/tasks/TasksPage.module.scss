@@ -410,3 +410,20 @@
     margin-left: 0;
   }
 }
+
+@media (max-width: 1024px) {
+  .content {
+    border-radius: var(--radius-4);
+    padding: var(--spacing-2);
+  }
+}
+
+@media (max-width: 768px) {
+  .pageHeader {
+    padding: var(--spacing-3);
+  }
+
+  .boardSurface {
+    padding: var(--spacing-2);
+  }
+}

@@ -110,3 +110,31 @@
     width: 100%;
   }
 }
+
+@media (max-width: 1024px) {
+  .content {
+    padding: var(--spacing-2);
+    border-radius: var(--radius-4);
+    min-height: 0;
+  }
+
+  .contentPanel {
+    padding: var(--spacing-3);
+  }
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding: var(--spacing-1);
+    gap: var(--spacing-3);
+  }
+
+  .contentPanel {
+    padding: var(--spacing-2);
+    border-radius: var(--radius-3);
+  }
+
+  .archivedWrapper {
+    padding: var(--spacing-3);
+  }
+}

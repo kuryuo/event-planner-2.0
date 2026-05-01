@@ -1,7 +1,7 @@
 import {type ChangeEvent, useEffect, useMemo, useRef, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {Tag} from 'antd';
-import Sidebar from '@/components/sidebar/Sidebar';
+import { AppShell } from '@/components/app-shell/AppShell';
 import styles from './ProfilePage.module.scss';
 import ChevronLeftIcon from '@/assets/img/icon-s/chevron-left.svg?react';
 import ChevronDownIcon from '@/assets/img/icon-m/chevron-down.svg?react';
@@ -682,11 +682,11 @@ export default function ProfilePage() {
     };
 
     return (
-        <div className={styles.pageWrapper}>
-            <div className={styles.sidebar}>
-                <Sidebar notificationCount={5}/>
-            </div>
-
+        <AppShell
+            pageWrapperClassName={styles.pageWrapper}
+            sidebarColumnClassName={styles.sidebar}
+            sidebarProps={{ notificationCount: 5 }}
+        >
             <div className={styles.content}>
                 <div className={styles.topBar}>
                     <button className={styles.backButton} onClick={handleBack}>
@@ -1133,6 +1133,6 @@ export default function ProfilePage() {
                     />
                 ))}
             </div>
-        </div>
+        </AppShell>
     );
 }

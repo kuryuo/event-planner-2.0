@@ -3,3 +3,9 @@
   border-radius: var(--radius-6);
   overflow: hidden;
 }
+
+@media (max-width: 768px) {
+  .calendarWrapper {
+    border-radius: var(--radius-4);
+  }
+}

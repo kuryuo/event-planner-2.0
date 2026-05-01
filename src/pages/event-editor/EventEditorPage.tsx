@@ -1,4 +1,4 @@
-import Sidebar from "@/components/sidebar/Sidebar";
+import { AppShell } from "@/components/app-shell/AppShell";
 import EventForm from "@/pages/event-editor/components/event-form/EventForm";
 import styles from "./EventEditorPage.module.scss";
 import {useSearchParams} from "react-router-dom";
@@ -21,12 +21,11 @@ export default function EventEditorPage() {
     }
 
     return (
-             <div className={styles.pageWrapper}>
-                 <div className={styles.sidebar}>
-                     <Sidebar
-                         notificationCount={5}
-                     />
-                 </div>
+        <AppShell
+            pageWrapperClassName={styles.pageWrapper}
+            sidebarColumnClassName={styles.sidebar}
+            sidebarProps={{ notificationCount: 5 }}
+        >
             <div className={styles.form}>
                 <EventForm
                     eventData={eventData?.result}
@@ -36,6 +35,6 @@ export default function EventEditorPage() {
                     isEditMode={!!eventId}
                 />
             </div>
-        </div>
+        </AppShell>
     );
 }

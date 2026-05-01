@@ -88,3 +88,34 @@
 .toolbarBtn.active {
   color: var(--content-primary);
 }
+
+@media (max-width: 768px) {
+  .customToolbar {
+    flex-direction: column;
+    align-items: stretch;
+    height: auto;
+    gap: var(--spacing-3);
+    padding: var(--spacing-4);
+  }
+
+  .leftPart {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .rightPart {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .buttonsWrapper {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .navLabel {
+    text-align: center;
+    width: 100%;
+  }
+}

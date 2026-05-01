@@ -550,10 +550,6 @@ background: var(--bg-primary);
 }
 
 @media (max-width: 1120px) {
-  .sidebar {
-    display: none;
-  }
-
   .content {
     border-radius: 0;
     padding: var(--spacing-3);

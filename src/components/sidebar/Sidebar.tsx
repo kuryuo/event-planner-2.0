@@ -35,7 +35,7 @@ import SearchModal from "@/components/sidebar/search-modal/SearchModal";
 import NotificationsDrawer from "@/components/notifications-drawer/NotificationsDrawer.tsx";
 import { useTheme } from "@/hooks/ui/useTheme.ts";
 
-interface SidebarProps {
+export interface SidebarProps {
   notificationCount?: number;
   tasksCount?: number;
 }

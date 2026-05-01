@@ -1,6 +1,6 @@
 import {useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import Sidebar from '@/components/sidebar/Sidebar';
+import { AppShell } from '@/components/app-shell/AppShell';
 import {Input} from "antd";
 import ArchiveEventCard from '@/pages/archive/components/archive-event-card/ArchiveEventCard.tsx';
 import SearchIcon from '@/assets/img/icon-m/search.svg?react';
@@ -49,11 +49,11 @@ export default function ArchivePage() {
     }, [archivedResponse?.result, isError, profileEvents, query]);
 
     return (
-        <div className={styles.pageWrapper}>
-            <div className={styles.sidebar}>
-                <Sidebar notificationCount={5}/>
-            </div>
-
+        <AppShell
+            pageWrapperClassName={styles.pageWrapper}
+            sidebarColumnClassName={styles.sidebar}
+            sidebarProps={{ notificationCount: 5 }}
+        >
             <div className={styles.content}>
                 <div className={styles.headerCard}>
                     <div>
@@ -105,6 +105,6 @@ export default function ArchivePage() {
                     )}
                 </section>
             </div>
-        </div>
+        </AppShell>
     );
 }

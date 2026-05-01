@@ -126,8 +126,9 @@
 }
 
 @media (max-width: 960px) {
-  .sidebar {
-    display: none;
+  .content {
+    padding: var(--spacing-3);
+    min-height: 0;
   }
 
   .headerCard {

@@ -2,7 +2,7 @@ import {useMemo} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import type {AppDispatch, RootState} from '@/store/store.ts';
-import Sidebar from '@/components/sidebar/Sidebar.tsx';
+import { AppShell } from '@/components/app-shell/AppShell';
 import {Button} from "antd";
 import {
     useGetInvitationsQuery,
@@ -164,11 +164,11 @@ export default function NotificationsPage() {
     };
 
     return (
-        <div className={styles.pageWrapper}>
-            <div className={styles.sidebar}>
-                <Sidebar notificationCount={unreadCount}/>
-            </div>
-
+        <AppShell
+            pageWrapperClassName={styles.pageWrapper}
+            sidebarColumnClassName={styles.sidebar}
+            sidebarProps={{ notificationCount: unreadCount }}
+        >
             <div className={styles.contentArea}>
                 <div className={styles.content}>
                 <div className={styles.header}>
@@ -309,6 +309,6 @@ export default function NotificationsPage() {
                 )}
             </div>
             </div>
-        </div>
+        </AppShell>
     );
 }

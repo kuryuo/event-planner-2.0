@@ -19,12 +19,6 @@
   color: var(--content-primary);
 }
 
-.mainInfoRow {
-  display: grid;
-  grid-template-columns: 1.6fr minmax(260px, 0.8fr);
-  gap: var(--spacing-6);
-}
-
 .infoBlock,
 .descriptionBlock,
 .participantsBlock {
@@ -59,27 +53,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-1);
-}
-
-.reportCard {
-  border-radius: var(--radius-4);
-  border: 1px solid var(--border-primary);
-  padding: var(--spacing-4);
-  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-brand-green-subtle) 100%);
-  height: fit-content;
-}
-
-.reportTitle {
-  @include ty.font(subtitle-s, semibold);
-  color: var(--content-primary);
-  margin-bottom: var(--spacing-4);
-}
-
-.reportLink {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-2);
-  @include ty.font(body-s, regular);
 }
 
 .descriptionText {
@@ -124,10 +97,6 @@
 }
 
 @media (max-width: 1080px) {
-  .mainInfoRow {
-    grid-template-columns: 1fr;
-  }
-
   .infoGrid {
     grid-template-columns: 1fr;
     row-gap: var(--spacing-1);

@@ -167,19 +167,34 @@
 }
 
 @media (max-width: 1024px) {
-  .pageWrapper {
-    flex-direction: column;
-    height: auto;
-    min-height: 100vh;
-  }
-
   .contentArea {
+    width: 100%;
     padding-top: 0;
+    align-items: stretch;
   }
 
   .content {
-    width: auto;
+    width: 100%;
     min-height: auto;
     border-radius: var(--radius-3);
+    padding: var(--spacing-4) var(--spacing-3);
+  }
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding: var(--spacing-3) var(--spacing-2);
+  }
+
+  .header {
+    flex-wrap: wrap;
+  }
+
+  .cardMain {
+    flex-wrap: wrap;
+  }
+
+  .cardDate {
+    white-space: normal;
   }
 }

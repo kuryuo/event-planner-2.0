@@ -37,3 +37,16 @@
   border-radius: var(--radius-6);
   z-index: 50;
 }
+
+@media (max-width: 1024px) {
+  .calendar {
+    padding: var(--spacing-2);
+    min-height: 60vh;
+  }
+}
+
+@media (max-width: 768px) {
+  .calendar {
+    padding: var(--spacing-1);
+  }
+}

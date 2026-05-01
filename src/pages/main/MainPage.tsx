@@ -1,6 +1,6 @@
 import {useState} from "react";
 import Calendar from "@/pages/main/components/calendar/Calendar";
-import Sidebar from "@/components/sidebar/Sidebar";
+import { AppShell } from "@/components/app-shell/AppShell";
 import Filters from "@/pages/main/components/filters/Filters";
 import styles from "./MainPage.module.scss";
 import {useGetProfileQuery} from "@/services/api/profileApi.ts";
@@ -13,11 +13,11 @@ export default function MainPage() {
     useGetProfileQuery();
 
     return (
-        <div className={styles.pageWrapper}>
-            <div className={styles.sidebar}>
-                <Sidebar />
-            </div>
-
+        <AppShell
+            pageWrapperClassName={styles.pageWrapper}
+            sidebarColumnClassName={styles.sidebar}
+            sidebarProps={{ notificationCount: 5 }}
+        >
             <div className={styles.calendar}>
                 <Calendar
                     onFilterClick={() => setShowFilters(prev => !prev)}
@@ -34,6 +34,6 @@ export default function MainPage() {
                     appliedFilters={filters}
                 />
             )}
-        </div>
+        </AppShell>
     );
 }

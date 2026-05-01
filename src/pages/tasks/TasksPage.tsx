@@ -1,4 +1,4 @@
-import Sidebar from "@/components/sidebar/Sidebar";
+import { AppShell } from "@/components/app-shell/AppShell";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import {
@@ -349,11 +349,11 @@ export default function TasksPage() {
   };
 
   return (
-    <div className={styles.pageWrapper}>
-      <div className={styles.sidebar}>
-        <Sidebar notificationCount={5} />
-      </div>
-
+    <AppShell
+      pageWrapperClassName={styles.pageWrapper}
+      sidebarColumnClassName={styles.sidebar}
+      sidebarProps={{ notificationCount: 5 }}
+    >
       <div className={styles.content}>
         <div className={styles.pageHeader}>
           <h1 className={styles.pageHeaderTitle}>Мои задачи</h1>
@@ -779,6 +779,6 @@ export default function TasksPage() {
           </>
         )}
       </div>
-    </div>
+    </AppShell>
   );
 }

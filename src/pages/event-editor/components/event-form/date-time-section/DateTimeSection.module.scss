@@ -177,3 +177,20 @@
   color: var(--content-primary);
 }
 
+@media (max-width: 768px) {
+  .row {
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+  }
+
+  .wrapper[data-variant="date"] {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .wrapper[data-variant="time"] {
+    flex: 1;
+    min-width: 0;
+    max-width: 100%;
+  }
+}

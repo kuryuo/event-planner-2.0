@@ -1,5 +1,4 @@
 import {Avatar} from "antd";
-import FileLinesIcon from '@/assets/image/file-lines.svg?react';
 import OwnerIcon from '@/assets/image/owner-icon.svg?react';
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 import {useEventSubscribers} from '@/hooks/api/useEventSubscribers.ts';
@@ -63,62 +62,52 @@ export default function ArchivedEventOverview({
                 <h2 className={styles.title}>{title}</h2>
             </div>
 
-            <div className={styles.mainInfoRow}>
-                <section className={styles.infoBlock}>
-                    <h3 className={styles.blockTitle}>Основная информация</h3>
-                    <div className={styles.infoGrid}>
-                        <span className={styles.label}>Тип</span>
-                        <span className={styles.value}>
-                            <Tag
-                                bordered={false}
-                                style={{
-                                    ...tagTextStyleM,
-                                    backgroundColor: "var(--bg-orange)",
-                                    color: "var(--content-orange)",
-                                }}
-                            >
-                                {categories[0]?.text || 'Событие'}
-                            </Tag>
+            <section className={styles.infoBlock}>
+                <h3 className={styles.blockTitle}>Основная информация</h3>
+                <div className={styles.infoGrid}>
+                    <span className={styles.label}>Тип</span>
+                    <span className={styles.value}>
+                        <Tag
+                            bordered={false}
+                            style={{
+                                ...tagTextStyleM,
+                                backgroundColor: "var(--bg-orange)",
+                                color: "var(--content-orange)",
+                            }}
+                        >
+                            {categories[0]?.text || 'Событие'}
+                        </Tag>
+                    </span>
+
+                    <span className={styles.label}>Дата и время</span>
+                    <span className={styles.value}>{formattedDate || 'Не указано'}</span>
+
+                    <span className={styles.label}>Место</span>
+                    <span className={styles.value}>{placeText}</span>
+
+                    <span className={styles.label}>Теги</span>
+                    <span className={styles.value}>
+                        <span className={styles.tagsRow}>
+                            {categories.map((category) => (
+                                <Tag
+                                    key={category.text}
+                                    bordered={false}
+                                    style={{
+                                        ...tagTextStyleM,
+                                        backgroundColor: "var(--bg-purple)",
+                                        color: "var(--content-purple)",
+                                    }}
+                                >
+                                    {category.text}
+                                </Tag>
+                            ))}
                         </span>
+                    </span>
 
-                        <span className={styles.label}>Дата и время</span>
-                        <span className={styles.value}>{formattedDate || 'Не указано'}</span>
-
-                        <span className={styles.label}>Место</span>
-                        <span className={styles.value}>{placeText}</span>
-
-                        <span className={styles.label}>Теги</span>
-                        <span className={styles.value}>
-                            <span className={styles.tagsRow}>
-                                {categories.map((category) => (
-                                    <Tag
-                                        key={category.text}
-                                        bordered={false}
-                                        style={{
-                                            ...tagTextStyleM,
-                                            backgroundColor: "var(--bg-purple)",
-                                            color: "var(--content-purple)",
-                                        }}
-                                    >
-                                        {category.text}
-                                    </Tag>
-                                ))}
-                            </span>
-                        </span>
-
-                        <span className={styles.label}>Посетители</span>
-                        <span className={styles.value}>{participants.length}</span>
-                    </div>
-                </section>
-
-                <section className={styles.reportCard}>
-                    <h3 className={styles.reportTitle}>Отчет по мероприятию</h3>
-                    <div className={styles.reportLink}>
-                        <FileLinesIcon/>
-                        <span>Отчет_34234324.pdf</span>
-                    </div>
-                </section>
-            </div>
+                    <span className={styles.label}>Посетители</span>
+                    <span className={styles.value}>{participants.length}</span>
+                </div>
+            </section>
 
             <section className={styles.descriptionBlock}>
                 <h3 className={styles.blockTitle}>Описание</h3>

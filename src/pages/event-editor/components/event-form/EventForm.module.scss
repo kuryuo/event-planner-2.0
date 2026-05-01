@@ -418,3 +418,20 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 768px) {
+  .header {
+    padding: var(--spacing-3);
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+  }
+
+  .form {
+    padding: var(--spacing-4);
+    gap: var(--spacing-4);
+  }
+
+  .contentGrid {
+    gap: var(--spacing-2);
+  }
+}
