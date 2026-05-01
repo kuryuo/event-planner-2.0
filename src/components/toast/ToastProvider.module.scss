@@ -1,5 +1,11 @@
 @use '@/typography-variables' as ty;
 
+@property --toast-ring-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 360deg;
+}
+
 .viewport {
   position: fixed;
   top: var(--spacing-6);
@@ -62,6 +68,12 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  background: conic-gradient(
+    var(--bg-brand-green) var(--toast-ring-angle),
+    transparent 0deg
+  );
+  animation: toast-ring-countdown var(--toast-duration, 5s) linear forwards;
+  will-change: --toast-ring-angle;
 
   &::before {
     content: '';
@@ -87,5 +99,15 @@
   svg {
     width: 24px;
     height: 24px;
+  }
+}
+
+@keyframes toast-ring-countdown {
+  from {
+    --toast-ring-angle: 360deg;
+  }
+
+  to {
+    --toast-ring-angle: 0deg;
   }
 }

@@ -26,6 +26,7 @@ import {useGetProfileEventsQuery, useGetProfileQuery, useUpdateProfileMutation} 
 import {useGetUserEventsQuery, useGetUserProfileQuery} from '@/services/api/userApi.ts';
 import ProfileActionModal from '@/components/profile-action-modal/ProfileActionModal.tsx';
 import ProfileSnackbar, {type ProfileSnackbarVariant} from '@/components/profile-snackbar/ProfileSnackbar.tsx';
+import {getApiErrorMessage} from '@/utils/apiError.ts';
 import type {UserEvent} from '@/types/api/Profile.ts';
 import {isValidPhone, isValidTelegram} from '@/utils/validation.ts';
 import {useLazyGetMyBoardTasksQuery} from '@/services/api/eventApi.ts';
@@ -420,7 +421,7 @@ export default function ProfilePage() {
             pushToast('Профиль успешно обновлен', 'success');
         } catch (error) {
             console.error('Не удалось сохранить настройки', error);
-            pushToast('Ошибка при сохранении профиля', 'error');
+            pushToast(getApiErrorMessage(error, 'Ошибка при сохранении профиля'), 'error');
         }
     };
 

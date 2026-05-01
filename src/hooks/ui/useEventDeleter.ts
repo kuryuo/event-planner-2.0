@@ -1,5 +1,6 @@
 import {useNavigate} from 'react-router-dom';
 import {useDeleteEventMutation} from '@/services/api/eventApi.ts';
+import {useApiToast} from '@/hooks/ui/useApiToast.ts';
 
 export interface UseEventDeleterOutput {
     handleDelete: (eventId: string) => Promise<void>;
@@ -9,17 +10,18 @@ export interface UseEventDeleterOutput {
 
 export const useEventDeleter = (): UseEventDeleterOutput => {
     const navigate = useNavigate();
+    const {showApiError, showSuccess} = useApiToast();
     const [deleteEventMutation, {isLoading, error}] = useDeleteEventMutation();
 
     const handleDelete = async (eventId: string) => {
         try {
             await deleteEventMutation(eventId).unwrap();
-            console.log('Событие успешно удалено');
+            showSuccess('Мероприятие успешно удалено');
             navigate('/main');
-        } catch (err: any) {
+        } catch (err) {
             console.error('Ошибка удаления события:', err);
-            const errorMessage = err?.data?.message || err?.message || 'Произошла ошибка при удалении';
-            throw new Error(errorMessage);
+            showApiError(err, 'Не удалось удалить мероприятие');
+            throw err;
         }
     };
 

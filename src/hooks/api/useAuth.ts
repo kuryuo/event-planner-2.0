@@ -9,6 +9,7 @@ import {
     useLogoutMutation
 } from '@/services/api/authApi.ts';
 import type {LoginPayload, RegisterPayload} from '@/types/api/Auth.ts';
+import {getApiErrorMessage} from '@/utils/apiError.ts';
 
 export const useAuth = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -28,9 +29,8 @@ export const useAuth = () => {
             const result = await loginMutation(payload).unwrap();
             dispatch(setTokens(result.data));
             return {success: true};
-        } catch (err: any) {
-            const message = err.data?.message || err.message;
-            return {success: false, error: message};
+        } catch (err) {
+            return {success: false, error: getApiErrorMessage(err, 'Не удалось войти')};
         }
     };
 
@@ -39,9 +39,8 @@ export const useAuth = () => {
             const result = await registerMutation(payload).unwrap();
             dispatch(setTokens(result.data));
             return {success: true};
-        } catch (err: any) {
-            const message = err.data?.message || err.message;
-            return {success: false, error: message};
+        } catch (err) {
+            return {success: false, error: getApiErrorMessage(err, 'Не удалось зарегистрироваться')};
         }
     };
 
@@ -60,8 +59,8 @@ export const useAuth = () => {
         try {
             await recoverPasswordMutation(payload).unwrap();
             return {success: true};
-        } catch (err: any) {
-            return {success: false, error: err.data?.message || err.message};
+        } catch (err) {
+            return {success: false, error: getApiErrorMessage(err, 'Не удалось восстановить пароль')};
         }
     };
 

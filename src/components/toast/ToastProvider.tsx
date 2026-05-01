@@ -1,4 +1,4 @@
-import {createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode} from 'react';
+import {createContext, useCallback, useContext, useEffect, useMemo, useState, type CSSProperties, type ReactNode} from 'react';
 import CircleIcon from '@/assets/img/icon-l/circle.svg?react';
 import CheckCircleIcon from '@/assets/image/check-circle.svg?react';
 import WarningCircleIcon from '@/assets/image/warning-circle.svg?react';
@@ -35,23 +35,15 @@ const getIconByType = (type: ToastType) => {
 };
 
 function ToastCard({toast, count, onClose}: { toast: ToastItem; count: number; onClose: (id: string) => void }) {
-    const [progress, setProgress] = useState(100);
-
     const Icon = getIconByType(toast.type ?? 'info');
 
-    useEffect(() => {
-        const startedAt = performance.now();
-        const timer = window.setInterval(() => {
-            const elapsed = performance.now() - startedAt;
-            const next = Math.max(0, 100 - (elapsed / toast.durationMs) * 100);
-            setProgress(next);
-        }, 100);
+    const counterStyle = {
+        '--toast-duration': `${toast.durationMs}ms`,
+    } as CSSProperties;
 
+    useEffect(() => {
         const closeTimer = window.setTimeout(() => onClose(toast.id), toast.durationMs);
-        return () => {
-            window.clearInterval(timer);
-            window.clearTimeout(closeTimer);
-        };
+        return () => window.clearTimeout(closeTimer);
     }, [onClose, toast.durationMs, toast.id]);
 
     return (
@@ -72,12 +64,7 @@ function ToastCard({toast, count, onClose}: { toast: ToastItem; count: number; o
                     {toast.actionLabel}
                 </button>
             )}
-            <div
-                className={styles.counter}
-                style={{
-                    background: `conic-gradient(var(--bg-brand-green) ${progress * 3.6}deg, transparent 0deg)`,
-                }}
-            >
+            <div className={styles.counter} style={counterStyle}>
                 <span>{count}</span>
             </div>
             <button type="button" className={styles.closeButton} onClick={() => onClose(toast.id)}>

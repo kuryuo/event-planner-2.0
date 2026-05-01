@@ -10,6 +10,7 @@ import TrashIcon from '@/assets/img/icon-m/trash.svg?react';
 import {Avatar, Tabs} from "antd";
 import {Button} from "antd";
 import {useEventDeleter} from '@/hooks/ui/useEventDeleter.ts';
+import {useApiToast} from '@/hooks/ui/useApiToast.ts';
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 import {useGetProfileEventsQuery} from "@/services/api/profileApi.ts";
 import {
@@ -83,6 +84,7 @@ export default function Header({
     const [isStatusOpen, setIsStatusOpen] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState(() => normalizeStatusLabel(status));
     const {handleDelete, isLoading: isDeleting} = useEventDeleter();
+    const {showApiError, showSuccess} = useApiToast();
     
     const {data: subscribedEvents} = useGetProfileEventsQuery();
     const [subscribeToEvent] = useSubscribeToEventMutation();
@@ -127,12 +129,14 @@ export default function Header({
 
             try {
                 await updateLifecycleState({eventId, lifecycleState: statusLabelToApiValue[option]}).unwrap();
+                showSuccess('Статус мероприятия обновлен');
             } catch (error) {
                 console.error('Не удалось обновить статус мероприятия:', error);
                 setSelectedStatus(previousStatus);
+                showApiError(error, 'Не удалось обновить статус мероприятия');
             }
         },
-        [eventId, isAdmin, selectedStatus, updateLifecycleState],
+        [eventId, isAdmin, selectedStatus, showApiError, showSuccess, updateLifecycleState],
     );
 
     const statusMenuItems: MenuProps['items'] = useMemo(
@@ -170,11 +174,14 @@ export default function Header({
         try {
             if (isSubscribed) {
                 await unsubscribeFromEvent(eventId).unwrap();
+                showSuccess('Вы отписались от мероприятия');
             } else {
                 await subscribeToEvent(eventId).unwrap();
+                showSuccess('Вы подписались на мероприятие');
             }
         } catch (error) {
             console.error('Ошибка при подписке/отписке:', error);
+            showApiError(error, 'Не удалось изменить подписку');
         }
     };
 
@@ -267,8 +274,10 @@ export default function Header({
                                                     await updateCancellation({eventId, isCancelled: !isCancelledNow}).unwrap();
                                                     setSelectedStatus(!isCancelledNow ? 'Отменено' : 'В работе');
                                                     setIsMenuOpen(false);
+                                                    showSuccess(!isCancelledNow ? 'Мероприятие отменено' : 'Отмена снята');
                                                 } catch (error) {
                                                     console.error('Не удалось обновить отмену:', error);
+                                                    showApiError(error, 'Не удалось обновить отмену мероприятия');
                                                 }
                                             }}
                                             disabled={isUpdatingCancellation || isReadOnlyLifecycle}
@@ -285,8 +294,10 @@ export default function Header({
                                                 try {
                                                     await copyToTemplate({eventId, name: templateName.trim()}).unwrap();
                                                     setIsMenuOpen(false);
+                                                    showSuccess('Шаблон сохранен');
                                                 } catch (error) {
                                                     console.error('Не удалось создать шаблон:', error);
+                                                    showApiError(error, 'Не удалось создать шаблон');
                                                 }
                                             }}
                                             disabled={isCopyingTemplate}

@@ -6,6 +6,7 @@ import {
     useUploadEventAvatarMutation
 } from '@/services/api/eventApi.ts';
 import type {CreateEventPayload, UpdateEventPayload} from '@/types/api/Event.ts';
+import {useApiToast} from '@/hooks/ui/useApiToast.ts';
 
 export interface UseEventEditorOutput {
     handleSubmit: (payload: CreateEventPayload | UpdateEventPayload) => Promise<void>;
@@ -17,6 +18,7 @@ export interface UseEventEditorOutput {
 
 export const useEventEditor = (eventId?: string): UseEventEditorOutput => {
     const navigate = useNavigate();
+    const {showApiError, showSuccess} = useApiToast();
     const [createEventMutation, {isLoading: isCreating, error: createError}] = useCreateEventMutation();
     const [updateEventMutation, {isLoading: isUpdating, error: updateError}] = useUpdateEventMutation();
     const [deleteEventMutation, {isLoading: isDeleting, error: deleteError}] = useDeleteEventMutation();
@@ -36,6 +38,8 @@ export const useEventEditor = (eventId?: string): UseEventEditorOutput => {
                 if (avatar) {
                     await uploadAvatarMutation({eventId, avatar}).unwrap();
                 }
+
+                showSuccess('Мероприятие успешно обновлено');
             } else {
                 const createPayload = payload as CreateEventPayload;
                 const result = await createEventMutation(createPayload).unwrap();
@@ -43,21 +47,25 @@ export const useEventEditor = (eventId?: string): UseEventEditorOutput => {
                 if (avatar && result?.result?.id) {
                     await uploadAvatarMutation({eventId: result.result.id, avatar}).unwrap();
                 }
+
+                showSuccess('Мероприятие успешно создано');
             }
             navigate('/main');
         } catch (err) {
             console.error('Ошибка сохранения события:', err);
+            showApiError(err, 'Не удалось сохранить мероприятие');
         }
     };
 
     const handleDelete = async (eventId: string) => {
         try {
             await deleteEventMutation(eventId).unwrap();
+            showSuccess('Мероприятие успешно удалено');
             navigate('/main');
-        } catch (err: any) {
+        } catch (err) {
             console.error('Ошибка удаления события:', err);
-            const errorMessage = err?.data?.message || err?.message || 'Произошла ошибка при удалении';
-            throw new Error(errorMessage);
+            showApiError(err, 'Не удалось удалить мероприятие');
+            throw err;
         }
     };
 
