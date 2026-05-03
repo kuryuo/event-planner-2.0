@@ -16,11 +16,13 @@ export interface EventResponse {
     previewPhotos: string[];
     status: string | null;
     lifecycleState?: EventLifecycleState;
+    isCancelled?: boolean;
+    myParticipantRole?: ParticipantRoleKind | string | null;
     avatar?: string | null;
     color?: string;
 }
 
-export type EventLifecycleState = 'Draft' | 'Published' | 'Completed' | 'Cancelled';
+export type EventLifecycleState = 'Draft' | 'Published' | 'Completed' | 'Cancelled' | 'Archived';
 
 export type VenueFormat = 'InPerson' | 'Online' | 'Hybrid';
 
@@ -30,6 +32,7 @@ export type EventTypeKind =
     | 'PP'
     | 'SpecialCourse'
     | 'Practice'
+    | 'CareerEvent'
     | 'CereerEvent';
 
 export type ParticipantRoleKind = 'Organizer' | 'Editor' | 'Assistant' | 'Observer';
@@ -296,6 +299,12 @@ export interface MyAssignedTaskItem {
     title?: string | null;
     description?: string | null;
     assignedUserId?: string | null;
+    assigneeId?: string | null;
+    assigneeName?: string | null;
+    assigneeDisplayName?: string | null;
+    assignedUserName?: string | null;
+    assigneeAvatarUrl?: string | null;
+    assigneeAvatar?: string | null;
     creatorId?: string | null;
     dueDate?: string | null;
     priority?: 'Urgent' | 'High' | 'Medium' | 'Low' | string | null;

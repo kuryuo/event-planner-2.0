@@ -1,5 +1,6 @@
 import {baseApi} from "@/services/api/baseApi.ts";
 import type {UpdateUserAvatarPayload, UpdateUserProfilePayload, UserEvent, UserProfile} from "@/types/api/Profile.ts";
+import {normalizeEventTypes} from '@/utils/eventTypeLabels.ts';
 
 
 export const profileApi = baseApi.injectEndpoints({
@@ -49,6 +50,18 @@ export const profileApi = baseApi.injectEndpoints({
                 url: 'users/me/events',
                 method: 'GET',
             }),
+            transformResponse: (response: unknown): UserEvent[] => {
+                const events = Array.isArray(response)
+                    ? response
+                    : Array.isArray((response as { result?: UserEvent[] })?.result)
+                        ? (response as { result: UserEvent[] }).result
+                        : [];
+
+                return events.map((event) => ({
+                    ...event,
+                    types: normalizeEventTypes(event.types),
+                }));
+            },
             providesTags: ['Profile'],
         }),
     })

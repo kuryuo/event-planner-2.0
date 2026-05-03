@@ -1,3 +1,5 @@
+import type {EventTypeKind} from '@/types/api/Event.ts';
+
 export type UserPrivilege = 'COMMON' | 'ADMIN' | 'ORGANIZER';
 
 export interface UserProfile {
@@ -34,6 +36,7 @@ export interface UserEvent {
     location: string | null;
     format: 'online' | 'offline';
     eventType: 'open' | 'closed' | string;
+    types?: EventTypeKind[];
     responsiblePersonId: string;
     maxParticipants: number;
     color?: string;
