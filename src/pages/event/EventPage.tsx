@@ -34,9 +34,8 @@ export default function EventPage() {
     );
     const [activeTab, setActiveTab] = useState(TAB_INDEX_OVERVIEW);
 
-    const isAdmin = profile && event?.responsiblePersonId 
-        ? profile.id === event.responsiblePersonId 
-        : false;
+    const isAdmin = event?.myParticipantRole === 'Organizer'
+        || Boolean(profile && event?.responsiblePersonId && profile.id === event.responsiblePersonId);
 
     const normalizedStatus = (event?.lifecycleState ?? event?.status ?? '').toLowerCase();
     const isStatusArchived =
@@ -113,7 +112,10 @@ export default function EventPage() {
                             <Participants eventId={event.id} isAdmin={isAdmin}/>
                         </div>
                         <div className={styles.sideContent}>
-                            <EventTasksOverview eventId={event.id}/>
+                            <EventTasksOverview
+                                eventId={event.id}
+                                onOpenBoard={() => setActiveTab(TAB_INDEX_KANBAN)}
+                            />
                         </div>
                     </div>
                 );
@@ -166,7 +168,10 @@ export default function EventPage() {
                         eventId={event.id}
                         avatar={event.avatar}
                         isArchived={isArchivedEvent}
-                        status={event.lifecycleState ?? event.status}
+                        lifecycleState={event.lifecycleState}
+                        status={event.status}
+                        isCancelled={event.isCancelled}
+                        participantRole={event.myParticipantRole}
                         updateData={{
                             name: event.name,
                             description: event.description,
@@ -191,7 +196,10 @@ export default function EventPage() {
                         eventId={event.id}
                         avatar={event.avatar}
                         isArchived={isArchivedEvent}
-                        status={event.lifecycleState ?? event.status}
+                        lifecycleState={event.lifecycleState}
+                        status={event.status}
+                        isCancelled={event.isCancelled}
+                        participantRole={event.myParticipantRole}
                         updateData={{
                             name: event.name,
                             description: event.description,

@@ -43,10 +43,12 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
     if (isLoading) {
         return (
             <div className={styles.gallery}>
-                <div className={styles.loading}>Загрузка фотографий...</div>
+                <div className={styles.loading}>Загрузка медиа...</div>
             </div>
         );
     }
+
+    const uploadLabel = isUploading ? 'Загрузка...' : 'Загрузить фото и видео';
 
     return (
         <>
@@ -61,7 +63,7 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
                                 onClick={handleUploadClick}
                                 disabled={isUploading}
                             >
-                                {isUploading ? 'Загрузка...' : 'Загрузить'}
+                                {uploadLabel}
                             </Button>
                             <Button
                                 type={isSelectionMode ? "primary" : "text"}
@@ -100,7 +102,9 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
                 {error || !hasPhotos ? (
                     <div className={styles.emptyState}>
                         <h3 className={styles.emptyTitle}>Добавьте фото или видео</h3>
-                        <p className={styles.emptyText}>Перетащите файлы сюда или нажмите на кнопку ниже</p>
+                        <p className={styles.emptyText}>
+                            Перетащите файлы сюда или нажмите на кнопку ниже
+                        </p>
                         <Button
                             type="primary"
                             icon={<PlusLgIcon className={styles.icon}/>}
@@ -108,7 +112,7 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
                             onClick={handleUploadClick}
                             disabled={isUploading}
                         >
-                            {isUploading ? 'Загрузка...' : 'Добавить документ'}
+                            {uploadLabel}
                         </Button>
                     </div>
                 ) : (
@@ -118,9 +122,8 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
                             if (!imageUrl) return null;
 
                             const isVideo = isVideoPath(photo.filePath);
-                            
                             const isSelected = selectedPhotoIds.has(photo.id);
-                            
+
                             return (
                                 <div
                                     key={photo.id}
@@ -162,7 +165,7 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
                     </div>
                 )}
             </div>
-            
+
             {selectedPhotoIndex !== null && !isSelectionMode && (
                 <PhotoViewer
                     photos={photos}
@@ -176,3 +179,4 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
         </>
     );
 }
+

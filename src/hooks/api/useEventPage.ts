@@ -2,7 +2,7 @@ import {useMemo} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {useGetEventByIdQuery} from '@/services/api/eventApi.ts';
 import {formatDateTimeRange} from '@/utils/date.ts';
-import type {VenueFormat} from '@/types/api/Event.ts';
+import type {ParticipantRoleKind, VenueFormat} from '@/types/api/Event.ts';
 
 export interface UseEventPageOutput {
     event: {
@@ -16,6 +16,8 @@ export interface UseEventPageOutput {
         endDate: string | null;
         status: string | null;
         lifecycleState?: string | null;
+        isCancelled?: boolean;
+        myParticipantRole?: ParticipantRoleKind | string | null;
         categories: Array<{ text: string }>;
         avatar?: string | null;
         color?: string;
@@ -53,6 +55,8 @@ export const useEventPage = (): UseEventPageOutput => {
             endDate: eventData.endDate,
             status: eventData.status,
             lifecycleState: eventData.lifecycleState ?? null,
+            isCancelled: eventData.isCancelled ?? false,
+            myParticipantRole: eventData.myParticipantRole ?? null,
             formattedDate: eventData.startDate && eventData.endDate
                 ? formatDateTimeRange(eventData.startDate, eventData.endDate)
                 : '',

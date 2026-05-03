@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent} from 'react';
 import {useSelector} from 'react-redux';
 import PlusIcon from '@/assets/img/icon-s/plus-lg.svg?react';
 import CheckIcon from '@/assets/img/icon-m/check2.svg?react';
@@ -7,6 +7,8 @@ import SearchIcon from '@/assets/img/icon-m/search.svg?react';
 import FilterIcon from '@/assets/img/icon-m/filter.svg?react';
 import ChevronDownIcon from '@/assets/img/icon-m/chevron-down.svg?react';
 import ChevronRightIcon from '@/assets/img/icon-m/chevron-right.svg?react';
+import ThreeDotsVerticalIcon from '@/assets/img/icon-m/three-dots-vertical.svg?react';
+import TrashIcon from '@/assets/img/icon-m/trash.svg?react';
 import JustifyIcon from '@/assets/img/icon-m/justify.svg?react';
 import StackedIcon from '@/assets/img/icon-m/view-stacked.svg?react';
 import {Button} from "antd";
@@ -26,9 +28,11 @@ import {
     useCreateEventNoteMutation,
     useUpdateEventNoteMutation,
     useLazyDownloadEventAttachmentQuery,
+    useDeleteEventAttachmentMutation,
     useUploadEventAttachmentFileMutation,
     useUploadEventAttachmentLinkMutation,
 } from '@/services/api/eventApi.ts';
+import {useApiToast} from '@/hooks/ui/useApiToast.ts';
 import type {RootState} from '@/store/store.ts';
 import styles from './EventDocumentsTab.module.scss';
 import {isValidUrl} from '@/utils/validation.ts';
@@ -39,7 +43,14 @@ interface EventDocumentsTabProps {
     eventId: string;
 }
 
+interface AttachmentContextMenuState {
+    attachmentId: string;
+    x: number;
+    y: number;
+}
+
 const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
+    const {showApiError, showSuccess} = useApiToast();
     const currentUserId = useSelector((state: RootState) => state.profile.profile?.id ?? '');
     const {data: subscribersData} = useGetEventSubscribersQuery(
         {eventId, count: 200, offset: 0},
@@ -112,10 +123,14 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
     const [createNote, {isLoading: isCreatingNote}] = useCreateEventNoteMutation();
     const [updateNote] = useUpdateEventNoteMutation();
     const [downloadAttachment] = useLazyDownloadEventAttachmentQuery();
+    const [deleteAttachment, {isLoading: isDeletingAttachment}] = useDeleteEventAttachmentMutation();
     const [isAddLinkOpen, setIsAddLinkOpen] = useState(false);
     const [linkTitleDraft, setLinkTitleDraft] = useState('');
     const [linkUrlDraft, setLinkUrlDraft] = useState('');
     const [attachmentToOpen, setAttachmentToOpen] = useState<EventAttachment | null>(null);
+    const [attachmentToDelete, setAttachmentToDelete] = useState<EventAttachment | null>(null);
+    const [openMenuAttachmentId, setOpenMenuAttachmentId] = useState<string | null>(null);
+    const [contextMenu, setContextMenu] = useState<AttachmentContextMenuState | null>(null);
     const [isDownloading, setIsDownloading] = useState(false);
 
     const documentsDescription = canManageDocuments
@@ -211,6 +226,111 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
         if (kind === 'file') return 'File';
         if (att.resource?.startsWith('http')) return 'Link';
         return 'Unknown';
+    };
+
+    const closeAttachmentMenus = useCallback(() => {
+        setOpenMenuAttachmentId(null);
+        setContextMenu(null);
+    }, []);
+
+    useEffect(() => {
+        if (!openMenuAttachmentId && !contextMenu) return;
+
+        const handleOutsideClick = (event: Event) => {
+            const target = event.target;
+            if (!(target instanceof Element)) return;
+            if (target.closest(`.${styles.attachmentMenu}`) || target.closest(`.${styles.rowMenuWrap}`)) {
+                return;
+            }
+            closeAttachmentMenus();
+        };
+
+        document.addEventListener('click', handleOutsideClick);
+        return () => document.removeEventListener('click', handleOutsideClick);
+    }, [openMenuAttachmentId, contextMenu, closeAttachmentMenus]);
+
+    const requestDeleteAttachment = useCallback((att: EventAttachment) => {
+        setAttachmentToDelete(att);
+        closeAttachmentMenus();
+    }, [closeAttachmentMenus]);
+
+    const handleAttachmentContextMenu = (event: MouseEvent, att: EventAttachment) => {
+        if (!canManageDocuments) return;
+        event.preventDefault();
+        event.stopPropagation();
+        setOpenMenuAttachmentId(null);
+        setContextMenu({
+            attachmentId: att.id,
+            x: event.clientX,
+            y: event.clientY,
+        });
+    };
+
+    const confirmDeleteAttachment = async () => {
+        if (!attachmentToDelete || !eventId) return;
+
+        try {
+            await deleteAttachment({eventId, attachmentId: attachmentToDelete.id}).unwrap();
+            if (attachmentToOpen?.id === attachmentToDelete.id) {
+                setAttachmentToOpen(null);
+            }
+            showSuccess('Документ удалён');
+            setAttachmentToDelete(null);
+        } catch (error) {
+            showApiError(error, 'Не удалось удалить документ');
+        }
+    };
+
+    const renderAttachmentMenu = (
+        onDelete: () => void,
+        style?: CSSProperties,
+    ) => (
+        <div
+            className={styles.attachmentMenu}
+            style={style}
+            onClick={(event) => event.stopPropagation()}
+        >
+            <button
+                type="button"
+                className={styles.attachmentMenuDanger}
+                onMouseDown={(event) => event.stopPropagation()}
+                onClick={(event) => {
+                    event.stopPropagation();
+                    onDelete();
+                }}
+            >
+                <TrashIcon className={styles.attachmentMenuTrashIcon}/>
+                Удалить
+            </button>
+        </div>
+    );
+
+    const renderAttachmentActions = (att: EventAttachment) => {
+        if (!canManageDocuments) return null;
+
+        const isMenuOpen = openMenuAttachmentId === att.id;
+
+        return (
+            <div
+                className={styles.rowMenuWrap}
+                onClick={(event) => event.stopPropagation()}
+            >
+                <button
+                    type="button"
+                    className={styles.iconBtn}
+                    aria-label="Действия с документом"
+                    title="Действия"
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        setContextMenu(null);
+                        setOpenMenuAttachmentId((prev) => (prev === att.id ? null : att.id));
+                    }}
+                >
+                    <ThreeDotsVerticalIcon/>
+                </button>
+                {isMenuOpen && renderAttachmentMenu(() => requestDeleteAttachment(att))}
+            </div>
+        );
     };
 
     const confirmOpenAttachment = async () => {
@@ -501,11 +621,14 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
 
                 {viewMode === 'rows' && hasDocumentsList && (
                     <div className={styles.attachmentsTable}>
-                        <div className={styles.attachmentsHeader}>
+                        <div
+                            className={`${styles.attachmentsHeader} ${canManageDocuments ? styles.withActions : ''}`}
+                        >
                             <span>Название</span>
                             <span>Автор</span>
                             <span>Дата загрузки</span>
                             <span>Размер</span>
+                            {canManageDocuments ? <span aria-hidden /> : null}
                         </div>
 
                         {isAddLinkOpen && (
@@ -562,11 +685,19 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
                             const size = formatBytes(att.size);
                             const kind = getAttachmentKind(att);
                             return (
-                                <button
+                                <div
                                     key={att.id}
-                                    type="button"
-                                    className={styles.attachmentsRow}
+                                    role="button"
+                                    tabIndex={0}
+                                    className={`${styles.attachmentsRow} ${canManageDocuments ? styles.withActions : ''}`}
                                     onClick={() => setAttachmentToOpen(att)}
+                                    onContextMenu={(event) => handleAttachmentContextMenu(event, att)}
+                                    onKeyDown={(event) => {
+                                        if (event.key === 'Enter' || event.key === ' ') {
+                                            event.preventDefault();
+                                            setAttachmentToOpen(att);
+                                        }
+                                    }}
                                 >
                                     <div className={styles.nameCell}>
                                         {kind === 'Link' ? <LinkIcon className={styles.rowIcon}/> : <FileIcon className={styles.rowIcon}/>}
@@ -575,7 +706,8 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
                                     <div className={styles.metaCell}>{author}</div>
                                     <div className={styles.metaCell}>{date}</div>
                                     <div className={styles.metaCell}>{size}</div>
-                                </button>
+                                    {renderAttachmentActions(att)}
+                                </div>
                             );
                         })}
                     </div>
@@ -592,17 +724,18 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
                             const size = formatBytes(att.size);
                             const kind = getAttachmentKind(att);
                             return (
-                                <button key={att.id} type="button" className={styles.docCard} onClick={() => setAttachmentToOpen(att)}>
+                                <div key={att.id} className={styles.docCard} onClick={() => setAttachmentToOpen(att)} onContextMenu={(event) => handleAttachmentContextMenu(event, att)}>
                                     <div className={styles.cardTop}>
                                         {kind === 'Link' ? <LinkIcon className={styles.rowIcon}/> : <FileIcon className={styles.rowIcon}/>}
                                         <span className={styles.cardTitle}>{title}</span>
+                                        {renderAttachmentActions(att)}
                                     </div>
                                     <div className={styles.cardMeta}>
                                         <span>{author}</span>
                                         <span>{date}</span>
                                         <span>{size}</span>
                                     </div>
-                                </button>
+                                </div>
                             );
                         })}
                     </div>
@@ -628,6 +761,34 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
             >
                 {notesSectionChildren}
             </EventDocumentSection>
+
+            {contextMenu && canManageDocuments && (() => {
+                const att = attachments.find((item) => item.id === contextMenu.attachmentId);
+                if (!att) return null;
+                return renderAttachmentMenu(
+                    () => requestDeleteAttachment(att),
+                    {top: contextMenu.y, left: contextMenu.x, position: 'fixed'},
+                );
+            })()}
+
+            <ProfileActionModal
+                isOpen={Boolean(attachmentToDelete)}
+                title="Удалить документ?"
+                description={
+                    attachmentToDelete
+                        ? `Удалить «${getAttachmentLabel(attachmentToDelete)}»? Это действие нельзя отменить.`
+                        : undefined
+                }
+                onClose={() => {
+                    if (isDeletingAttachment) return;
+                    setAttachmentToDelete(null);
+                }}
+                onConfirm={() => void confirmDeleteAttachment()}
+                confirmText="Удалить"
+                cancelText="Отмена"
+                confirmTone="danger"
+                confirmDisabled={isDeletingAttachment}
+            />
 
             <ProfileActionModal
                 isOpen={Boolean(attachmentToOpen)}

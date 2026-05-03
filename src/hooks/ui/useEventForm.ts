@@ -14,15 +14,7 @@ import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 import {combineDateTime, parseDateTime} from '@/utils/date';
 import {isValidAddress, isValidUrl} from '@/utils/validation.ts';
 import type {EventParticipantAssignment} from '@/types/api/Event.ts';
-
-const EVENT_TYPE_OPTIONS: EventTypeKind[] = [
-    'Hackathon',
-    'Lecture',
-    'PP',
-    'SpecialCourse',
-    'Practice',
-    'CereerEvent',
-];
+import {EVENT_TYPE_OPTIONS, normalizeEventTypes} from '@/utils/eventTypeLabels.ts';
 
 const VENUE_FORMAT_MAP: Record<string, VenueFormat> = {
     InPerson: 'InPerson',
@@ -93,7 +85,7 @@ export const useEventForm = (eventData?: EventResponse | null) => {
             }
 
             setCategories(eventData.categories ?? []);
-            setSelectedTypes(eventData.types ?? []);
+            setSelectedTypes(normalizeEventTypes(eventData.types));
 
             if (eventData.color) {
                 setAvatarColor(eventData.color);

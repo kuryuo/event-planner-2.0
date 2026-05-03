@@ -51,7 +51,7 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
         {label: 'ПП', value: 'PP'},
         {label: 'Спецкурс', value: 'SpecialCourse'},
         {label: 'Практика', value: 'Practice'},
-        {label: 'Карьерные мероприятия', value: 'CereerEvent'},
+        {label: 'Карьерные мероприятия', value: 'CareerEvent'},
     ];
 
     const tagTextStyleS = {

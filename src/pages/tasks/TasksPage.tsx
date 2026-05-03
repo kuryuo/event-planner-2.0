@@ -27,7 +27,7 @@ import XLgIcon from "@/assets/img/icon-m/x.svg?react";
 import type { RootState } from "@/store/store.ts";
 import {Checkbox, Switch} from "antd";
 import BoardTaskCard from "@/pages/tasks/components/board-task-card/BoardTaskCard";
-import { buildImageUrl } from "@/utils/buildImageUrl.ts";
+import { getTaskAssigneeAvatar, getTaskAssigneeId, getTaskAssigneeName } from "@/utils/boardTask.ts";
 import {Avatar} from "antd";
 import {
   useGetTaskCommentsQuery,
@@ -105,9 +105,9 @@ const toBoard = (
           title: String(task.title ?? "Новая задача"),
           description: String(task.description ?? ""),
           dueDate: task.dueDate ?? undefined,
-          assigneeName: String(task.eventName ?? "Мероприятие"),
-          assigneeAvatar: buildImageUrl(task.eventAvatarUrl) ?? undefined,
-          assigneeId: task.assignedUserId ?? undefined,
+          assigneeName: getTaskAssigneeName(task),
+          assigneeAvatar: getTaskAssigneeAvatar(task),
+          assigneeId: getTaskAssigneeId(task),
           priority:
             task.priority === "Urgent"
               ? "Срочный"

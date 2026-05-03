@@ -6,6 +6,7 @@ import GeoAltIcon from '@/assets/img/icon-m/geo-alt.svg?react';
 import styles from './ArchiveEventCard.module.scss';
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 import type {UserEvent} from '@/types/api/Profile.ts';
+import {getEventTypeLabel} from '@/utils/eventTypeLabels.ts';
 
 interface ArchiveEventCardProps {
     event: UserEvent;
@@ -23,6 +24,7 @@ const getFakeParticipants = (seed: string) => {
 export default function ArchiveEventCard({event, onClick}: ArchiveEventCardProps) {
     const date = format(new Date(event.startDate), 'd MMMM, HH:mm', {locale: ru});
     const category = event.categories?.[0] ?? 'Категория';
+    const eventTypeLabel = event.types?.[0] ? getEventTypeLabel(event.types[0]) : null;
     const preview = buildImageUrl(event.avatar) ?? buildImageUrl(event.previewPhotos?.[0]) ?? FALLBACK_PREVIEW;
     const tagTextStyleM = {
         fontFamily: "'Manrope', sans-serif",
@@ -50,6 +52,18 @@ export default function ArchiveEventCard({event, onClick}: ArchiveEventCardProps
                 >
                     {category}
                 </Tag>
+                {eventTypeLabel ? (
+                    <Tag
+                        bordered={false}
+                        style={{
+                            ...tagTextStyleM,
+                            backgroundColor: "var(--bg-secondary)",
+                            color: "var(--content-primary)",
+                        }}
+                    >
+                        {eventTypeLabel}
+                    </Tag>
+                ) : null}
                 <Tag
                     bordered={false}
                     style={{

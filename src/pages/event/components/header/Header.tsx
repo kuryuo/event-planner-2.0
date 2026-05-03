@@ -20,7 +20,12 @@ import {
     useUpdateEventCancellationMutation,
     useUpdateEventLifecycleStateMutation
 } from "@/services/api/eventApi.ts";
-import type {EventLifecycleState, EventTypeKind, VenueFormat} from '@/types/api/Event.ts';
+import type {EventLifecycleState, EventTypeKind, ParticipantRoleKind, VenueFormat} from '@/types/api/Event.ts';
+import {
+    getParticipantRoleLabel,
+    labelToLifecycleState,
+    lifecycleStateToLabel,
+} from '@/utils/eventLifecycle.ts';
 
 interface HeaderProps {
     isAdmin?: boolean;
@@ -29,7 +34,10 @@ interface HeaderProps {
     activeTab?: number;
     avatar?: string | null;
     isArchived?: boolean;
+    lifecycleState?: EventLifecycleState | string | null;
     status?: string | null;
+    isCancelled?: boolean;
+    participantRole?: ParticipantRoleKind | string | null;
     updateData?: {
         name: string;
         description: string;
@@ -49,20 +57,17 @@ interface HeaderProps {
 
 const STATUS_OPTIONS = ['Черновик', 'В работе', 'Завершено', 'Отменено'];
 
-const statusLabelToApiValue: Record<string, EventLifecycleState> = {
-    'Черновик': 'Draft',
-    'В работе': 'Published',
-    'Завершено': 'Completed',
-    'Отменено': 'Cancelled',
-};
-
-const normalizeStatusLabel = (value?: string | null): string => {
-    const normalized = (value ?? '').toLowerCase();
-    if (normalized.includes('draft') || normalized.includes('чернов')) return 'Черновик';
-    if (normalized.includes('work') || normalized.includes('progress') || normalized.includes('в работе')) return 'В работе';
-    if (normalized.includes('cancel') || normalized.includes('отмен')) return 'Отменено';
-    if (normalized.includes('done') || normalized.includes('finish') || normalized.includes('complete') || normalized.includes('заверш')) return 'Завершено';
-    return 'Черновик';
+const resolveLifecycleLabel = ({
+    lifecycleState,
+    status,
+    isCancelled,
+}: {
+    lifecycleState?: string | null;
+    status?: string | null;
+    isCancelled?: boolean;
+}): string => {
+    if (isCancelled) return 'Отменено';
+    return lifecycleStateToLabel(lifecycleState, status);
 };
 
 export default function Header({
@@ -72,7 +77,10 @@ export default function Header({
     activeTab = 0,
     avatar,
     isArchived = false,
+    lifecycleState,
     status,
+    isCancelled = false,
+    participantRole,
     updateData: _updateData,
     onTabChange,
     showSummary = true,
@@ -82,7 +90,10 @@ export default function Header({
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isStatusOpen, setIsStatusOpen] = useState(false);
-    const [selectedStatus, setSelectedStatus] = useState(() => normalizeStatusLabel(status));
+    const [selectedStatus, setSelectedStatus] = useState(() =>
+        resolveLifecycleLabel({lifecycleState, status, isCancelled}),
+    );
+    const roleLabel = getParticipantRoleLabel(participantRole, isAdmin);
     const {handleDelete, isLoading: isDeleting} = useEventDeleter();
     const {showApiError, showSuccess} = useApiToast();
     
@@ -128,7 +139,7 @@ export default function Header({
             setIsStatusOpen(false);
 
             try {
-                await updateLifecycleState({eventId, lifecycleState: statusLabelToApiValue[option]}).unwrap();
+                await updateLifecycleState({eventId, lifecycleState: labelToLifecycleState(option)}).unwrap();
                 showSuccess('Статус мероприятия обновлен');
             } catch (error) {
                 console.error('Не удалось обновить статус мероприятия:', error);
@@ -165,8 +176,8 @@ export default function Header({
     };
 
     useEffect(() => {
-        setSelectedStatus(normalizeStatusLabel(status));
-    }, [status]);
+        setSelectedStatus(resolveLifecycleLabel({lifecycleState, status, isCancelled}));
+    }, [lifecycleState, status, isCancelled]);
 
     const handleSubscribeClick = async () => {
         if (!eventId) return;
@@ -198,7 +209,7 @@ export default function Header({
                     </Avatar>
                     <h2 className={styles.summaryTitle}>{name}</h2>
                     <span className={styles.summaryStatus}>{selectedStatus}</span>
-                    <span className={styles.summaryRole}>{isAdmin ? 'Вы организатор' : 'Вы участник'}</span>
+                    <span className={styles.summaryRole}>{roleLabel}</span>
                 </div>
             </div>}
 

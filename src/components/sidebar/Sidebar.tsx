@@ -37,7 +37,6 @@ import { useTheme } from "@/hooks/ui/useTheme.ts";
 
 export interface SidebarProps {
   notificationCount?: number;
-  tasksCount?: number;
 }
 
 const RECENT_SEARCHES_STORAGE_KEY = "sidebar_recent_searches";
@@ -63,7 +62,6 @@ const loadRecentSearches = (): string[] => {
 
 export default function Sidebar({
   notificationCount = 3,
-  tasksCount = 0,
 }: SidebarProps) {
   useNotificationsSignalR();
 
@@ -335,9 +333,7 @@ export default function Sidebar({
             </span>
             <span className="ep-nav-item__label">Мои задачи</span>
           </span>
-          <span className="ep-nav-item__icon" aria-hidden="true">
-            <span className="ep-badge--plain">{tasksCount}</span>
-          </span>
+          <span className="ep-nav-item__icon" aria-hidden="true" />
         </Button>
 
         <div className={styles.eventsSection}>

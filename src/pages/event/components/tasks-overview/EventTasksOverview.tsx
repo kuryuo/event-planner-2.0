@@ -1,5 +1,4 @@
 import {useMemo} from 'react';
-import {useNavigate} from 'react-router-dom';
 import FileLinesIcon from '@/assets/image/file-lines.svg?react';
 import {useGetEventBoardQuery} from '@/services/api/eventApi.ts';
 import BoardTaskCard, {type BoardTaskCardPriority} from '@/pages/tasks/components/board-task-card/BoardTaskCard.tsx';
@@ -8,6 +7,7 @@ import styles from './EventTasksOverview.module.scss';
 
 interface EventTasksOverviewProps {
     eventId: string;
+    onOpenBoard?: () => void;
 }
 
 interface TaskCard {
@@ -38,8 +38,7 @@ const isDoneColumn = (name?: string | null): boolean => {
         || normalized.includes('выполн');
 };
 
-export default function EventTasksOverview({eventId}: EventTasksOverviewProps) {
-    const navigate = useNavigate();
+export default function EventTasksOverview({eventId, onOpenBoard}: EventTasksOverviewProps) {
     const {data, isLoading} = useGetEventBoardQuery({eventId}, {
         skip: !eventId,
         refetchOnFocus: true,
@@ -94,7 +93,7 @@ export default function EventTasksOverview({eventId}: EventTasksOverviewProps) {
             <div className={styles.headerRow}>
                 <h3 className={styles.title}>Задачи</h3>
                 {totalCount > 0 && (
-                    <button className={styles.linkButton} onClick={() => navigate(`/tasks?eventId=${eventId}`)} type="button">
+                    <button className={styles.linkButton} onClick={onOpenBoard} type="button">
                         Смотреть все
                     </button>
                 )}
@@ -106,7 +105,7 @@ export default function EventTasksOverview({eventId}: EventTasksOverviewProps) {
                 <div className={styles.emptyState}>
                     <FileLinesIcon className={styles.emptyIcon}/>
                     <p className={styles.emptyText}>Пока нет задач</p>
-                    <button className={styles.boardButton} type="button" onClick={() => navigate(`/tasks?eventId=${eventId}`)}>
+                    <button className={styles.boardButton} type="button" onClick={onOpenBoard}>
                         Перейти на доску
                     </button>
                 </div>

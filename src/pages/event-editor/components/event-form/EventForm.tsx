@@ -24,7 +24,8 @@ import {useGetAdminUsersQuery} from "@/services/api/userApi.ts";
 import XIcon from '@/assets/img/icon-s/x.svg?react';
 import ChevronDownIcon from '@/assets/img/icon-m/chevron-down.svg?react';
 import Check2Icon from '@/assets/img/icon-m/check2.svg?react';
-import type {Organizer} from "@/types/api/User.ts";
+import type {AdminUser} from "@/types/api/User.ts";
+import {EVENT_TYPE_LABELS} from '@/utils/eventTypeLabels.ts';
 import type {EventParticipantAssignment, ParticipantRoleKind} from "@/types/api/Event.ts";
 
 interface EventFormProps {
@@ -95,8 +96,16 @@ export default function EventForm({
             .map((label) => ({value: label}));
     }, [categoryOptions, categories, inputValue]);
 
+    const [isTagsDropdownOpen, setIsTagsDropdownOpen] = useState(false);
+
+    useEffect(() => {
+        if (showCategorySelect && tagAutocompleteOptions.length > 0) {
+            setIsTagsDropdownOpen(true);
+        }
+    }, [showCategorySelect, tagAutocompleteOptions.length]);
+
     const [participantsQuery, setParticipantsQuery] = useState('');
-    const [selectedUserCandidate, setSelectedUserCandidate] = useState<Organizer | null>(null);
+    const [selectedUserCandidate, setSelectedUserCandidate] = useState<AdminUser | null>(null);
     const {data: usersData, isLoading: isUsersLoading} = useGetAdminUsersQuery(
         {count: 200, offset: 0},
     );
@@ -128,7 +137,7 @@ export default function EventForm({
         }));
     };
 
-    const addParticipant = (user: Organizer) => {
+    const addParticipant = (user: AdminUser) => {
         if (participants.some((p) => p.userId === user.id)) {
             setParticipantsQuery('');
             setSelectedUserCandidate(null);
@@ -148,15 +157,6 @@ export default function EventForm({
         setParticipants(
             participants.map((p) => (p.userId === userId ? {...p, role} : p)),
         );
-    };
-
-    const EVENT_TYPE_LABELS = {
-        Hackathon: 'Хакатон',
-        Lecture: 'Лекция',
-        PP: 'ПП',
-        SpecialCourse: 'Спецкурс',
-        Practice: 'Практика',
-        CereerEvent: 'Карьерные мероприятия',
     };
 
     const tagTextStyleS = {
@@ -494,14 +494,22 @@ export default function EventForm({
                                     className={`${styles.categoriesAutocomplete} ep-input ep-input--m`}
                                     value={inputValue}
                                     options={tagAutocompleteOptions}
-                                    onChange={(v) => setInputValue(String(v))}
+                                    open={isTagsDropdownOpen && tagAutocompleteOptions.length > 0}
+                                    onDropdownVisibleChange={setIsTagsDropdownOpen}
+                                    onChange={(v) => {
+                                        setInputValue(String(v));
+                                        setIsTagsDropdownOpen(true);
+                                    }}
+                                    onFocus={() => setIsTagsDropdownOpen(true)}
                                     onSelect={(value) => {
                                         addChip(String(value));
                                         setInputValue('');
+                                        setIsTagsDropdownOpen(false);
                                     }}
                                     onKeyDown={handleKeyDown}
                                     disabled={isLoadingCategories}
                                     placeholder="Введите тег или выберите из списка"
+                                    filterOption={false}
                                     allowClear
                                 />
 
