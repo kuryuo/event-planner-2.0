@@ -29,7 +29,7 @@
   grid-template-columns: 24px 1fr auto auto 24px;
   gap: var(--spacing-4);
   align-items: center;
-  color: var(--content-primary-inverse);
+  color: var(--white);
   pointer-events: auto;
 }
 
@@ -43,19 +43,19 @@
   }
 }
 
-.icon_info { color: var(--content-primary-inverse); }
+.icon_info { color: var(--white); }
 .icon_success { color: var(--content-positive); }
 .icon_warning { color: var(--content-notice); }
 .icon_error { color: var(--content-negative); }
 
 .message {
   @include ty.font(body-s, regular);
-  color: var(--content-primary-inverse);
+  color: var(--white);
 }
 
 .actionButton {
   @include ty.font(body-s, semibold);
-  color: var(--content-primary-inverse);
+  color: var(--white);
   background: transparent;
   cursor: pointer;
 }
@@ -87,13 +87,13 @@
     position: relative;
     z-index: 1;
     @include ty.font(body-s, semibold);
-    color: var(--content-primary-inverse);
+    color: var(--white);
   }
 }
 
 .closeButton {
   background: transparent;
-  color: var(--content-primary-inverse);
+  color: var(--white);
   cursor: pointer;
 
   svg {

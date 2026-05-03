@@ -128,6 +128,7 @@
     --content-primary-inverse: var(--white);
     --content-primary-inverse-subtle: var(--white);
     --content-primary-inverse-mono: var(--white);
+    --content-on-brand: var(--white);
     --content-secondary: var(--gray-60);
     --content-secondary-inverse: var(--gray-40);
     --content-secondary-inverse-mono: var(--gray-20);
@@ -279,6 +280,7 @@
     --content-primary-inverse: var(--gray-100);
     --content-primary-inverse-subtle: var(--gray-30);
     --content-primary-inverse-mono: var(--white);
+    --content-on-brand: var(--white);
     --content-secondary: var(--gray-40);
     --content-secondary-inverse: var(--gray-60);
     --content-secondary-inverse-mono: var(--gray-20);
@@ -530,7 +532,7 @@ body {
 .ep-btn--filled-green.ant-btn-primary {
     background: var(--bg-brand-green) !important;
     border-color: var(--bg-brand-green) !important;
-    color: var(--content-primary-inverse) !important;
+    color: var(--content-on-brand) !important;
 }
 .ep-btn--filled-green.ant-btn-primary:not(:disabled):hover {
     background: var(--bg-brand-green-hover) !important;
@@ -709,7 +711,7 @@ body {
 /* Ant Badge (вместо `ui/badge/Badge`) */
 .ep-badge--text.ant-badge .ant-badge-count {
     background: var(--bg-brand-green) !important;
-    color: var(--content-primary-inverse) !important;
+    color: var(--content-on-brand) !important;
     border-radius: var(--radius-100) !important;
     box-shadow: none !important;
     min-width: 20px;

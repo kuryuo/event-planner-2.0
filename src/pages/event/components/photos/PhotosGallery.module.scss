@@ -82,7 +82,7 @@
   z-index: 1;
   margin-top: var(--spacing-2);
   background-color: var(--bg-brand-green) !important;
-  color: var(--content-primary-inverse) !important;
+  color: var(--content-on-brand) !important;
 
   &:hover {
     background-color: var(--bg-brand-green-hover) !important;
@@ -146,6 +146,6 @@
   padding: 4px 8px;
   border-radius: var(--radius-100);
   background: rgba(11, 32, 39, 0.78);
-  color: var(--content-primary-inverse);
+  color: var(--content-on-brand);
   @include ty.font(caption-m, semibold);
 }

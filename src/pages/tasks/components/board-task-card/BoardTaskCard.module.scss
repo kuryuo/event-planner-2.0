@@ -1,5 +1,8 @@
 .card {
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   border: 1px solid #dfe5eb;
   border-radius: 14px;
   background: var(--bg-primary);
@@ -8,25 +11,33 @@
   flex-direction: column;
   gap: 14px;
   text-align: left;
+  overflow: hidden;
 }
 
 .textBlock {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
 
   h4 {
     margin: 0;
     font-size: 20px;
     font-weight: 700;
-    color: #122734;
+    color: var(--content-primary);
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
   p {
     margin: 0;
     font-size: 18px;
     line-height: 1.3;
-    color: #6a7883;
+    color: var(--content-secondary);
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 }
 
@@ -48,7 +59,7 @@
   span {
     font-size: 14px;
     line-height: 1.2;
-    color: #6a7883;
+    color: var(--content-secondary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -65,7 +76,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    color: #6a7883;
+    color: var(--content-secondary);
     font-size: 14px;
     line-height: 1.2;
     white-space: nowrap;

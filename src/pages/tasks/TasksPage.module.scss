@@ -38,7 +38,7 @@
 
 .pageHeaderTitle {
   @include ty.font(title-m, semibold);
-  color: #22313d;
+  color: var(--content-primary);
 }
 
 .boardSurface {
@@ -69,21 +69,21 @@
 .searchControl {
   width: 300px;
   height: 40px;
-  border: 1px solid #d6dde3;
+  border: 1px solid var(--border-primary);
   border-radius: 8px;
   background: var(--bg-primary);
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 0 12px;
-  color: #95a1ac;
+  color: var(--content-secondary);
 
   input {
     border: none;
     width: 100%;
     outline: none;
     background: transparent;
-    color: #22313d;
+    color: var(--content-primary);
     font-size: 18px;
   }
 }
@@ -91,7 +91,7 @@
 .filterControl,
 .sortControl {
   height: 40px;
-  border: 1px solid #d6dde3;
+  border: 1px solid var(--border-primary);
   border-radius: 8px;
   background: var(--bg-primary);
   display: inline-flex;
@@ -99,7 +99,7 @@
   gap: 8px;
   padding: 0 12px;
   cursor: pointer;
-  color: #455866;
+  color: var(--content-secondary);
   font-weight: 600;
 }
 
@@ -117,7 +117,7 @@
   right: 0;
   width: 230px;
   background: var(--bg-primary);
-  border: 1px solid #d6dde3;
+  border: 1px solid var(--border-primary);
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(34, 49, 61, 0.14);
   z-index: 10;
@@ -129,7 +129,7 @@
     background: transparent;
     text-align: left;
     font-size: 20px;
-    color: #22313d;
+    color: var(--content-primary);
     padding: 8px 10px;
     border-radius: 8px;
     cursor: pointer;
@@ -146,7 +146,7 @@
   left: 0;
   width: 320px;
   background: var(--bg-primary);
-  border: 1px solid #d6dde3;
+  border: 1px solid var(--border-primary);
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(34, 49, 61, 0.14);
   z-index: 10;
@@ -158,14 +158,14 @@
   h4 {
     margin: 2px 0;
     font-size: 16px;
-    color: #22313d;
+    color: var(--content-primary);
   }
 
   label {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    color: #2f3d49;
+    color: var(--content-primary);
     font-size: 14px;
   }
 }
@@ -173,14 +173,14 @@
 .assigneeMock {
   height: 36px;
   width: 100%;
-  border: 1px solid #d6dde3;
+  border: 1px solid var(--border-primary);
   border-radius: 8px;
   background: var(--bg-primary);
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 12px;
-  color: #96a2ad;
+  color: var(--content-secondary);
 }
 
 .assigneeChevron {
@@ -195,18 +195,18 @@
 
   span {
     font-size: 14px;
-    color: #2f3d49;
+    color: var(--content-primary);
   }
 }
 
 .resetFiltersBtn {
   margin-top: 2px;
-  border: 1px solid #d6dde3;
+  border: 1px solid var(--border-primary);
   border-radius: 8px;
   background: var(--bg-primary);
   height: 34px;
   cursor: pointer;
-  color: #455866;
+  color: var(--content-secondary);
 }
 
 .filterControl svg,
@@ -303,7 +303,17 @@
   color: var(--content-secondary);
 }
 
-.taskDescription p { margin: 8px 0 0; color: var(--content-primary); }
+.taskDescription {
+  min-width: 0;
+
+  p {
+    margin: 8px 0 0;
+    color: var(--content-primary);
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
 
 .taskTabs {
   display: inline-flex;
@@ -353,6 +363,16 @@
     align-items: center;
     justify-content: center;
   }
+}
+
+:global(.react-kanban-card) {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  padding: 0;
+  margin-bottom: 12px;
+  background: transparent;
+  box-sizing: border-box;
 }
 
 :global(.react-kanban-column) {

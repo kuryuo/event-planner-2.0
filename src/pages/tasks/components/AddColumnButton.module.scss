@@ -1,10 +1,10 @@
 .button {
   width: 34px;
   height: 34px;
-  border: 1px solid #d0d7df;
+  border: 1px solid var(--border-primary);
   border-radius: 8px;
   background: var(--bg-secondary-subtle);
-  color: #2f3d49;
+  color: var(--content-primary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -13,7 +13,7 @@
 
   &:hover {
     background: var(--bg-secondary-subtle);
-    border-color: #bcc7d1;
+    border-color: var(--border-primary);
   }
 
   &:disabled {

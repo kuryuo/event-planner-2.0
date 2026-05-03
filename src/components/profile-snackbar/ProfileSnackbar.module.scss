@@ -6,7 +6,7 @@
   height: 56px;
   border-radius: var(--radius-100);
   background: linear-gradient(90deg, #022434 0%, #011b28 100%);
-  color: var(--content-primary-inverse);
+  color: var(--white);
   box-shadow: var(--lvl2);
   display: flex;
   align-items: center;
@@ -25,6 +25,7 @@
 
 .text {
   @include ty.font(subtitle-s, regular);
+  color: var(--white);
   flex: 1;
   min-width: 0;
   white-space: nowrap;
@@ -34,7 +35,7 @@
 
 .action {
   @include ty.font(button-m, semibold);
-  color: var(--content-primary-inverse);
+  color: var(--white);
   background: transparent;
   cursor: pointer;
 }
@@ -62,7 +63,7 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  color: var(--content-primary-inverse);
+  color: var(--white);
   display: inline-flex;
   align-items: center;
   justify-content: center;
