@@ -1,9 +1,11 @@
 import {useState, useRef} from "react";
 import {useGetEventPhotosQuery, useUploadEventPhotoMutation, useDeleteEventPhotoMutation} from '@/services/api/eventApi';
+import {useApiToast} from '@/hooks/ui/useApiToast.ts';
 
 const PHOTOS_PER_PAGE = 20;
 
 export const usePhotosGallery = (eventId: string) => {
+    const {showSuccess, showApiError} = useApiToast();
     const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
     const [isSelectionMode, setIsSelectionMode] = useState(false);
     const [selectedPhotoIds, setSelectedPhotoIds] = useState<Set<string>>(new Set());
@@ -68,8 +70,9 @@ export const usePhotosGallery = (eventId: string) => {
                 await uploadPhoto({eventId, file}).unwrap();
             }
             refetch();
+            showSuccess('Медиафайл успешно загружен');
         } catch (err) {
-            console.error('Ошибка при загрузке медиа:', err);
+            showApiError(err, 'Не удалось загрузить медиафайл');
         } finally {
             if (fileInputRef.current) {
                 fileInputRef.current.value = '';

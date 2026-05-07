@@ -5,14 +5,14 @@
   max-width: 560px;
   height: 56px;
   border-radius: var(--radius-100);
-  background: linear-gradient(90deg, #022434 0%, #011b28 100%);
-  color: var(--white);
-  box-shadow: var(--lvl2);
+  background: linear-gradient(90deg, var(--toast-bg) 0%, var(--toast-bg-end) 100%);
+  color: var(--toast-fg);
+  box-shadow: var(--toast-shadow);
   display: flex;
   align-items: center;
   gap: var(--spacing-3);
   padding: 0 var(--spacing-4);
-  border: 1px solid var(--white-alpha-12);
+  border: 1px solid var(--toast-border);
 }
 
 .leadingIcon {
@@ -25,7 +25,7 @@
 
 .text {
   @include ty.font(subtitle-s, regular);
-  color: var(--white);
+  color: var(--toast-fg);
   flex: 1;
   min-width: 0;
   white-space: nowrap;
@@ -35,7 +35,7 @@
 
 .action {
   @include ty.font(button-m, semibold);
-  color: var(--white);
+  color: var(--toast-fg);
   background: transparent;
   cursor: pointer;
 }
@@ -44,8 +44,8 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 1px solid var(--bg-brand-green);
-  color: var(--content-brand-green);
+  border: 1px solid var(--toast-ring);
+  color: var(--toast-ring);
   @include ty.font(caption-m, semibold);
   display: inline-flex;
   justify-content: center;
@@ -63,7 +63,7 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  color: var(--white);
+  color: var(--toast-fg);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -72,15 +72,15 @@
 }
 
 .success .leadingIcon {
-  color: var(--content-positive);
+  color: var(--toast-icon-success);
 }
 
 .warning .leadingIcon {
-  color: var(--content-notice);
+  color: var(--toast-icon-warning);
 }
 
 .error .leadingIcon {
-  color: var(--content-negative);
+  color: var(--toast-icon-error);
 }
 
 @media (max-width: 760px) {

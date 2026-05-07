@@ -252,6 +252,19 @@
     /* алиас для карточек без отдельного токена в палитре */
     --bg-card: var(--bg-primary);
 
+    /* тосты / снекбары */
+    --toast-bg: var(--white);
+    --toast-bg-end: var(--white);
+    --toast-fg: var(--content-primary);
+    --toast-border: var(--border-primary);
+    --toast-icon-info: var(--content-primary);
+    --toast-icon-success: var(--content-positive);
+    --toast-icon-warning: var(--content-notice);
+    --toast-icon-error: var(--content-negative);
+    --toast-ring: var(--bg-brand-green);
+    --toast-counter-inner: var(--white);
+    --toast-shadow: var(--lvl2);
+
     /* чат: свои сообщения (светлая тема — светлый фон, тёмная тема — глубокий зелёный) */
     --chat-own-bubble: linear-gradient(135deg, var(--brand-green-10) 0%, #d4f4eb 100%);
     --chat-own-text: var(--gray-100);
@@ -375,6 +388,18 @@
     --overlay-secondary: var(--black-alpha-50);
 
     --bg-card: var(--bg-primary);
+
+    --toast-bg: #001a24;
+    --toast-bg-end: #002436;
+    --toast-fg: var(--white);
+    --toast-border: var(--border-inverse);
+    --toast-icon-info: var(--white);
+    --toast-icon-success: var(--content-positive);
+    --toast-icon-warning: var(--content-notice);
+    --toast-icon-error: var(--content-negative);
+    --toast-ring: var(--bg-brand-green);
+    --toast-counter-inner: #001a24;
+    --toast-shadow: var(--lvl2);
 
     --chat-own-bubble: linear-gradient(135deg, #0f4a42 0%, #0a332d 100%);
     --chat-own-text: rgba(255, 255, 255, 0.96);

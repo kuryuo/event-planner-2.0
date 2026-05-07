@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState, type CSSProperties} from 'react';
 import {useSelector} from 'react-redux';
 import PlusIcon from '@/assets/img/icon-s/plus-lg.svg?react';
 import CheckIcon from '@/assets/img/icon-m/check2.svg?react';
@@ -41,12 +41,6 @@ import {useClickOutside} from '@/hooks/ui/useClickOutside.ts';
 
 interface EventDocumentsTabProps {
     eventId: string;
-}
-
-interface AttachmentContextMenuState {
-    attachmentId: string;
-    x: number;
-    y: number;
 }
 
 const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
@@ -130,7 +124,6 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
     const [attachmentToOpen, setAttachmentToOpen] = useState<EventAttachment | null>(null);
     const [attachmentToDelete, setAttachmentToDelete] = useState<EventAttachment | null>(null);
     const [openMenuAttachmentId, setOpenMenuAttachmentId] = useState<string | null>(null);
-    const [contextMenu, setContextMenu] = useState<AttachmentContextMenuState | null>(null);
     const [isDownloading, setIsDownloading] = useState(false);
 
     const documentsDescription = canManageDocuments
@@ -143,7 +136,12 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
 
     const handlePickFile = async (file: File) => {
         if (!eventId) return;
-        await uploadFile({eventId, file});
+        try {
+            await uploadFile({eventId, file}).unwrap();
+            showSuccess('Документ успешно загружен');
+        } catch (error) {
+            showApiError(error, 'Не удалось загрузить документ');
+        }
     };
 
     const handleAddLink = () => {
@@ -155,10 +153,15 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
         const trimmedUrl = linkUrlDraft.trim();
         const trimmedTitle = linkTitleDraft.trim();
         if (!trimmedUrl || !isValidUrl(trimmedUrl)) return;
-        await uploadLink({eventId, url: trimmedUrl, title: trimmedTitle || undefined});
-        setLinkTitleDraft('');
-        setLinkUrlDraft('');
-        setIsAddLinkOpen(false);
+        try {
+            await uploadLink({eventId, url: trimmedUrl, title: trimmedTitle || undefined}).unwrap();
+            setLinkTitleDraft('');
+            setLinkUrlDraft('');
+            setIsAddLinkOpen(false);
+            showSuccess('Ссылка успешно добавлена');
+        } catch (error) {
+            showApiError(error, 'Не удалось добавить ссылку');
+        }
     };
 
     const cancelLink = () => {
@@ -230,11 +233,10 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
 
     const closeAttachmentMenus = useCallback(() => {
         setOpenMenuAttachmentId(null);
-        setContextMenu(null);
     }, []);
 
     useEffect(() => {
-        if (!openMenuAttachmentId && !contextMenu) return;
+        if (!openMenuAttachmentId) return;
 
         const handleOutsideClick = (event: Event) => {
             const target = event.target;
@@ -247,24 +249,12 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
 
         document.addEventListener('click', handleOutsideClick);
         return () => document.removeEventListener('click', handleOutsideClick);
-    }, [openMenuAttachmentId, contextMenu, closeAttachmentMenus]);
+    }, [openMenuAttachmentId, closeAttachmentMenus]);
 
     const requestDeleteAttachment = useCallback((att: EventAttachment) => {
         setAttachmentToDelete(att);
         closeAttachmentMenus();
     }, [closeAttachmentMenus]);
-
-    const handleAttachmentContextMenu = (event: MouseEvent, att: EventAttachment) => {
-        if (!canManageDocuments) return;
-        event.preventDefault();
-        event.stopPropagation();
-        setOpenMenuAttachmentId(null);
-        setContextMenu({
-            attachmentId: att.id,
-            x: event.clientX,
-            y: event.clientY,
-        });
-    };
 
     const confirmDeleteAttachment = async () => {
         if (!attachmentToDelete || !eventId) return;
@@ -322,7 +312,6 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
                     title="Действия"
                     onClick={(event) => {
                         event.stopPropagation();
-                        setContextMenu(null);
                         setOpenMenuAttachmentId((prev) => (prev === att.id ? null : att.id));
                     }}
                 >
@@ -691,7 +680,6 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
                                     tabIndex={0}
                                     className={`${styles.attachmentsRow} ${canManageDocuments ? styles.withActions : ''}`}
                                     onClick={() => setAttachmentToOpen(att)}
-                                    onContextMenu={(event) => handleAttachmentContextMenu(event, att)}
                                     onKeyDown={(event) => {
                                         if (event.key === 'Enter' || event.key === ' ') {
                                             event.preventDefault();
@@ -724,7 +712,7 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
                             const size = formatBytes(att.size);
                             const kind = getAttachmentKind(att);
                             return (
-                                <div key={att.id} className={styles.docCard} onClick={() => setAttachmentToOpen(att)} onContextMenu={(event) => handleAttachmentContextMenu(event, att)}>
+                                <div key={att.id} className={styles.docCard} onClick={() => setAttachmentToOpen(att)}>
                                     <div className={styles.cardTop}>
                                         {kind === 'Link' ? <LinkIcon className={styles.rowIcon}/> : <FileIcon className={styles.rowIcon}/>}
                                         <span className={styles.cardTitle}>{title}</span>
@@ -761,15 +749,6 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
             >
                 {notesSectionChildren}
             </EventDocumentSection>
-
-            {contextMenu && canManageDocuments && (() => {
-                const att = attachments.find((item) => item.id === contextMenu.attachmentId);
-                if (!att) return null;
-                return renderAttachmentMenu(
-                    () => requestDeleteAttachment(att),
-                    {top: contextMenu.y, left: contextMenu.x, position: 'fixed'},
-                );
-            })()}
 
             <ProfileActionModal
                 isOpen={Boolean(attachmentToDelete)}
