@@ -5,6 +5,7 @@ import {useEventSubscribers} from '@/hooks/api/useEventSubscribers.ts';
 import styles from './ArchivedEventOverview.module.scss';
 import type {VenueFormat} from '@/types/api/Event.ts';
 import {formatEventPlaceText} from '@/utils/eventPlace.ts';
+import {getParticipantRoleName, isEventOrganizer} from '@/utils/participantRole.ts';
 import {Tag} from "antd";
 
 interface ArchivedEventOverviewProps {
@@ -17,6 +18,7 @@ interface ArchivedEventOverviewProps {
     venueFormat?: VenueFormat | null;
     description: string;
     categories: Array<{text: string}>;
+    responsiblePersonId?: string;
 }
 
 export default function ArchivedEventOverview({
@@ -29,6 +31,7 @@ export default function ArchivedEventOverview({
     venueFormat,
     description,
     categories,
+    responsiblePersonId,
 }: ArchivedEventOverviewProps) {
     const {participants} = useEventSubscribers(eventId);
 
@@ -43,15 +46,6 @@ export default function ArchivedEventOverview({
         marginInlineEnd: 0,
         userSelect: "none",
     } as const;
-
-    const mapRoleLabel = (role?: string | null): string => {
-        const normalized = (role ?? '').toLowerCase();
-        if (normalized.includes('organizer')) return 'Организатор';
-        if (normalized.includes('editor')) return 'Редактор';
-        if (normalized.includes('assistant')) return 'Помощник';
-        if (normalized.includes('observer')) return 'Наблюдатель';
-        return 'Участник';
-    };
 
     return (
         <div className={styles.wrapper}>
@@ -125,7 +119,11 @@ export default function ArchivedEventOverview({
                                 </Avatar>
                                 <span>{participant.name}</span>
                             </div>
-                            {mapRoleLabel(participant.role) === 'Организатор' ? (
+                            {isEventOrganizer({
+                                role: participant.role,
+                                userId: participant.id,
+                                responsiblePersonId,
+                            }) ? (
                                 <div className={styles.ownerBadge}>
                                     <OwnerIcon className={styles.ownerIcon}/>
                                 </div>
@@ -138,7 +136,7 @@ export default function ArchivedEventOverview({
                                         color: "var(--content-purple)",
                                     }}
                                 >
-                                    {mapRoleLabel(participant.role)}
+                                    {getParticipantRoleName(participant.role)}
                                 </Tag>
                             )}
                         </div>

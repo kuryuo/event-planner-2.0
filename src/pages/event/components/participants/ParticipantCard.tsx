@@ -11,6 +11,7 @@ import {
     useAssignUserRoleMutation
 } from '@/services/api/eventApi';
 import styles from './ParticipantCard.module.scss';
+import {isOrganizerRole} from '@/utils/participantRole.ts';
 import {Tag} from "antd";
 
 const ROLE_MAP = {
@@ -99,7 +100,7 @@ export default function ParticipantCard({
         }
     };
 
-    const isOrganizer = currentRoleValue === 'Organizer';
+    const isOrganizer = isOrganizerRole(currentRoleValue);
     const tagTextStyleM = {
         fontFamily: "'Manrope', sans-serif",
         fontSize: 14,

@@ -1,4 +1,5 @@
 import type {EventLifecycleState, ParticipantRoleKind} from '@/types/api/Event.ts';
+import {normalizeParticipantRole} from '@/utils/participantRole.ts';
 
 export const LIFECYCLE_STATE_LABELS: Record<EventLifecycleState, string> = {
     Draft: 'Черновик',
@@ -56,10 +57,10 @@ export const getParticipantRoleLabel = (
     role?: ParticipantRoleKind | string | null,
     isOrganizerFallback = false,
 ): string => {
-    if (role === 'Organizer') return 'Вы организатор';
-    if (role === 'Editor') return 'Вы редактор';
-    if (role === 'Assistant') return 'Вы помощник';
-    if (role === 'Observer') return 'Вы наблюдатель';
-    if (isOrganizerFallback) return 'Вы организатор';
+    const normalizedRole = normalizeParticipantRole(role);
+    if (normalizedRole === 'Organizer' || isOrganizerFallback) return 'Вы организатор';
+    if (normalizedRole === 'Editor') return 'Вы редактор';
+    if (normalizedRole === 'Assistant') return 'Вы помощник';
+    if (normalizedRole === 'Observer') return 'Вы наблюдатель';
     return 'Вы участник';
 };

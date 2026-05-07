@@ -14,6 +14,7 @@ import EventTasksOverview from '@/pages/event/components/tasks-overview/EventTas
 import {useGetEventSubscribersQuery} from '@/services/api/eventApi.ts';
 import EventDocumentsTab from '@/pages/event/components/documents/EventDocumentsTab.tsx';
 import EventKanbanTab from '@/pages/event/components/kanban/EventKanbanTab.tsx';
+import {isEventOrganizer} from '@/utils/participantRole.ts';
 
 const TAB_INDEX_OVERVIEW = 0;
 const TAB_INDEX_DOCUMENTS = 1;
@@ -34,8 +35,11 @@ export default function EventPage() {
     );
     const [activeTab, setActiveTab] = useState(TAB_INDEX_OVERVIEW);
 
-    const isAdmin = event?.myParticipantRole === 'Organizer'
-        || Boolean(profile && event?.responsiblePersonId && profile.id === event.responsiblePersonId);
+    const isAdmin = isEventOrganizer({
+        role: event?.myParticipantRole,
+        userId: profile?.id,
+        responsiblePersonId: event?.responsiblePersonId,
+    });
 
     const normalizedStatus = (event?.lifecycleState ?? event?.status ?? '').toLowerCase();
     const isStatusArchived =
@@ -74,6 +78,7 @@ export default function EventPage() {
                                 auditorium={event.auditorium}
                                 venueFormat={event.venueFormat}
                                 description={event.description}
+                                responsiblePersonId={event.responsiblePersonId}
                             />
                         </div>
                     );
