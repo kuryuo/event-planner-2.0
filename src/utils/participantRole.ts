@@ -24,6 +24,42 @@ export const normalizeParticipantRole = (
 export const isOrganizerRole = (role?: string | null): boolean =>
     normalizeParticipantRole(role) === 'Organizer';
 
+/**
+ * Полный контроль на вкладке «Обзор»: статус, кебаб (отмена/шаблон/удаление), управление участниками.
+ * Редактор, помощник и наблюдатель не получают эти действия, даже если указаны как ответственные.
+ */
+export const canManageEventOrgOverview = ({
+    role,
+    userId,
+    responsiblePersonId,
+}: {
+    role?: string | null;
+    userId?: string | null;
+    responsiblePersonId?: string | null;
+}): boolean => {
+    const r = normalizeParticipantRole(role);
+    if (r === 'Editor' || r === 'Assistant' || r === 'Observer') return false;
+    return isEventOrganizer({role, userId, responsiblePersonId});
+};
+
+/**
+ * Переход в редактор карточки мероприятия (кнопка «Редактировать»).
+ */
+export const canNavigateToEventEditor = ({
+    role,
+    userId,
+    responsiblePersonId,
+}: {
+    role?: string | null;
+    userId?: string | null;
+    responsiblePersonId?: string | null;
+}): boolean => {
+    const r = normalizeParticipantRole(role);
+    if (r === 'Assistant' || r === 'Observer') return false;
+    if (r === 'Organizer' || r === 'Editor') return true;
+    return Boolean(userId && responsiblePersonId && userId === responsiblePersonId);
+};
+
 export const getParticipantRoleName = (role?: string | null): string => {
     switch (normalizeParticipantRole(role)) {
         case 'Organizer':
@@ -35,7 +71,7 @@ export const getParticipantRoleName = (role?: string | null): string => {
         case 'Observer':
             return 'Наблюдатель';
         default:
-            return 'Участник';
+            return 'Без роли';
     }
 };
 

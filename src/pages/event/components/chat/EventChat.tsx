@@ -21,7 +21,9 @@ import {
     useSendEventChatMessageWithFilesMutation,
     useUpdateEventChatMessageMutation,
 } from '@/services/api/chatApi.ts';
+import {useGetEventSubscribersQuery} from '@/services/api/eventApi.ts';
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
+import {normalizeParticipantRole} from '@/utils/participantRole.ts';
 import Link45degIcon from '@/assets/img/icon-m/link-45deg.svg?react';
 import SearchIcon from '@/assets/img/icon-m/search.svg?react';
 import ArrowUpRightIcon from '@/assets/img/icon-m/arrow-up-right.svg?react';
@@ -151,6 +153,10 @@ export default function EventChat({eventId}: EventChatProps) {
     }, [dispatch, eventId]);
 
     const {data: profile} = useGetProfileQuery();
+    const {data: subscribersData} = useGetEventSubscribersQuery(
+        {eventId, count: 200, offset: 0},
+        {skip: !eventId},
+    );
 
     const {data: messages = [], isLoading, isFetching} = useGetEventChatMessagesQuery({
         eventId,
@@ -222,6 +228,14 @@ export default function EventChat({eventId}: EventChatProps) {
 
         return searchedMessages;
     }, [searchText, searchedMessages]);
+
+    const isObserver = useMemo(() => {
+        const myId = profile?.id ?? '';
+        if (!myId) return false;
+        const users = subscribersData?.res?.users ?? [];
+        const rawRole = users.find((user) => user.id === myId)?.role ?? null;
+        return normalizeParticipantRole(rawRole) === 'Observer';
+    }, [profile?.id, subscribersData]);
 
     useEffect(() => {
         if (!isSearchOpen || !searchText.trim()) {
@@ -309,10 +323,12 @@ export default function EventChat({eventId}: EventChatProps) {
     }, [composerFiles]);
 
     const openFileDialog = () => {
+        if (isObserver) return;
         fileInputRef.current?.click();
     };
 
     const handleFilesSelected = (event: ChangeEvent<HTMLInputElement>) => {
+        if (isObserver) return;
         const selected = Array.from(event.target.files ?? []);
         if (selected.length === 0) {
             return;
@@ -350,6 +366,7 @@ export default function EventChat({eventId}: EventChatProps) {
     };
 
     const handleSend = async () => {
+        if (isObserver) return;
         const trimmedText = text.trim();
         if (!trimmedText && composerFiles.length === 0) {
             return;
@@ -384,7 +401,8 @@ export default function EventChat({eventId}: EventChatProps) {
             }).unwrap();
 
             clearComposer();
-        } catch {
+        } catch (error) {
+            console.error('Не удалось отправить сообщение:', error);
         }
     };
 
@@ -406,7 +424,8 @@ export default function EventChat({eventId}: EventChatProps) {
 
         try {
             await navigator.clipboard.writeText(value);
-        } catch {
+        } catch (error) {
+            console.error('Не удалось скопировать текст:', error);
         }
     };
 
@@ -441,7 +460,8 @@ export default function EventChat({eventId}: EventChatProps) {
             if (editingMessageId === deleteCandidate.id) {
                 clearComposer();
             }
-        } catch {
+        } catch (error) {
+            console.error('Не удалось удалить сообщение:', error);
         }
     };
 
@@ -751,71 +771,79 @@ export default function EventChat({eventId}: EventChatProps) {
                             </div>
                         )}
 
-                        <div className={styles.composerRow}>
-                            <button className={styles.iconButton} onClick={openFileDialog} aria-label="Прикрепить файл">
-                                <Link45degIcon/>
-                            </button>
-
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                className={styles.hiddenInput}
-                                multiple
-                                onChange={handleFilesSelected}
-                            />
-
-                            <input
-                                className={styles.composerInput}
-                                value={text}
-                                onChange={(event) => setText(event.target.value)}
-                                placeholder={editingMessageId ? 'Измените сообщение...' : 'Напишите сообщение...'}
-                                onKeyDown={(event) => {
-                                    if (event.key === 'Enter' && !event.shiftKey) {
-                                        event.preventDefault();
-                                        void handleSend();
-                                    }
-                                }}
-                            />
-
-                            <div className={styles.composerRight}>
-                                <button
-                                    className={styles.iconButton}
-                                    onClick={() => setIsEmojiOpen((prev) => !prev)}
-                                    aria-label="Emoji"
-                                >
-                                    😊
-                                </button>
-
-                                <button
-                                    className={clsx(
-                                        styles.iconButton,
-                                        styles.sendButton,
-                                        canSend ? styles.sendButtonActive : styles.sendButtonInactive,
-                                    )}
-                                    onClick={() => void handleSend()}
-                                    disabled={isBusy || !canSend}
-                                    aria-label="Отправить"
-                                >
-                                    <SendIcon/>
-                                </button>
+                        {isObserver ? (
+                            <div className={styles.composerRow}>
+                                <span className={styles.observerComposerHint}>
+                                    Вы не можете писать сообщения, потому что Ваша роль «Наблюдатель»
+                                </span>
                             </div>
+                        ) : (
+                            <div className={styles.composerRow}>
+                                <button className={styles.iconButton} onClick={openFileDialog} aria-label="Прикрепить файл">
+                                    <Link45degIcon/>
+                                </button>
 
-                            {isEmojiOpen && (
-                                <div className={styles.emojiPanel} ref={emojiRef}>
-                                    <EmojiPicker
-                                        onEmojiClick={(emojiData: EmojiClickData) => {
-                                            setText((prev) => `${prev}${emojiData.emoji}`);
-                                        }}
-                                        previewConfig={{showPreview: false}}
-                                        searchDisabled={false}
-                                        skinTonesDisabled
-                                        autoFocusSearch={false}
-                                        height={320}
-                                        width={320}
-                                    />
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    className={styles.hiddenInput}
+                                    multiple
+                                    onChange={handleFilesSelected}
+                                />
+
+                                <input
+                                    className={styles.composerInput}
+                                    value={text}
+                                    onChange={(event) => setText(event.target.value)}
+                                    placeholder={editingMessageId ? 'Измените сообщение...' : 'Напишите сообщение...'}
+                                    onKeyDown={(event) => {
+                                        if (event.key === 'Enter' && !event.shiftKey) {
+                                            event.preventDefault();
+                                            void handleSend();
+                                        }
+                                    }}
+                                />
+
+                                <div className={styles.composerRight}>
+                                    <button
+                                        className={styles.iconButton}
+                                        onClick={() => setIsEmojiOpen((prev) => !prev)}
+                                        aria-label="Emoji"
+                                    >
+                                        😊
+                                    </button>
+
+                                    <button
+                                        className={clsx(
+                                            styles.iconButton,
+                                            styles.sendButton,
+                                            canSend ? styles.sendButtonActive : styles.sendButtonInactive,
+                                        )}
+                                        onClick={() => void handleSend()}
+                                        disabled={isBusy || !canSend}
+                                        aria-label="Отправить"
+                                    >
+                                        <SendIcon/>
+                                    </button>
                                 </div>
-                            )}
-                        </div>
+
+                                {isEmojiOpen && (
+                                    <div className={styles.emojiPanel} ref={emojiRef}>
+                                        <EmojiPicker
+                                            onEmojiClick={(emojiData: EmojiClickData) => {
+                                                setText((prev) => `${prev}${emojiData.emoji}`);
+                                            }}
+                                            previewConfig={{showPreview: false}}
+                                            searchDisabled={false}
+                                            skinTonesDisabled
+                                            autoFocusSearch={false}
+                                            height={320}
+                                            width={320}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
 

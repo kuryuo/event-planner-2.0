@@ -10,10 +10,11 @@ import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 interface ParticipantsProps {
     eventId: string | null;
     maxParticipants?: number;
-    isAdmin?: boolean;
+    /** Роли участников, исключение, кнопка «Добавить» — только у организатора */
+    canManageParticipants?: boolean;
 }
 
-export default function Participants({eventId, maxParticipants, isAdmin = false}: ParticipantsProps) {
+export default function Participants({eventId, maxParticipants, canManageParticipants = false}: ParticipantsProps) {
     const [searchName, setSearchName] = useState('');
 
     const {data, isLoading, error} = useGetEventSubscribersQuery(
@@ -48,7 +49,7 @@ export default function Participants({eventId, maxParticipants, isAdmin = false}
                     onChange={(event) => setSearchName(event.target.value)}
                 />
 
-                {isAdmin && (
+                {canManageParticipants && (
                     <Button type="default" className="ep-btn ep-btn--m ep-btn--filled-gray" disabled>
                         Добавить
                     </Button>
@@ -75,8 +76,8 @@ export default function Participants({eventId, maxParticipants, isAdmin = false}
                             role={participant.role}
                             eventId={eventId || ''}
                             userId={participant.id}
-                            showActions={isAdmin}
-                            canEditRoles={isAdmin}
+                            showActions={canManageParticipants}
+                            canEditRoles={canManageParticipants}
                         />
                     ))}
                 </div>

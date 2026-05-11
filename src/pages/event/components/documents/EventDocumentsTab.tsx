@@ -38,6 +38,7 @@ import styles from './EventDocumentsTab.module.scss';
 import {isValidUrl} from '@/utils/validation.ts';
 import type {EventAttachment} from '@/types/api/Event.ts';
 import {useClickOutside} from '@/hooks/ui/useClickOutside.ts';
+import {normalizeParticipantRole} from '@/utils/participantRole.ts';
 
 interface EventDocumentsTabProps {
     eventId: string;
@@ -54,14 +55,8 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
     const canManageDocuments = useMemo(() => {
         const users = subscribersData?.res?.users ?? [];
         const role = users.find((user) => user.id === currentUserId)?.role ?? null;
-        const normalizedRole = String(role ?? '').toLowerCase();
-        return (
-            !role
-            || normalizedRole === 'organizer'
-            || normalizedRole === 'editor'
-            || normalizedRole === 'организатор'
-            || normalizedRole === 'редактор'
-        );
+        const normalizedRole = normalizeParticipantRole(role);
+        return normalizedRole === 'Organizer' || normalizedRole === 'Editor' || normalizedRole === 'Assistant';
     }, [subscribersData, currentUserId]);
 
     const [searchValue, setSearchValue] = useState('');
@@ -135,7 +130,7 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
         : 'Идеи, мысли и короткие заметки по мероприятию';
 
     const handlePickFile = async (file: File) => {
-        if (!eventId) return;
+        if (!eventId || !canManageDocuments) return;
         try {
             await uploadFile({eventId, file}).unwrap();
             showSuccess('Документ успешно загружен');
@@ -149,7 +144,7 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
     };
 
     const submitLink = async () => {
-        if (!eventId) return;
+        if (!eventId || !canManageDocuments) return;
         const trimmedUrl = linkUrlDraft.trim();
         const trimmedTitle = linkTitleDraft.trim();
         if (!trimmedUrl || !isValidUrl(trimmedUrl)) return;
@@ -190,11 +185,9 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
                 <EventNoteCard
                     key={note.id}
                     note={note}
-                    canEdit={
-                        canManageDocuments
-                        || (Boolean(note.authorId) && note.authorId === currentUserId)
-                    }
+                    canEdit={canManageDocuments}
                     onSave={async (text) => {
+                        if (!canManageDocuments) return;
                         await updateNote({eventId, noteId: note.id, text}).unwrap();
                     }}
                 />
@@ -257,7 +250,7 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
     }, [closeAttachmentMenus]);
 
     const confirmDeleteAttachment = async () => {
-        if (!attachmentToDelete || !eventId) return;
+        if (!attachmentToDelete || !eventId || !canManageDocuments) return;
 
         try {
             await deleteAttachment({eventId, attachmentId: attachmentToDelete.id}).unwrap();

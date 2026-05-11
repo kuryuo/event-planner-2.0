@@ -5,7 +5,12 @@ import {Button} from "antd";
 import {Checkbox} from "antd";
 import PlusLgIcon from '@/assets/img/icon-m/plus-lg.svg?react';
 import TrashIcon from '@/assets/img/icon-m/trash.svg?react';
+import {useMemo} from "react";
 import {usePhotosGallery} from '@/hooks/ui/usePhotosGallery';
+import {useSelector} from "react-redux";
+import type {RootState} from "@/store/store.ts";
+import {useGetEventSubscribersQuery} from "@/services/api/eventApi.ts";
+import {normalizeParticipantRole} from "@/utils/participantRole.ts";
 
 interface PhotosGalleryProps {
     eventId: string;
@@ -17,6 +22,18 @@ const isVideoPath = (path?: string): boolean => {
 };
 
 export default function PhotosGallery({eventId}: PhotosGalleryProps) {
+    const currentUserId = useSelector((state: RootState) => state.profile.profile?.id ?? '');
+    const {data: subscribersData} = useGetEventSubscribersQuery(
+        {eventId, count: 200, offset: 0},
+        {skip: !eventId},
+    );
+    const canManageMedia = useMemo(() => {
+        const users = subscribersData?.res?.users ?? [];
+        const role = users.find((user) => user.id === currentUserId)?.role ?? null;
+        const normalizedRole = normalizeParticipantRole(role);
+        return normalizedRole === 'Organizer' || normalizedRole === 'Editor';
+    }, [subscribersData, currentUserId]);
+
     const {
         photos,
         isLoading,
@@ -56,24 +73,28 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
                 {hasPhotos && (
                     <div className={styles.controls}>
                         <div className={styles.leftControls}>
-                            <Button
-                                type="default"
-                                icon={<PlusLgIcon className={styles.icon}/>}
-                                className="ep-btn ep-btn--m ep-btn--filled-gray"
-                                onClick={handleUploadClick}
-                                disabled={isUploading}
-                            >
-                                {uploadLabel}
-                            </Button>
-                            <Button
-                                type={isSelectionMode ? "primary" : "text"}
-                                className={`ep-btn ep-btn--m ${isSelectionMode ? "ep-btn--filled-purple" : "ep-btn--text"}`}
-                                onClick={handleSelectModeToggle}
-                            >
-                                Выбрать
-                            </Button>
+                            {canManageMedia && (
+                                <>
+                                    <Button
+                                        type="default"
+                                        icon={<PlusLgIcon className={styles.icon}/>}
+                                        className="ep-btn ep-btn--m ep-btn--filled-gray"
+                                        onClick={handleUploadClick}
+                                        disabled={isUploading}
+                                    >
+                                        {uploadLabel}
+                                    </Button>
+                                    <Button
+                                        type={isSelectionMode ? "primary" : "text"}
+                                        className={`ep-btn ep-btn--m ${isSelectionMode ? "ep-btn--filled-purple" : "ep-btn--text"}`}
+                                        onClick={handleSelectModeToggle}
+                                    >
+                                        Выбрать
+                                    </Button>
+                                </>
+                            )}
                         </div>
-                        {hasSelectedPhotos && (
+                        {canManageMedia && hasSelectedPhotos && (
                             <div className={styles.rightControls}>
                                 <Button
                                     type="primary"
@@ -90,30 +111,38 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
                     </div>
                 )}
 
-                <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*,video/*"
-                    multiple
-                    style={{display: 'none'}}
-                    onChange={handleFileChange}
-                />
+                {canManageMedia && (
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*,video/*"
+                        multiple
+                        style={{display: 'none'}}
+                        onChange={handleFileChange}
+                    />
+                )}
 
                 {error || !hasPhotos ? (
                     <div className={styles.emptyState}>
-                        <h3 className={styles.emptyTitle}>Добавьте фото или видео</h3>
+                        <h3 className={styles.emptyTitle}>
+                            {canManageMedia ? 'Добавьте фото или видео' : 'Фото и видео отсутствуют'}
+                        </h3>
                         <p className={styles.emptyText}>
-                            Перетащите файлы сюда или нажмите на кнопку ниже
+                            {canManageMedia
+                                ? 'Перетащите файлы сюда или нажмите на кнопку ниже'
+                                : 'Пока нет медиафайлов для просмотра'}
                         </p>
-                        <Button
-                            type="primary"
-                            icon={<PlusLgIcon className={styles.icon}/>}
-                            className={`ep-btn ep-btn--m ep-btn--filled-purple ${styles.emptyUploadButton}`}
-                            onClick={handleUploadClick}
-                            disabled={isUploading}
-                        >
-                            {uploadLabel}
-                        </Button>
+                        {canManageMedia && (
+                            <Button
+                                type="primary"
+                                icon={<PlusLgIcon className={styles.icon}/>}
+                                className={`ep-btn ep-btn--m ep-btn--filled-purple ${styles.emptyUploadButton}`}
+                                onClick={handleUploadClick}
+                                disabled={isUploading}
+                            >
+                                {uploadLabel}
+                            </Button>
+                        )}
                     </div>
                 ) : (
                     <div className={styles.grid}>
@@ -130,7 +159,7 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
                                     className={`${styles.photoItem} ${isSelected ? styles.selected : ''} ${isSelectionMode ? styles.selectionMode : ''}`}
                                     onClick={() => handlePhotoClick(photo.id, index)}
                                 >
-                                    {isSelectionMode && (
+                                    {canManageMedia && isSelectionMode && (
                                         <div className={styles.checkboxWrapper} onClick={(e) => e.stopPropagation()}>
                                             <Checkbox
                                                 checked={isSelected}
@@ -173,7 +202,7 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
                     onClose={handleCloseViewer}
                     onNext={handleNextPhoto}
                     onPrev={handlePrevPhoto}
-                    onDeleteCurrent={handleDeleteCurrent}
+                    onDeleteCurrent={canManageMedia ? handleDeleteCurrent : undefined}
                 />
             )}
         </>

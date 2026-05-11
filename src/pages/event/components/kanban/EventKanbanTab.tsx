@@ -30,6 +30,7 @@ import AddColumnButton from "@/pages/tasks/components/AddColumnButton";
 import BoardTaskCard from "@/pages/tasks/components/board-task-card/BoardTaskCard";
 import ProfileActionModal from "@/components/profile-action-modal/ProfileActionModal";
 import {Button as AntButton} from "antd";
+import {normalizeParticipantRole} from "@/utils/participantRole.ts";
 import {
   useCreateBoardColumnMutation,
   useCreateBoardTaskMutation,
@@ -72,52 +73,102 @@ type BoardColumn = Column<BoardCard> & {
   cards: BoardCard[];
 };
 
-const toBoard = (payload: any): KanbanBoard<BoardCard> => {
-  const sourceRaw = payload?.result ?? payload ?? {};
-  const source = Array.isArray(sourceRaw) ? sourceRaw[0] ?? {} : sourceRaw;
-  const columns = source?.columns ?? source?.boardColumns ?? [];
+interface RawBoardTask {
+  id?: unknown;
+  title?: unknown;
+  description?: unknown;
+  dueDate?: unknown;
+  deadline?: unknown;
+  assigneeDisplayName?: unknown;
+  assigneeName?: unknown;
+  assignedUserName?: unknown;
+  assigneeAvatarUrl?: unknown;
+  assigneeAvatar?: unknown;
+  priority?: unknown;
+  commentCount?: unknown;
+  commentsCount?: unknown;
+  comments?: unknown;
+  assigneeId?: unknown;
+  assignedUserId?: unknown;
+}
+
+interface RawBoardColumn {
+  id?: unknown;
+  name?: unknown;
+  tasks?: unknown;
+  boardTasks?: unknown;
+}
+
+interface RawBoardResponse {
+  result?: unknown;
+  columns?: unknown;
+  boardColumns?: unknown;
+}
+
+const asRecord = (value: unknown): Record<string, unknown> =>
+  value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+
+const toBoard = (payload: unknown): KanbanBoard<BoardCard> => {
+  const payloadRec = asRecord(payload);
+  const sourceRaw = (payloadRec.result ?? payload ?? {}) as unknown;
+  const source = Array.isArray(sourceRaw)
+    ? (sourceRaw[0] ?? {}) as unknown
+    : sourceRaw;
+  const sourceRec = asRecord(source) as unknown as RawBoardResponse;
+  const columns = (sourceRec.columns ?? sourceRec.boardColumns ?? []) as unknown;
 
   return {
     columns: (Array.isArray(columns) ? columns : []).map(
-      (column: any, columnIndex: number) => {
-        const tasks = column?.tasks ?? column?.boardTasks ?? [];
+      (column: unknown, columnIndex: number) => {
+        const colRec = asRecord(column) as unknown as RawBoardColumn;
+        const tasksRaw = (colRec.tasks ?? colRec.boardTasks ?? []) as unknown;
+        const tasks = Array.isArray(tasksRaw) ? (tasksRaw as unknown[]) : [];
 
         return {
-          id: String(column?.id ?? `column-${columnIndex}`),
-          title: String(column?.name ?? "Колонка"),
-          cards: (Array.isArray(tasks) ? tasks : []).map(
-            (task: any, taskIndex: number) => ({
-              id: String(task?.id ?? `task-${taskIndex}`),
-              taskId: String(task?.id ?? `task-${taskIndex}`),
-              title: String(task?.title ?? "Новая задача"),
-              description: String(task?.description ?? ""),
-              dueDate: task?.dueDate ?? task?.deadline ?? undefined,
+          id: String(colRec.id ?? `column-${columnIndex}`),
+          title: String(colRec.name ?? "Колонка"),
+          cards: tasks.map((task: unknown, taskIndex: number) => {
+            const taskRec = asRecord(task) as unknown as RawBoardTask;
+            const comments = Array.isArray(taskRec.comments)
+              ? taskRec.comments
+              : [];
+            const priority = String(taskRec.priority ?? "");
+            return {
+              id: String(taskRec.id ?? `task-${taskIndex}`),
+              taskId: String(taskRec.id ?? `task-${taskIndex}`),
+              title: String(taskRec.title ?? "Новая задача"),
+              description: String(taskRec.description ?? ""),
+              dueDate: (taskRec.dueDate ?? taskRec.deadline ?? undefined) as
+                | string
+                | undefined,
               assigneeName: String(
-                task?.assigneeDisplayName ??
-                  task?.assigneeName ??
-                  task?.assignedUserName ??
+                taskRec.assigneeDisplayName ??
+                  taskRec.assigneeName ??
+                  taskRec.assignedUserName ??
                   "Не назначено"
               ),
-              assigneeAvatar:
-                task?.assigneeAvatarUrl ?? task?.assigneeAvatar ?? undefined,
+              assigneeAvatar: String(
+                taskRec.assigneeAvatarUrl ?? taskRec.assigneeAvatar ?? ""
+              )
+                ? String(taskRec.assigneeAvatarUrl ?? taskRec.assigneeAvatar)
+                : undefined,
               priority:
-                task?.priority === "Urgent"
+                priority === "Urgent"
                   ? "Срочный"
-                  : task?.priority === "High"
-                  ? "Высокий"
-                  : task?.priority === "Low"
-                  ? "Низкий"
-                  : "Средний",
+                  : priority === "High"
+                    ? "Высокий"
+                    : priority === "Low"
+                      ? "Низкий"
+                      : "Средний",
               commentsCount: Number(
-                task?.commentCount ??
-                  task?.commentsCount ??
-                  task?.comments?.length ??
-                  0
+                taskRec.commentCount ?? taskRec.commentsCount ?? comments.length ?? 0
               ),
-              status: String(column?.name ?? "Запланировано"),
-              assigneeId: task?.assigneeId ?? task?.assignedUserId ?? undefined,
-            })
-          ),
+              status: String(colRec.name ?? "Запланировано"),
+              assigneeId: String(taskRec.assigneeId ?? taskRec.assignedUserId ?? "")
+                ? String(taskRec.assigneeId ?? taskRec.assignedUserId)
+                : undefined,
+            };
+          }),
         };
       }
     ),
@@ -225,13 +276,10 @@ export default function EventKanbanTab({ eventId }: Props) {
     const users = subscribersData?.res?.users ?? [];
     return users.find((user) => user.id === currentUserId)?.role ?? null;
   }, [subscribersData, currentUserId]);
-  const normalizedRole = String(currentUserRole ?? "").toLowerCase();
-  const canManageTask =
-    !currentUserRole ||
-    normalizedRole === "organizer" ||
-    normalizedRole === "editor" ||
-    normalizedRole === "организатор" ||
-    normalizedRole === "редактор";
+  const canManageTask = useMemo(() => {
+    const role = normalizeParticipantRole(currentUserRole);
+    return role === "Organizer" || role === "Editor";
+  }, [currentUserRole]);
 
   const hydratedBoard = useMemo(() => toBoard(boardData), [boardData]);
   const [boardState, setBoardState] = useState<KanbanBoard<BoardCard>>({
@@ -326,6 +374,7 @@ export default function EventKanbanTab({ eventId }: Props) {
   const board = boardState.columns.length ? boardState : hydratedBoard;
 
   const cancelPendingNewColumn = async (columnId: string) => {
+    if (!canManageTask) return;
     if (columnIdAwaitingFirstName !== columnId) return;
     setColumnIdAwaitingFirstName(null);
     try {
@@ -337,6 +386,7 @@ export default function EventKanbanTab({ eventId }: Props) {
   };
 
   const commitColumnTitle = async (columnId: string, draft: string) => {
+    if (!canManageTask) return;
     const trimmed = draft.trim();
     const awaitingFirst = columnIdAwaitingFirstName === columnId;
     const renaming = columnIdInlineRename === columnId;
@@ -381,9 +431,17 @@ export default function EventKanbanTab({ eventId }: Props) {
 
   const handleMoveCard = async (
     card: BoardCard,
-    source: any,
-    destination: any
+    source?: { fromColumnId?: string | number; fromPosition: number },
+    destination?: { toColumnId?: string | number; toPosition?: number }
   ) => {
+    if (!source?.fromColumnId || !destination?.toColumnId) {
+      await refetch();
+      return;
+    }
+    if (typeof destination.toPosition !== "number") {
+      await refetch();
+      return;
+    }
     setBoardState((current) => moveCard(current, source, destination));
     try {
       await moveTask({
@@ -420,14 +478,17 @@ export default function EventKanbanTab({ eventId }: Props) {
   };
 
   const handleDeleteColumn = (column: BoardColumn) => {
+    if (!canManageTask) return;
     setColumnToDelete(column);
   };
 
   const handleCreateTaskGlobal = async () => {
+    if (!canManageTask) return;
     setIsCreateTaskPanelOpen(true);
   };
 
   const handleSubmitTaskFromPanel = async () => {
+    if (!canManageTask) return;
     if (!taskTitle.trim()) return;
 
     if (editingTask) {
@@ -477,6 +538,7 @@ export default function EventKanbanTab({ eventId }: Props) {
   };
 
   const confirmDeleteColumn = async () => {
+    if (!canManageTask) return;
     if (!columnToDelete) return;
     const deletedId = String(columnToDelete.id);
     await deleteColumn({ eventId, columnId: deletedId }).unwrap();
@@ -496,11 +558,17 @@ export default function EventKanbanTab({ eventId }: Props) {
     [boardFacets]
   );
   const assigneeOptions = useMemo(() => {
-    const users = boardAssignees?.result ?? [];
-    return users.map((user: any) => ({
-      id: user.id,
-      name: user.name || user.displayName || "Участник",
-    }));
+    const usersRaw = (boardAssignees as unknown as { result?: unknown })?.result;
+    const users = Array.isArray(usersRaw) ? (usersRaw as unknown[]) : [];
+    return users
+      .map((user) => {
+        const rec = asRecord(user);
+        const id = String(rec.id ?? "");
+        if (!id) return null;
+        const name = String(rec.name ?? rec.displayName ?? "").trim();
+        return { id, name: name || "Участник" };
+      })
+      .filter(Boolean) as { id: string; name: string }[];
   }, [boardAssignees]);
   const selectedAssigneeName =
     assigneeOptions.find((user) => user.id === selectedAssigneeId)?.name ||
@@ -726,14 +794,16 @@ export default function EventKanbanTab({ eventId }: Props) {
               </div>
             )}
           </div>
-          <AntButton
-            type="primary"
-            icon={<PlusIcon />}
-            className="ep-btn ep-btn--s ep-btn--filled-green"
-            onClick={handleCreateTaskGlobal}
-          >
-            Создать задачу
-          </AntButton>
+          {canManageTask && (
+            <AntButton
+              type="primary"
+              icon={<PlusIcon />}
+              className="ep-btn ep-btn--s ep-btn--filled-green"
+              onClick={handleCreateTaskGlobal}
+            >
+              Создать задачу
+            </AntButton>
+          )}
         </div>
       </div>
 
@@ -774,7 +844,7 @@ export default function EventKanbanTab({ eventId }: Props) {
                 title={boardColumn.title}
                 count={boardColumn.cards.length}
                 colorIndex={columnIndex >= 0 ? columnIndex : 0}
-                showActions
+                showActions={canManageTask}
                 inlineTitleMode={inlineTitleMode}
                 canEditTitleInline={canManageTask}
                 onCommitInlineTitle={(name) =>

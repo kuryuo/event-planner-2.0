@@ -62,5 +62,5 @@ export const getParticipantRoleLabel = (
     if (normalizedRole === 'Editor') return 'Вы редактор';
     if (normalizedRole === 'Assistant') return 'Вы помощник';
     if (normalizedRole === 'Observer') return 'Вы наблюдатель';
-    return 'Вы участник';
+    return 'Роль не назначена';
 };

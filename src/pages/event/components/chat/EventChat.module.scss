@@ -469,6 +469,13 @@
   color: var(--content-secondary);
 }
 
+.observerComposerHint {
+  flex: 1;
+  @include ty.font(subtitle-s, regular);
+  color: var(--content-secondary);
+  user-select: none;
+}
+
 .composerRight {
   display: inline-flex;
   align-items: center;

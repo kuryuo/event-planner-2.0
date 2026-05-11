@@ -12,15 +12,12 @@ import {Button} from "antd";
 import {useEventDeleter} from '@/hooks/ui/useEventDeleter.ts';
 import {useApiToast} from '@/hooks/ui/useApiToast.ts';
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
-import {useGetProfileEventsQuery} from "@/services/api/profileApi.ts";
 import {
     useCopyEventToTemplateMutation,
-    useSubscribeToEventMutation,
-    useUnsubscribeFromEventMutation,
     useUpdateEventCancellationMutation,
     useUpdateEventLifecycleStateMutation
 } from "@/services/api/eventApi.ts";
-import type {EventLifecycleState, EventTypeKind, ParticipantRoleKind, VenueFormat} from '@/types/api/Event.ts';
+import type {EventLifecycleState, ParticipantRoleKind} from '@/types/api/Event.ts';
 import {
     getParticipantRoleLabel,
     labelToLifecycleState,
@@ -28,7 +25,10 @@ import {
 } from '@/utils/eventLifecycle.ts';
 
 interface HeaderProps {
-    isAdmin?: boolean;
+    /** Статус мероприятия, кебаб (отмена / шаблон / удаление), полное управление участниками */
+    canManageEventOrgOverview?: boolean;
+    /** Кнопка «Редактировать» (карточка в редакторе) */
+    canNavigateToEventEditor?: boolean;
     name: string;
     eventId?: string;
     activeTab?: number;
@@ -38,17 +38,6 @@ interface HeaderProps {
     status?: string | null;
     isCancelled?: boolean;
     participantRole?: ParticipantRoleKind | string | null;
-    updateData?: {
-        name: string;
-        description: string;
-        startDate?: string | null;
-        endDate?: string | null;
-        location: string;
-        venueFormat?: VenueFormat;
-        types?: EventTypeKind[];
-        maxParticipants?: number;
-        color?: string;
-    };
     onTabChange?: (index: number) => void;
     showSummary?: boolean;
     showTabs?: boolean;
@@ -71,7 +60,8 @@ const resolveLifecycleLabel = ({
 };
 
 export default function Header({
-    isAdmin = false,
+    canManageEventOrgOverview = false,
+    canNavigateToEventEditor = false,
     name,
     eventId,
     activeTab = 0,
@@ -81,7 +71,6 @@ export default function Header({
     status,
     isCancelled = false,
     participantRole,
-    updateData: _updateData,
     onTabChange,
     showSummary = true,
     showTabs = true,
@@ -93,21 +82,13 @@ export default function Header({
     const [selectedStatus, setSelectedStatus] = useState(() =>
         resolveLifecycleLabel({lifecycleState, status, isCancelled}),
     );
-    const roleLabel = getParticipantRoleLabel(participantRole, isAdmin);
+    const roleLabel = getParticipantRoleLabel(participantRole, canManageEventOrgOverview);
     const {handleDelete, isLoading: isDeleting} = useEventDeleter();
     const {showApiError, showSuccess} = useApiToast();
-    
-    const {data: subscribedEvents} = useGetProfileEventsQuery();
-    const [subscribeToEvent] = useSubscribeToEventMutation();
-    const [unsubscribeFromEvent] = useUnsubscribeFromEventMutation();
+
     const [updateLifecycleState] = useUpdateEventLifecycleStateMutation();
     const [updateCancellation, {isLoading: isUpdatingCancellation}] = useUpdateEventCancellationMutation();
     const [copyToTemplate, {isLoading: isCopyingTemplate}] = useCopyEventToTemplateMutation();
-    
-    const isSubscribed = useMemo(() => {
-        if (!eventId || !subscribedEvents) return false;
-        return subscribedEvents.some(event => event.id === eventId);
-    }, [eventId, subscribedEvents]);
 
     const handleEdit = () => {
         if (eventId) {
@@ -128,7 +109,7 @@ export default function Header({
 
     const handleStatusPick = useCallback(
         async (option: string) => {
-            if (!eventId || !isAdmin) {
+            if (!eventId || !canManageEventOrgOverview) {
                 setSelectedStatus(option);
                 setIsStatusOpen(false);
                 return;
@@ -147,7 +128,7 @@ export default function Header({
                 showApiError(error, 'Не удалось обновить статус мероприятия');
             }
         },
-        [eventId, isAdmin, selectedStatus, showApiError, showSuccess, updateLifecycleState],
+        [eventId, canManageEventOrgOverview, selectedStatus, showApiError, showSuccess, updateLifecycleState],
     );
 
     const statusMenuItems: MenuProps['items'] = useMemo(
@@ -178,23 +159,6 @@ export default function Header({
     useEffect(() => {
         setSelectedStatus(resolveLifecycleLabel({lifecycleState, status, isCancelled}));
     }, [lifecycleState, status, isCancelled]);
-
-    const handleSubscribeClick = async () => {
-        if (!eventId) return;
-        
-        try {
-            if (isSubscribed) {
-                await unsubscribeFromEvent(eventId).unwrap();
-                showSuccess('Вы отписались от мероприятия');
-            } else {
-                await subscribeToEvent(eventId).unwrap();
-                showSuccess('Вы подписались на мероприятие');
-            }
-        } catch (error) {
-            console.error('Ошибка при подписке/отписке:', error);
-            showApiError(error, 'Не удалось изменить подписку');
-        }
-    };
 
     const isCancelledNow = selectedStatus === 'Отменено';
     const isCompletedNow = selectedStatus === 'Завершено';
@@ -237,7 +201,7 @@ export default function Header({
                         <div className={styles.statusWrapper}>
                             <Dropdown
                                 trigger={['click']}
-                                disabled={!isAdmin || isReadOnlyLifecycle}
+                                disabled={!canManageEventOrgOverview || isReadOnlyLifecycle}
                                 open={isStatusOpen}
                                 onOpenChange={setIsStatusOpen}
                                 menu={{
@@ -250,7 +214,7 @@ export default function Header({
                                 <button
                                     type="button"
                                     className={styles.statusButton}
-                                    disabled={!isAdmin || isReadOnlyLifecycle}
+                                    disabled={!canManageEventOrgOverview || isReadOnlyLifecycle}
                                 >
                                     {selectedStatus}
                                     <ChevronDownIcon className={styles.statusChevron}/>
@@ -259,95 +223,90 @@ export default function Header({
                         </div>
                     </div>
                     <div className={styles.right}>
-                        {isAdmin ? (
-                        <div className={styles.adminActions}>
-                            <Button
-                                type="default"
-                                className="ep-btn ep-btn--m ep-btn--filled-gray"
-                                onClick={handleEdit}
-                                disabled={isReadOnlyLifecycle}
-                            >
-                                Редактировать
-                            </Button>
-                            <Dropdown
-                                trigger={['click']}
-                                open={isMenuOpen}
-                                onOpenChange={setIsMenuOpen}
-                                placement="bottomRight"
-                                dropdownRender={() => (
-                                    <div className={styles.dropdown} onClick={(e) => e.stopPropagation()}>
-                                        <Button
-                                            type="text"
-                                            className={`${styles.dropdownAction} ep-btn ep-btn--m ep-btn--text`}
-                                            onClick={async () => {
-                                                if (!eventId) return;
-                                                try {
-                                                    await updateCancellation({eventId, isCancelled: !isCancelledNow}).unwrap();
-                                                    setSelectedStatus(!isCancelledNow ? 'Отменено' : 'В работе');
-                                                    setIsMenuOpen(false);
-                                                    showSuccess(!isCancelledNow ? 'Мероприятие отменено' : 'Отмена снята');
-                                                } catch (error) {
-                                                    console.error('Не удалось обновить отмену:', error);
-                                                    showApiError(error, 'Не удалось обновить отмену мероприятия');
-                                                }
-                                            }}
-                                            disabled={isUpdatingCancellation || isReadOnlyLifecycle}
-                                        >
-                                            {isCancelledNow ? 'Снять отмену' : 'Отменить мероприятие'}
-                                        </Button>
-                                        <Button
-                                            type="text"
-                                            className={`${styles.dropdownAction} ep-btn ep-btn--m ep-btn--text`}
-                                            onClick={async () => {
-                                                if (!eventId) return;
-                                                const templateName = window.prompt('Название шаблона', `${name} шаблон`);
-                                                if (!templateName?.trim()) return;
-                                                try {
-                                                    await copyToTemplate({eventId, name: templateName.trim()}).unwrap();
-                                                    setIsMenuOpen(false);
-                                                    showSuccess('Шаблон сохранен');
-                                                } catch (error) {
-                                                    console.error('Не удалось создать шаблон:', error);
-                                                    showApiError(error, 'Не удалось создать шаблон');
-                                                }
-                                            }}
-                                            disabled={isCopyingTemplate}
-                                        >
-                                            {isCopyingTemplate ? 'Создаем...' : 'Сохранить как шаблон'}
-                                        </Button>
-                                        <Button
-                                            type="text"
-                                            danger
-                                            icon={<TrashIcon className={styles.trashIcon}/>}
-                                            className={`${styles.dropdownAction} ep-btn ep-btn--m ep-btn--text`}
-                                            onClick={handleDeleteClick}
-                                            disabled={isDeleting}
-                                        >
-                                            {isDeleting ? 'Удаление...' : 'Удалить мероприятие'}
-                                        </Button>
-                                    </div>
-                                )}
-                            >
-                                <div className={styles.menuWrapper}>
-                                    <button
-                                        type="button"
-                                        className={styles.menuButton}
-                                        aria-label="Меню"
+                        {(canNavigateToEventEditor || canManageEventOrgOverview) && (
+                            <div className={styles.adminActions}>
+                                {canNavigateToEventEditor && (
+                                    <Button
+                                        type="default"
+                                        className="ep-btn ep-btn--m ep-btn--filled-gray"
+                                        onClick={handleEdit}
+                                        disabled={isReadOnlyLifecycle}
                                     >
-                                        <ThreeDotsVerticalIcon className={styles.menuIcon}/>
-                                    </button>
-                                </div>
-                            </Dropdown>
-                        </div>
-                    ) : (
-                        <Button 
-                            type={isSubscribed ? "default" : "primary"}
-                            className={`ep-btn ep-btn--m ${isSubscribed ? "ep-btn--filled-gray" : "ep-btn--filled-purple"}`}
-                            disabled={isReadOnlyLifecycle}
-                            onClick={handleSubscribeClick}
-                        >
-                            {isSubscribed ? "Я не пойду" : "Я пойду"}
-                        </Button>
+                                        Редактировать
+                                    </Button>
+                                )}
+                                {canManageEventOrgOverview && (
+                                    <Dropdown
+                                        trigger={['click']}
+                                        open={isMenuOpen}
+                                        onOpenChange={setIsMenuOpen}
+                                        placement="bottomRight"
+                                        dropdownRender={() => (
+                                            <div className={styles.dropdown} onClick={(e) => e.stopPropagation()}>
+                                                <Button
+                                                    type="text"
+                                                    className={`${styles.dropdownAction} ep-btn ep-btn--m ep-btn--text`}
+                                                    onClick={async () => {
+                                                        if (!eventId) return;
+                                                        try {
+                                                            await updateCancellation({eventId, isCancelled: !isCancelledNow}).unwrap();
+                                                            setSelectedStatus(!isCancelledNow ? 'Отменено' : 'В работе');
+                                                            setIsMenuOpen(false);
+                                                            showSuccess(!isCancelledNow ? 'Мероприятие отменено' : 'Отмена снята');
+                                                        } catch (error) {
+                                                            console.error('Не удалось обновить отмену:', error);
+                                                            showApiError(error, 'Не удалось обновить отмену мероприятия');
+                                                        }
+                                                    }}
+                                                    disabled={isUpdatingCancellation || isReadOnlyLifecycle}
+                                                >
+                                                    {isCancelledNow ? 'Снять отмену' : 'Отменить мероприятие'}
+                                                </Button>
+                                                <Button
+                                                    type="text"
+                                                    className={`${styles.dropdownAction} ep-btn ep-btn--m ep-btn--text`}
+                                                    onClick={async () => {
+                                                        if (!eventId) return;
+                                                        const templateName = window.prompt('Название шаблона', `${name} шаблон`);
+                                                        if (!templateName?.trim()) return;
+                                                        try {
+                                                            await copyToTemplate({eventId, name: templateName.trim()}).unwrap();
+                                                            setIsMenuOpen(false);
+                                                            showSuccess('Шаблон сохранен');
+                                                        } catch (error) {
+                                                            console.error('Не удалось создать шаблон:', error);
+                                                            showApiError(error, 'Не удалось создать шаблон');
+                                                        }
+                                                    }}
+                                                    disabled={isCopyingTemplate}
+                                                >
+                                                    {isCopyingTemplate ? 'Создаем...' : 'Сохранить как шаблон'}
+                                                </Button>
+                                                <Button
+                                                    type="text"
+                                                    danger
+                                                    icon={<TrashIcon className={styles.trashIcon}/>}
+                                                    className={`${styles.dropdownAction} ep-btn ep-btn--m ep-btn--text`}
+                                                    onClick={handleDeleteClick}
+                                                    disabled={isDeleting}
+                                                >
+                                                    {isDeleting ? 'Удаление...' : 'Удалить мероприятие'}
+                                                </Button>
+                                            </div>
+                                        )}
+                                    >
+                                        <div className={styles.menuWrapper}>
+                                            <button
+                                                type="button"
+                                                className={styles.menuButton}
+                                                aria-label="Меню"
+                                            >
+                                                <ThreeDotsVerticalIcon className={styles.menuIcon}/>
+                                            </button>
+                                        </div>
+                                    </Dropdown>
+                                )}
+                            </div>
                         )}
                     </div>
                 </div>

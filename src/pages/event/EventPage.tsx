@@ -14,7 +14,10 @@ import EventTasksOverview from '@/pages/event/components/tasks-overview/EventTas
 import {useGetEventSubscribersQuery} from '@/services/api/eventApi.ts';
 import EventDocumentsTab from '@/pages/event/components/documents/EventDocumentsTab.tsx';
 import EventKanbanTab from '@/pages/event/components/kanban/EventKanbanTab.tsx';
-import {isEventOrganizer} from '@/utils/participantRole.ts';
+import {
+    canManageEventOrgOverview,
+    canNavigateToEventEditor,
+} from '@/utils/participantRole.ts';
 
 const TAB_INDEX_OVERVIEW = 0;
 const TAB_INDEX_DOCUMENTS = 1;
@@ -35,7 +38,12 @@ export default function EventPage() {
     );
     const [activeTab, setActiveTab] = useState(TAB_INDEX_OVERVIEW);
 
-    const isAdmin = isEventOrganizer({
+    const canManageOrgOverview = canManageEventOrgOverview({
+        role: event?.myParticipantRole,
+        userId: profile?.id,
+        responsiblePersonId: event?.responsiblePersonId,
+    });
+    const canOpenEventEditor = canNavigateToEventEditor({
         role: event?.myParticipantRole,
         userId: profile?.id,
         responsiblePersonId: event?.responsiblePersonId,
@@ -114,7 +122,7 @@ export default function EventPage() {
                                 color={event.color}
                                 visitorsCount={visitorsCount}
                             />
-                            <Participants eventId={event.id} isAdmin={isAdmin}/>
+                            <Participants eventId={event.id} canManageParticipants={canManageOrgOverview}/>
                         </div>
                         <div className={styles.sideContent}>
                             <EventTasksOverview
@@ -168,7 +176,8 @@ export default function EventPage() {
             >
                 <div className={styles.headerWrapper}>
                     <Header
-                        isAdmin={isAdmin}
+                        canManageEventOrgOverview={canManageOrgOverview}
+                        canNavigateToEventEditor={canOpenEventEditor}
                         name={event.name}
                         eventId={event.id}
                         avatar={event.avatar}
@@ -177,16 +186,6 @@ export default function EventPage() {
                         status={event.status}
                         isCancelled={event.isCancelled}
                         participantRole={event.myParticipantRole}
-                        updateData={{
-                            name: event.name,
-                            description: event.description,
-                            startDate: event.startDate,
-                            endDate: event.endDate,
-                            location: event.location,
-                            venueFormat: event.venueFormat,
-                            maxParticipants: event.maxParticipants,
-                            color: event.color,
-                        }}
                         activeTab={activeTab}
                         onTabChange={setActiveTab}
                         showTabs={false}
@@ -196,7 +195,8 @@ export default function EventPage() {
 
                 <section className={styles.contentPanel}>
                     <Header
-                        isAdmin={isAdmin}
+                        canManageEventOrgOverview={canManageOrgOverview}
+                        canNavigateToEventEditor={canOpenEventEditor}
                         name={event.name}
                         eventId={event.id}
                         avatar={event.avatar}
@@ -205,16 +205,6 @@ export default function EventPage() {
                         status={event.status}
                         isCancelled={event.isCancelled}
                         participantRole={event.myParticipantRole}
-                        updateData={{
-                            name: event.name,
-                            description: event.description,
-                            startDate: event.startDate,
-                            endDate: event.endDate,
-                            location: event.location,
-                            venueFormat: event.venueFormat,
-                            maxParticipants: event.maxParticipants,
-                            color: event.color,
-                        }}
                         activeTab={activeTab}
                         onTabChange={setActiveTab}
                         showSummary={false}
