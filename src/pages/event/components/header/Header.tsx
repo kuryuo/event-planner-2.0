@@ -163,6 +163,7 @@ export default function Header({
     const isCancelledNow = selectedStatus === 'Отменено';
     const isCompletedNow = selectedStatus === 'Завершено';
     const isReadOnlyLifecycle = isArchived || isCompletedNow;
+    const canChangeStatus = canManageEventOrgOverview && !isReadOnlyLifecycle;
 
     return (
         <header className={styles.header}>
@@ -199,27 +200,29 @@ export default function Header({
                         <h2 className={styles.title}>{name}</h2>
 
                         <div className={styles.statusWrapper}>
-                            <Dropdown
-                                trigger={['click']}
-                                disabled={!canManageEventOrgOverview || isReadOnlyLifecycle}
-                                open={isStatusOpen}
-                                onOpenChange={setIsStatusOpen}
-                                menu={{
-                                    items: statusMenuItems,
-                                    onClick: ({key}) => {
-                                        void handleStatusPick(String(key));
-                                    },
-                                }}
-                            >
-                                <button
-                                    type="button"
-                                    className={styles.statusButton}
-                                    disabled={!canManageEventOrgOverview || isReadOnlyLifecycle}
+                            {canChangeStatus ? (
+                                <Dropdown
+                                    trigger={['click']}
+                                    open={isStatusOpen}
+                                    onOpenChange={setIsStatusOpen}
+                                    menu={{
+                                        items: statusMenuItems,
+                                        onClick: ({key}) => {
+                                            void handleStatusPick(String(key));
+                                        },
+                                    }}
                                 >
-                                    {selectedStatus}
-                                    <ChevronDownIcon className={styles.statusChevron}/>
-                                </button>
-                            </Dropdown>
+                                    <button
+                                        type="button"
+                                        className={styles.statusButton}
+                                    >
+                                        {selectedStatus}
+                                        <ChevronDownIcon className={styles.statusChevron}/>
+                                    </button>
+                                </Dropdown>
+                            ) : (
+                                <span className={styles.statusBadge}>{selectedStatus}</span>
+                            )}
                         </div>
                     </div>
                     <div className={styles.right}>
