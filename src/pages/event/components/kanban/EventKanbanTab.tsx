@@ -47,7 +47,7 @@ import {
   useAddTaskCommentMutation,
   useUpdateBoardColumnMutation,
 } from "@/services/api/eventApi.ts";
-import type { GetEventBoardPayload } from "@/types/api/Event.ts";
+import type { GetEventBoardPayload, ParticipantRoleKind } from "@/types/api/Event.ts";
 import type { RootState } from "@/store/store";
 import styles from "./EventKanbanTab.module.scss";
 
@@ -177,9 +177,11 @@ const toBoard = (payload: unknown): KanbanBoard<BoardCard> => {
 
 interface Props {
   eventId: string;
+  participantRole?: ParticipantRoleKind | string | null;
+  canManageTasks?: boolean;
 }
 
-export default function EventKanbanTab({ eventId }: Props) {
+export default function EventKanbanTab({ eventId, participantRole, canManageTasks }: Props) {
   const [searchValue, setSearchValue] = useState("");
   const [mockSort, setMockSort] = useState<
     "urgentFirst" | "newestFirst" | "oldestFirst" | "assigneeAsc"
@@ -273,13 +275,17 @@ export default function EventKanbanTab({ eventId }: Props) {
     (state: RootState) => state.profile.profile?.id ?? ""
   );
   const currentUserRole = useMemo(() => {
+    if (participantRole) return participantRole;
+
     const users = subscribersData?.res?.users ?? [];
     return users.find((user) => user.id === currentUserId)?.role ?? null;
-  }, [subscribersData, currentUserId]);
+  }, [participantRole, subscribersData, currentUserId]);
   const canManageTask = useMemo(() => {
+    if (typeof canManageTasks === "boolean") return canManageTasks;
+
     const role = normalizeParticipantRole(currentUserRole);
     return role === "Organizer" || role === "Editor";
-  }, [currentUserRole]);
+  }, [canManageTasks, currentUserRole]);
 
   const hydratedBoard = useMemo(() => toBoard(boardData), [boardData]);
   const [boardState, setBoardState] = useState<KanbanBoard<BoardCard>>({

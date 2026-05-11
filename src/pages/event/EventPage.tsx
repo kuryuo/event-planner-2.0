@@ -147,7 +147,11 @@ export default function EventPage() {
             case TAB_INDEX_KANBAN:
                 return (
                     <div className={clsx(styles.tabContent, styles.kanbanTabContent)}>
-                        <EventKanbanTab eventId={event.id}/>
+                        <EventKanbanTab
+                            eventId={event.id}
+                            participantRole={event.myParticipantRole}
+                            canManageTasks={canOpenEventEditor}
+                        />
                     </div>
                 );
             case TAB_INDEX_MEDIA:

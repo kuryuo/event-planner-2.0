@@ -205,40 +205,55 @@ export default function EventForm({
         setIsExitModalOpen(true);
     };
 
+    const handleExitWithoutSave = () => {
+        if (isEditMode && eventData?.id) {
+            navigate(`/event?id=${eventData.id}`);
+            return;
+        }
+
+        navigate(-1);
+    };
+
+    const exitModalTitle = isEditMode
+        ? 'Выйти из редактирования мероприятия?'
+        : 'Выйти из создания мероприятия?';
+    const exitModalDescription = isEditMode
+        ? 'Вы уверены, что хотите выйти из редактирования? Несохраненные изменения будут потеряны.'
+        : 'Вы можете вернуться к созданию, чтобы продолжить редактирование.';
+    const exitModalFooter = isEditMode
+        ? [
+            <Button key="back" onClick={() => setIsExitModalOpen(false)}>
+                Вернуться к редактированию
+            </Button>,
+            <Button key="exit" type="primary" danger onClick={handleExitWithoutSave}>
+                Выйти
+            </Button>,
+        ]
+        : [
+            <Button key="back" onClick={() => setIsExitModalOpen(false)}>
+                Вернуться к созданию
+            </Button>,
+            <Button key="draft" type="default" onClick={() => handleSubmit({publish: false})}>
+                Сохранить черновик
+            </Button>,
+            <Button key="exit" type="primary" danger onClick={handleExitWithoutSave}>
+                Выйти
+            </Button>,
+        ];
+
     return (
         <div className={styles.formWrapper}>
             <Modal
                 open={isExitModalOpen}
                 onCancel={() => setIsExitModalOpen(false)}
-                footer={[
-                    <Button key="back" onClick={() => setIsExitModalOpen(false)}>
-                        Вернуться к созданию
-                    </Button>,
-                    <Button
-                        key="draft"
-                        type="default"
-                        onClick={() => {
-                            if (isEditMode) {
-                                setIsExitModalOpen(false);
-                                navigate(-1);
-                                return;
-                            }
-                            handleSubmit({publish: false});
-                        }}
-                    >
-                        Сохранить черновик
-                    </Button>,
-                    <Button key="exit" type="primary" danger onClick={() => navigate(-1)}>
-                        Выйти
-                    </Button>,
-                ]}
+                footer={exitModalFooter}
                 closable
                 centered
-                title="Выйти из создания мероприятия?"
+                title={exitModalTitle}
             >
                 <div style={{display: "flex", flexDirection: "column", gap: 8}}>
                     <div style={{color: "var(--content-secondary)"}}>
-                        Вы можете вернуться к созданию, чтобы продолжить редактирование.
+                        {exitModalDescription}
                     </div>
                 </div>
             </Modal>
