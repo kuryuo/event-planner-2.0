@@ -36,15 +36,17 @@ import {useApiToast} from '@/hooks/ui/useApiToast.ts';
 import type {RootState} from '@/store/store.ts';
 import styles from './EventDocumentsTab.module.scss';
 import {isValidUrl} from '@/utils/validation.ts';
-import type {EventAttachment} from '@/types/api/Event.ts';
+import type {EventAttachment, ParticipantRoleKind} from '@/types/api/Event.ts';
 import {useClickOutside} from '@/hooks/ui/useClickOutside.ts';
 import {normalizeParticipantRole} from '@/utils/participantRole.ts';
 
 interface EventDocumentsTabProps {
     eventId: string;
+    participantRole?: ParticipantRoleKind | string | null;
+    canManageDocuments?: boolean;
 }
 
-const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
+const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canManageDocumentsProp}: EventDocumentsTabProps) => {
     const {showApiError, showSuccess} = useApiToast();
     const currentUserId = useSelector((state: RootState) => state.profile.profile?.id ?? '');
     const {data: subscribersData} = useGetEventSubscribersQuery(
@@ -53,11 +55,16 @@ const EventDocumentsTab = ({eventId}: EventDocumentsTabProps) => {
     );
 
     const canManageDocuments = useMemo(() => {
+        if (typeof canManageDocumentsProp === 'boolean') return canManageDocumentsProp;
+
+        const roleFromEvent = normalizeParticipantRole(participantRole);
+        if (roleFromEvent) return roleFromEvent !== 'Observer';
+
         const users = subscribersData?.res?.users ?? [];
         const role = users.find((user) => user.id === currentUserId)?.role ?? null;
         const normalizedRole = normalizeParticipantRole(role);
         return normalizedRole === 'Organizer' || normalizedRole === 'Editor' || normalizedRole === 'Assistant';
-    }, [subscribersData, currentUserId]);
+    }, [canManageDocumentsProp, participantRole, subscribersData, currentUserId]);
 
     const [searchValue, setSearchValue] = useState('');
     const [sort, setSort] = useState<'Newest' | 'Oldest' | 'TitleAsc' | 'AuthorAsc'>('Newest');

@@ -17,6 +17,7 @@ import EventKanbanTab from '@/pages/event/components/kanban/EventKanbanTab.tsx';
 import {
     canManageEventOrgOverview,
     canNavigateToEventEditor,
+    normalizeParticipantRole,
 } from '@/utils/participantRole.ts';
 
 const TAB_INDEX_OVERVIEW = 0;
@@ -48,6 +49,11 @@ export default function EventPage() {
         userId: profile?.id,
         responsiblePersonId: event?.responsiblePersonId,
     });
+    const normalizedParticipantRole = normalizeParticipantRole(event?.myParticipantRole);
+    const canManageEventDocuments =
+        canManageOrgOverview
+        || normalizedParticipantRole === 'Editor'
+        || normalizedParticipantRole === 'Assistant';
 
     const normalizedStatus = (event?.lifecycleState ?? event?.status ?? '').toLowerCase();
     const isStatusArchived =
@@ -93,7 +99,11 @@ export default function EventPage() {
                 case TAB_INDEX_ARCHIVED_DOCUMENTS:
                     return (
                         <div className={styles.tabContent}>
-                            <EventDocumentsTab eventId={event.id}/>
+                            <EventDocumentsTab
+                                eventId={event.id}
+                                participantRole={event.myParticipantRole}
+                                canManageDocuments={canManageEventDocuments}
+                            />
                         </div>
                     );
                 case TAB_INDEX_ARCHIVED_MEDIA:
@@ -135,7 +145,11 @@ export default function EventPage() {
             case TAB_INDEX_DOCUMENTS:
                 return (
                     <div className={styles.tabContent}>
-                        <EventDocumentsTab eventId={event.id}/>
+                        <EventDocumentsTab
+                            eventId={event.id}
+                            participantRole={event.myParticipantRole}
+                            canManageDocuments={canManageEventDocuments}
+                        />
                     </div>
                 );
             case TAB_INDEX_CHAT:
