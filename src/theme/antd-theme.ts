@@ -42,6 +42,7 @@ export const antdTheme: ThemeConfig = {
             controlHeight: 44,
             controlHeightLG: 52,
             activeShadow: 'none',
+            fontFamily: `'Manrope', sans-serif`,
         },
         Checkbox: {
             borderRadiusSM: 4,

@@ -1,6 +1,6 @@
 import type {EventContentArg as FullCalendarEventContentArg} from '@fullcalendar/core';
 import styles from './CalendarEvent.module.scss';
-import {formatTimeRange} from '@/utils';
+import {formatTimeRange} from '@/utils/date';
 
 interface CalendarEventProps {
     arg: FullCalendarEventContentArg;

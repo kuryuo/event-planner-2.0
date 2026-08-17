@@ -3,7 +3,7 @@ import FullCalendar from '@fullcalendar/react';
 import CalendarToolbar from '../calendar/toolbar/CalendarToolbar';
 import CalendarBody from './body/CalendarBody';
 import styles from './Calendar.module.scss';
-import {shiftMonth, shiftWeek} from '@/utils';
+import {shiftMonth, shiftWeek} from '@/utils/date';
 import EventsList from "@/pages/main/components/events-list/EventsList.tsx";
 import {useEventsData} from '@/hooks/api/useEventsData.ts';
 import type {GetEventsPayload} from '@/types/api/Event.ts';

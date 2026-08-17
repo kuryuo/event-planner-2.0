@@ -5,18 +5,12 @@ import {normalizeEventTypes} from '@/utils/eventTypeLabels.ts';
 
 export const userApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
-        /**
-         * Получить профиль пользователя по ID
-         */
         getUserProfile: builder.query<UserForeignProfile, string>({
             query: (userId) => ({
                 url: `users/${userId}`,
                 method: 'GET',
             }),
         }),
-        /**
-         * Получить все мероприятия на которые подписан пользователь
-         */
         getUserEvents: builder.query<UserEvent[], string>({
             query: (userId) => ({
                 url: `users/${userId}/events`,
@@ -35,9 +29,6 @@ export const userApi = baseApi.injectEndpoints({
                 }));
             },
         }),
-        /**
-         * Получить всех пользователей обладающих привилегией на создание мероприятий
-         */
         getOrganizers: builder.query<Organizer[], void>({
             query: () => ({
                 url: 'users/organizers',
@@ -51,9 +42,6 @@ export const userApi = baseApi.injectEndpoints({
                 return [];
             },
         }),
-        /**
-         * Получить список пользователей (admin)
-         */
         getAdminUsers: builder.query<
             AdminUser[],
             {

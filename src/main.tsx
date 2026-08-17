@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import {Provider} from 'react-redux';
 import {applyThemeFromStorage} from '@/hooks/ui/useTheme.ts';
 import './index.css';
-import './antd-typography-overrides.scss';
+import './styles/antd-components.scss';
 import App from './App.tsx';
 import {store} from './store/store';
 import {ToastProvider} from '@/components/toast/ToastProvider.tsx';

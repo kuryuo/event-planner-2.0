@@ -1,13 +1,20 @@
 import {Controller, useForm} from 'react-hook-form';
-import {Button} from "antd";
-import {Checkbox} from "antd";
-import styles from "./AuthForm.module.scss";
-import imageSrc from "@/assets/img/image.png";
+import {Button, Checkbox} from 'antd';
+import styles from './AuthForm.module.scss';
 import {isValidEmail} from '@/utils/validation.ts';
-import {Input} from "antd";
+import {Input} from '@/ui/input/Input';
+import {FormField} from '@/ui/form-field/FormField';
+import {AuthLayout} from '@/pages/auth/components/AuthLayout';
+import type {LoginPayload} from '@/types/api/Auth';
+
+interface LoginFormValues {
+    email: string;
+    password: string;
+    rememberMe: boolean;
+}
 
 interface LoginFormProps {
-    onSubmit: (data: { email: string; password: string }) => void;
+    onSubmit: (data: LoginPayload) => Promise<{success: boolean; error?: string}> | void;
     loading?: boolean;
     error?: string;
     onRegisterClick?: () => void;
@@ -15,22 +22,22 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({
-                                      onSubmit,
-                                      loading = false,
-                                      error,
-                                      onRegisterClick,
-                                      onRecoverPasswordClick
-                                  }: LoginFormProps) {
+    onSubmit,
+    loading = false,
+    error,
+    onRegisterClick,
+    onRecoverPasswordClick,
+}: LoginFormProps) {
     const {
         control,
         handleSubmit,
-        formState: {errors}
-    } = useForm<{ email: string; password: string; rememberMe: boolean }>({
+        formState: {errors},
+    } = useForm<LoginFormValues>({
         defaultValues: {
             email: '',
             password: '',
             rememberMe: false,
-        }
+        },
     });
 
     const submitHandler = handleSubmit((values) => {
@@ -38,117 +45,89 @@ export default function LoginForm({
     });
 
     return (
-        <div className={styles.container}>
-            <div className={styles.imageSection}>
-                <img src={imageSrc} alt="Login" className={styles.image}/>
-            </div>
-            <div className={styles.formSection}>
-                <form onSubmit={submitHandler} className={styles.form}>
-                    <h2 className={styles.title}>Вход</h2>
-
-                    <div className={styles.fieldsWrapper}>
-                        <Controller
-                            name="email"
-                            control={control}
-                            rules={{
-                                required: 'Email обязателен',
-                                validate: (value) => isValidEmail(value) || 'Введите корректный email',
-                            }}
-                            render={({field}) => (
+        <AuthLayout title="Вход">
+            <form onSubmit={submitHandler} className={styles.formInner}>
+                <div className={styles.fieldsWrapper}>
+                    <Controller
+                        name="email"
+                        control={control}
+                        rules={{
+                            required: 'Email обязателен',
+                            validate: (value) => isValidEmail(value) || 'Введите корректный email',
+                        }}
+                        render={({field}) => (
+                            <FormField error={errors.email?.message}>
                                 <Input
+                                    {...field}
                                     placeholder="Email"
                                     type="email"
-                                    value={field.value}
-                                    onChange={field.onChange}
-                                    onBlur={field.onBlur}
-                                    className="ep-input ep-input--m"
+                                    autoComplete="email"
+                                    status={errors.email ? 'error' : undefined}
                                 />
-                            )}
-                        />
+                            </FormField>
+                        )}
+                    />
 
-                        <Controller
-                            name="password"
-                            control={control}
-                            rules={{
-                                required: 'Пароль обязателен',
-                                minLength: {value: 6, message: 'Минимум 6 символов'},
-                            }}
-                            render={({field}) => (
+                    <Controller
+                        name="password"
+                        control={control}
+                        rules={{
+                            required: 'Пароль обязателен',
+                            minLength: {value: 6, message: 'Минимум 6 символов'},
+                        }}
+                        render={({field}) => (
+                            <FormField error={errors.password?.message}>
                                 <Input.Password
+                                    {...field}
                                     placeholder="Пароль"
-                                    value={field.value}
-                                    onChange={field.onChange}
-                                    onBlur={field.onBlur}
-                                    className="ep-input ep-input--m"
+                                    autoComplete="current-password"
+                                    status={errors.password ? 'error' : undefined}
                                 />
-                            )}
-                        />
-
-                        <div className={styles.checkboxWrapper}>
-                            <Controller
-                                name="rememberMe"
-                                control={control}
-                                render={({field}) => (
-                                    <Checkbox
-                                        checked={field.value}
-                                        className="ep-checkbox"
-                                        onChange={(e) => field.onChange(e.target.checked)}
-                                    />
-                                )}
-                            />
-                            <span className={styles.checkboxLabel}>Запомнить меня</span>
-                        </div>
-
-                        {error && (
-                            <div>
-                                {error}
-                            </div>
+                            </FormField>
                         )}
-                        {errors.email?.message && (
-                            <div>
-                                {errors.email.message}
-                            </div>
-                        )}
-                        {errors.password?.message && (
-                            <div>
-                                {errors.password.message}
-                            </div>
-                        )}
-                    </div>
+                    />
 
-                    <Button
-                        type="primary"
-                        htmlType="submit"
-                        disabled={loading}
-                        className={`ep-btn ep-btn--m ep-btn--filled-purple ${styles.submitButton}`}
-                    >
-                        {loading ? "Вход..." : "Войти"}
-                    </Button>
-
-                    <div className={styles.links}>
-                        <div className={styles.linkWrapper}>
-                            <span className={styles.text}>Нет аккаунта? </span>
-                            <button
-                                type="button"
-                                onClick={onRegisterClick}
-                                className={styles.link}
+                    <Controller
+                        name="rememberMe"
+                        control={control}
+                        render={({field}) => (
+                            <Checkbox
+                                checked={field.value}
+                                className={`ep-checkbox ${styles.checkbox}`}
+                                onChange={(e) => field.onChange(e.target.checked)}
                             >
-                                Зарегистрироваться
-                            </button>
-                        </div>
-                        <div className={styles.linkWrapper}>
-                            <span className={styles.text}>Забыли пароль? </span>
-                            <button
-                                type="button"
-                                onClick={onRecoverPasswordClick}
-                                className={styles.link}
-                            >
-                                Восстановить пароль
-                            </button>
-                        </div>
+                                <span className={styles.checkboxLabel}>Запомнить меня</span>
+                            </Checkbox>
+                        )}
+                    />
+
+                    {error ? <p className={styles.error}>{error}</p> : null}
+                </div>
+
+                <Button
+                    type="primary"
+                    htmlType="submit"
+                    disabled={loading}
+                    className={`ep-btn ep-btn--m ep-btn--filled-purple ${styles.submitButton}`}
+                >
+                    {loading ? 'Вход...' : 'Войти'}
+                </Button>
+
+                <div className={styles.links}>
+                    <div className={styles.linkWrapper}>
+                        <span className={styles.text}>Нет аккаунта? </span>
+                        <button type="button" onClick={onRegisterClick} className={styles.link}>
+                            Зарегистрироваться
+                        </button>
                     </div>
-                </form>
-            </div>
-        </div>
+                    <div className={styles.linkWrapper}>
+                        <span className={styles.text}>Забыли пароль? </span>
+                        <button type="button" onClick={onRecoverPasswordClick} className={styles.link}>
+                            Восстановить пароль
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </AuthLayout>
     );
 }

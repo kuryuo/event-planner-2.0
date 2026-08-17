@@ -1,79 +1,71 @@
 import {useEffect} from 'react';
 import {Controller, useForm} from 'react-hook-form';
-import styles from "./ProfileForm.module.scss";
-import {Input} from "antd";
-import {Button} from "antd";
-import GeoAltIcon from "@/assets/img/icon-m/geo-alt.svg?react";
-// import EnvelopeIcon from "@/assets/img/icon-m/envelope.svg?react";
-import TelephoneIcon from "@/assets/img/icon-m/telephone.svg?react";
-import TelegramIcon from "@/assets/img/icon-m/telegram.svg?react";
+import {Button} from 'antd';
+import styles from './ProfileForm.module.scss';
+import {Input} from '@/ui/input/Input';
+import {FormField} from '@/ui/form-field/FormField';
+import GeoAltIcon from '@/assets/img/icon-m/geo-alt.svg?react';
+import TelephoneIcon from '@/assets/img/icon-m/telephone.svg?react';
+import TelegramIcon from '@/assets/img/icon-m/telegram.svg?react';
 import {isValidAddress, isValidPhone, isValidTelegram} from '@/utils/validation.ts';
 
-interface ProfileFormProps {
-    onSubmit?: (data: any) => void;
-    onCancel?: () => void;
-    loading?: boolean;
-    initialData?: {
-        firstName?: string;
-        lastName?: string;
-        profession?: string;
-        city?: string;
-        email?: string;
-        phoneNumber?: string;
-        telegram?: string;
-    };
+interface ProfileFormValues {
+    firstName: string;
+    lastName: string;
+    profession: string;
+    city: string;
+    phoneNumber: string;
+    telegram: string;
 }
 
+interface ProfileFormProps {
+    onSubmit?: (data: ProfileFormValues) => void;
+    onCancel?: () => void;
+    loading?: boolean;
+    initialData?: Partial<ProfileFormValues> & {email?: string};
+}
+
+const emptyValues: ProfileFormValues = {
+    firstName: '',
+    lastName: '',
+    profession: '',
+    city: '',
+    phoneNumber: '',
+    telegram: '',
+};
+
+const toFormValues = (data?: ProfileFormProps['initialData']): ProfileFormValues => ({
+    firstName: data?.firstName ?? '',
+    lastName: data?.lastName ?? '',
+    profession: data?.profession ?? '',
+    city: data?.city ?? '',
+    phoneNumber: data?.phoneNumber ?? '',
+    telegram: data?.telegram ?? '',
+});
+
 export default function ProfileForm({
-                                        onSubmit,
-                                        onCancel,
-                                        loading = false,
-                                        initialData,
-                                    }: ProfileFormProps) {
-    const {control, handleSubmit, reset, formState: {errors}} = useForm({
+    onSubmit,
+    onCancel,
+    loading = false,
+    initialData,
+}: ProfileFormProps) {
+    const {control, handleSubmit, reset, formState: {errors}} = useForm<ProfileFormValues>({
         mode: 'onBlur',
-        defaultValues: {
-            firstName: initialData?.firstName ?? '',
-            lastName: initialData?.lastName ?? '',
-            profession: initialData?.profession ?? '',
-            city: initialData?.city ?? '',
-            phoneNumber: initialData?.phoneNumber ?? '',
-            telegram: initialData?.telegram ?? '',
-        }
+        defaultValues: toFormValues(initialData),
     });
 
     useEffect(() => {
         if (!initialData) return;
-        reset({
-            firstName: initialData.firstName ?? '',
-            lastName: initialData.lastName ?? '',
-            profession: initialData.profession ?? '',
-            city: initialData.city ?? '',
-            phoneNumber: initialData.phoneNumber ?? '',
-            telegram: initialData.telegram ?? '',
-        });
+        reset(toFormValues(initialData));
     }, [initialData, reset]);
 
-    const submitForm = (formData: any) => {
-        if (onSubmit) {
-            onSubmit(formData);
-        }
+    const submitForm = (formData: ProfileFormValues) => {
+        onSubmit?.(formData);
     };
 
     const handleCancel = () => {
-        if (initialData) {
-            reset({
-                firstName: initialData.firstName ?? '',
-                lastName: initialData.lastName ?? '',
-                profession: initialData.profession ?? '',
-                city: initialData.city ?? '',
-                phoneNumber: initialData.phoneNumber ?? '',
-                telegram: initialData.telegram ?? '',
-            });
-        }
-        if (onCancel) {
-            onCancel();
-        }
+        reset(initialData ? toFormValues(initialData) : emptyValues);
+        onCancel?.();
     };
 
     return (
@@ -81,149 +73,122 @@ export default function ProfileForm({
             <div className={styles.section}>
                 <h3 className={styles.sectionTitle}>Личные данные</h3>
                 <div className={styles.nameRow}>
-                    <Controller name="firstName" control={control} rules={{
-                        required: 'Имя обязательно',
-                        minLength: {value: 2, message: 'Минимум 2 символа'},
-                        maxLength: {value: 40, message: 'Максимум 40 символов'},
-                    }} render={({field}) => (
-                        <div className="ep-field">
-                            <Input
-                                placeholder="Имя"
-                                value={field.value}
-                                onChange={field.onChange}
-                                onBlur={field.onBlur}
-                                status={errors.firstName ? "error" : undefined}
-                                className="ep-input ep-input--m"
-                            />
-                            {errors.firstName?.message && (
-                                <span className="ep-field__helper ep-field__helper--error">
-                                    {String(errors.firstName.message)}
-                                </span>
-                            )}
-                        </div>
-                    )}/>
-                    <Controller name="lastName" control={control} rules={{
-                        required: 'Фамилия обязательна',
-                        minLength: {value: 2, message: 'Минимум 2 символа'},
-                        maxLength: {value: 50, message: 'Максимум 50 символов'},
-                    }} render={({field}) => (
-                        <div className="ep-field">
-                            <Input
-                                placeholder="Фамилия"
-                                value={field.value}
-                                onChange={field.onChange}
-                                onBlur={field.onBlur}
-                                status={errors.lastName ? "error" : undefined}
-                                className="ep-input ep-input--m"
-                            />
-                            {errors.lastName?.message && (
-                                <span className="ep-field__helper ep-field__helper--error">
-                                    {String(errors.lastName.message)}
-                                </span>
-                            )}
-                        </div>
-                    )}/>
+                    <Controller
+                        name="firstName"
+                        control={control}
+                        rules={{
+                            required: 'Имя обязательно',
+                            minLength: {value: 2, message: 'Минимум 2 символа'},
+                            maxLength: {value: 40, message: 'Максимум 40 символов'},
+                        }}
+                        render={({field}) => (
+                            <FormField error={errors.firstName?.message}>
+                                <Input
+                                    {...field}
+                                    placeholder="Имя"
+                                    status={errors.firstName ? 'error' : undefined}
+                                />
+                            </FormField>
+                        )}
+                    />
+                    <Controller
+                        name="lastName"
+                        control={control}
+                        rules={{
+                            required: 'Фамилия обязательна',
+                            minLength: {value: 2, message: 'Минимум 2 символа'},
+                            maxLength: {value: 50, message: 'Максимум 50 символов'},
+                        }}
+                        render={({field}) => (
+                            <FormField error={errors.lastName?.message}>
+                                <Input
+                                    {...field}
+                                    placeholder="Фамилия"
+                                    status={errors.lastName ? 'error' : undefined}
+                                />
+                            </FormField>
+                        )}
+                    />
                 </div>
-                <Controller name="profession" control={control} rules={{
-                    required: 'Укажите должность',
-                    minLength: {value: 2, message: 'Минимум 2 символа'},
-                    maxLength: {value: 80, message: 'Максимум 80 символов'},
-                }} render={({field}) => (
-                    <div className="ep-field">
-                        <Input
-                            placeholder="Должность"
-                            value={field.value}
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
-                            status={errors.profession ? "error" : undefined}
-                            className="ep-input ep-input--m"
-                        />
-                        {errors.profession?.message && (
-                            <span className="ep-field__helper ep-field__helper--error">
-                                {String(errors.profession.message)}
-                            </span>
-                        )}
-                    </div>
-                )}/>
-                <Controller name="city" control={control} rules={{
-                    required: 'Укажите адрес или город',
-                    validate: (value) => isValidAddress(value) || 'Введите корректный адрес',
-                }} render={({field}) => (
-                    <div className="ep-field">
-                        <Input
-                            placeholder="Город"
-                            value={field.value}
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
-                            prefix={<GeoAltIcon/>}
-                            status={errors.city ? "error" : undefined}
-                            className="ep-input ep-input--m"
-                        />
-                        {errors.city?.message && (
-                            <span className="ep-field__helper ep-field__helper--error">
-                                {String(errors.city.message)}
-                            </span>
-                        )}
-                    </div>
-                )}/>
+                <Controller
+                    name="profession"
+                    control={control}
+                    rules={{
+                        required: 'Укажите должность',
+                        minLength: {value: 2, message: 'Минимум 2 символа'},
+                        maxLength: {value: 80, message: 'Максимум 80 символов'},
+                    }}
+                    render={({field}) => (
+                        <FormField error={errors.profession?.message}>
+                            <Input
+                                {...field}
+                                placeholder="Должность"
+                                status={errors.profession ? 'error' : undefined}
+                            />
+                        </FormField>
+                    )}
+                />
+                <Controller
+                    name="city"
+                    control={control}
+                    rules={{
+                        required: 'Укажите адрес или город',
+                        validate: (value) => isValidAddress(value) || 'Введите корректный адрес',
+                    }}
+                    render={({field}) => (
+                        <FormField error={errors.city?.message}>
+                            <Input
+                                {...field}
+                                placeholder="Город"
+                                prefix={<GeoAltIcon/>}
+                                status={errors.city ? 'error' : undefined}
+                            />
+                        </FormField>
+                    )}
+                />
             </div>
 
             <div className={styles.divider}></div>
 
             <div className={styles.section}>
                 <h3 className={styles.sectionTitle}>Контактные данные</h3>
-                {/* <TextField
-                    placeholder="Email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    leftIcon={<EnvelopeIcon/>}
-                    fieldSize="M"
-                    disabled
-                /> */}
-                <Controller name="phoneNumber" control={control} rules={{
-                    required: 'Укажите номер телефона',
-                    validate: (value) => isValidPhone(value) || 'Введите корректный телефон (+7XXXXXXXXXX)',
-                }} render={({field}) => (
-                    <div className="ep-field">
-                        <Input
-                            placeholder="Телефон"
-                            type="tel"
-                            value={field.value}
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
-                            prefix={<TelephoneIcon/>}
-                            status={errors.phoneNumber ? "error" : undefined}
-                            className="ep-input ep-input--m"
-                        />
-                        {errors.phoneNumber?.message && (
-                            <span className="ep-field__helper ep-field__helper--error">
-                                {String(errors.phoneNumber.message)}
-                            </span>
-                        )}
-                    </div>
-                )}/>
-                <Controller name="telegram" control={control} rules={{
-                    required: 'Укажите Telegram',
-                    validate: (value) => isValidTelegram(value) || 'Некорректный Telegram (@username)',
-                }} render={({field}) => (
-                    <div className="ep-field">
-                        <Input
-                            placeholder="Telegram"
-                            value={field.value}
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
-                            prefix={<TelegramIcon/>}
-                            status={errors.telegram ? "error" : undefined}
-                            className="ep-input ep-input--m"
-                        />
-                        {errors.telegram?.message && (
-                            <span className="ep-field__helper ep-field__helper--error">
-                                {String(errors.telegram.message)}
-                            </span>
-                        )}
-                    </div>
-                )}/>
+                <Controller
+                    name="phoneNumber"
+                    control={control}
+                    rules={{
+                        required: 'Укажите номер телефона',
+                        validate: (value) => isValidPhone(value) || 'Введите корректный телефон (+7XXXXXXXXXX)',
+                    }}
+                    render={({field}) => (
+                        <FormField error={errors.phoneNumber?.message}>
+                            <Input
+                                {...field}
+                                placeholder="Телефон"
+                                type="tel"
+                                prefix={<TelephoneIcon/>}
+                                status={errors.phoneNumber ? 'error' : undefined}
+                            />
+                        </FormField>
+                    )}
+                />
+                <Controller
+                    name="telegram"
+                    control={control}
+                    rules={{
+                        required: 'Укажите Telegram',
+                        validate: (value) => isValidTelegram(value) || 'Некорректный Telegram (@username)',
+                    }}
+                    render={({field}) => (
+                        <FormField error={errors.telegram?.message}>
+                            <Input
+                                {...field}
+                                placeholder="Telegram"
+                                prefix={<TelegramIcon/>}
+                                status={errors.telegram ? 'error' : undefined}
+                            />
+                        </FormField>
+                    )}
+                />
             </div>
 
             <div>

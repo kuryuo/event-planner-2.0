@@ -8,21 +8,19 @@ import {
     useRecoverPasswordMutation,
     useLogoutMutation
 } from '@/services/api/authApi.ts';
-import type {LoginPayload, RegisterPayload} from '@/types/api/Auth.ts';
+import type {LoginPayload, RecoverPayload, RegisterPayload} from '@/types/api/Auth.ts';
 import {getApiErrorMessage} from '@/utils/apiError.ts';
 
 export const useAuth = () => {
     const dispatch = useDispatch<AppDispatch>();
     const auth = useSelector((state: RootState) => state.auth);
 
-    const [loginMutation, {isLoading: isLoginLoading, error: loginError}] = useLoginMutation();
-    const [registerMutation, {isLoading: isRegisterLoading, error: registerError}] = useRegisterMutation();
+    const [loginMutation, {isLoading: isLoginLoading}] = useLoginMutation();
+    const [registerMutation, {isLoading: isRegisterLoading}] = useRegisterMutation();
     const [recoverPasswordMutation, {isLoading: isRecoverPasswordLoading}] = useRecoverPasswordMutation();
     const [logoutMutation, {isLoading: isLogoutLoading}] = useLogoutMutation();
 
     const isLoading = isLoginLoading || isRegisterLoading || isRecoverPasswordLoading || isLogoutLoading;
-
-    const error = loginError || registerError;
 
     const login = async (payload: LoginPayload) => {
         try {
@@ -55,7 +53,7 @@ export const useAuth = () => {
         }
     };
 
-    const recoverPassword = async (payload: { email: string }) => {
+    const recoverPassword = async (payload: RecoverPayload) => {
         try {
             await recoverPasswordMutation(payload).unwrap();
             return {success: true};
@@ -72,6 +70,5 @@ export const useAuth = () => {
         recoverPassword,
         isAuthenticated: !!auth.accessToken,
         loading: isLoading,
-        error: error ? (typeof error === 'string' ? error : 'Произошла ошибка') : null,
     };
 };

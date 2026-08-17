@@ -1,36 +1,45 @@
 import {Controller, useForm} from 'react-hook-form';
-import {Button} from "antd";
-import styles from "./AuthForm.module.scss";
-import imageSrc from "@/assets/img/image.png";
+import {Button} from 'antd';
+import styles from './AuthForm.module.scss';
 import {isValidEmail} from '@/utils/validation.ts';
-import {Input} from "antd";
+import {Input} from '@/ui/input/Input';
+import {FormField} from '@/ui/form-field/FormField';
+import {AuthLayout} from '@/pages/auth/components/AuthLayout';
+
+interface RegistrationFormValues {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    passwordConfirm: string;
+}
 
 interface RegistrationFormProps {
-    onSubmit: (data: { username: string; email: string; password: string }) => void;
+    onSubmit: (data: {username: string; email: string; password: string}) => Promise<{success: boolean; error?: string}> | void;
     loading?: boolean;
     error?: string;
     onLoginClick?: () => void;
 }
 
 export default function RegistrationForm({
-                                             onSubmit,
-                                             loading = false,
-                                             error,
-                                             onLoginClick
-                                         }: RegistrationFormProps) {
+    onSubmit,
+    loading = false,
+    error,
+    onLoginClick,
+}: RegistrationFormProps) {
     const {
         control,
         handleSubmit,
-        watch,
-        formState: {errors}
-    } = useForm<{ firstName: string; lastName: string; email: string; password: string; passwordConfirm: string }>({
+        getValues,
+        formState: {errors},
+    } = useForm<RegistrationFormValues>({
         defaultValues: {
             firstName: '',
             lastName: '',
             email: '',
             password: '',
             passwordConfirm: '',
-        }
+        },
     });
 
     const submitHandler = handleSubmit((values) => {
@@ -39,132 +48,125 @@ export default function RegistrationForm({
     });
 
     return (
-        <div className={styles.container}>
-            <div className={styles.imageSection}>
-                <img src={imageSrc} alt="Registration" className={styles.image}/>
-            </div>
-            <div className={styles.formSection}>
-                <form onSubmit={submitHandler} className={styles.form}>
-                    <h2 className={styles.title}>Регистрация</h2>
-
-                    <div className={styles.fieldsWrapper}>
-                        <div className={styles.nameRow}>
-                            <Controller
-                                name="firstName"
-                                control={control}
-                                rules={{
-                                    required: 'Имя обязательно',
-                                    minLength: {value: 2, message: 'Минимум 2 символа'},
-                                }}
-                                render={({field}) => (
-                                    <Input
-                                        placeholder="Имя"
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        className="ep-input ep-input--m"
-                                    />
-                                )}
-                            />
-                            <Controller
-                                name="lastName"
-                                control={control}
-                                rules={{
-                                    required: 'Фамилия обязательна',
-                                    minLength: {value: 2, message: 'Минимум 2 символа'},
-                                }}
-                                render={({field}) => (
-                                    <Input
-                                        placeholder="Фамилия"
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        className="ep-input ep-input--m"
-                                    />
-                                )}
-                            />
-                        </div>
-
+        <AuthLayout title="Регистрация">
+            <form onSubmit={submitHandler} className={styles.formInner}>
+                <div className={styles.fieldsWrapper}>
+                    <div className={styles.nameRow}>
                         <Controller
-                            name="email"
+                            name="firstName"
                             control={control}
                             rules={{
-                                required: 'Email обязателен',
-                                validate: (value) => isValidEmail(value) || 'Введите корректный email',
+                                required: 'Имя обязательно',
+                                minLength: {value: 2, message: 'Минимум 2 символа'},
                             }}
                             render={({field}) => (
+                                <FormField error={errors.firstName?.message}>
+                                    <Input
+                                        {...field}
+                                        placeholder="Имя"
+                                        autoComplete="given-name"
+                                        status={errors.firstName ? 'error' : undefined}
+                                    />
+                                </FormField>
+                            )}
+                        />
+                        <Controller
+                            name="lastName"
+                            control={control}
+                            rules={{
+                                required: 'Фамилия обязательна',
+                                minLength: {value: 2, message: 'Минимум 2 символа'},
+                            }}
+                            render={({field}) => (
+                                <FormField error={errors.lastName?.message}>
+                                    <Input
+                                        {...field}
+                                        placeholder="Фамилия"
+                                        autoComplete="family-name"
+                                        status={errors.lastName ? 'error' : undefined}
+                                    />
+                                </FormField>
+                            )}
+                        />
+                    </div>
+
+                    <Controller
+                        name="email"
+                        control={control}
+                        rules={{
+                            required: 'Email обязателен',
+                            validate: (value) => isValidEmail(value) || 'Введите корректный email',
+                        }}
+                        render={({field}) => (
+                            <FormField error={errors.email?.message}>
                                 <Input
+                                    {...field}
                                     placeholder="Email"
                                     type="email"
-                                    value={field.value}
-                                    onChange={field.onChange}
-                                    className="ep-input ep-input--m"
+                                    autoComplete="email"
+                                    status={errors.email ? 'error' : undefined}
                                 />
-                            )}
-                        />
+                            </FormField>
+                        )}
+                    />
 
-                        <Controller
-                            name="password"
-                            control={control}
-                            rules={{required: 'Пароль обязателен', minLength: {value: 6, message: 'Минимум 6 символов'}}}
-                            render={({field}) => (
+                    <Controller
+                        name="password"
+                        control={control}
+                        rules={{
+                            required: 'Пароль обязателен',
+                            minLength: {value: 6, message: 'Минимум 6 символов'},
+                        }}
+                        render={({field}) => (
+                            <FormField error={errors.password?.message}>
                                 <Input.Password
+                                    {...field}
                                     placeholder="Пароль"
-                                    value={field.value}
-                                    onChange={field.onChange}
-                                    className="ep-input ep-input--m"
+                                    autoComplete="new-password"
+                                    status={errors.password ? 'error' : undefined}
                                 />
-                            )}
-                        />
+                            </FormField>
+                        )}
+                    />
 
-                        <Controller
-                            name="passwordConfirm"
-                            control={control}
-                            rules={{
-                                required: 'Повторите пароль',
-                                validate: (value) => value === watch('password') || 'Пароли не совпадают'
-                            }}
-                            render={({field}) => (
+                    <Controller
+                        name="passwordConfirm"
+                        control={control}
+                        rules={{
+                            required: 'Повторите пароль',
+                            validate: (value) => value === getValues('password') || 'Пароли не совпадают',
+                        }}
+                        render={({field}) => (
+                            <FormField error={errors.passwordConfirm?.message}>
                                 <Input.Password
+                                    {...field}
                                     placeholder="Повторите пароль"
-                                    value={field.value}
-                                    onChange={field.onChange}
-                                    className="ep-input ep-input--m"
+                                    autoComplete="new-password"
+                                    status={errors.passwordConfirm ? 'error' : undefined}
                                 />
-                            )}
-                        />
-
-                        {error && (
-                            <div className={styles.error}>
-                                {error}
-                            </div>
+                            </FormField>
                         )}
-                        {(errors.firstName?.message || errors.lastName?.message || errors.email?.message || errors.password?.message || errors.passwordConfirm?.message) && (
-                            <div className={styles.error}>
-                                {errors.firstName?.message || errors.lastName?.message || errors.email?.message || errors.password?.message || errors.passwordConfirm?.message}
-                            </div>
-                        )}
-                    </div>
+                    />
 
-                    <Button
-                        type="primary"
-                        htmlType="submit"
-                        disabled={loading}
-                        className={`ep-btn ep-btn--m ep-btn--filled-purple ${styles.submitButton}`}
-                    >
-                        {loading ? "Загрузка..." : "Зарегистрироваться"}
-                    </Button>
+                    {error ? <p className={styles.error}>{error}</p> : null}
+                </div>
 
-                    <div className={styles.linkWrapper}>
-                        <span className={styles.text}>Уже есть аккаунт? </span>
-                        <button
-                            type="button"
-                            onClick={onLoginClick}
-                            className={styles.link}
-                        >
-                            Войти
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                <Button
+                    type="primary"
+                    htmlType="submit"
+                    disabled={loading}
+                    className={`ep-btn ep-btn--m ep-btn--filled-purple ${styles.submitButton}`}
+                >
+                    {loading ? 'Загрузка...' : 'Зарегистрироваться'}
+                </Button>
+
+                <div className={styles.linkWrapper}>
+                    <span className={styles.text}>Уже есть аккаунт? </span>
+                    <button type="button" onClick={onLoginClick} className={styles.link}>
+                        Войти
+                    </button>
+                </div>
+            </form>
+        </AuthLayout>
     );
 }

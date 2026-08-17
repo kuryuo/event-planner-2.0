@@ -20,7 +20,7 @@ export const combineDateTime = (date: Date | undefined, time: string): string | 
 
 /**
  * Парсит ISO строку даты и времени в объект с датой и временем.
- * 
+ *
  * @param dateTimeString - строка даты и времени в формате ISO
  * @returns объект с полями date (Date) и time (строка "HH:MM")
  */
@@ -70,9 +70,46 @@ export const formatDateTimeRange = (startDate: Date | string, endDate: Date | st
         const startTime = format(start, "HH:mm", {locale: ru});
         const endTime = format(end, "HH:mm", {locale: ru});
         return `${datePart}, ${startTime} - ${endTime}`;
-    } else {
-        const startFormatted = format(start, "d MMMM HH:mm", {locale: ru});
-        const endFormatted = format(end, "d MMMM HH:mm", {locale: ru});
-        return `${startFormatted} - ${endFormatted}`;
     }
+
+    const startFormatted = format(start, "d MMMM HH:mm", {locale: ru});
+    const endFormatted = format(end, "d MMMM HH:mm", {locale: ru});
+    return `${startFormatted} - ${endFormatted}`;
 };
+
+export function formatTimeRange(start?: Date | null, end?: Date | null): string {
+    if (!start || !end) return '';
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${pad(start.getHours())}:${pad(start.getMinutes())} - ${pad(end.getHours())}:${pad(end.getMinutes())}`;
+}
+
+export function formatCalendarLabel(currentDate: Date, currentView: 'dayGridMonth' | 'timeGridWeek'): string {
+    if (currentView === 'dayGridMonth') {
+        return currentDate.toLocaleString('ru-RU', {month: 'long', year: 'numeric'})
+            .replace(/^./, str => str.toUpperCase());
+    }
+
+    const startOfWeek = new Date(currentDate);
+    startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + 1);
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+    const startDay = startOfWeek.getDate();
+    const endDay = endOfWeek.getDate();
+    const monthName = endOfWeek.toLocaleString('ru-RU', {month: 'long'})
+        .replace(/^./, str => str.toUpperCase());
+
+    return `${startDay} – ${endDay} ${monthName}`;
+}
+
+export function shiftMonth(date: Date, step: number): Date {
+    const newDate = new Date(date);
+    newDate.setMonth(newDate.getMonth() + step);
+    return newDate;
+}
+
+export function shiftWeek(date: Date, step: number): Date {
+    const newDate = new Date(date);
+    newDate.setDate(newDate.getDate() + step * 7 - newDate.getDay() + 1);
+    return newDate;
+}

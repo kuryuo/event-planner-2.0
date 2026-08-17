@@ -5,9 +5,6 @@ import {normalizeEventTypes} from '@/utils/eventTypeLabels.ts';
 
 export const profileApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
-        /**
-         * Получить профиль текущего пользователя
-         */
         getProfile: builder.query<UserProfile, void>({
             query: () => ({
                 url: 'users/me',
@@ -15,9 +12,6 @@ export const profileApi = baseApi.injectEndpoints({
             }),
             providesTags: ['Profile'],
         }),
-        /**
-         * Обновить профиль пользователя
-         */
         updateProfile: builder.mutation<UserProfile, UpdateUserProfilePayload>({
             query: (body) => ({
                 url: 'users/me',
@@ -26,9 +20,6 @@ export const profileApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ['Profile'],
         }),
-        /**
-         * Загрузить новый аватар пользователя
-         */
         updateProfileAvatar: builder.mutation<UserProfile, UpdateUserAvatarPayload>({
             query: ({file}) => {
                 const formData = new FormData();
@@ -42,9 +33,6 @@ export const profileApi = baseApi.injectEndpoints({
             },
             invalidatesTags: ['Profile'],
         }),
-        /**
-         * Получить список мероприятий, на которые подписан пользователь
-         */
         getProfileEvents: builder.query<UserEvent[], void>({
             query: () => ({
                 url: 'users/me/events',

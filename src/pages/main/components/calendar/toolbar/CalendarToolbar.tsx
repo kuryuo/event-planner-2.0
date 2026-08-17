@@ -5,7 +5,7 @@ import ChevronRight from '@/assets/img/icon-m/chevron-right.svg?react';
 import ViewStacked from '@/assets/img/icon-m/view-stacked.svg?react';
 import Calendar from '@/assets/img/icon-m/calendar.svg?react'
 import Filter from '@/assets/img/icon-m/filter.svg?react';
-import {formatCalendarLabel} from '@/utils';
+import {formatCalendarLabel} from '@/utils/date';
 
 type CalendarView = 'dayGridMonth' | 'timeGridWeek';
 
