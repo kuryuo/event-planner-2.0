@@ -3,6 +3,7 @@ import ChatIcon from '@/assets/img/icon-m/chat.svg?react';
 import CalendarIcon from '@/assets/img/icon-m/calendar.svg?react';
 import styles from './BoardTaskCard.module.scss';
 import {Tag} from "antd";
+import {useI18n} from '@/i18n/I18nProvider';
 
 export type BoardTaskCardPriority = 'Срочный' | 'Высокий' | 'Средний' | 'Низкий';
 
@@ -17,12 +18,17 @@ interface Props {
     avatarFallbackType?: 'user' | 'event';
 }
 
-const formatDeadline = (value?: string) => {
-    if (!value) return 'Без срока';
+const formatDeadline = (value: string | undefined, language: 'ru' | 'en', noDeadlineText: string) => {
+    if (!value) return noDeadlineText;
     const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return 'Без срока';
-    const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
-    return `До ${date.getDate()} ${months[date.getMonth()]}`;
+    if (Number.isNaN(date.getTime())) return noDeadlineText;
+
+    if (language === 'ru') {
+        const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+        return `До ${date.getDate()} ${months[date.getMonth()]}`;
+    }
+
+    return date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
 };
 
 const priorityColorByValue = {
@@ -33,6 +39,7 @@ const priorityColorByValue = {
 } as const;
 
 export default function BoardTaskCard({title, description, dueDate, assigneeName, assigneeAvatar, priority, commentsCount}: Props) {
+    const {t, language} = useI18n();
     const tagTextStyleS = {
         fontFamily: "'Manrope', sans-serif",
         fontSize: 16,
@@ -44,6 +51,16 @@ export default function BoardTaskCard({title, description, dueDate, assigneeName
         userSelect: "none",
     } as const;
     const priorityColor = priorityColorByValue[priority];
+    const priorityLabel =
+        priority === 'Срочный'
+            ? t('eventPage.kanban.priorities.urgent')
+            : priority === 'Высокий'
+                ? t('eventPage.kanban.priorities.high')
+                : priority === 'Низкий'
+                    ? t('eventPage.kanban.priorities.low')
+                    : t('eventPage.kanban.priorities.medium');
+
+    const noDeadlineText = t('eventPage.kanban.noDeadline');
 
     return (
         <article className={styles.card}>
@@ -55,12 +72,12 @@ export default function BoardTaskCard({title, description, dueDate, assigneeName
                     color: `var(--content-${priorityColor})`,
                 }}
             >
-                {priority}
+                {priorityLabel}
             </Tag>
 
             <div className={styles.textBlock}>
                 <h4>{title}</h4>
-                <p>{description || 'Описание отсутствует'}</p>
+                <p>{description || t('eventPage.kanban.noDescription')}</p>
             </div>
 
             <div className={styles.metaRow}>
@@ -73,7 +90,7 @@ export default function BoardTaskCard({title, description, dueDate, assigneeName
 
                 <div className={styles.extra}>
                     <span><ChatIcon/>{commentsCount}</span>
-                    <span><CalendarIcon/>{formatDeadline(dueDate)}</span>
+                    <span><CalendarIcon/>{formatDeadline(dueDate, language, noDeadlineText)}</span>
                 </div>
             </div>
         </article>

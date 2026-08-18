@@ -19,6 +19,7 @@ import {
     canNavigateToEventEditor,
     normalizeParticipantRole,
 } from '@/utils/participantRole.ts';
+import {useI18n} from '@/i18n/I18nProvider';
 
 const TAB_INDEX_OVERVIEW = 0;
 const TAB_INDEX_DOCUMENTS = 1;
@@ -31,6 +32,7 @@ const TAB_INDEX_ARCHIVED_DOCUMENTS = 1;
 const TAB_INDEX_ARCHIVED_MEDIA = 2;
 
 export default function EventPage() {
+    const {t} = useI18n();
     const {event, isLoading, error} = useEventPage();
     const {data: profile} = useGetProfileQuery();
     const {data: subscribersData} = useGetEventSubscribersQuery(
@@ -69,11 +71,11 @@ export default function EventPage() {
     const visitorsCount = subscribersData?.res?.totalCount;
 
     if (isLoading) {
-        return <div>Загрузка...</div>;
+        return <div>{t('eventPage.loading')}</div>;
     }
 
     if (error || !event) {
-        return <div>Событие не найдено</div>;
+        return <div>{t('eventPage.eventNotFound')}</div>;
     }
 
     const renderContent = () => {

@@ -16,7 +16,7 @@ const readStringField = (record: Record<string, unknown>, key: string): string |
 
 export const getApiErrorMessage = (
     error: unknown,
-    fallback = 'Произошла ошибка',
+    fallback = 'Something went wrong',
 ): string => {
     if (typeof error === 'string' && error.trim()) {
         return error.trim();

@@ -7,6 +7,7 @@ import styles from './ArchiveEventCard.module.scss';
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 import type {UserEvent} from '@/types/api/Profile.ts';
 import {getEventTypeLabel} from '@/utils/eventTypeLabels.ts';
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface ArchiveEventCardProps {
     event: UserEvent;
@@ -22,8 +23,9 @@ const getFakeParticipants = (seed: string) => {
 };
 
 export default function ArchiveEventCard({event, onClick}: ArchiveEventCardProps) {
-    const date = format(new Date(event.startDate), 'd MMMM, HH:mm', {locale: ru});
-    const category = event.categories?.[0] ?? 'Категория';
+    const {t, language} = useI18n();
+    const date = format(new Date(event.startDate), 'd MMMM, HH:mm', {locale: language === 'ru' ? ru : undefined});
+    const category = event.categories?.[0] ?? t('archive.category');
     const eventTypeLabel = event.types?.[0] ? getEventTypeLabel(event.types[0]) : null;
     const preview = buildImageUrl(event.avatar) ?? buildImageUrl(event.previewPhotos?.[0]) ?? FALLBACK_PREVIEW;
     const tagTextStyleM = {
@@ -72,7 +74,7 @@ export default function ArchiveEventCard({event, onClick}: ArchiveEventCardProps
                         color: "var(--content-cyan)",
                     }}
                 >
-                    Вы редактор
+                    {t('archive.youAreEditor')}
                 </Tag>
             </div>
 
@@ -83,7 +85,7 @@ export default function ArchiveEventCard({event, onClick}: ArchiveEventCardProps
                 <span className={styles.metaItem}><GeoAltIcon/>{event.location || 'Zoom'}</span>
             </div>
 
-            <p className={styles.description}>{event.description || 'Описание мероприятия не добавлено'}</p>
+            <p className={styles.description}>{event.description || t('archive.noDescription')}</p>
 
             <div className={styles.footer}>
                 <div className={styles.participants}>
@@ -94,7 +96,7 @@ export default function ArchiveEventCard({event, onClick}: ArchiveEventCardProps
 
                 <div className={styles.progressInfo}>
                     <div className={styles.progressHeader}>
-                        <span>Выполнено задач</span>
+                        <span>{t('archive.completedTasks')}</span>
                         <span>5/43</span>
                     </div>
                     <div className={styles.progressTrack}>

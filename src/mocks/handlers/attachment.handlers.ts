@@ -2,6 +2,7 @@ import { http, HttpResponse } from "msw";
 import type { EventAttachment } from "@/types/api/Event";
 import { API_BASE_URL } from "../config";
 import { requireMockAuth } from "../utils/requireMockAuth";
+import { mockT } from "../utils/mockI18n";
 
 interface LinkBody {
   title?: string;
@@ -78,7 +79,7 @@ export const attachmentHandlers = [
           authors: [
             {
               id: "mock-user-1",
-              displayName: "Ivan Ivanov",
+              displayName: mockT("chat.userIvan", request),
               avatarUrl: null,
             },
           ],
@@ -132,7 +133,21 @@ export const attachmentHandlers = [
         return String(second.createdAt).localeCompare(String(first.createdAt));
       });
 
-      return HttpResponse.json({ result: attachments });
+      return HttpResponse.json({
+        result: attachments.map((attachment) => ({
+          ...attachment,
+          title:
+            attachment.title === "Event program"
+              ? mockT("attachment.eventProgram", request)
+              : attachment.title === "Event website"
+                ? mockT("attachment.eventWebsite", request)
+                : attachment.title,
+          authorDisplayName:
+            attachment.authorDisplayName === "Ivan Ivanov"
+              ? mockT("chat.userIvan", request)
+              : attachment.authorDisplayName,
+        })),
+      });
     }
   ),
 
@@ -150,7 +165,7 @@ export const attachmentHandlers = [
 
       if (!file || typeof file === "string") {
         return HttpResponse.json(
-          { message: "File is required" },
+          { message: mockT("attachment.fileRequired", request) },
           { status: 400 }
         );
       }
@@ -172,7 +187,7 @@ export const attachmentHandlers = [
         contentType: file.type || "application/octet-stream",
         size: file.size,
         fileExtension,
-        authorDisplayName: "Ivan Ivanov",
+        authorDisplayName: mockT("chat.userIvan", request),
         authorAvatarUrl: null,
         createdAt: new Date().toISOString(),
       };
@@ -196,7 +211,7 @@ export const attachmentHandlers = [
 
       if (!body.url) {
         return HttpResponse.json(
-          { message: "URL is required" },
+          { message: mockT("attachment.urlRequired", request) },
           { status: 400 }
         );
       }
@@ -212,7 +227,7 @@ export const attachmentHandlers = [
         resource: body.url,
         url: body.url,
         linkSiteKey: hostname,
-        authorDisplayName: "Ivan Ivanov",
+        authorDisplayName: mockT("chat.userIvan", request),
         authorAvatarUrl: null,
         createdAt: new Date().toISOString(),
       };
@@ -238,7 +253,7 @@ export const attachmentHandlers = [
 
       if (!attachment || attachment.kind !== "File") {
         return HttpResponse.json(
-          { message: "File not found" },
+          { message: mockT("attachment.fileNotFound", request) },
           { status: 404 }
         );
       }
@@ -274,7 +289,7 @@ export const attachmentHandlers = [
 
       if (filteredAttachments.length === attachments.length) {
         return HttpResponse.json(
-          { message: "Attachment not found" },
+          { message: mockT("attachment.notFound", request) },
           { status: 404 }
         );
       }

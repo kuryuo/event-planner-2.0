@@ -63,6 +63,9 @@ const toArray = <T>(response: unknown): T[] => {
 };
 
 const mapNotification = (item: unknown): NotificationItem | null => {
+    const currentLanguage = typeof window !== 'undefined' && window.localStorage.getItem('app_language') === 'en'
+        ? 'en'
+        : 'ru';
     if (!item || typeof item !== 'object') return null;
 
     const source = item as Record<string, unknown>;
@@ -88,7 +91,9 @@ const mapNotification = (item: unknown): NotificationItem | null => {
 
     const title =
         (source.title as string | null | undefined)
-        ?? ((type?.toLowerCase() === 'chatmessage' && senderName) ? `Новое сообщение от ${senderName}` : null);
+        ?? ((type?.toLowerCase() === 'chatmessage' && senderName)
+            ? (currentLanguage === 'en' ? `New message from ${senderName}` : `Новое сообщение от ${senderName}`)
+            : null);
 
     return {
         id,

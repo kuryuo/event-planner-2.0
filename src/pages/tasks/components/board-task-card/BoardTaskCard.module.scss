@@ -1,7 +1,8 @@
 .card {
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
+  width: 326px;
+  min-width: 326px;
+  max-width: 326px;
+  flex-shrink: 0;
   box-sizing: border-box;
   border: 1px solid #dfe5eb;
   border-radius: 14px;
@@ -38,6 +39,10 @@
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 }
 

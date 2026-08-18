@@ -29,6 +29,7 @@ import {Checkbox, Switch} from "antd";
 import BoardTaskCard from "@/pages/tasks/components/board-task-card/BoardTaskCard";
 import { getTaskAssigneeAvatar, getTaskAssigneeId, getTaskAssigneeName } from "@/utils/boardTask.ts";
 import {Avatar} from "antd";
+import {useI18n} from '@/i18n/I18nProvider';
 import {
   useGetTaskCommentsQuery,
   useGetTaskHistoryQuery,
@@ -79,7 +80,11 @@ const isTaskAssignedToCurrentUser = (
 const toBoard = (
   tasks: MyAssignedTaskItem[],
   currentUserId: string,
-  onlyMyTasks: boolean
+  onlyMyTasks: boolean,
+  placeholders: {
+    noStatus: string;
+    newTask: string;
+  }
 ): KanbanBoard<BoardCard> => {
   const filtered = (tasks ?? []).filter((task) => {
     if (!onlyMyTasks) return true;
@@ -88,7 +93,7 @@ const toBoard = (
 
   const byStatus = new Map<string, MyAssignedTaskItem[]>();
   filtered.forEach((task) => {
-    const status = task.status?.trim() || "Без статуса";
+    const status = task.status?.trim() || placeholders.noStatus;
     const bucket = byStatus.get(status) ?? [];
     bucket.push(task);
     byStatus.set(status, bucket);
@@ -102,7 +107,7 @@ const toBoard = (
         cards: items.map((task, taskIndex) => ({
           id: String(task.id ?? `task-${taskIndex}`),
           taskId: String(task.id ?? `task-${taskIndex}`),
-          title: String(task.title ?? "Новая задача"),
+          title: String(task.title ?? placeholders.newTask),
           description: String(task.description ?? ""),
           dueDate: task.dueDate ?? undefined,
           assigneeName: getTaskAssigneeName(task),
@@ -127,6 +132,7 @@ const toBoard = (
 };
 
 export default function TasksPage() {
+  const {t, language} = useI18n();
   const currentUserId = useSelector(
     (state: RootState) => state.profile.profile?.id ?? ""
   );
@@ -184,8 +190,12 @@ export default function TasksPage() {
   );
   const [addTaskComment] = useAddTaskCommentMutation();
   const hydratedBoard = useMemo(
-    () => toBoard(myTasksData, currentUserId, onlyMyTasks),
-    [myTasksData, currentUserId, onlyMyTasks]
+    () =>
+      toBoard(myTasksData, currentUserId, onlyMyTasks, {
+        noStatus: t("tasksPage.noStatus"),
+        newTask: t("tasksPage.newTask"),
+      }),
+    [myTasksData, currentUserId, onlyMyTasks, t]
   );
 
   useEffect(() => {
@@ -319,12 +329,20 @@ export default function TasksPage() {
 
   const sortLabel =
     mockSort === "urgentFirst"
-      ? "Сначала срочные"
+      ? t("eventPage.kanban.sort.urgentFirst")
       : mockSort === "newestFirst"
-      ? "Сначала новые"
+      ? t("eventPage.kanban.sort.newestFirst")
       : mockSort === "oldestFirst"
-      ? "Сначала старые"
-      : "Исполнитель: А -> Я";
+      ? t("eventPage.kanban.sort.oldestFirst")
+      : t("eventPage.kanban.sort.assigneeAsc");
+  const selectedTaskPriorityLabel =
+    selectedTask?.priority === "Срочный"
+      ? t("eventPage.kanban.priorities.urgent")
+      : selectedTask?.priority === "Высокий"
+      ? t("eventPage.kanban.priorities.high")
+      : selectedTask?.priority === "Низкий"
+      ? t("eventPage.kanban.priorities.low")
+      : t("eventPage.kanban.priorities.medium");
   const assigneeFacets: Array<{ id: string; displayName?: string | null }> = [];
 
   const handleMoveCard = async (
@@ -356,11 +374,11 @@ export default function TasksPage() {
     >
       <div className={styles.content}>
         <div className={styles.pageHeader}>
-          <h1 className={styles.pageHeaderTitle}>Мои задачи</h1>
+          <h1 className={styles.pageHeaderTitle}>{t('tasksPage.title')}</h1>
         </div>
 
         {isLoading ? (
-          <p className={styles.subtitle}>Загружаем доску...</p>
+          <p className={styles.subtitle}>{t('tasksPage.boardLoading')}</p>
         ) : (
           <section className={styles.boardSurface}>
             <div className={styles.boardControls}>
@@ -369,7 +387,7 @@ export default function TasksPage() {
                   <SearchIcon />
                   <input
                     type="text"
-                    placeholder="Задача..."
+                    placeholder={t('eventPage.kanban.searchPlaceholder')}
                     value={searchValue}
                     onChange={(event) => setSearchValue(event.target.value)}
                   />
@@ -381,7 +399,7 @@ export default function TasksPage() {
                     onClick={() => setIsFilterOpen((prev) => !prev)}
                   >
                     <FilterIcon />
-                    <span>Фильтры</span>
+                    <span>{t('eventPage.kanban.filters')}</span>
                     <ChevronDownIcon
                       className={isFilterOpen ? styles.chevronUp : ""}
                     />
@@ -389,7 +407,7 @@ export default function TasksPage() {
 
                   {isFilterOpen && (
                     <div className={styles.filterMenu}>
-                      <h4>Дедлайн</h4>
+                      <h4>{t('eventPage.kanban.deadline')}</h4>
                       <label>
                         <Checkbox
                           checked={filterDeadlineOverdue}
@@ -398,7 +416,7 @@ export default function TasksPage() {
                             setFilterDeadlineOverdue((prev) => !prev)
                           }
                         />
-                        Просрочен
+                        {t('eventPage.kanban.overdue')}
                       </label>
                       <label>
                         <Checkbox
@@ -408,7 +426,7 @@ export default function TasksPage() {
                             setFilterDeadlineToday((prev) => !prev)
                           }
                         />
-                        Сегодня
+                        {t('eventPage.kanban.today')}
                       </label>
                       <label>
                         <Checkbox
@@ -418,7 +436,7 @@ export default function TasksPage() {
                             setFilterDeadlineTomorrow((prev) => !prev)
                           }
                         />
-                        Завтра
+                        {t('eventPage.kanban.tomorrow')}
                       </label>
                       <label>
                         <Checkbox
@@ -428,13 +446,13 @@ export default function TasksPage() {
                             setFilterDeadlineThisWeek((prev) => !prev)
                           }
                         />
-                        На этой неделе
+                        {t('eventPage.kanban.thisWeek')}
                       </label>
 
-                      <h4>Исполнитель</h4>
+                      <h4>{t('eventPage.kanban.assignee')}</h4>
                       {assigneeFacets.length === 0 ? (
                         <button type="button" className={styles.assigneeMock}>
-                          <span>Нет исполнителей</span>
+                          <span>{t('tasksPage.noAssignees')}</span>
                           <ChevronDownIcon className={styles.assigneeChevron} />
                         </button>
                       ) : (
@@ -453,12 +471,12 @@ export default function TasksPage() {
                                 )
                               }
                             />
-                            {assignee.displayName || "Участник"}
+                            {assignee.displayName || t('tasksPage.participantFallback')}
                           </label>
                         ))
                       )}
 
-                      <h4>Приоритет</h4>
+                      <h4>{t('eventPage.kanban.priority')}</h4>
                       <label>
                         <Checkbox
                           checked={filterPriorityUrgent}
@@ -467,7 +485,7 @@ export default function TasksPage() {
                             setFilterPriorityUrgent((prev) => !prev)
                           }
                         />
-                        Срочный
+                        {t('eventPage.kanban.priorities.urgent')}
                       </label>
                       <label>
                         <Checkbox
@@ -477,7 +495,7 @@ export default function TasksPage() {
                             setFilterPriorityHigh((prev) => !prev)
                           }
                         />
-                        Высокий
+                        {t('eventPage.kanban.priorities.high')}
                       </label>
                       <label>
                         <Checkbox
@@ -487,7 +505,7 @@ export default function TasksPage() {
                             setFilterPriorityMedium((prev) => !prev)
                           }
                         />
-                        Средний
+                        {t('eventPage.kanban.priorities.medium')}
                       </label>
                       <label>
                         <Checkbox
@@ -495,7 +513,7 @@ export default function TasksPage() {
                           className="ep-checkbox"
                           onChange={() => setFilterPriorityLow((prev) => !prev)}
                         />
-                        Низкий
+                        {t('eventPage.kanban.priorities.low')}
                       </label>
 
                       <div className={styles.onlyMyWrap}>
@@ -504,7 +522,7 @@ export default function TasksPage() {
                           onChange={setOnlyMyTasks}
                           className="ep-switch"
                         />
-                        <span>Только мои задачи</span>
+                        <span>{t('eventPage.kanban.onlyMyTasks')}</span>
                       </div>
 
                       <button
@@ -523,7 +541,7 @@ export default function TasksPage() {
                           setMockFilter("all");
                         }}
                       >
-                        Сбросить
+                        {t('eventPage.kanban.resetFilters')}
                       </button>
                     </div>
                   )}
@@ -548,7 +566,7 @@ export default function TasksPage() {
                         setIsSortOpen(false);
                       }}
                     >
-                      Сначала срочные
+                      {t('eventPage.kanban.sort.urgentFirst')}
                     </button>
                     <button
                       type="button"
@@ -557,7 +575,7 @@ export default function TasksPage() {
                         setIsSortOpen(false);
                       }}
                     >
-                      Сначала новые
+                      {t('eventPage.kanban.sort.newestFirst')}
                     </button>
                     <button
                       type="button"
@@ -566,7 +584,7 @@ export default function TasksPage() {
                         setIsSortOpen(false);
                       }}
                     >
-                      Сначала старые
+                      {t('eventPage.kanban.sort.oldestFirst')}
                     </button>
                     <button
                       type="button"
@@ -575,7 +593,7 @@ export default function TasksPage() {
                         setIsSortOpen(false);
                       }}
                     >
-                      Исполнитель: А -&gt; Я
+                      {t('eventPage.kanban.sort.assigneeAsc')}
                     </button>
                   </div>
                 )}
@@ -648,30 +666,30 @@ export default function TasksPage() {
 
               <div className={styles.taskMeta}>
                 <StatusIcon className={styles.metaIcon} />
-                <span>Статус</span>
+                <span>{t('eventPage.kanban.details.status')}</span>
                 <strong>{selectedTask.status}</strong>
               </div>
               <div className={styles.taskMeta}>
                 <FlagIcon className={styles.metaIcon} />
-                <span>Приоритет</span>
-                <strong>{selectedTask.priority}</strong>
+                <span>{t('eventPage.kanban.details.priority')}</span>
+                <strong>{selectedTaskPriorityLabel}</strong>
               </div>
               <div className={styles.taskMeta}>
                 <CalendarIcon className={styles.metaIcon} />
-                <span>Дедлайн</span>
+                <span>{t('eventPage.kanban.details.deadline')}</span>
                 <strong>
                   {selectedTask.dueDate
-                    ? new Intl.DateTimeFormat("ru-RU", {
+                    ? new Intl.DateTimeFormat(language === 'ru' ? "ru-RU" : "en-US", {
                         day: "2-digit",
                         month: "long",
                         year: "numeric",
                       }).format(new Date(selectedTask.dueDate))
-                    : "Без срока"}
+                    : t('eventPage.kanban.details.noDeadlinePlaceholder')}
                 </strong>
               </div>
               <div className={styles.taskMeta}>
                 <PersonIcon className={styles.metaIcon} />
-                <span>Исполнитель</span>
+                <span>{t('eventPage.kanban.details.assignee')}</span>
                 <strong className={styles.assignee}>
                   <Avatar
                     className="ep-avatar"
@@ -687,9 +705,9 @@ export default function TasksPage() {
               <div className={styles.taskDescription}>
                 <div className={styles.taskDescriptionTitle}>
                   <TextLeftIcon className={styles.metaIcon} />
-                  <span>Описание</span>
+                  <span>{t('eventPage.kanban.details.description')}</span>
                 </div>
-                <p>{selectedTask.description || "Описание отсутствует"}</p>
+                <p>{selectedTask.description || t('tasksPage.noDescription')}</p>
               </div>
 
               <div className={styles.taskTabs}>
@@ -700,7 +718,7 @@ export default function TasksPage() {
                   }
                   onClick={() => setActiveTaskTab("comments")}
                 >
-                  Комментарии
+                  {t('eventPage.kanban.details.tabs.comments')}
                 </button>
                 <button
                   type="button"
@@ -709,7 +727,7 @@ export default function TasksPage() {
                   }
                   onClick={() => setActiveTaskTab("history")}
                 >
-                  История
+                  {t('eventPage.kanban.details.tabs.history')}
                 </button>
               </div>
 
@@ -719,11 +737,11 @@ export default function TasksPage() {
                       <article key={comment.id} className={styles.feedItem}>
                         <div className={styles.feedHead}>
                           <strong>
-                            {comment.authorName || "Пользователь"}
+                            {comment.authorName || t('eventPage.kanban.details.userFallback')}
                           </strong>
                           <span>
                             {comment.createdAt
-                              ? new Intl.DateTimeFormat("ru-RU", {
+                              ? new Intl.DateTimeFormat(language === 'ru' ? "ru-RU" : "en-US", {
                                   hour: "2-digit",
                                   minute: "2-digit",
                                 }).format(new Date(comment.createdAt))
@@ -736,10 +754,10 @@ export default function TasksPage() {
                   : taskHistory.map((item) => (
                       <article key={item.id} className={styles.feedItem}>
                         <div className={styles.feedHead}>
-                          <strong>{item.authorName || "Система"}</strong>
+                          <strong>{item.authorName || t('eventPage.kanban.details.systemFallback')}</strong>
                           <span>
                             {item.createdAt
-                              ? new Intl.DateTimeFormat("ru-RU", {
+                              ? new Intl.DateTimeFormat(language === 'ru' ? "ru-RU" : "en-US", {
                                   day: "2-digit",
                                   month: "2-digit",
                                   hour: "2-digit",
@@ -751,7 +769,7 @@ export default function TasksPage() {
                         <p>
                           {item.description ||
                             item.action ||
-                            "Изменение задачи"}
+                            t('eventPage.kanban.details.taskChangeFallback')}
                         </p>
                       </article>
                     ))}
@@ -762,7 +780,7 @@ export default function TasksPage() {
                   <input
                     value={commentText}
                     onChange={(event) => setCommentText(event.target.value)}
-                    placeholder="Комментарий..."
+                    placeholder={t('eventPage.kanban.details.commentPlaceholder')}
                   />
                   <button type="button">
                     <FaceSmileIcon />

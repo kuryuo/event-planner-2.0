@@ -25,8 +25,9 @@ import XIcon from '@/assets/img/icon-s/x.svg?react';
 import ChevronDownIcon from '@/assets/img/icon-m/chevron-down.svg?react';
 import Check2Icon from '@/assets/img/icon-m/check2.svg?react';
 import type {AdminUser} from "@/types/api/User.ts";
-import {EVENT_TYPE_LABELS} from '@/utils/eventTypeLabels.ts';
+import {getEventTypeLabel} from '@/utils/eventTypeLabels.ts';
 import type {EventParticipantAssignment, ParticipantRoleKind} from "@/types/api/Event.ts";
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface EventFormProps {
     eventData?: EventResponse | null;
@@ -43,6 +44,7 @@ export default function EventForm({
                                       error: _error,
                                       isEditMode = false
                                   }: EventFormProps) {
+    const {t} = useI18n();
     const navigate = useNavigate();
     const [formError, setFormError] = useState<string>('');
     const [isAuditoriumVisible, setIsAuditoriumVisible] = useState(Boolean(eventData?.auditorium));
@@ -118,10 +120,10 @@ export default function EventForm({
     });
 
     const ROLE_LABELS: Record<ParticipantRoleKind, string> = {
-        Organizer: 'Организатор',
-        Editor: 'Редактор',
-        Assistant: 'Помощник',
-        Observer: 'Наблюдатель',
+        Organizer: t('eventEditor.roleOrganizer'),
+        Editor: t('eventEditor.roleEditor'),
+        Assistant: t('eventEditor.roleAssistant'),
+        Observer: t('eventEditor.roleObserver'),
     };
 
     const roleMenuItems = (current: ParticipantRoleKind): MenuProps['items'] => {
@@ -215,29 +217,29 @@ export default function EventForm({
     };
 
     const exitModalTitle = isEditMode
-        ? 'Выйти из редактирования мероприятия?'
-        : 'Выйти из создания мероприятия?';
+        ? t('eventEditor.exitEditTitle')
+        : t('eventEditor.exitCreateTitle');
     const exitModalDescription = isEditMode
-        ? 'Вы уверены, что хотите выйти из редактирования? Несохраненные изменения будут потеряны.'
-        : 'Вы можете вернуться к созданию, чтобы продолжить редактирование.';
+        ? t('eventEditor.exitEditDescription')
+        : t('eventEditor.exitCreateDescription');
     const exitModalFooter = isEditMode
         ? [
             <Button key="back" onClick={() => setIsExitModalOpen(false)}>
-                Вернуться к редактированию
+                {t('eventEditor.backToEdit')}
             </Button>,
             <Button key="exit" type="primary" danger onClick={handleExitWithoutSave}>
-                Выйти
+                {t('eventEditor.exit')}
             </Button>,
         ]
         : [
             <Button key="back" onClick={() => setIsExitModalOpen(false)}>
-                Вернуться к созданию
+                {t('eventEditor.backToCreate')}
             </Button>,
             <Button key="draft" type="default" onClick={() => handleSubmit({publish: false})}>
-                Сохранить черновик
+                {t('eventEditor.saveDraft')}
             </Button>,
             <Button key="exit" type="primary" danger onClick={handleExitWithoutSave}>
-                Выйти
+                {t('eventEditor.exit')}
             </Button>,
         ];
 
@@ -260,7 +262,7 @@ export default function EventForm({
             <div className={styles.header}>
                 <input
                     type="text"
-                    placeholder="Название мероприятия"
+                    placeholder={t('eventEditor.eventNamePlaceholder')}
                     className={styles.input}
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
@@ -272,15 +274,19 @@ export default function EventForm({
             <div className={styles.contentGrid}>
                 <div className={styles.form}>
                     <div className={styles.section}>
-                        <span className={styles.title}>Дата и время</span>
+                        <span className={styles.title}>{t('eventEditor.dateTime')}</span>
                         <DateTimeSection/>
                     </div>
 
                     <div className={styles.section}>
-                        <span className={styles.title}>Место</span>
+                        <span className={styles.title}>{t('eventEditor.place')}</span>
                         <Segmented
                             className="ep-segmented"
-                            options={["Очно", "Онлайн", "Гибрид"]}
+                            options={[
+                                {label: t('eventEditor.formatInPerson'), value: 'Очно'},
+                                {label: t('eventEditor.formatOnline'), value: 'Онлайн'},
+                                {label: t('eventEditor.formatHybrid'), value: 'Гибрид'},
+                            ]}
                             value={format}
                             onChange={(value) => {
                                 setFormat(String(value));
@@ -292,7 +298,7 @@ export default function EventForm({
                         />
                         {format === 'Онлайн' && (
                             <Input
-                                placeholder="Ссылка для подключения"
+                                placeholder={t('eventEditor.connectLink')}
                                 value={auditorium}
                                 onChange={e => setAuditorium(e.target.value)}
                                 prefix={<Link45Icon/>}
@@ -302,14 +308,14 @@ export default function EventForm({
                         {format === 'Гибрид' && (
                             <div className={styles.venueFieldsStack}>
                                 <Input
-                                    placeholder="Адрес"
+                                    placeholder={t('eventEditor.address')}
                                     value={location}
                                     onChange={e => setLocation(e.target.value)}
                                     prefix={<GeoAltIcon/>}
                                     className="ep-input ep-input--m"
                                 />
                                 <Input
-                                    placeholder="Ссылка для подключения"
+                                    placeholder={t('eventEditor.connectLink')}
                                     value={auditorium}
                                     onChange={e => setAuditorium(e.target.value)}
                                     prefix={<Link45Icon/>}
@@ -322,7 +328,7 @@ export default function EventForm({
                                 <div className={styles.locationRow}>
                                     <div className={styles.addressField}>
                                         <Input
-                                            placeholder="Адрес"
+                                            placeholder={t('eventEditor.address')}
                                             value={location}
                                             onChange={e => setLocation(e.target.value)}
                                             prefix={<GeoAltIcon/>}
@@ -335,13 +341,13 @@ export default function EventForm({
                                             className={`ep-btn ep-btn--m ep-btn--filled-gray ${styles.addAuditoriumButton}`}
                                             onClick={() => setIsAuditoriumVisible(true)}
                                         >
-                                            Добавить аудиторию
+                                            {t('eventEditor.addAuditorium')}
                                         </Button>
                                     )}
                                 </div>
                                 {isAuditoriumVisible && (
                                     <Input
-                                        placeholder="Аудитория"
+                                        placeholder={t('eventEditor.auditorium')}
                                         value={auditorium}
                                         onChange={e => setAuditorium(e.target.value)}
                                         className="ep-input ep-input--m"
@@ -352,7 +358,7 @@ export default function EventForm({
                     </div>
 
                     <div className={styles.section}>
-                        <span className={styles.title}>Тип</span>
+                        <span className={styles.title}>{t('eventEditor.type')}</span>
                         <div className={styles.chipContainer}>
                             {eventTypeOptions.map((type) => (
                                 <button
@@ -374,7 +380,7 @@ export default function EventForm({
                                                 : "var(--border-primary)",
                                         }}
                                     >
-                                        {EVENT_TYPE_LABELS[type]}
+                                        {getEventTypeLabel(type)}
                                     </Tag>
                                 </button>
                             ))}
@@ -384,7 +390,7 @@ export default function EventForm({
                     <Divider style={{margin: 0}}/>
 
                     <div className={styles.section}>
-                        <span className={styles.title}>Участники</span>
+                        <span className={styles.title}>{t('eventEditor.participants')}</span>
                         <div className={styles.participantsCreator}>
                             <AutoComplete
                                 className={styles.participantsAutoComplete}
@@ -397,7 +403,7 @@ export default function EventForm({
                                     const selected = (usersData ?? []).find((u) => u.id === value) ?? null;
                                     if (selected) {
                                         const fullName =
-                                            `${selected.lastName ?? ''} ${selected.firstName ?? ''} ${selected.middleName ?? ''}`.trim() || 'Без имени';
+                                            `${selected.lastName ?? ''} ${selected.firstName ?? ''} ${selected.middleName ?? ''}`.trim() || t('eventEditor.noName');
                                         setSelectedUserCandidate(selected);
                                         setParticipantsQuery(fullName);
                                     }
@@ -405,12 +411,12 @@ export default function EventForm({
                                 open={Boolean(participantsQuery.trim())}
                                 popupClassName={styles.participantsDropdown}
                                 notFoundContent={
-                                    isUsersLoading ? 'Загрузка...' : 'Ничего не найдено'
+                                    isUsersLoading ? t('eventEditor.usersLoading') : t('eventEditor.usersNotFound')
                                 }
                                 options={
                                     filteredUsers.map((u) => {
                                         const fullName =
-                                            `${u.lastName ?? ''} ${u.firstName ?? ''} ${u.middleName ?? ''}`.trim() || 'Без имени';
+                                            `${u.lastName ?? ''} ${u.firstName ?? ''} ${u.middleName ?? ''}`.trim() || t('eventEditor.noName');
                                         return {
                                             value: u.id,
                                             label: (
@@ -426,7 +432,7 @@ export default function EventForm({
                                 }
                             >
                                 <Input
-                                    placeholder="Имя"
+                                    placeholder={t('eventEditor.namePlaceholder')}
                                     className="ep-input ep-input--m"
                                 />
                             </AutoComplete>
@@ -441,7 +447,7 @@ export default function EventForm({
                                     }
                                 }}
                             >
-                                Добавить
+                                {t('eventEditor.add')}
                             </Button>
                         </div>
 
@@ -450,7 +456,7 @@ export default function EventForm({
                                 {participants.map((p) => {
                                     const user = (usersData ?? []).find((u) => u.id === p.userId);
                                     const fullName = user
-                                        ? `${user.lastName ?? ''} ${user.firstName ?? ''} ${user.middleName ?? ''}`.trim() || 'Без имени'
+                                        ? `${user.lastName ?? ''} ${user.firstName ?? ''} ${user.middleName ?? ''}`.trim() || t('eventEditor.noName')
                                         : p.userId;
                                     return (
                                         <div key={p.userId} className={styles.participantRow}>
@@ -479,7 +485,7 @@ export default function EventForm({
                                                 <button
                                                     type="button"
                                                     className={styles.removeParticipantBtn}
-                                                    aria-label="Удалить"
+                                                    aria-label={t('eventEditor.deleteParticipant')}
                                                     onClick={() => removeParticipant(p.userId)}
                                                 >
                                                     <XIcon className={styles.removeParticipantIcon}/>
@@ -495,7 +501,7 @@ export default function EventForm({
                     <Divider style={{margin: 0}}/>
 
                     <div className={styles.section}>
-                        <span className={styles.title}>Теги</span>
+                        <span className={styles.title}>{t('eventEditor.tags')}</span>
                         <button
                             className={styles.categoryButton}
                             onClick={() => setShowCategorySelect(prev => !prev)}
@@ -523,7 +529,7 @@ export default function EventForm({
                                     }}
                                     onKeyDown={handleKeyDown}
                                     disabled={isLoadingCategories}
-                                    placeholder="Введите тег или выберите из списка"
+                                    placeholder={t('eventEditor.tagPlaceholder')}
                                     filterOption={false}
                                     allowClear
                                 />
@@ -552,12 +558,12 @@ export default function EventForm({
                     <div className={styles.section}>
                         <div className="ep-textarea-field">
                             <div className="ep-textarea-field__label-row">
-                                <label className="ep-textarea-field__label">Описание</label>
+                                <label className="ep-textarea-field__label">{t('eventEditor.description')}</label>
                                 <span className="ep-textarea-field__counter">{String(description ?? '').length}/800</span>
                             </div>
                             <Input.TextArea
                                 className="ep-textarea"
-                                placeholder="Описание"
+                                placeholder={t('eventEditor.description')}
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 autoSize={{minRows: 1}}
@@ -573,14 +579,14 @@ export default function EventForm({
                             className="ep-btn ep-btn--m ep-btn--filled-purple"
                             onClick={() => handleSubmit({publish: true})}
                         >
-                            {isEditMode ? 'Сохранить изменения' : 'Создать'}
+                            {isEditMode ? t('eventEditor.saveChanges') : t('eventEditor.create')}
                         </Button>
                     </div>
                 </div>
 
                 <div className={styles.coverPanel}>
-                    <span className={styles.title}>Обложка</span>
-                    <span className={styles.hint}>Рекомендуемый размер - 544x213 пикселей.</span>
+                    <span className={styles.title}>{t('eventEditor.cover')}</span>
+                    <span className={styles.hint}>{t('eventEditor.coverHint')}</span>
 
                     <input
                         ref={fileInputRef}
@@ -596,11 +602,11 @@ export default function EventForm({
                         onClick={() => fileInputRef.current?.click()}
                     >
                         {avatarPreview ? (
-                            <img src={avatarPreview} alt="Обложка" className={styles.coverPreview}/>
+                            <img src={avatarPreview} alt={t('eventEditor.coverAlt')} className={styles.coverPreview}/>
                         ) : (
                             <div className={styles.coverUploadInner}>
                                 <ImageIcon/>
-                                <span>Загрузите изображение</span>
+                                <span>{t('eventEditor.uploadImage')}</span>
                             </div>
                         )}
                     </button>

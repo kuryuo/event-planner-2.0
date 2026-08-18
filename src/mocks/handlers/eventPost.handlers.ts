@@ -2,6 +2,7 @@ import { http, HttpResponse } from "msw";
 import type { EventPost } from "@/types/api/Event";
 import { API_BASE_URL } from "../config";
 import { requireMockAuth } from "../utils/requireMockAuth";
+import { mockT } from "../utils/mockI18n";
 
 let nextPostId = 2;
 
@@ -46,7 +47,17 @@ export const eventPostHandlers = [
       const count = Number(url.searchParams.get("count") ?? posts.length);
 
       return HttpResponse.json({
-        result: posts.slice(offset, offset + count),
+        result: posts.slice(offset, offset + count).map((post) => ({
+          ...post,
+          title:
+            post.title === "Registration is open"
+              ? mockT("post.seedTitle", request)
+              : post.title,
+          text:
+            post.text === "Registration is now open for the Frontend Meetup."
+              ? mockT("post.seedText", request)
+              : post.text,
+        })),
       });
     }
   ),
@@ -66,7 +77,7 @@ export const eventPostHandlers = [
 
       if (!title || !text) {
         return HttpResponse.json(
-          { message: "Title and text are required" },
+          { message: mockT("post.titleAndTextRequired", request) },
           { status: 400 }
         );
       }
@@ -102,12 +113,24 @@ export const eventPostHandlers = [
 
       if (!post) {
         return HttpResponse.json(
-          { message: "Post not found" },
+          { message: mockT("post.notFound", request) },
           { status: 404 }
         );
       }
 
-      return HttpResponse.json({ result: post });
+      return HttpResponse.json({
+        result: {
+          ...post,
+          title:
+            post.title === "Registration is open"
+              ? mockT("post.seedTitle", request)
+              : post.title,
+          text:
+            post.text === "Registration is now open for the Frontend Meetup."
+              ? mockT("post.seedText", request)
+              : post.text,
+        },
+      });
     }
   ),
 
@@ -129,7 +152,7 @@ export const eventPostHandlers = [
 
       if (!post) {
         return HttpResponse.json(
-          { message: "Post not found" },
+          { message: mockT("post.notFound", request) },
           { status: 404 }
         );
       }
@@ -142,7 +165,19 @@ export const eventPostHandlers = [
         post.text = text;
       }
 
-      return HttpResponse.json({ result: post });
+      return HttpResponse.json({
+        result: {
+          ...post,
+          title:
+            post.title === "Registration is open"
+              ? mockT("post.seedTitle", request)
+              : post.title,
+          text:
+            post.text === "Registration is now open for the Frontend Meetup."
+              ? mockT("post.seedText", request)
+              : post.text,
+        },
+      });
     }
   ),
 
@@ -161,7 +196,7 @@ export const eventPostHandlers = [
 
       if (filteredPosts.length === posts.length) {
         return HttpResponse.json(
-          { message: "Post not found" },
+          { message: mockT("post.notFound", request) },
           { status: 404 }
         );
       }

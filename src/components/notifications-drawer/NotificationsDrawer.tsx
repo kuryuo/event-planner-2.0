@@ -14,6 +14,7 @@ import {markAllChatAlertsRead, markChatAlertRead} from '@/store/realtimeSlice.ts
 import BellIcon from '@/assets/image/bell.svg?react';
 import CloseIcon from '@/assets/img/icon-m/x.svg?react';
 import styles from './NotificationsDrawer.module.scss';
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface NotificationsDrawerProps {
     open: boolean;
@@ -31,44 +32,53 @@ type ViewNotification = {
     eventId?: string;
 };
 
-const shortMessage = (value?: string): string => {
-    if (!value) return 'Новое сообщение';
+const shortMessage = (value: string | undefined, fallback: string): string => {
+    if (!value) return fallback;
     return value.length > 120 ? `${value.slice(0, 120)}...` : value;
 };
 
-const resolveNotificationTitle = (type?: string | null, senderName?: string | null): string => {
+const resolveNotificationTitle = (
+    t: (key: string, params?: Record<string, string | number>) => string,
+    type?: string | null,
+    senderName?: string | null,
+): string => {
     const normalized = String(type ?? '').toLowerCase();
-    if (normalized === 'chatmessage') return `Новое сообщение${senderName ? ` от ${senderName}` : ''}`;
-    if (normalized === 'eventstart') return 'Скоро начало мероприятия';
-    if (normalized === 'bufferendingsoon') return 'Скоро завершится буферный период';
-    if (normalized === 'taskdeadline') return 'Срок задачи';
-    if (normalized === 'eventcancelled') return 'Мероприятие отменено';
-    if (normalized === 'eventpublished') return 'Мероприятие опубликовано';
-    return 'Уведомление';
+    if (normalized === 'chatmessage') return senderName ? t('notifications.newMessageFrom', {name: senderName}) : t('notifications.newMessage');
+    if (normalized === 'eventstart') return t('notifications.eventStartSoon');
+    if (normalized === 'bufferendingsoon') return t('notifications.bufferEndingSoon');
+    if (normalized === 'taskdeadline') return t('notifications.taskDeadline');
+    if (normalized === 'eventcancelled') return t('notifications.eventCancelled');
+    if (normalized === 'eventpublished') return t('notifications.eventPublished');
+    return t('notifications.title');
 };
 
-const formatRelativeTime = (value: string): string => {
+const formatRelativeTime = (
+    value: string,
+    language: 'ru' | 'en',
+    t: (key: string, params?: Record<string, string | number>) => string,
+): string => {
     const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return 'только что';
+    if (Number.isNaN(date.getTime())) return t('common.status.justNow');
 
     const diffMs = Date.now() - date.getTime();
     const minutes = Math.max(1, Math.floor(diffMs / 60000));
 
-    if (minutes < 60) return `${minutes} мин назад`;
+    if (minutes < 60) return t('common.relative.minutesAgo', {count: minutes});
 
     const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours} ч назад`;
+    if (hours < 24) return t('common.relative.hoursAgo', {count: hours});
 
     const days = Math.floor(hours / 24);
-    if (days < 7) return `${days} дн назад`;
+    if (days < 7) return t('common.relative.daysAgo', {count: days});
 
-    return new Intl.DateTimeFormat('ru-RU', {
+    return new Intl.DateTimeFormat(language === 'ru' ? 'ru-RU' : 'en-US', {
         day: '2-digit',
         month: '2-digit',
     }).format(date);
 };
 
 export default function NotificationsDrawer({open, onClose}: NotificationsDrawerProps) {
+    const {t, language} = useI18n();
     const [shouldRender, setShouldRender] = useState(open);
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
@@ -111,9 +121,9 @@ export default function NotificationsDrawer({open, onClose}: NotificationsDrawer
     const mergedNotifications = useMemo<ViewNotification[]>(() => {
         const apiItems: ViewNotification[] = notifications.map((notification) => ({
             id: notification.id,
-            title: notification.title || resolveNotificationTitle(notification.type, notification.senderName),
+            title: notification.title || resolveNotificationTitle(t, notification.type, notification.senderName),
             text: notification.type?.toLowerCase() === 'chatmessage'
-                ? `${shortMessage(notification.messageText ?? notification.text)}${notification.communityName ? ` • ${notification.communityName}` : ''}`
+                ? `${shortMessage(notification.messageText ?? notification.text, t('notifications.newMessage'))}${notification.communityName ? ` • ${notification.communityName}` : ''}`
                 : notification.text,
             isRead: notification.isRead,
             createdAt: notification.createdAt,
@@ -123,8 +133,8 @@ export default function NotificationsDrawer({open, onClose}: NotificationsDrawer
 
         const chatItems: ViewNotification[] = chatAlerts.map((alert) => ({
             id: alert.id,
-            title: alert.senderName ? `Новое сообщение от ${alert.senderName}` : 'Новое сообщение в чате',
-            text: `${shortMessage(alert.messageText)}${alert.eventName ? ` • ${alert.eventName}` : ''}`,
+            title: alert.senderName ? t('notifications.newMessageFrom', {name: alert.senderName}) : t('notifications.newChatMessage'),
+            text: `${shortMessage(alert.messageText, t('notifications.newMessage'))}${alert.eventName ? ` • ${alert.eventName}` : ''}`,
             isRead: alert.isRead,
             createdAt: alert.createdAt,
             isLocalChat: true,
@@ -132,7 +142,7 @@ export default function NotificationsDrawer({open, onClose}: NotificationsDrawer
         }));
 
         return [...apiItems, ...chatItems];
-    }, [notifications, chatAlerts]);
+    }, [notifications, chatAlerts, t]);
 
     const invitationById = useMemo(() => {
         return new Map(invitations.map((invitation) => [invitation.id, invitation]));
@@ -189,17 +199,17 @@ export default function NotificationsDrawer({open, onClose}: NotificationsDrawer
 
     return (
         <div className={`${styles.root} ${open ? styles.open : styles.closing}`}>
-            <button type="button" className={styles.backdrop} aria-label="Закрыть уведомления" onClick={onClose} />
-            <aside className={styles.drawer} role="dialog" aria-modal="true" aria-label="Уведомления">
+            <button type="button" className={styles.backdrop} aria-label={t('notifications.closeDrawer')} onClick={onClose} />
+            <aside className={styles.drawer} role="dialog" aria-modal="true" aria-label={t('notifications.title')}>
                 <div className={styles.header}>
-                    <h2 className={styles.title}>Уведомления</h2>
-                    <button type="button" className={styles.closeButton} onClick={onClose} aria-label="Закрыть">
+                    <h2 className={styles.title}>{t('notifications.title')}</h2>
+                    <button type="button" className={styles.closeButton} onClick={onClose} aria-label={t('common.actions.close')}>
                         <CloseIcon aria-hidden/>
                     </button>
                 </div>
 
                 <div className={styles.headerActions}>
-                    <span className={styles.counter}>Новые: {unreadCount}</span>
+                    <span className={styles.counter}>{t('notifications.unreadCount', {count: unreadCount})}</span>
                     <Button
                         type="text"
                         className="ep-btn ep-btn--m ep-btn--text"
@@ -209,17 +219,17 @@ export default function NotificationsDrawer({open, onClose}: NotificationsDrawer
                         }}
                         disabled={unreadCount === 0 || isMarkingAll}
                     >
-                        Прочитать все
+                        {t('common.actions.markAllRead')}
                     </Button>
                 </div>
 
                 {isLoading ? (
-                    <div className={styles.empty}>Загрузка уведомлений...</div>
+                    <div className={styles.empty}>{t('notifications.loading')}</div>
                 ) : sortedNotifications.length === 0 ? (
-                    <div className={styles.empty}>Уведомлений пока нет</div>
+                    <div className={styles.empty}>{t('notifications.empty')}</div>
                 ) : (
                     <div className={styles.list}>
-                        {unreadNotifications.length > 0 && <div className={styles.sectionTitle}>Новые</div>}
+                        {unreadNotifications.length > 0 && <div className={styles.sectionTitle}>{t('notifications.unreadSection')}</div>}
                         {unreadNotifications.map((notification) => {
                             const invitation = notification.invitationId
                                 ? invitationById.get(notification.invitationId)
@@ -247,7 +257,7 @@ export default function NotificationsDrawer({open, onClose}: NotificationsDrawer
                                                 <span className={styles.statusDot} aria-hidden="true" />
                                             </div>
                                             <div className={styles.cardText}>{notification.text}</div>
-                                            <div className={styles.cardDate}>{formatRelativeTime(notification.createdAt)}</div>
+                                            <div className={styles.cardDate}>{formatRelativeTime(notification.createdAt, language, t)}</div>
                                         </div>
                                         <span className={styles.cardArrow} aria-hidden="true">→</span>
                                     </div>
@@ -259,14 +269,14 @@ export default function NotificationsDrawer({open, onClose}: NotificationsDrawer
                                             onClick={() => handleRead(notification)}
                                             disabled={isMarkingRead}
                                         >
-                                            Отметить прочитанным
+                                            {t('common.actions.markAsRead')}
                                         </Button>
                                     </div>
 
                                     {invitation && (
                                         <div className={styles.invitationBlock}>
                                             <div className={styles.cardText}>
-                                                Приглашение на мероприятие {invitation.eventName || invitation.eventId}
+                                                {t('notifications.invitationToEvent', {name: invitation.eventName || invitation.eventId})}
                                             </div>
                                             <div className={styles.actions}>
                                                 <Button
@@ -275,7 +285,7 @@ export default function NotificationsDrawer({open, onClose}: NotificationsDrawer
                                                     onClick={() => handleRespond(invitation.id, true)}
                                                     disabled={isResponding}
                                                 >
-                                                    Принять
+                                                    {t('common.actions.accept')}
                                                 </Button>
                                                 <Button
                                                     type="text"
@@ -284,7 +294,7 @@ export default function NotificationsDrawer({open, onClose}: NotificationsDrawer
                                                     onClick={() => handleRespond(invitation.id, false)}
                                                     disabled={isResponding}
                                                 >
-                                                    Отклонить
+                                                    {t('common.actions.decline')}
                                                 </Button>
                                             </div>
                                         </div>
@@ -293,7 +303,7 @@ export default function NotificationsDrawer({open, onClose}: NotificationsDrawer
                             );
                         })}
 
-                        {readNotifications.length > 0 && <div className={styles.sectionTitle}>Прочитанные</div>}
+                        {readNotifications.length > 0 && <div className={styles.sectionTitle}>{t('notifications.readSection')}</div>}
                         {readNotifications.map((notification) => (
                             <div key={notification.id} className={styles.card}>
                                 <div
@@ -315,7 +325,7 @@ export default function NotificationsDrawer({open, onClose}: NotificationsDrawer
                                             <div className={styles.cardTitle}>{notification.title}</div>
                                         </div>
                                         <div className={styles.cardText}>{notification.text}</div>
-                                        <div className={styles.cardDate}>{formatRelativeTime(notification.createdAt)}</div>
+                                        <div className={styles.cardDate}>{formatRelativeTime(notification.createdAt, language, t)}</div>
                                     </div>
                                     <span className={styles.cardArrow} aria-hidden="true">→</span>
                                 </div>

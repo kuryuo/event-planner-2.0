@@ -13,6 +13,7 @@ import {
   updateMockEventRecord,
 } from "../db/event.db";
 import { requireMockAuth } from "../utils/requireMockAuth";
+import { mockT } from "../utils/mockI18n";
 
 const filterEvents = ({
   events,
@@ -41,7 +42,7 @@ export const eventHandlers = [
       return authError;
     }
 
-    const events = getMockEvents().filter(
+    const events = getMockEvents({ request }).filter(
       ({ lifecycleState }) => lifecycleState !== "Archived"
     );
 
@@ -55,7 +56,7 @@ export const eventHandlers = [
       return authError;
     }
 
-    const events = getMockEvents().filter(
+    const events = getMockEvents({ request }).filter(
       ({ lifecycleState }) => lifecycleState === "Archived"
     );
 
@@ -71,7 +72,7 @@ export const eventHandlers = [
       return authError;
     }
 
-    const events = getMockEvents().filter(
+    const events = getMockEvents({ request }).filter(
       ({ lifecycleState }) => lifecycleState !== "Archived"
     );
 
@@ -102,11 +103,12 @@ export const eventHandlers = [
 
     const event = getMockEventById({
       eventId: String(params.eventId),
+      request,
     });
 
     if (!event) {
       return HttpResponse.json(
-        { message: "Event not found" },
+        { message: mockT("event.errorNotFound", request) },
         { status: 404 }
       );
     }
@@ -131,7 +133,7 @@ export const eventHandlers = [
 
       if (!event) {
         return HttpResponse.json(
-          { message: "Event not found" },
+          { message: mockT("event.errorNotFound", request) },
           { status: 404 }
         );
       }
@@ -153,7 +155,7 @@ export const eventHandlers = [
 
     if (!isDeleted) {
       return HttpResponse.json(
-        { message: "Event not found" },
+        { message: mockT("event.errorNotFound", request) },
         { status: 404 }
       );
     }

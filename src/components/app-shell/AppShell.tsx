@@ -5,6 +5,7 @@ import { useLocation } from "react-router-dom";
 import Sidebar, { type SidebarProps } from "@/components/sidebar/Sidebar";
 import MenuIcon from "@/assets/img/icon-m/justify.svg?react";
 import shellStyles from "./AppShell.module.scss";
+import { useI18n } from "@/i18n/I18nProvider";
 
 const NARROW_LAYOUT_QUERY = "(max-width: 1024px)";
 
@@ -39,6 +40,7 @@ export const AppShell = ({
   sidebarProps,
   children,
 }: AppShellProps) => {
+  const { t } = useI18n();
   const isNarrow = useIsNarrowLayout();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const location = useLocation();
@@ -64,7 +66,7 @@ export const AppShell = ({
             shellStyles.menuButton,
             drawerOpen && shellStyles.menuButtonHidden,
           )}
-          aria-label="Открыть меню"
+          aria-label={t("common.labels.openMenu")}
           aria-expanded={drawerOpen}
           onClick={openMenu}
         >

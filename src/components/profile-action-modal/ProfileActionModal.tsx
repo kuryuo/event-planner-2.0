@@ -2,6 +2,7 @@ import type {ReactNode} from 'react';
 import styles from './ProfileActionModal.module.scss';
 import {Button} from "antd";
 import XIcon from '@/assets/img/icon-s/x.svg?react';
+import {useI18n} from '@/i18n/I18nProvider';
 
 type ConfirmTone = 'default' | 'danger';
 
@@ -24,12 +25,13 @@ export default function ProfileActionModal({
     description,
     onClose,
     onConfirm,
-    confirmText = 'Подтвердить',
-    cancelText = 'Отменить',
+    confirmText,
+    cancelText,
     confirmTone = 'default',
     confirmDisabled = false,
     children,
 }: ProfileActionModalProps) {
+    const {t} = useI18n();
     if (!isOpen) {
         return null;
     }
@@ -39,7 +41,7 @@ export default function ProfileActionModal({
             <div className={styles.modal} onClick={(event) => event.stopPropagation()}>
                 <div className={styles.headerRow}>
                     <h3 className={styles.title}>{title}</h3>
-                    <button className={styles.closeButton} onClick={onClose} aria-label="Закрыть">
+                    <button className={styles.closeButton} onClick={onClose} aria-label={t('common.actions.close')}>
                         <XIcon/>
                     </button>
                 </div>
@@ -49,7 +51,7 @@ export default function ProfileActionModal({
 
                 <div className={styles.actions}>
                     <Button type="text" className="ep-btn ep-btn--m ep-btn--text" onClick={onClose}>
-                        {cancelText}
+                        {cancelText ?? t('common.actions.cancel')}
                     </Button>
                     {onConfirm && (
                         <Button
@@ -59,7 +61,7 @@ export default function ProfileActionModal({
                             onClick={onConfirm}
                             disabled={confirmDisabled}
                         >
-                            {confirmText}
+                            {confirmText ?? t('common.actions.confirm')}
                         </Button>
                     )}
                 </div>

@@ -2,6 +2,7 @@ import { http, HttpResponse } from "msw";
 import type { ChatAttachment, ChatMessage } from "@/types/api/Chat";
 import { API_BASE_URL } from "../config";
 import { requireMockAuth } from "../utils/requireMockAuth";
+import { mockT } from "../utils/mockI18n";
 
 interface SendMessageBody {
   text: string;
@@ -127,7 +128,36 @@ export const chatHandlers = [
         eventId: String(params.eventId),
       })
         .filter((message) => message.text.toLowerCase().includes(text))
-        .slice(0, maxResults);
+        .slice(0, maxResults)
+        .map((message) => ({
+          ...message,
+          authorName:
+            message.authorName === "Peter Petrov"
+              ? mockT("chat.userPeter", request)
+              : message.authorName === "Ivan Ivanov"
+                ? mockT("chat.userIvan", request)
+                : message.authorName,
+          text:
+            message.text === "Hi! When does the registration start?"
+              ? mockT("chat.seedQuestion", request)
+              : message.text === "Registration starts at 09:30."
+                ? mockT("chat.seedAnswer", request)
+                : message.text,
+          replyToMessage: message.replyToMessage
+            ? {
+                ...message.replyToMessage,
+                authorName:
+                  message.replyToMessage.authorName === "Peter Petrov"
+                    ? mockT("chat.userPeter", request)
+                    : message.replyToMessage.authorName,
+                text:
+                  message.replyToMessage.text ===
+                  "Hi! When does the registration start?"
+                    ? mockT("chat.seedQuestion", request)
+                    : message.replyToMessage.text,
+              }
+            : null,
+        }));
 
       return HttpResponse.json({ result: messages });
     }
@@ -149,7 +179,35 @@ export const chatHandlers = [
       const count = Number(url.searchParams.get("count") ?? 50);
 
       return HttpResponse.json({
-        result: messages.slice(offset, offset + count),
+        result: messages.slice(offset, offset + count).map((message) => ({
+          ...message,
+          authorName:
+            message.authorName === "Peter Petrov"
+              ? mockT("chat.userPeter", request)
+              : message.authorName === "Ivan Ivanov"
+                ? mockT("chat.userIvan", request)
+                : message.authorName,
+          text:
+            message.text === "Hi! When does the registration start?"
+              ? mockT("chat.seedQuestion", request)
+              : message.text === "Registration starts at 09:30."
+                ? mockT("chat.seedAnswer", request)
+                : message.text,
+          replyToMessage: message.replyToMessage
+            ? {
+                ...message.replyToMessage,
+                authorName:
+                  message.replyToMessage.authorName === "Peter Petrov"
+                    ? mockT("chat.userPeter", request)
+                    : message.replyToMessage.authorName,
+                text:
+                  message.replyToMessage.text ===
+                  "Hi! When does the registration start?"
+                    ? mockT("chat.seedQuestion", request)
+                    : message.replyToMessage.text,
+              }
+            : null,
+        })),
       });
     }
   ),
@@ -167,7 +225,7 @@ export const chatHandlers = [
 
       if (!body.text.trim()) {
         return HttpResponse.json(
-          { message: "Message text is required" },
+          { message: mockT("chat.messageTextRequired", request) },
           { status: 400 }
         );
       }
@@ -201,7 +259,7 @@ export const chatHandlers = [
 
       if (!text.trim() && attachments.length === 0) {
         return HttpResponse.json(
-          { message: "Message or file is required" },
+          { message: mockT("chat.messageOrFileRequired", request) },
           { status: 400 }
         );
       }
@@ -232,7 +290,7 @@ export const chatHandlers = [
 
       if (!message) {
         return HttpResponse.json(
-          { message: "Message not found" },
+          { message: mockT("chat.messageNotFound", request) },
           { status: 404 }
         );
       }
@@ -271,7 +329,7 @@ export const chatHandlers = [
 
       if (filteredMessages.length === messages.length) {
         return HttpResponse.json(
-          { message: "Message not found" },
+          { message: mockT("chat.messageNotFound", request) },
           { status: 404 }
         );
       }
@@ -297,7 +355,7 @@ export const chatHandlers = [
 
       if (!message) {
         return HttpResponse.json(
-          { message: "Message not found" },
+          { message: mockT("chat.messageNotFound", request) },
           { status: 404 }
         );
       }
@@ -329,7 +387,7 @@ export const chatHandlers = [
 
       if (!message) {
         return HttpResponse.json(
-          { message: "Message not found" },
+          { message: mockT("chat.messageNotFound", request) },
           { status: 404 }
         );
       }

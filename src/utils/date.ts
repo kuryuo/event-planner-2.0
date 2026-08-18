@@ -83,9 +83,14 @@ export function formatTimeRange(start?: Date | null, end?: Date | null): string 
     return `${pad(start.getHours())}:${pad(start.getMinutes())} - ${pad(end.getHours())}:${pad(end.getMinutes())}`;
 }
 
-export function formatCalendarLabel(currentDate: Date, currentView: 'dayGridMonth' | 'timeGridWeek'): string {
+export function formatCalendarLabel(
+    currentDate: Date,
+    currentView: 'dayGridMonth' | 'timeGridWeek',
+    language: 'ru' | 'en' = 'ru',
+): string {
+    const locale = language === 'ru' ? 'ru-RU' : 'en-US';
     if (currentView === 'dayGridMonth') {
-        return currentDate.toLocaleString('ru-RU', {month: 'long', year: 'numeric'})
+        return currentDate.toLocaleString(locale, {month: 'long', year: 'numeric'})
             .replace(/^./, str => str.toUpperCase());
     }
 
@@ -96,7 +101,7 @@ export function formatCalendarLabel(currentDate: Date, currentView: 'dayGridMont
 
     const startDay = startOfWeek.getDate();
     const endDay = endOfWeek.getDate();
-    const monthName = endOfWeek.toLocaleString('ru-RU', {month: 'long'})
+    const monthName = endOfWeek.toLocaleString(locale, {month: 'long'})
         .replace(/^./, str => str.toUpperCase());
 
     return `${startDay} – ${endDay} ${monthName}`;

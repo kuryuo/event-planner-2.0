@@ -5,6 +5,7 @@ import type {
 } from "@/types/api/Profile";
 import { createMockProfile } from "../factories/profile.factory";
 import { createMockProfileEvent } from "../factories/profileEvent.factory";
+import { mockT } from "../utils/mockI18n";
 
 interface UpdateMockProfileParams {
   payload: UpdateUserProfilePayload;
@@ -31,9 +32,27 @@ const mockProfileEvents: UserEvent[] = [
   }),
 ];
 
-export const getMockProfile = (): UserProfile => ({
-  ...mockProfile,
-});
+export const getMockProfile = (request?: Request): UserProfile => {
+  const localizedProfile = createMockProfile({ request });
+
+  return {
+    ...localizedProfile,
+    ...mockProfile,
+    firstName: mockProfile.firstName || localizedProfile.firstName,
+    lastName: mockProfile.lastName || localizedProfile.lastName,
+    middleName: mockProfile.middleName || localizedProfile.middleName,
+    profession:
+      mockProfile.profession === "Event organizer" ||
+      mockProfile.profession === "Организатор мероприятий" ||
+      !mockProfile.profession
+        ? mockT("profile.profession", request)
+        : mockProfile.profession,
+    city:
+      mockProfile.city === "Moscow" || mockProfile.city === "Москва" || !mockProfile.city
+        ? mockT("profile.city", request)
+        : mockProfile.city,
+  } as UserProfile;
+};
 
 export const updateMockProfile = ({
   payload,
@@ -57,5 +76,48 @@ export const updateMockProfileAvatar = ({
   return getMockProfile();
 };
 
-export const getMockProfileEvents = (): UserEvent[] =>
-  mockProfileEvents.map((event) => ({ ...event }));
+export const getMockProfileEvents = (request?: Request): UserEvent[] =>
+  mockProfileEvents.map((event, index) => {
+    if (index === 0) {
+      return {
+        ...createMockProfileEvent({ request }),
+        ...event,
+        name:
+          event.name === "Frontend Meetup" || event.name === "Frontend митап"
+            ? mockT("profile.eventName", request)
+            : event.name,
+        description:
+          event.description === "Frontend developers meetup" ||
+          event.description === "Встреча frontend-разработчиков"
+            ? mockT("profile.eventDescription", request)
+            : event.description,
+        location:
+          event.location === "Moscow" || event.location === "Москва"
+            ? mockT("profile.eventLocation", request)
+            : event.location,
+        categories: event.categories?.map((category) =>
+          category === "Development" || category === "Разработка"
+            ? mockT("profile.categoryDevelopment", request)
+            : category
+        ) ?? [],
+      };
+    }
+
+    return {
+      ...event,
+      name:
+        event.name === "Hackathon 2026" || event.name === "Хакатон 2026"
+          ? mockT("profile.eventHackathonName", request)
+          : event.name,
+      description:
+        event.description === "Team software development projects" ||
+        event.description === "Командная разработка программных проектов"
+          ? mockT("profile.eventHackathonDescription", request)
+          : event.description,
+      categories: event.categories?.map((category) =>
+        category === "Development" || category === "Разработка"
+          ? mockT("profile.categoryDevelopment", request)
+          : category
+      ) ?? [],
+    };
+  });

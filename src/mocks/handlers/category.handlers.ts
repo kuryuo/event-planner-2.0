@@ -3,6 +3,7 @@ import type { CategoriesResponse } from "@/types/api/Category";
 import { API_BASE_URL } from "../config";
 import { createMockCategory } from "../factories/category.factory";
 import { requireMockAuth } from "../utils/requireMockAuth";
+import { mockT } from "../utils/mockI18n";
 
 export const categoryHandlers = [
   http.get(`${API_BASE_URL}/api/categories`, ({ request }) => {
@@ -14,17 +15,19 @@ export const categoryHandlers = [
 
     const response: CategoriesResponse = {
       result: [
-        createMockCategory(),
+        createMockCategory({ request }),
         createMockCategory({
+          request,
           overrides: {
             id: "mock-category-2",
-            name: "Education",
+            name: mockT("category.education", request),
           },
         }),
         createMockCategory({
+          request,
           overrides: {
             id: "mock-category-3",
-            name: "Career",
+            name: mockT("category.career", request),
           },
         }),
       ],

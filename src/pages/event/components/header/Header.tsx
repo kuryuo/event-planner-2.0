@@ -20,9 +20,10 @@ import {
 import type {EventLifecycleState, ParticipantRoleKind} from '@/types/api/Event.ts';
 import {
     getParticipantRoleLabel,
-    labelToLifecycleState,
     lifecycleStateToLabel,
+    toLifecycleState,
 } from '@/utils/eventLifecycle.ts';
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface HeaderProps {
     /** Статус мероприятия, кебаб (отмена / шаблон / удаление), полное управление участниками */
@@ -44,9 +45,7 @@ interface HeaderProps {
     showMain?: boolean;
 }
 
-const STATUS_OPTIONS = ['Черновик', 'В работе', 'Завершено', 'Отменено'];
-
-const resolveLifecycleLabel = ({
+const resolveLifecycleState = ({
     lifecycleState,
     status,
     isCancelled,
@@ -54,10 +53,17 @@ const resolveLifecycleLabel = ({
     lifecycleState?: string | null;
     status?: string | null;
     isCancelled?: boolean;
-}): string => {
-    if (isCancelled) return 'Отменено';
-    return lifecycleStateToLabel(lifecycleState, status);
+}): EventLifecycleState => {
+    if (isCancelled) return 'Cancelled';
+    return toLifecycleState(lifecycleState, status);
 };
+
+const isLifecycleState = (value: string): value is EventLifecycleState =>
+    value === 'Draft' ||
+    value === 'Published' ||
+    value === 'Completed' ||
+    value === 'Cancelled' ||
+    value === 'Archived';
 
 export default function Header({
     canManageEventOrgOverview = false,
@@ -76,11 +82,16 @@ export default function Header({
     showTabs = true,
     showMain = true,
 }: HeaderProps) {
+    const {t, language} = useI18n();
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isStatusOpen, setIsStatusOpen] = useState(false);
-    const [selectedStatus, setSelectedStatus] = useState(() =>
-        resolveLifecycleLabel({lifecycleState, status, isCancelled}),
+    const [selectedStatus, setSelectedStatus] = useState<EventLifecycleState>(() =>
+        resolveLifecycleState({lifecycleState, status, isCancelled}),
+    );
+    const statusOptions = useMemo<EventLifecycleState[]>(
+        () => ['Draft', 'Published', 'Completed', 'Cancelled'],
+        [],
     );
     const roleLabel = getParticipantRoleLabel(participantRole, canManageEventOrgOverview);
     const {handleDelete, isLoading: isDeleting} = useEventDeleter();
@@ -102,13 +113,13 @@ export default function Header({
                 await handleDelete(eventId);
                 setIsMenuOpen(false);
             } catch (err) {
-                console.error('Не удалось удалить событие:', err);
+                console.error('Failed to delete event:', err);
             }
         }
     };
 
     const handleStatusPick = useCallback(
-        async (option: string) => {
+        async (option: EventLifecycleState) => {
             if (!eventId || !canManageEventOrgOverview) {
                 setSelectedStatus(option);
                 setIsStatusOpen(false);
@@ -120,34 +131,33 @@ export default function Header({
             setIsStatusOpen(false);
 
             try {
-                await updateLifecycleState({eventId, lifecycleState: labelToLifecycleState(option)}).unwrap();
-                showSuccess('Статус мероприятия обновлен');
+                await updateLifecycleState({eventId, lifecycleState: option}).unwrap();
+                showSuccess(t('eventPage.statusUpdated'));
             } catch (error) {
-                console.error('Не удалось обновить статус мероприятия:', error);
+                console.error('Failed to update event status:', error);
                 setSelectedStatus(previousStatus);
-                showApiError(error, 'Не удалось обновить статус мероприятия');
+                showApiError(error, t('eventPage.statusUpdateFailed'));
             }
         },
-        [eventId, canManageEventOrgOverview, selectedStatus, showApiError, showSuccess, updateLifecycleState],
+        [eventId, canManageEventOrgOverview, selectedStatus, showApiError, showSuccess, t, updateLifecycleState],
     );
 
     const statusMenuItems: MenuProps['items'] = useMemo(
-        () =>
-            STATUS_OPTIONS.map((option) => ({
+        () => statusOptions.map((option) => ({
                 key: option,
                 label: (
                     <span className={styles.statusMenuRow}>
-                        <span>{option}</span>
+                        <span>{lifecycleStateToLabel(option, option)}</span>
                         {option === selectedStatus ? <Check2Icon className={styles.statusCheck}/> : null}
                     </span>
                 ),
             })),
-        [selectedStatus],
+        [selectedStatus, statusOptions, language],
     );
 
     const tabItems = isArchived
-        ? [{label: 'Обзор'}, {label: 'Документы'}, {label: 'Медиа'}]
-        : [{label: 'Обзор'}, {label: 'Документы'}, {label: 'Kanban доска'}, {label: 'Чат'}, {label: 'Медиа'}];
+        ? [{label: t('eventPage.overview')}, {label: t('eventPage.documentsTab')}, {label: t('eventPage.mediaTab')}]
+        : [{label: t('eventPage.overview')}, {label: t('eventPage.documentsTab')}, {label: t('eventPage.kanbanTab')}, {label: t('eventPage.chat')}, {label: t('eventPage.mediaTab')}];
     const isOverviewTabActive = activeTab === 0;
 
     const handleTabChange = (index: number) => {
@@ -157,11 +167,12 @@ export default function Header({
     };
 
     useEffect(() => {
-        setSelectedStatus(resolveLifecycleLabel({lifecycleState, status, isCancelled}));
-    }, [lifecycleState, status, isCancelled]);
+        setSelectedStatus(resolveLifecycleState({lifecycleState, status, isCancelled}));
+    }, [lifecycleState, status, isCancelled, language]);
 
-    const isCancelledNow = selectedStatus === 'Отменено';
-    const isCompletedNow = selectedStatus === 'Завершено';
+    const selectedStatusLabel = lifecycleStateToLabel(selectedStatus, selectedStatus);
+    const isCancelledNow = selectedStatus === 'Cancelled';
+    const isCompletedNow = selectedStatus === 'Completed';
     const isReadOnlyLifecycle = isArchived || isCompletedNow;
     const canChangeStatus = canManageEventOrgOverview && !isReadOnlyLifecycle;
 
@@ -173,7 +184,7 @@ export default function Header({
                         {(name?.[0] ?? "—").toUpperCase()}
                     </Avatar>
                     <h2 className={styles.summaryTitle}>{name}</h2>
-                    <span className={styles.summaryStatus}>{selectedStatus}</span>
+                    <span className={styles.summaryStatus}>{selectedStatusLabel}</span>
                     <span className={styles.summaryRole}>{roleLabel}</span>
                 </div>
             </div>}
@@ -208,7 +219,11 @@ export default function Header({
                                     menu={{
                                         items: statusMenuItems,
                                         onClick: ({key}) => {
-                                            void handleStatusPick(String(key));
+                                            const selectedKey = String(key);
+                                            if (!isLifecycleState(selectedKey)) {
+                                                return;
+                                            }
+                                            void handleStatusPick(selectedKey);
                                         },
                                     }}
                                 >
@@ -216,12 +231,12 @@ export default function Header({
                                         type="button"
                                         className={styles.statusButton}
                                     >
-                                        {selectedStatus}
+                                        {selectedStatusLabel}
                                         <ChevronDownIcon className={styles.statusChevron}/>
                                     </button>
                                 </Dropdown>
                             ) : (
-                                <span className={styles.statusBadge}>{selectedStatus}</span>
+                                <span className={styles.statusBadge}>{selectedStatusLabel}</span>
                             )}
                         </div>
                     </div>
@@ -235,7 +250,7 @@ export default function Header({
                                         onClick={handleEdit}
                                         disabled={isReadOnlyLifecycle}
                                     >
-                                        Редактировать
+                                        {t('eventPage.edit')}
                                     </Button>
                                 )}
                                 {canManageEventOrgOverview && (
@@ -253,37 +268,37 @@ export default function Header({
                                                         if (!eventId) return;
                                                         try {
                                                             await updateCancellation({eventId, isCancelled: !isCancelledNow}).unwrap();
-                                                            setSelectedStatus(!isCancelledNow ? 'Отменено' : 'В работе');
+                                                            setSelectedStatus(!isCancelledNow ? 'Cancelled' : 'Published');
                                                             setIsMenuOpen(false);
-                                                            showSuccess(!isCancelledNow ? 'Мероприятие отменено' : 'Отмена снята');
+                                                            showSuccess(!isCancelledNow ? t('eventPage.eventCancelled') : t('eventPage.cancellationRemoved'));
                                                         } catch (error) {
-                                                            console.error('Не удалось обновить отмену:', error);
-                                                            showApiError(error, 'Не удалось обновить отмену мероприятия');
+                                                            console.error('Failed to update cancellation:', error);
+                                                            showApiError(error, t('eventPage.cancellationUpdateFailed'));
                                                         }
                                                     }}
                                                     disabled={isUpdatingCancellation || isReadOnlyLifecycle}
                                                 >
-                                                    {isCancelledNow ? 'Снять отмену' : 'Отменить мероприятие'}
+                                                    {isCancelledNow ? t('eventPage.cancellationRemoved') : t('eventPage.eventCancelled')}
                                                 </Button>
                                                 <Button
                                                     type="text"
                                                     className={`${styles.dropdownAction} ep-btn ep-btn--m ep-btn--text`}
                                                     onClick={async () => {
                                                         if (!eventId) return;
-                                                        const templateName = window.prompt('Название шаблона', `${name} шаблон`);
+                                                        const templateName = window.prompt(t('eventPage.templateName'), `${name} template`);
                                                         if (!templateName?.trim()) return;
                                                         try {
                                                             await copyToTemplate({eventId, name: templateName.trim()}).unwrap();
                                                             setIsMenuOpen(false);
-                                                            showSuccess('Шаблон сохранен');
+                                                            showSuccess(t('eventPage.templateSaved'));
                                                         } catch (error) {
-                                                            console.error('Не удалось создать шаблон:', error);
-                                                            showApiError(error, 'Не удалось создать шаблон');
+                                                            console.error('Failed to create template:', error);
+                                                            showApiError(error, t('eventPage.templateCreateFailed'));
                                                         }
                                                     }}
                                                     disabled={isCopyingTemplate}
                                                 >
-                                                    {isCopyingTemplate ? 'Создаем...' : 'Сохранить как шаблон'}
+                                                    {isCopyingTemplate ? t('eventPage.creating') : t('eventPage.saveAsTemplate')}
                                                 </Button>
                                                 <Button
                                                     type="text"
@@ -293,7 +308,7 @@ export default function Header({
                                                     onClick={handleDeleteClick}
                                                     disabled={isDeleting}
                                                 >
-                                                    {isDeleting ? 'Удаление...' : 'Удалить мероприятие'}
+                                                    {isDeleting ? t('eventPage.deleting') : t('eventPage.deleteEvent')}
                                                 </Button>
                                             </div>
                                         )}
@@ -302,7 +317,7 @@ export default function Header({
                                             <button
                                                 type="button"
                                                 className={styles.menuButton}
-                                                aria-label="Меню"
+                                                aria-label={t('eventPage.menu')}
                                             >
                                                 <ThreeDotsVerticalIcon className={styles.menuIcon}/>
                                             </button>

@@ -39,6 +39,7 @@ import {isValidUrl} from '@/utils/validation.ts';
 import type {EventAttachment, ParticipantRoleKind} from '@/types/api/Event.ts';
 import {useClickOutside} from '@/hooks/ui/useClickOutside.ts';
 import {normalizeParticipantRole} from '@/utils/participantRole.ts';
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface EventDocumentsTabProps {
     eventId: string;
@@ -47,6 +48,7 @@ interface EventDocumentsTabProps {
 }
 
 const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canManageDocumentsProp}: EventDocumentsTabProps) => {
+    const {t, language} = useI18n();
     const {showApiError, showSuccess} = useApiToast();
     const currentUserId = useSelector((state: RootState) => state.profile.profile?.id ?? '');
     const {data: subscribersData} = useGetEventSubscribersQuery(
@@ -129,20 +131,20 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
     const [isDownloading, setIsDownloading] = useState(false);
 
     const documentsDescription = canManageDocuments
-        ? 'Загружайте файлы и добавляйте ссылки на документы, презентации, таблицы и другие материалы мероприятия'
-        : 'Файлы и ссылки на документы, презентации, таблицы и другие материалы мероприятия';
+        ? t('eventPage.documents.documentsDescriptionManage')
+        : t('eventPage.documents.documentsDescriptionRead');
 
     const notesDescription = canManageDocuments
-        ? 'Записывайте идеи, мысли и короткие заметки по мероприятию'
-        : 'Идеи, мысли и короткие заметки по мероприятию';
+        ? t('eventPage.documents.notesDescriptionManage')
+        : t('eventPage.documents.notesDescriptionRead');
 
     const handlePickFile = async (file: File) => {
         if (!eventId || !canManageDocuments) return;
         try {
             await uploadFile({eventId, file}).unwrap();
-            showSuccess('Документ успешно загружен');
+            showSuccess(t('eventPage.documents.uploadSuccess'));
         } catch (error) {
-            showApiError(error, 'Не удалось загрузить документ');
+            showApiError(error, t('eventPage.documents.uploadFailed'));
         }
     };
 
@@ -160,9 +162,9 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
             setLinkTitleDraft('');
             setLinkUrlDraft('');
             setIsAddLinkOpen(false);
-            showSuccess('Ссылка успешно добавлена');
+            showSuccess(t('eventPage.documents.linkAddedSuccess'));
         } catch (error) {
-            showApiError(error, 'Не удалось добавить ссылку');
+            showApiError(error, t('eventPage.documents.linkAddedFailed'));
         }
     };
 
@@ -212,7 +214,7 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
 
     const formatBytes = (value: number | null | undefined): string => {
         if (!value || value <= 0) return '—';
-        const units = ['Б', 'КБ', 'МБ', 'ГБ'];
+        const units = language === 'ru' ? ['Б', 'КБ', 'МБ', 'ГБ'] : ['B', 'KB', 'MB', 'GB'];
         const idx = Math.min(Math.floor(Math.log(value) / Math.log(1024)), units.length - 1);
         const sized = value / Math.pow(1024, idx);
         const digits = idx === 0 ? 0 : sized >= 10 ? 0 : 1;
@@ -220,7 +222,7 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
     };
 
     const getAttachmentLabel = (att: EventAttachment): string => {
-        return att.title || att.originalFileName || att.fileName || att.url || att.resource || 'Вложение';
+        return att.title || att.originalFileName || att.fileName || att.url || att.resource || t('eventPage.documents.attachmentFallback');
     };
 
     const getAttachmentKind = (att: EventAttachment): 'File' | 'Link' | 'Unknown' => {
@@ -264,10 +266,10 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
             if (attachmentToOpen?.id === attachmentToDelete.id) {
                 setAttachmentToOpen(null);
             }
-            showSuccess('Документ удалён');
+            showSuccess(t('eventPage.documents.deletedSuccess'));
             setAttachmentToDelete(null);
         } catch (error) {
-            showApiError(error, 'Не удалось удалить документ');
+            showApiError(error, t('eventPage.documents.deletedFailed'));
         }
     };
 
@@ -290,7 +292,7 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                 }}
             >
                 <TrashIcon className={styles.attachmentMenuTrashIcon}/>
-                Удалить
+                {t('common.actions.delete')}
             </button>
         </div>
     );
@@ -308,8 +310,8 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                 <button
                     type="button"
                     className={styles.iconBtn}
-                    aria-label="Действия с документом"
-                    title="Действия"
+                    aria-label={t('eventPage.documents.documentsTitle')}
+                    title={t('eventPage.documents.documentsTitle')}
                     onClick={(event) => {
                         event.stopPropagation();
                         setOpenMenuAttachmentId((prev) => (prev === att.id ? null : att.id));
@@ -357,17 +359,17 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
     return (
         <div className={styles.root}>
             <EventDocumentSection
-                title="Документы"
+                title={t('eventPage.documents.documentsTitle')}
                 description={documentsDescription}
-                emptyMessage={canManageDocuments ? 'Добавьте первый документ для мероприятия' : 'Пока нет документов'}
-                emptyHint={canManageDocuments ? 'Перетащите файлы сюда или нажмите на кнопку ниже.' : undefined}
+                emptyMessage={canManageDocuments ? t('eventPage.documents.addFirstDocument') : t('eventPage.documents.noDocuments')}
+                emptyHint={canManageDocuments ? t('eventPage.documents.emptyHint') : undefined}
                 headerAction={canManageDocuments ? (
                     <AddDocumentMenu
                         onPickFile={handlePickFile}
                         onAddLink={handleAddLink}
                         trigger={(
                             <Button type="default" className="ep-btn ep-btn--s ep-btn--filled-gray">
-                                Добавить
+                                {t('eventPage.documents.add')}
                             </Button>
                         )}
                     />
@@ -382,7 +384,7 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                                 icon={<PlusIcon/>}
                                 className="ep-btn ep-btn--s ep-btn--filled-green"
                             >
-                                Добавить документ
+                                {t('eventPage.documents.addDocument')}
                             </Button>
                         )}
                     />
@@ -394,7 +396,7 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                             <SearchIcon/>
                             <input
                                 type="text"
-                                placeholder="Документ..."
+                                placeholder={t('eventPage.documents.searchPlaceholder')}
                                 value={searchValue}
                                 onChange={(e) => setSearchValue(e.target.value)}
                             />
@@ -403,22 +405,22 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                         <div className={styles.controlDropdown} ref={filterRef}>
                             <button type="button" className={styles.filterControl} onClick={() => setIsFilterOpen((p) => !p)}>
                                 <FilterIcon/>
-                                <span>Фильтр</span>
+                                <span>{t('eventPage.documents.filter')}</span>
                                 <ChevronDownIcon className={isFilterOpen ? styles.chevronUp : ''}/>
                             </button>
 
                             {isFilterOpen && (
                                 <div className={styles.filterMenu}>
                                     <div>
-                                        <h4>Тип</h4>
+                                        <h4>{t('eventPage.documents.type')}</h4>
                                         <div className={styles.typePills}>
-                                            <button type="button" className={`${styles.pill} ${kindFile ? styles.pillActive : ''}`} onClick={() => setKindFile((p) => !p)}>Файл</button>
-                                            <button type="button" className={`${styles.pill} ${kindLink ? styles.pillActive : ''}`} onClick={() => setKindLink((p) => !p)}>Ссылка</button>
+                                            <button type="button" className={`${styles.pill} ${kindFile ? styles.pillActive : ''}`} onClick={() => setKindFile((p) => !p)}>{t('eventPage.documents.file')}</button>
+                                            <button type="button" className={`${styles.pill} ${kindLink ? styles.pillActive : ''}`} onClick={() => setKindLink((p) => !p)}>{t('eventPage.documents.link')}</button>
                                         </div>
                                     </div>
 
                                     <div>
-                                        <h4>Автор</h4>
+                                        <h4>{t('eventPage.documents.author')}</h4>
                                         <div
                                             className={styles.authorMenuWrap}
                                             onMouseEnter={() => setIsAuthorPanelOpen(true)}
@@ -432,7 +434,7 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                                                 aria-expanded={isAuthorPanelOpen}
                                                 aria-haspopup="dialog"
                                             >
-                                                <span className={styles.authorLabel}>Автор</span>
+                                                <span className={styles.authorLabel}>{t('eventPage.documents.author')}</span>
                                                 <span className={styles.authorTrailing}>
                                                     {selectedAuthorIds.length > 0 ? (
                                                         <span className={styles.authorBadge}>{selectedAuthorIds.length}</span>
@@ -445,12 +447,12 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                                                 <div
                                                     className={styles.filterSubPanel}
                                                     role="dialog"
-                                                    aria-label="Выбор авторов"
+                                                    aria-label={t('eventPage.documents.authorSelect')}
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
                                                     <input
                                                         className={styles.subSearch}
-                                                        placeholder="Имя..."
+                                                        placeholder={t('eventPage.documents.namePlaceholder')}
                                                         value={authorSearch}
                                                         onChange={(e) => setAuthorSearch(e.target.value)}
                                                     />
@@ -471,7 +473,7 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                                                                             className={styles.subLeft}
                                                                             onClick={toggleAuthor}
                                                                         >
-                                                                            <span className={styles.subName}>{a.displayName || 'Пользователь'}</span>
+                                                                            <span className={styles.subName}>{a.displayName || t('eventPage.documents.userFallback')}</span>
                                                                         </button>
                                                                         <Checkbox checked={checked} className="ep-checkbox" onChange={toggleAuthor}/>
                                                                     </div>
@@ -484,7 +486,7 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                                     </div>
 
                                     <div>
-                                        <h4>Расширение</h4>
+                                        <h4>{t('eventPage.documents.extension')}</h4>
                                         {fileExtensions.map((ext) => (
                                             <div key={ext.extension} className={styles.filterCheckRow}>
                                                 <Checkbox
@@ -517,7 +519,7 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
 
                                     {linkSites.length > 0 && (
                                         <div>
-                                            <h4>Площадки</h4>
+                                            <h4>{t('eventPage.documents.platforms')}</h4>
                                             {linkSites.map((site) => (
                                                 <div key={site.siteKey} className={styles.filterCheckRow}>
                                                     <Checkbox
@@ -562,7 +564,7 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                                             setIsAuthorPanelOpen(false);
                                         }}
                                     >
-                                        Сбросить фильтр
+                                        {t('eventPage.documents.resetFilter')}
                                     </button>
                                 </div>
                             )}
@@ -572,15 +574,15 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                     <div className={styles.controlsRight}>
                         <div className={styles.controlDropdown} ref={sortRef}>
                             <button type="button" className={styles.sortControl} onClick={() => setIsSortOpen((p) => !p)}>
-                                <span>{sort === 'Newest' ? 'Сначала новые' : sort === 'Oldest' ? 'Сначала старые' : sort === 'TitleAsc' ? 'А -> Я' : 'Автор: А -> Я'}</span>
+                                <span>{sort === 'Newest' ? t('eventPage.documents.sortNewest') : sort === 'Oldest' ? t('eventPage.documents.sortOldest') : sort === 'TitleAsc' ? t('eventPage.documents.sortTitleAsc') : t('eventPage.documents.sortAuthorAsc')}</span>
                                 <ChevronDownIcon className={isSortOpen ? styles.chevronUp : ''}/>
                             </button>
                             {isSortOpen && (
                                 <div className={styles.sortMenu}>
-                                    <button type="button" onClick={() => { setSort('Newest'); setIsSortOpen(false); }}>Сначала новые</button>
-                                    <button type="button" onClick={() => { setSort('Oldest'); setIsSortOpen(false); }}>Сначала старые</button>
-                                    <button type="button" onClick={() => { setSort('TitleAsc'); setIsSortOpen(false); }}>А -&gt; Я</button>
-                                    <button type="button" onClick={() => { setSort('AuthorAsc'); setIsSortOpen(false); }}>Автор: А -&gt; Я</button>
+                                    <button type="button" onClick={() => { setSort('Newest'); setIsSortOpen(false); }}>{t('eventPage.documents.sortNewest')}</button>
+                                    <button type="button" onClick={() => { setSort('Oldest'); setIsSortOpen(false); }}>{t('eventPage.documents.sortOldest')}</button>
+                                    <button type="button" onClick={() => { setSort('TitleAsc'); setIsSortOpen(false); }}>{t('eventPage.documents.sortTitleAsc')}</button>
+                                    <button type="button" onClick={() => { setSort('AuthorAsc'); setIsSortOpen(false); }}>{t('eventPage.documents.sortAuthorAsc')}</button>
                                 </div>
                             )}
                         </div>
@@ -590,8 +592,8 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                                 type="button"
                                 className={`${styles.viewBtn} ${viewMode === 'rows' ? styles.viewBtnActive : ''}`}
                                 onClick={() => setViewMode('rows')}
-                                aria-label="Строками"
-                                title="Строками"
+                                aria-label={t('eventPage.documents.rowsView')}
+                                title={t('eventPage.documents.rowsView')}
                             >
                                 <JustifyIcon/>
                             </button>
@@ -599,8 +601,8 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                                 type="button"
                                 className={`${styles.viewBtn} ${viewMode === 'cards' ? styles.viewBtnActive : ''}`}
                                 onClick={() => setViewMode('cards')}
-                                aria-label="Карточками"
-                                title="Карточками"
+                                aria-label={t('eventPage.documents.cardsView')}
+                                title={t('eventPage.documents.cardsView')}
                             >
                                 <StackedIcon/>
                             </button>
@@ -613,10 +615,10 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                         <div
                             className={`${styles.attachmentsHeader} ${canManageDocuments ? styles.withActions : ''}`}
                         >
-                            <span>Название</span>
-                            <span>Автор</span>
-                            <span>Дата загрузки</span>
-                            <span>Размер</span>
+                            <span>{t('eventPage.documents.columnName')}</span>
+                            <span>{t('eventPage.documents.columnAuthor')}</span>
+                            <span>{t('eventPage.documents.columnUploadDate')}</span>
+                            <span>{t('eventPage.documents.columnSize')}</span>
                             {canManageDocuments ? <span aria-hidden /> : null}
                         </div>
 
@@ -629,13 +631,13 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                                             className={styles.linkInput}
                                             value={linkTitleDraft}
                                             onChange={(e) => setLinkTitleDraft(e.target.value)}
-                                            placeholder="Название ссылки"
+                                            placeholder={t('eventPage.documents.linkTitlePlaceholder')}
                                         />
                                         <input
                                             className={styles.linkInput}
                                             value={linkUrlDraft}
                                             onChange={(e) => setLinkUrlDraft(e.target.value)}
-                                            placeholder="Вставьте ссылку..."
+                                            placeholder={t('eventPage.documents.linkUrlPlaceholder')}
                                         />
                                     </div>
                                 </div>
@@ -647,8 +649,8 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                                         className={styles.iconBtn}
                                         onClick={() => void submitLink()}
                                         disabled={!linkUrlDraft.trim() || !isValidUrl(linkUrlDraft)}
-                                        aria-label="Сохранить ссылку"
-                                        title="Сохранить"
+                                        aria-label={t('common.actions.save')}
+                                        title={t('common.actions.save')}
                                     >
                                         <CheckIcon/>
                                     </button>
@@ -656,8 +658,8 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                                         type="button"
                                         className={styles.iconBtn}
                                         onClick={cancelLink}
-                                        aria-label="Отменить"
-                                        title="Отменить"
+                                        aria-label={t('common.actions.cancel')}
+                                        title={t('common.actions.cancel')}
                                     >
                                         <XIcon/>
                                     </button>
@@ -669,7 +671,7 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                             const title = getAttachmentLabel(att);
                             const author = att.authorDisplayName || '—';
                             const date = att.createdAt
-                                ? new Intl.DateTimeFormat('ru-RU', {day: '2-digit', month: '2-digit', year: 'numeric'}).format(new Date(att.createdAt))
+                                ? new Intl.DateTimeFormat(language === 'ru' ? 'ru-RU' : 'en-US', {day: '2-digit', month: '2-digit', year: 'numeric'}).format(new Date(att.createdAt))
                                 : '—';
                             const size = formatBytes(att.size);
                             const kind = getAttachmentKind(att);
@@ -707,7 +709,7 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                             const title = getAttachmentLabel(att);
                             const author = att.authorDisplayName || '—';
                             const date = att.createdAt
-                                ? new Intl.DateTimeFormat('ru-RU', {day: '2-digit', month: '2-digit', year: 'numeric'}).format(new Date(att.createdAt))
+                                ? new Intl.DateTimeFormat(language === 'ru' ? 'ru-RU' : 'en-US', {day: '2-digit', month: '2-digit', year: 'numeric'}).format(new Date(att.createdAt))
                                 : '—';
                             const size = formatBytes(att.size);
                             const kind = getAttachmentKind(att);
@@ -731,9 +733,9 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
             </EventDocumentSection>
             <hr className={styles.divider} aria-hidden/>
             <EventDocumentSection
-                title="Заметки"
+                title={t('eventPage.documents.notesTitle')}
                 description={notesDescription}
-                emptyMessage="Пока нет заметок"
+                emptyMessage={t('eventPage.documents.noNotes')}
                 headerAction={canManageDocuments ? (
                     <Button
                         type="default"
@@ -743,7 +745,7 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                             requestAnimationFrame(() => newNoteTextareaRef.current?.focus());
                         }}
                     >
-                        Создать заметку
+                        {t('eventPage.documents.createNote')}
                     </Button>
                 ) : undefined}
             >
@@ -752,10 +754,12 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
 
             <ProfileActionModal
                 isOpen={Boolean(attachmentToDelete)}
-                title="Удалить документ?"
+                title={t('eventPage.documents.deleteDocumentTitle')}
                 description={
                     attachmentToDelete
-                        ? `Удалить «${getAttachmentLabel(attachmentToDelete)}»? Это действие нельзя отменить.`
+                        ? t('eventPage.documents.deleteDocumentDescription', {
+                            name: getAttachmentLabel(attachmentToDelete),
+                        })
                         : undefined
                 }
                 onClose={() => {
@@ -763,8 +767,8 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                     setAttachmentToDelete(null);
                 }}
                 onConfirm={() => void confirmDeleteAttachment()}
-                confirmText="Удалить"
-                cancelText="Отмена"
+                confirmText={t('common.actions.delete')}
+                cancelText={t('common.actions.cancel')}
                 confirmTone="danger"
                 confirmDisabled={isDeletingAttachment}
             />
@@ -774,15 +778,17 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                 title={
                     attachmentToOpen
                         ? (getAttachmentKind(attachmentToOpen) === 'Link'
-                            ? 'Переход по ссылке'
-                            : 'Скачать файл?')
+                            ? t('eventPage.documents.openLinkTitle')
+                            : t('eventPage.documents.downloadFileTitle'))
                         : ''
                 }
                 description={
                     attachmentToOpen
                         ? (getAttachmentKind(attachmentToOpen) === 'Link'
                             ? undefined
-                            : `Скачать «${getAttachmentLabel(attachmentToOpen)}»?`)
+                            : t('eventPage.documents.downloadFileDescription', {
+                                name: getAttachmentLabel(attachmentToOpen),
+                            }))
                         : undefined
                 }
                 onClose={() => {
@@ -790,17 +796,15 @@ const EventDocumentsTab = ({eventId, participantRole, canManageDocuments: canMan
                     setAttachmentToOpen(null);
                 }}
                 onConfirm={() => void confirmOpenAttachment()}
-                confirmText={attachmentToOpen && getAttachmentKind(attachmentToOpen) === 'Link' ? 'Перейти' : 'Скачать'}
-                cancelText="Отмена"
+                confirmText={attachmentToOpen && getAttachmentKind(attachmentToOpen) === 'Link' ? t('eventPage.documents.open') : t('eventPage.documents.download')}
+                cancelText={t('common.actions.cancel')}
                 confirmDisabled={isDownloading}
             >
                 {attachmentToOpen && getAttachmentKind(attachmentToOpen) === 'Link' && (
                     <p className={styles.linkConfirmLine}>
-                        Вы уверены, что хотите перейти по ссылке (
-                        <span className={styles.linkConfirmUrlInline}>
-                            {attachmentToOpen.resource ?? attachmentToOpen.url ?? '—'}
-                        </span>
-                        )?
+                        {t('eventPage.documents.linkConfirm', {
+                            url: attachmentToOpen.resource ?? attachmentToOpen.url ?? '—',
+                        })}
                     </p>
                 )}
             </ProfileActionModal>

@@ -6,6 +6,7 @@ import type {
 } from "@/types/api/Event";
 import { API_BASE_URL } from "../config";
 import { requireMockAuth } from "../utils/requireMockAuth";
+import { mockT } from "../utils/mockI18n";
 
 interface TextBody {
   text: string;
@@ -78,7 +79,17 @@ export const collaborationHandlers = [
       }
 
       return HttpResponse.json({
-        result: notesByEvent.get(String(params.eventId)) ?? [],
+        result: (notesByEvent.get(String(params.eventId)) ?? []).map((note) => ({
+          ...note,
+          text:
+            note.text === "Check the venue readiness one day before the event."
+              ? mockT("collab.noteSeed", request)
+              : note.text,
+          authorName:
+            note.authorName === "Ivan Ivanov"
+              ? mockT("chat.userIvan", request)
+              : note.authorName,
+        })),
       });
     }
   ),
@@ -96,7 +107,7 @@ export const collaborationHandlers = [
 
       if (!body.text.trim()) {
         return HttpResponse.json(
-          { message: "Note text is required" },
+          { message: mockT("collab.noteTextRequired", request) },
           { status: 400 }
         );
       }
@@ -107,7 +118,7 @@ export const collaborationHandlers = [
         id: `mock-note-${nextNoteId++}`,
         eventId,
         authorId: "mock-user-1",
-        authorName: "Ivan Ivanov",
+        authorName: mockT("chat.userIvan", request),
         text: body.text,
         createdAt: now,
         updatedAt: now,
@@ -136,7 +147,7 @@ export const collaborationHandlers = [
 
       if (!note) {
         return HttpResponse.json(
-          { message: "Note not found" },
+          { message: mockT("collab.noteNotFound", request) },
           { status: 404 }
         );
       }
@@ -158,7 +169,17 @@ export const collaborationHandlers = [
       }
 
       return HttpResponse.json({
-        result: commentsByTask.get(String(params.taskId)) ?? [],
+        result: (commentsByTask.get(String(params.taskId)) ?? []).map((comment) => ({
+          ...comment,
+          text:
+            comment.text === "The draft agenda is already ready."
+              ? mockT("collab.commentSeed", request)
+              : comment.text,
+          authorName:
+            comment.authorName === "Ivan Ivanov"
+              ? mockT("chat.userIvan", request)
+              : comment.authorName,
+        })),
       });
     }
   ),
@@ -177,7 +198,7 @@ export const collaborationHandlers = [
       const comment: EventTaskComment = {
         id: `mock-comment-${nextCommentId++}`,
         text: body.text,
-        authorName: "Ivan Ivanov",
+        authorName: mockT("chat.userIvan", request),
         createdAt: new Date().toISOString(),
       };
 
@@ -200,7 +221,19 @@ export const collaborationHandlers = [
       }
 
       return HttpResponse.json({
-        result: historyByTask.get(String(params.taskId)) ?? [],
+        result: (historyByTask.get(String(params.taskId)) ?? []).map((item) => ({
+          ...item,
+          description:
+            item.description === "Task created"
+              ? mockT("collab.historyTaskCreated", request)
+              : item.description === "Priority changed to High"
+                ? mockT("collab.historyPriorityChanged", request)
+                : item.description,
+          authorName:
+            item.authorName === "Ivan Ivanov"
+              ? mockT("chat.userIvan", request)
+              : item.authorName,
+        })),
       });
     }
   ),

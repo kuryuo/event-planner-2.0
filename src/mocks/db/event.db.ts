@@ -4,6 +4,7 @@ import type {
   UpdateEventPayload,
 } from "@/types/api/Event";
 import { createMockEvent } from "../factories/event.factory";
+import { mockT } from "../utils/mockI18n";
 
 interface CreateMockEventRecordParams {
   payload: CreateEventPayload;
@@ -45,17 +46,87 @@ let mockEvents: EventResponse[] = [
   }),
 ];
 
-export const getMockEvents = (): EventResponse[] =>
-  mockEvents.map((event) => ({ ...event }));
+const isAnyOf = ({
+  value,
+  variants,
+}: {
+  value: string | null | undefined;
+  variants: string[];
+}): boolean => variants.includes(value ?? "");
+
+const localizeEvent = ({
+  event,
+  request,
+}: {
+  event: EventResponse;
+  request?: Request;
+}): EventResponse => ({
+  ...event,
+  name:
+    isAnyOf({ value: event.name, variants: ["Frontend Meetup", "Frontend митап"] })
+      ? mockT("event.frontendMeetupName", request)
+      : isAnyOf({ value: event.name, variants: ["Hackathon 2026", "Хакатон 2026"] })
+        ? mockT("event.hackathonName", request)
+        : isAnyOf({
+            value: event.name,
+            variants: ["Archived lecture", "Архивная лекция"],
+          })
+          ? mockT("event.archivedLectureName", request)
+          : event.name,
+  description:
+    isAnyOf({
+      value: event.description,
+      variants: ["Frontend developers meetup", "Встреча frontend-разработчиков"],
+    })
+      ? mockT("event.frontendMeetupDescription", request)
+      : isAnyOf({
+          value: event.description,
+          variants: [
+            "Team software development projects",
+            "Командная разработка программных проектов",
+          ],
+        })
+        ? mockT("event.hackathonDescription", request)
+        : event.description,
+  location:
+    isAnyOf({ value: event.location, variants: ["Moscow", "Москва"] })
+      ? mockT("event.locationMoscow", request)
+      : isAnyOf({
+          value: event.location,
+          variants: ["Saint Petersburg", "Санкт-Петербург"],
+        })
+        ? mockT("event.locationSpb", request)
+        : event.location,
+  auditorium:
+    isAnyOf({ value: event.auditorium, variants: ["Main hall", "Главный зал"] })
+      ? mockT("event.mainHall", request)
+      : event.auditorium,
+  categories: (event.categories ?? []).map((category) =>
+    isAnyOf({ value: category, variants: ["Development", "Разработка"] })
+      ? mockT("category.development", request)
+      : isAnyOf({ value: category, variants: ["Career", "Карьера"] })
+        ? mockT("category.career", request)
+        : category
+  ),
+});
+
+export const getMockEvents = ({
+  request,
+}: {
+  request?: Request;
+} = {}): EventResponse[] =>
+  mockEvents.map((event) => localizeEvent({ event, request }));
 
 export const getMockEventById = ({
   eventId,
+  request,
 }: {
   eventId: string;
+  request?: Request;
 }): EventResponse | undefined => {
   const event = mockEvents.find(({ id }) => id === eventId);
 
-  return event ? { ...event } : undefined;
+  return event ? localizeEvent({ event, request }) : undefined;
 };
 
 export const createMockEventRecord = ({

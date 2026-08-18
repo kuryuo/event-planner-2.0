@@ -8,6 +8,7 @@ import PenIcon from "@/assets/img/icon-m/pen.svg?react";
 import TrashIcon from "@/assets/img/icon-m/trash.svg?react";
 import {useClickOutside} from "@/hooks/ui/useClickOutside.ts";
 import {useEventPosts} from "@/hooks/api/useEventPosts.ts";
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface PostsProps {
     eventId: string;
@@ -15,6 +16,7 @@ interface PostsProps {
 }
 
 export default function Post({eventId, isAdmin = false}: PostsProps) {
+    const {t} = useI18n();
     const {
         posts,
         isLoading,
@@ -51,7 +53,7 @@ export default function Post({eventId, isAdmin = false}: PostsProps) {
             setIsFormOpen(false);
             setEditingPostId(null);
         } catch (error) {
-            console.error("Ошибка при сохранении поста:", error);
+            console.error("Failed to save post:", error);
         }
     };
 
@@ -69,7 +71,7 @@ export default function Post({eventId, isAdmin = false}: PostsProps) {
             await deletePost(postId);
             setOpenDeleteMenuId(null);
         } catch (error) {
-            console.error("Ошибка при удалении поста:", error);
+            console.error("Failed to delete post:", error);
         }
     };
 
@@ -81,9 +83,9 @@ export default function Post({eventId, isAdmin = false}: PostsProps) {
         return (
             <div className={styles.posts}>
                 <div className={styles.header}>
-                    <h2 className={styles.title}>Посты</h2>
+                    <h2 className={styles.title}>{t('eventPage.posts')}</h2>
                 </div>
-                <div>Загрузка...</div>
+                <div>{t('eventPage.loading')}</div>
             </div>
         );
     }
@@ -91,7 +93,7 @@ export default function Post({eventId, isAdmin = false}: PostsProps) {
     return (
         <div className={styles.posts}>
             <div className={styles.header}>
-                <h2 className={styles.title}>Посты</h2>
+                <h2 className={styles.title}>{t('eventPage.posts')}</h2>
                 <span className={styles.count}>{posts.length}</span>
             </div>
 
@@ -101,7 +103,7 @@ export default function Post({eventId, isAdmin = false}: PostsProps) {
                     className="ep-btn ep-btn--m ep-btn--filled-gray"
                     onClick={handleCreatePost}
                 >
-                    Создать пост
+                    {t('eventPage.createPost')}
                 </Button>
             )}
 
@@ -118,8 +120,8 @@ export default function Post({eventId, isAdmin = false}: PostsProps) {
 
             {posts.length === 0 ? (
                 <div className={styles.emptyState}>
-                    <img src={OctopusImg} alt="Нет постов" className={styles.octopusImage}/>
-                    <p className={styles.emptyText}>Ждем новые посты...</p>
+                    <img src={OctopusImg} alt={t('eventPage.noPosts')} className={styles.octopusImage}/>
+                    <p className={styles.emptyText}>{t('eventPage.waitingPosts')}</p>
                 </div>
             ) : (
                 <div className={styles.postsList}>
@@ -132,7 +134,7 @@ export default function Post({eventId, isAdmin = false}: PostsProps) {
                                         <button
                                             className={styles.postActionBtn}
                                             onClick={() => handleEditPost(post.id)}
-                                            aria-label="Редактировать пост"
+                                            aria-label={t('eventPage.editPostAria')}
                                         >
                                             <PenIcon/>
                                         </button>
@@ -143,7 +145,7 @@ export default function Post({eventId, isAdmin = false}: PostsProps) {
                                             <button
                                                 className={styles.postActionBtn}
                                                 onClick={() => handleDeleteMenuClick(post.id)}
-                                                aria-label="Удалить пост"
+                                                aria-label={t('eventPage.deletePostAria')}
                                             >
                                                 <TrashIcon/>
                                             </button>
@@ -156,7 +158,7 @@ export default function Post({eventId, isAdmin = false}: PostsProps) {
                                                         className="ep-btn ep-btn--m ep-btn--text"
                                                         onClick={() => handleDeletePost(post.id)}
                                                     >
-                                                        Удалить пост
+                                                        {t('eventPage.deletePost')}
                                                     </Button>
                                                 </div>
                                             )}

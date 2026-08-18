@@ -5,6 +5,7 @@ import CheckCircleIcon from '@/assets/image/check-circle.svg?react';
 import WarningCircleIcon from '@/assets/image/warning-circle.svg?react';
 import XCircleIcon from '@/assets/image/x-circle.svg?react';
 import styles from './ToastProvider.module.scss';
+import {useI18n} from '@/i18n/I18nProvider';
 
 type ToastType = 'info' | 'success' | 'warning' | 'error';
 
@@ -36,6 +37,7 @@ const getIconByType = (type: ToastType) => {
 };
 
 function ToastCard({toast, count, onClose}: { toast: ToastItem; count: number; onClose: (id: string) => void }) {
+    const {t} = useI18n();
     const Icon = getIconByType(toast.type ?? 'info');
 
     const counterStyle = {
@@ -68,7 +70,7 @@ function ToastCard({toast, count, onClose}: { toast: ToastItem; count: number; o
             <div className={styles.counter} style={counterStyle}>
                 <span>{count}</span>
             </div>
-            <button type="button" className={styles.closeButton} onClick={() => onClose(toast.id)} aria-label="Закрыть">
+            <button type="button" className={styles.closeButton} onClick={() => onClose(toast.id)} aria-label={t('common.actions.close')}>
                 <XIcon/>
             </button>
         </article>

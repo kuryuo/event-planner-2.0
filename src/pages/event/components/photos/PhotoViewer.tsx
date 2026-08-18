@@ -11,6 +11,7 @@ import BoxArrowUpRightIcon from '@/assets/img/icon-m/box-arrow-up-right.svg?reac
 import ArrowsAngleExpandIcon from '@/assets/img/icon-m/arrows-angle-expand.svg?react';
 import ArrowsAngleContractIcon from '@/assets/img/icon-m/arrows-angle-contract.svg?react';
 import {useClickOutside} from '@/hooks/ui/useClickOutside';
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface PhotoViewerProps {
     photos: Array<{id: string; filePath: string}>;
@@ -34,6 +35,7 @@ export default function PhotoViewer({
     onPrev,
     onDeleteCurrent,
 }: PhotoViewerProps) {
+    const {t} = useI18n();
     const containerRef = useRef<HTMLDivElement>(null);
     const overlayRef = useRef<HTMLDivElement>(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
@@ -84,7 +86,7 @@ export default function PhotoViewer({
         try {
             await navigator.clipboard.writeText(mediaUrl);
         } catch (error) {
-            console.error('Не удалось скопировать ссылку на медиа:', error);
+            console.error('Failed to copy media link:', error);
         }
     };
 
@@ -103,7 +105,7 @@ export default function PhotoViewer({
                 await document.exitFullscreen();
             }
         } catch (error) {
-            console.error('Не удалось переключить полноэкранный режим:', error);
+            console.error('Failed to toggle fullscreen mode:', error);
         }
     };
 
@@ -134,23 +136,23 @@ export default function PhotoViewer({
             <div className={styles.viewer} ref={containerRef} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.topToolbar}>
                     {onDeleteCurrent && (
-                        <button className={`${styles.toolbarButton} ${styles.dangerButton}`} onClick={() => void onDeleteCurrent()} aria-label="Удалить">
+                        <button className={`${styles.toolbarButton} ${styles.dangerButton}`} onClick={() => void onDeleteCurrent()} aria-label={t('eventPage.media.delete')}>
                             <TrashIcon/>
                         </button>
                     )}
-                    <button className={styles.toolbarButton} onClick={handleDownload} aria-label="Скачать">
+                    <button className={styles.toolbarButton} onClick={handleDownload} aria-label={t('eventPage.documents.download')}>
                         <DownloadIcon/>
                     </button>
-                    <button className={styles.toolbarButton} onClick={() => void handleCopyLink()} aria-label="Копировать ссылку">
+                    <button className={styles.toolbarButton} onClick={() => void handleCopyLink()} aria-label={t('eventPage.media.copyLink')}>
                         <Link45degIcon/>
                     </button>
-                    <button className={styles.toolbarButton} onClick={handleOpenExternal} aria-label="Открыть в новой вкладке">
+                    <button className={styles.toolbarButton} onClick={handleOpenExternal} aria-label={t('eventPage.media.openExternal')}>
                         <BoxArrowUpRightIcon/>
                     </button>
-                    <button className={styles.toolbarButton} onClick={() => void toggleFullscreen()} aria-label="Полный экран">
+                    <button className={styles.toolbarButton} onClick={() => void toggleFullscreen()} aria-label={t('eventPage.media.fullscreen')}>
                         {isFullscreen ? <ArrowsAngleContractIcon/> : <ArrowsAngleExpandIcon/>}
                     </button>
-                    <button className={styles.toolbarButton} onClick={onClose} aria-label="Закрыть">
+                    <button className={styles.toolbarButton} onClick={onClose} aria-label={t('common.actions.close')}>
                         <XIcon/>
                     </button>
                 </div>
@@ -159,7 +161,7 @@ export default function PhotoViewer({
                     <button
                         className={`${styles.navButton} ${styles.prevButton}`}
                         onClick={onPrev}
-                        aria-label="Предыдущее фото"
+                        aria-label={t('eventPage.media.previousPhoto')}
                     >
                         <ChevronLeftIcon className={styles.navIcon}/>
                     </button>
@@ -177,7 +179,7 @@ export default function PhotoViewer({
                     ) : (
                         <img
                             src={mediaUrl}
-                            alt={`Фото ${initialIndex + 1}`}
+                            alt={`${t('eventPage.media.photo')} ${initialIndex + 1}`}
                             className={styles.media}
                         />
                     )}
@@ -187,14 +189,14 @@ export default function PhotoViewer({
                     <button
                         className={`${styles.navButton} ${styles.nextButton}`}
                         onClick={onNext}
-                        aria-label="Следующее фото"
+                        aria-label={t('eventPage.media.nextPhoto')}
                     >
                         <ChevronRightIcon className={styles.navIcon}/>
                     </button>
                 )}
 
                 <div className={styles.counter}>
-                    {isVideo ? 'Видео' : 'Фото'} {initialIndex + 1} / {photos.length}
+                    {isVideo ? t('eventPage.media.video') : t('eventPage.media.photo')} {initialIndex + 1} / {photos.length}
                 </div>
             </div>
         </div>

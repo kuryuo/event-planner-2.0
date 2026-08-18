@@ -6,6 +6,7 @@ import {Button} from "antd";
 import ParticipantCard from './ParticipantCard.tsx';
 import {useGetEventSubscribersQuery} from '@/services/api/eventApi.ts';
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface ParticipantsProps {
     eventId: string | null;
@@ -15,6 +16,7 @@ interface ParticipantsProps {
 }
 
 export default function Participants({eventId, maxParticipants, canManageParticipants = false}: ParticipantsProps) {
+    const {t} = useI18n();
     const [searchName, setSearchName] = useState('');
 
     const {data, isLoading, error} = useGetEventSubscribersQuery(
@@ -30,19 +32,19 @@ export default function Participants({eventId, maxParticipants, canManagePartici
     const participantsCount = data?.res?.totalCount ?? participants.length;
 
     const formattedCount = maxParticipants
-        ? `${participantsCount} из ${maxParticipants}`
+        ? `${participantsCount} / ${maxParticipants}`
         : String(participantsCount);
 
     return (
         <section className={styles.participants}>
             <div className={styles.header}>
-                <h2 className={styles.title}>Участники</h2>
+                <h2 className={styles.title}>{t('eventPage.participants')}</h2>
                 <span className={styles.count}>{formattedCount}</span>
             </div>
 
             <div className={styles.controls}>
                 <Input
-                    placeholder="Имя"
+                    placeholder={t('eventPage.name')}
                     value={searchName}
                     prefix={<SearchIcon/>}
                     className="ep-input ep-input--m"
@@ -51,19 +53,19 @@ export default function Participants({eventId, maxParticipants, canManagePartici
 
                 {canManageParticipants && (
                     <Button type="default" className="ep-btn ep-btn--m ep-btn--filled-gray" disabled>
-                        Добавить
+                        {t('eventPage.add')}
                     </Button>
                 )}
             </div>
 
-            {isLoading && <div className={styles.state}>Загрузка...</div>}
+            {isLoading && <div className={styles.state}>{t('eventPage.loading')}</div>}
 
             {!isLoading && error && (
-                <div className={styles.state}>Ошибка загрузки участников</div>
+                <div className={styles.state}>{t('eventPage.participantsLoadFailed')}</div>
             )}
 
             {!isLoading && !error && participants.length === 0 && (
-                <div className={styles.state}>Участников пока нет</div>
+                <div className={styles.state}>{t('eventPage.noParticipants')}</div>
             )}
 
             {!isLoading && !error && participants.length > 0 && (
@@ -71,7 +73,7 @@ export default function Participants({eventId, maxParticipants, canManagePartici
                     {participants.map((participant) => (
                         <ParticipantCard
                             key={participant.id}
-                            name={participant.name || 'Пользователь'}
+                            name={participant.name || t('eventPage.user')}
                             avatarUrl={buildImageUrl(participant.avatarUrl) ?? null}
                             role={participant.role}
                             eventId={eventId || ''}

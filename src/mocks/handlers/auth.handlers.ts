@@ -11,6 +11,7 @@ import {
   createMockAuthTokens,
   MOCK_REFRESH_TOKEN,
 } from "../factories/auth.factory";
+import { mockT } from "../utils/mockI18n";
 
 const MOCK_EMAIL = "demo@example.com";
 const MOCK_PASSWORD = "demo123";
@@ -28,7 +29,7 @@ export const authHandlers = [
       credentials.password !== MOCK_PASSWORD
     ) {
       return HttpResponse.json(
-        { message: "Invalid email or password" },
+        { message: mockT("auth.invalidCredentials", request) },
         { status: 401 }
       );
     }
@@ -41,7 +42,7 @@ export const authHandlers = [
 
     if (!payload.email || !payload.password) {
       return HttpResponse.json(
-        { message: "Email and password are required" },
+        { message: mockT("auth.emailPasswordRequired", request) },
         { status: 400 }
       );
     }
@@ -54,7 +55,7 @@ export const authHandlers = [
 
     if (payload.refreshToken !== MOCK_REFRESH_TOKEN) {
       return HttpResponse.json(
-        { message: "Invalid refresh token" },
+        { message: mockT("auth.invalidRefreshToken", request) },
         { status: 401 }
       );
     }
@@ -69,7 +70,7 @@ export const authHandlers = [
 
       if (!payload.email) {
         return HttpResponse.json(
-          { message: "Email is required" },
+          { message: mockT("auth.emailRequired", request) },
           { status: 400 }
         );
       }

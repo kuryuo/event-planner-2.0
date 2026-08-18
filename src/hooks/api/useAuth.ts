@@ -10,6 +10,7 @@ import {
 } from '@/services/api/authApi.ts';
 import type {LoginPayload, RecoverPayload, RegisterPayload} from '@/types/api/Auth.ts';
 import {getApiErrorMessage} from '@/utils/apiError.ts';
+import {translate} from '@/i18n/index';
 
 export const useAuth = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -28,7 +29,7 @@ export const useAuth = () => {
             dispatch(setTokens(result.data));
             return {success: true};
         } catch (err) {
-            return {success: false, error: getApiErrorMessage(err, 'Не удалось войти')};
+            return {success: false, error: getApiErrorMessage(err, translate('auth.errors.loginFailed'))};
         }
     };
 
@@ -38,7 +39,7 @@ export const useAuth = () => {
             dispatch(setTokens(result.data));
             return {success: true};
         } catch (err) {
-            return {success: false, error: getApiErrorMessage(err, 'Не удалось зарегистрироваться')};
+            return {success: false, error: getApiErrorMessage(err, translate('auth.errors.registerFailed'))};
         }
     };
 
@@ -46,7 +47,7 @@ export const useAuth = () => {
         try {
             await logoutMutation().unwrap();
         } catch (err) {
-            console.error('Ошибка при выходе', err);
+            console.error(translate('auth.errors.logoutFailed'), err);
         } finally {
             dispatch(clearTokens());
             dispatch(baseApi.util.resetApiState());
@@ -58,7 +59,7 @@ export const useAuth = () => {
             await recoverPasswordMutation(payload).unwrap();
             return {success: true};
         } catch (err) {
-            return {success: false, error: getApiErrorMessage(err, 'Не удалось восстановить пароль')};
+            return {success: false, error: getApiErrorMessage(err, translate('auth.errors.recoverFailed'))};
         }
     };
 

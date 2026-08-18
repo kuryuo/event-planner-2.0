@@ -28,6 +28,8 @@
 .chipsRow {
   display: flex;
   gap: var(--spacing-1);
+  flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 .title {

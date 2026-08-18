@@ -4,6 +4,7 @@ import styles from './ProfileSnackbar.module.scss';
 import Check2Icon from '@/assets/img/icon-m/check2.svg?react';
 import XIcon from '@/assets/img/icon-s/x.svg?react';
 import CircleIcon from '@/assets/img/icon-m/circle.svg?react';
+import {useI18n} from '@/i18n/I18nProvider';
 import BanIcon from '@/assets/img/icon-m/ban.svg?react';
 
 export type ProfileSnackbarVariant = 'default' | 'success' | 'warning' | 'error';
@@ -34,6 +35,7 @@ export default function ProfileSnackbar({
     avatarUrl,
     onClose,
 }: ProfileSnackbarProps) {
+    const {t} = useI18n();
     return (
         <div className={clsx(styles.snackbar, styles[variant])}>
             <span className={styles.leadingIcon}>{ICON_MAP[variant]}</span>
@@ -49,7 +51,7 @@ export default function ProfileSnackbar({
 
             {typeof counter === 'number' && <span className={styles.counter}>{counter}</span>}
 
-            <button className={styles.closeButton} onClick={onClose} aria-label="Закрыть">
+            <button className={styles.closeButton} onClick={onClose} aria-label={t('common.actions.close')}>
                 <XIcon/>
             </button>
         </div>

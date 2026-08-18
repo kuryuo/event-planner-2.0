@@ -5,6 +5,7 @@ import type {
 } from "@/types/api/Notification";
 import { API_BASE_URL } from "../config";
 import { requireMockAuth } from "../utils/requireMockAuth";
+import { mockT } from "../utils/mockI18n";
 
 let notifications: NotificationItem[] = [
   {
@@ -64,7 +65,37 @@ export const notificationHandlers = [
     const count = Number(url.searchParams.get("count") ?? notifications.length);
 
     return HttpResponse.json({
-      result: notifications.slice(offset, offset + count),
+      result: notifications.slice(offset, offset + count).map((notification) => ({
+        ...notification,
+        title:
+          notification.id === "mock-notification-1"
+            ? mockT("notification.newMessageTitle", request)
+            : notification.id === "mock-notification-2"
+              ? mockT("notification.taskAssignedTitle", request)
+              : notification.id === "mock-notification-3"
+                ? mockT("notification.eventInvitationTitle", request)
+                : notification.title,
+        text:
+          notification.id === "mock-notification-1"
+            ? mockT("notification.newMessageText", request)
+            : notification.id === "mock-notification-2"
+              ? mockT("notification.taskAssignedText", request)
+              : notification.id === "mock-notification-3"
+                ? mockT("notification.eventInvitationText", request)
+                : notification.text,
+        senderName:
+          notification.senderName === "Peter Petrov"
+            ? mockT("chat.userPeter", request)
+            : notification.senderName,
+        communityName:
+          notification.communityName === "Frontend Meetup"
+            ? mockT("event.frontendMeetupName", request)
+            : notification.communityName,
+        messageText:
+          notification.messageText === "Hi! When does the registration start?"
+            ? mockT("chat.seedQuestion", request)
+            : notification.messageText,
+      })),
     });
   }),
 
@@ -109,7 +140,19 @@ export const notificationHandlers = [
       return authError;
     }
 
-    return HttpResponse.json({ result: invitations });
+    return HttpResponse.json({
+      result: invitations.map((invitation) => ({
+        ...invitation,
+        eventName:
+          invitation.eventName === "Hackathon 2026"
+            ? mockT("event.hackathonName", request)
+            : invitation.eventName,
+        invitedByName:
+          invitation.invitedByName === "Anna Sidorova"
+            ? mockT("notification.invitedByName", request)
+            : invitation.invitedByName,
+      })),
+    });
   }),
 
   http.post(
@@ -126,7 +169,7 @@ export const notificationHandlers = [
 
       if (!invitation) {
         return HttpResponse.json(
-          { message: "Invitation not found" },
+          { message: mockT("notification.invitationNotFound", request) },
           { status: 404 }
         );
       }

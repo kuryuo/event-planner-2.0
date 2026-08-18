@@ -15,6 +15,7 @@ import {combineDateTime, parseDateTime} from '@/utils/date';
 import {isValidAddress, isValidUrl} from '@/utils/validation.ts';
 import type {EventParticipantAssignment} from '@/types/api/Event.ts';
 import {EVENT_TYPE_OPTIONS, normalizeEventTypes} from '@/utils/eventTypeLabels.ts';
+import {useI18n} from '@/i18n/I18nProvider';
 
 const VENUE_FORMAT_MAP: Record<string, VenueFormat> = {
     InPerson: 'InPerson',
@@ -26,6 +27,7 @@ const VENUE_FORMAT_MAP: Record<string, VenueFormat> = {
 };
 
 export const useEventForm = (eventData?: EventResponse | null) => {
+    const {t} = useI18n();
     const {data: profile} = useGetProfileQuery();
     const {startDate, endDate, startTime, endTime, setStartDate, setEndDate, setStartTime, setEndTime} = useDateTime();
 
@@ -162,29 +164,29 @@ export const useEventForm = (eventData?: EventResponse | null) => {
     };
 
     const validateForm = (): string | null => {
-        if (!title.trim()) return 'Введите название мероприятия';
+        if (!title.trim()) return t('eventEditor.validation.eventNameRequired');
         if (format === 'Очно') {
-            if (!location.trim() || !isValidAddress(location)) return 'Введите корректный адрес';
+            if (!location.trim() || !isValidAddress(location)) return t('eventEditor.validation.validAddress');
         } else if (format === 'Онлайн') {
             if (!auditorium.trim() || !isValidUrl(auditorium)) {
-                return 'Укажите корректную ссылку для подключения (https://...)';
+                return t('eventEditor.validation.validConnectLink');
             }
         } else if (format === 'Гибрид') {
-            if (!location.trim() || !isValidAddress(location)) return 'Введите корректный адрес';
+            if (!location.trim() || !isValidAddress(location)) return t('eventEditor.validation.validAddress');
             if (!auditorium.trim() || !isValidUrl(auditorium)) {
-                return 'Укажите корректную ссылку для подключения (https://...)';
+                return t('eventEditor.validation.validConnectLink');
             }
         }
-        if (!startDate || !startTime) return 'Необходимо указать дату и время начала';
-        if (!endDate || !endTime) return 'Необходимо указать дату и время окончания';
+        if (!startDate || !startTime) return t('eventEditor.validation.startDateTimeRequired');
+        if (!endDate || !endTime) return t('eventEditor.validation.endDateTimeRequired');
         if (participants.length === 0 && !profile?.id) {
-            return 'Добавьте хотя бы одного участника';
+            return t('eventEditor.validation.addParticipant');
         }
         if (!profile?.id && !participants.some((p) => p.role === 'Organizer')) {
-            return 'Назначьте хотя бы одного организатора';
+            return t('eventEditor.validation.assignOrganizer');
         }
         if (!description.trim() || description.trim().length < 10) {
-            return 'Описание должно содержать минимум 10 символов';
+            return t('eventEditor.validation.descriptionMin');
         }
         return null;
     };

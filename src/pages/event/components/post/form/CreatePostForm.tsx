@@ -4,6 +4,7 @@ import styles from "./CreatePostForm.module.scss";
 import {Button} from "antd";
 import {Input} from "antd";
 import CloseIcon from "@/assets/img/icon-m/x.svg?react";
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface CreatePostFormProps {
     onClose: () => void;
@@ -15,6 +16,7 @@ interface CreatePostFormProps {
 }
 
 export default function CreatePostForm({onClose, onSubmit, initialTitle, initialText, isEditMode = false, isLoading = false}: CreatePostFormProps) {
+    const {t} = useI18n();
     const {control, handleSubmit, reset, formState: {errors}} = useForm<{ postTitle: string; postText: string }>({
         defaultValues: {
             postTitle: initialTitle || '',
@@ -42,11 +44,11 @@ export default function CreatePostForm({onClose, onSubmit, initialTitle, initial
     return (
         <div className={styles.createForm}>
             <div className={styles.formHeader}>
-                <h3 className={styles.formTitle}>{isEditMode ? "Редактировать пост" : "Новый пост"}</h3>
+                <h3 className={styles.formTitle}>{isEditMode ? t('eventPage.editPost') : t('eventPage.newPost')}</h3>
                 <button
                     className={styles.closeButton}
                     onClick={handleClose}
-                    aria-label="Закрыть"
+                    aria-label={t('common.actions.close')}
                 >
                     <CloseIcon className={styles.closeIcon}/>
                 </button>
@@ -55,10 +57,10 @@ export default function CreatePostForm({onClose, onSubmit, initialTitle, initial
                 <Controller
                     name="postTitle"
                     control={control}
-                    rules={{required: 'Введите заголовок', minLength: {value: 3, message: 'Минимум 3 символа'}}}
+                    rules={{required: t('eventPage.enterTitle'), minLength: {value: 3, message: t('eventPage.min3')}}}
                     render={({field}) => (
                         <Input
-                            placeholder="Заголовок"
+                            placeholder={t('eventPage.title')}
                             value={field.value}
                             onChange={field.onChange}
                             className="ep-input ep-input--m"
@@ -68,11 +70,11 @@ export default function CreatePostForm({onClose, onSubmit, initialTitle, initial
                 <Controller
                     name="postText"
                     control={control}
-                    rules={{required: 'Введите текст поста', minLength: {value: 10, message: 'Минимум 10 символов'}}}
+                    rules={{required: t('eventPage.enterPostText'), minLength: {value: 10, message: t('eventPage.min10')}}}
                     render={({field}) => (
                         <Input.TextArea
                             className="ep-textarea"
-                            placeholder="Основной текст"
+                            placeholder={t('eventPage.mainText')}
                             value={field.value}
                             onChange={field.onChange}
                             autoSize={{minRows: 1}}
@@ -90,7 +92,7 @@ export default function CreatePostForm({onClose, onSubmit, initialTitle, initial
                 onClick={handlePublish}
                 disabled={isLoading}
             >
-                {isLoading ? "Сохранение..." : (isEditMode ? "Сохранить" : "Опубликовать")}
+                {isLoading ? t('eventPage.saving') : (isEditMode ? t('common.actions.save') : t('eventPage.publish'))}
             </Button>
         </div>
     );

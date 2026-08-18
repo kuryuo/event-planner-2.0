@@ -1,13 +1,21 @@
 import type {EventTypeKind} from '@/types/api/Event.ts';
+import {translate} from '@/i18n/index';
 
 export const EVENT_TYPE_LABELS: Record<string, string> = {
-    Hackathon: 'Хакатон',
-    Lecture: 'Лекция',
-    PP: 'ПП',
-    SpecialCourse: 'Спецкурс',
-    Practice: 'Практика',
-    CareerEvent: 'Карьерные мероприятия',
-    CereerEvent: 'Карьерные мероприятия',
+    Hackathon: 'event.types.Hackathon',
+    Hackaton: 'event.types.Hackathon',
+    hackathon: 'event.types.Hackathon',
+    hackaton: 'event.types.Hackathon',
+    'event.types.Hackathon': 'event.types.Hackathon',
+    'event.types.hackathon': 'event.types.Hackathon',
+    'event.types.Hackaton': 'event.types.Hackathon',
+    'event.types.hackaton': 'event.types.Hackathon',
+    Lecture: 'event.types.Lecture',
+    PP: 'event.types.PP',
+    SpecialCourse: 'event.types.SpecialCourse',
+    Practice: 'event.types.Practice',
+    CareerEvent: 'event.types.CareerEvent',
+    CereerEvent: 'event.types.CareerEvent',
 };
 
 export const EVENT_TYPE_OPTIONS: EventTypeKind[] = [
@@ -20,7 +28,7 @@ export const EVENT_TYPE_OPTIONS: EventTypeKind[] = [
 ];
 
 export const getEventTypeLabel = (type: string): string =>
-    EVENT_TYPE_LABELS[type] ?? type;
+    EVENT_TYPE_LABELS[type] ? translate(EVENT_TYPE_LABELS[type]) : type;
 
 export const normalizeEventTypes = (
     types?: Array<string | null | undefined> | null,
@@ -29,5 +37,12 @@ export const normalizeEventTypes = (
 
     return types
         .filter((type): type is string => Boolean(type))
-        .map((type) => (type === 'CereerEvent' ? 'CareerEvent' : type) as EventTypeKind);
+        .map((type) => {
+            if (type === 'CereerEvent') return 'CareerEvent';
+            if (type === 'Hackaton' || type === 'hackaton') return 'Hackathon';
+            if (type === 'event.types.Hackaton' || type === 'event.types.hackaton') return 'Hackathon';
+            if (type === 'event.types.Hackathon' || type === 'event.types.hackathon') return 'Hackathon';
+            return type;
+        })
+        .map((type) => type as EventTypeKind);
 };

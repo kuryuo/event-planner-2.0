@@ -7,7 +7,6 @@ import {
   useGetProfileEventsQuery,
   useGetProfileQuery,
 } from "@/services/api/profileApi.ts";
-import { useCreateEventMutation } from "@/services/api/eventApi.ts";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,7 +17,6 @@ import { useGetNotificationsQuery } from "@/services/api/notificationApi.ts";
 import { useNotificationsSignalR } from "@/hooks/realtime/useNotificationsSignalR.ts";
 import { useChatNotificationsSignalR } from "@/hooks/realtime/useChatNotificationsSignalR.ts";
 import { clearEventChatUnread } from "@/store/realtimeSlice.ts";
-import { APRIL_TEST_EVENTS } from "@/dev/aprilEventsSeed.ts";
 
 import SearchIcon from "@/assets/image/search.svg?react";
 import BellIcon from "@/assets/image/bell.svg?react";
@@ -28,12 +26,13 @@ import FaceSmileIcon from "@/assets/image/face-smile.svg?react";
 import ChevronIcon from "@/assets/image/chevron.svg?react";
 import PlusIcon from "@/assets/image/plus-lg.svg?react";
 import BoxArchiveIcon from "@/assets/image/box-archive.svg?react";
-import DropletIcon from "@/assets/image/droplet.svg?react";
 import MoonIcon from "@/assets/image/moon.svg?react";
 import SunIcon from "@/assets/image/sun.svg?react";
 import SearchModal from "@/components/sidebar/search-modal/SearchModal";
 import NotificationsDrawer from "@/components/notifications-drawer/NotificationsDrawer.tsx";
 import { useTheme } from "@/hooks/ui/useTheme.ts";
+import LanguageSwitcher from "@/components/language-switcher/LanguageSwitcher";
+import { useI18n } from "@/i18n/I18nProvider";
 
 export interface SidebarProps {
   notificationCount?: number;
@@ -63,6 +62,7 @@ const loadRecentSearches = (): string[] => {
 export default function Sidebar({
   notificationCount = 3,
 }: SidebarProps) {
+  const { t, language } = useI18n();
   useNotificationsSignalR();
 
   const dispatch = useDispatch<AppDispatch>();
@@ -76,7 +76,6 @@ export default function Sidebar({
   const chatAlerts = useSelector(
     (state: RootState) => state.realtime.chatAlerts
   );
-  const [createEventMutation] = useCreateEventMutation();
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [eventsExpanded, setEventsExpanded] = useState(false);
@@ -121,7 +120,9 @@ export default function Sidebar({
 
   const eventsList = useMemo(() => {
     return (subscribedEvents ?? []).map((event) => {
-      const date = format(new Date(event.startDate), "d MMMM", { locale: ru });
+      const date = format(new Date(event.startDate), "d MMMM", {
+        locale: language === "ru" ? ru : undefined,
+      });
       return {
         id: event.id,
         title: event.name,
@@ -172,32 +173,6 @@ export default function Sidebar({
     );
   }, [notifications, notificationCount, notificationsLoading, unreadChatCount]);
 
-  const handleCreateAprilEvents = async () => {
-    const shouldCreate = window.confirm(
-      `Создать ${APRIL_TEST_EVENTS.length} тестовых мероприятий за апрель?`
-    );
-    if (!shouldCreate) return;
-
-    let createdCount = 0;
-
-    for (const eventPayload of APRIL_TEST_EVENTS) {
-      try {
-        await createEventMutation(eventPayload).unwrap();
-        createdCount += 1;
-      } catch (error) {
-        console.error(
-          "Не удалось создать тестовое мероприятие",
-          eventPayload.name,
-          error
-        );
-      }
-    }
-
-    window.alert(
-      `Создано мероприятий: ${createdCount} из ${APRIL_TEST_EVENTS.length}`
-    );
-  };
-
   const trackRecentSearch = (query: string) => {
     const normalized = query.trim();
     if (!normalized) return;
@@ -241,10 +216,10 @@ export default function Sidebar({
 
       <div className={styles.search} ref={searchRef}>
         <Input
-          placeholder="Поиск..."
+          placeholder={t("sidebar.searchPlaceholder")}
           value={searchQuery}
           prefix={<SearchIcon />}
-          aria-label="Поиск"
+          aria-label={t("sidebar.searchAria")}
           className="ep-input ep-input--m"
           onChange={(event) => setSearchQuery(event.target.value)}
           onClick={() => setIsSearchModalOpen(true)}
@@ -288,7 +263,7 @@ export default function Sidebar({
           <span className="ep-nav-item__icon">
             <BellIcon />
           </span>
-          <span className="ep-nav-item__label">Уведомления</span>
+            <span className="ep-nav-item__label">{t("common.actions.notifications")}</span>
         </span>
         <span className="ep-nav-item__icon" aria-hidden="true">
           {unreadNotificationsCount > 0 ? (
@@ -317,7 +292,7 @@ export default function Sidebar({
             <span className="ep-nav-item__icon">
               <CalendarIcon />
             </span>
-            <span className="ep-nav-item__label">Календарь</span>
+            <span className="ep-nav-item__label">{t("common.actions.calendar")}</span>
           </span>
           <span className="ep-nav-item__icon" aria-hidden="true" />
         </Button>
@@ -331,7 +306,7 @@ export default function Sidebar({
             <span className="ep-nav-item__icon">
               <FileLinesIcon />
             </span>
-            <span className="ep-nav-item__label">Мои задачи</span>
+            <span className="ep-nav-item__label">{t("common.actions.myTasks")}</span>
           </span>
           <span className="ep-nav-item__icon" aria-hidden="true" />
         </Button>
@@ -346,7 +321,7 @@ export default function Sidebar({
               <span className="ep-nav-item__icon">
                 <FaceSmileIcon />
               </span>
-              <span className="ep-nav-item__label">Мои мероприятия</span>
+              <span className="ep-nav-item__label">{t("common.actions.myEvents")}</span>
             </span>
             <span className="ep-nav-item__icon" aria-hidden="true">
               <ChevronIcon
@@ -400,19 +375,9 @@ export default function Sidebar({
                 onClick={() => navigate("/editor")}
                 style={{ justifyContent: "flex-start" }}
               >
-                Создать новое
+                {t("common.actions.createNew")}
               </Button>
 
-              {import.meta.env.DEV && (
-                <Button
-                  type="text"
-                  className={`${styles.seedEventsButton} ep-btn ep-btn--m ep-btn--text`}
-                  onClick={handleCreateAprilEvents}
-                  style={{ justifyContent: "flex-start" }}
-                >
-                  Создать 3 апрельских тестовых
-                </Button>
-              )}
             </div>
           )}
         </div>
@@ -426,7 +391,7 @@ export default function Sidebar({
             <span className="ep-nav-item__icon">
               <BoxArchiveIcon />
             </span>
-            <span className="ep-nav-item__label">Архив</span>
+            <span className="ep-nav-item__label">{t("common.actions.archive")}</span>
           </span>
           <span className="ep-nav-item__icon" aria-hidden="true" />
         </Button>
@@ -435,21 +400,20 @@ export default function Sidebar({
       <Divider style={{ margin: 0 }} />
 
       <div className={styles.themeSection}>
-        <button
-          type="button"
-          className={styles.themeButton}
-          onClick={toggleTheme}
-        >
-          <span className={styles.themeLeft}>
-            <span className={styles.themeDropIcon} aria-hidden="true">
-              <DropletIcon />
+        <div className={styles.languageSection}>
+          <LanguageSwitcher />
+          <button
+            type="button"
+            className={styles.themeToggleButton}
+            onClick={toggleTheme}
+            aria-label={t("common.actions.toggleTheme")}
+            title={t("common.actions.toggleTheme")}
+          >
+            <span className={styles.themeToggleIcon} aria-hidden="true">
+              {isDark ? <MoonIcon /> : <SunIcon />}
             </span>
-            <span>Тема</span>
-          </span>
-          <span className={styles.themeActionIcon} aria-hidden="true">
-            {isDark ? <MoonIcon /> : <SunIcon />}
-          </span>
-        </button>
+          </button>
+        </div>
       </div>
     </div>
   );

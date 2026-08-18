@@ -9,6 +9,7 @@ import { store } from "./store/store";
 import { ToastProvider } from "@/components/toast/ToastProvider.tsx";
 import { AntdAppProvider } from "@/providers/AntdAppProvider.tsx";
 import { IS_MOCK_MODE } from "@/config/runtime";
+import { I18nProvider } from "@/i18n/I18nProvider";
 
 const enableMocking = async () => {
   if (!IS_MOCK_MODE) {
@@ -28,13 +29,15 @@ const startApplication = async () => {
 
   ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
-      <Provider store={store}>
-        <AntdAppProvider>
-          <ToastProvider>
-            <App />
-          </ToastProvider>
-        </AntdAppProvider>
-      </Provider>
+      <I18nProvider>
+        <Provider store={store}>
+          <AntdAppProvider>
+            <ToastProvider>
+              <App />
+            </ToastProvider>
+          </AntdAppProvider>
+        </Provider>
+      </I18nProvider>
     </React.StrictMode>
   );
 };

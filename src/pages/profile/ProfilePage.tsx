@@ -39,6 +39,7 @@ import { getApiErrorMessage } from "@/utils/apiError.ts";
 import type { UserEvent } from "@/types/api/Profile.ts";
 import { isValidPhone, isValidTelegram } from "@/utils/validation.ts";
 import { useLazyGetMyBoardTasksQuery } from "@/services/api/eventApi.ts";
+import { useI18n } from "@/i18n/I18nProvider";
 
 type SortKey = "deadline" | "status" | "event" | "title";
 type ProfileModalType = "email" | "password" | "logout" | "delete" | null;
@@ -89,20 +90,24 @@ interface ProfileTask {
 const FALLBACK_EVENT = "/mock-assets/event.svg";
 const EMPTY_EVENTS: UserEvent[] = [];
 
-const SORT_OPTIONS: Array<{ key: SortKey; label: string }> = [
-  { key: "deadline", label: "По дедлайну" },
-  { key: "status", label: "По статусу" },
-  { key: "event", label: "По мероприятию" },
-  { key: "title", label: "А -> Я" },
+const SORT_OPTIONS: Array<{ key: SortKey }> = [
+  { key: "deadline" },
+  { key: "status" },
+  { key: "event" },
+  { key: "title" },
 ];
 
-const formatEventDate = (value: string): string => {
+const formatEventDate = (
+  value: string,
+  language: "ru" | "en",
+  dateNotSpecifiedLabel: string
+): string => {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
-    return "Дата не указана";
+    return dateNotSpecifiedLabel;
   }
 
-  return new Intl.DateTimeFormat("ru-RU", {
+  return new Intl.DateTimeFormat(language === "ru" ? "ru-RU" : "en-US", {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -111,26 +116,30 @@ const formatEventDate = (value: string): string => {
   }).format(date);
 };
 
-const formatDeadline = (value: string): string => {
+const formatDeadline = (value: string, language: "ru" | "en"): string => {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
     return value;
   }
 
-  return new Intl.DateTimeFormat("ru-RU", {
+  return new Intl.DateTimeFormat(language === "ru" ? "ru-RU" : "en-US", {
     day: "numeric",
     month: "long",
     year: "numeric",
   }).format(date);
 };
 
-const mapPrivilege = (value?: number | string): string => {
-  if (value === "ADMIN" || value === 2) return "Администратор";
-  if (value === "ORGANIZER" || value === 1) return "Организатор";
-  return "Сотрудник ЦАИ";
+const mapPrivilege = (
+  value: number | string | undefined,
+  labels: { admin: string; organizer: string; employee: string }
+): string => {
+  if (value === "ADMIN" || value === 2) return labels.admin;
+  if (value === "ORGANIZER" || value === 1) return labels.organizer;
+  return labels.employee;
 };
 
 export default function ProfilePage() {
+  const { t, language } = useI18n();
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
@@ -253,7 +262,11 @@ export default function ProfilePage() {
         lastName: foreignProfile.lastName ?? "",
         profession:
           foreignProfile.profession ??
-          mapPrivilege(foreignProfile.userPrivilege),
+          mapPrivilege(foreignProfile.userPrivilege, {
+            admin: t("profilePage.admin"),
+            organizer: t("profilePage.organizer"),
+            employee: t("profilePage.employee"),
+          }),
         phoneNumber: foreignProfile.phoneNumber ?? "",
         telegram: foreignProfile.telegram ?? "",
         email: foreignProfile.email ?? "",
@@ -270,14 +283,19 @@ export default function ProfilePage() {
       firstName: ownProfile.firstName ?? "",
       lastName: ownProfile.lastName ?? "",
       profession:
-        ownProfile.profession ?? mapPrivilege(ownProfile.userPrivilege),
+        ownProfile.profession ??
+        mapPrivilege(ownProfile.userPrivilege, {
+          admin: t("profilePage.admin"),
+          organizer: t("profilePage.organizer"),
+          employee: t("profilePage.employee"),
+        }),
       phoneNumber: ownProfile.phoneNumber ?? "",
       telegram: ownProfile.telegram ?? "",
       email: ownProfile.email ?? "",
       avatarUrl: buildImageUrl(ownProfile.avatarUrl),
       backgroundUrl: buildImageUrl(ownProfile.backgroundUrl),
     };
-  }, [isForeignProfile, foreignProfile, ownProfile]);
+  }, [isForeignProfile, foreignProfile, ownProfile, t]);
 
   useEffect(() => {
     if (!displayProfile || isForeignProfile) {
@@ -319,22 +337,22 @@ export default function ProfilePage() {
             return tasks.map(
               (task): ProfileTask => ({
                 id: String(task.id),
-                title: task.title || "Без названия",
+                title: task.title || t("profilePage.untitled"),
                 event: event.name,
                 eventCover:
                   buildImageUrl(event.avatar) ??
                   buildImageUrl(event.previewPhotos?.[0]) ??
                   FALLBACK_EVENT,
                 deadline: task.deadline || task.dueDate || "",
-                status: column?.name || "Без статуса",
+                status: column?.name || t("profilePage.noStatus"),
                 priority:
                   task.priority === "Urgent"
-                    ? "Срочный"
+                    ? t("eventPage.kanban.priorities.urgent")
                     : task.priority === "High"
-                    ? "Высокий"
+                    ? t("eventPage.kanban.priorities.high")
                     : task.priority === "Low"
-                    ? "Низкий"
-                    : "Средний",
+                    ? t("eventPage.kanban.priorities.low")
+                    : t("eventPage.kanban.priorities.medium"),
               })
             );
           });
@@ -358,17 +376,21 @@ export default function ProfilePage() {
     return () => {
       cancelled = true;
     };
-  }, [isForeignProfile, ownEvents]);
+  }, [isForeignProfile, ownEvents, t]);
 
   const eventCards = useMemo(() => {
     return subscribedEvents.slice(0, 2).map((event: UserEvent) => ({
       id: event.id,
       title: event.name,
-      date: formatEventDate(event.startDate),
+      date: formatEventDate(
+        event.startDate,
+        language,
+        t("profilePage.dateNotSpecified")
+      ),
       cover:
         buildImageUrl(event.avatar) ?? buildImageUrl(event.previewPhotos?.[0]),
     }));
-  }, [subscribedEvents]);
+  }, [subscribedEvents, language, t]);
 
   const sortedTasks = useMemo(() => {
     return [...profileTasks].sort((first, second) => {
@@ -391,7 +413,7 @@ export default function ProfilePage() {
   const fullName =
     `${displayProfile?.firstName ?? ""} ${
       displayProfile?.lastName ?? ""
-    }`.trim() || "Пользователь";
+    }`.trim() || t("profilePage.user");
   const coverImageSrc =
     backgroundPreviewUrl ??
     buildImageUrl(displayProfile?.backgroundUrl) ??
@@ -425,26 +447,30 @@ export default function ProfilePage() {
   const validateDraft = (value: SettingsDraft): SettingsDraftErrors => {
     const nextErrors: SettingsDraftErrors = {};
 
-    if (!value.firstName.trim()) nextErrors.firstName = "Введите имя";
+    if (!value.firstName.trim())
+      nextErrors.firstName = t("profilePage.firstNameRequired");
     else if (value.firstName.trim().length < 2)
-      nextErrors.firstName = "Минимум 2 символа";
+      nextErrors.firstName = t("common.errors.minTwoChars");
 
-    if (!value.lastName.trim()) nextErrors.lastName = "Введите фамилию";
+    if (!value.lastName.trim())
+      nextErrors.lastName = t("profilePage.lastNameRequired");
     else if (value.lastName.trim().length < 2)
-      nextErrors.lastName = "Минимум 2 символа";
+      nextErrors.lastName = t("common.errors.minTwoChars");
 
-    if (!value.profession.trim()) nextErrors.profession = "Введите должность";
+    if (!value.profession.trim())
+      nextErrors.profession = t("profilePage.professionRequired");
     else if (value.profession.trim().length < 2)
-      nextErrors.profession = "Минимум 2 символа";
+      nextErrors.profession = t("common.errors.minTwoChars");
 
-    if (!value.telegram.trim()) nextErrors.telegram = "Введите Telegram";
+    if (!value.telegram.trim())
+      nextErrors.telegram = t("profilePage.telegramRequired");
     else if (!isValidTelegram(value.telegram))
-      nextErrors.telegram = "Некорректный Telegram (@username)";
+      nextErrors.telegram = t("profilePage.invalidTelegram");
 
     if (!value.phoneNumber.trim())
-      nextErrors.phoneNumber = "Введите номер телефона";
+      nextErrors.phoneNumber = t("profilePage.phoneRequired");
     else if (!isValidPhone(value.phoneNumber))
-      nextErrors.phoneNumber = "Некорректный телефон (+7XXXXXXXXXX)";
+      nextErrors.phoneNumber = t("profilePage.invalidPhone");
 
     return nextErrors;
   };
@@ -462,7 +488,7 @@ export default function ProfilePage() {
     const errors = validateDraft(draft);
     setDraftErrors(errors);
     if (Object.keys(errors).length > 0) {
-      pushToast("Исправьте ошибки в форме профиля", "error");
+      pushToast(t("profilePage.fixErrors"), "error");
       return;
     }
 
@@ -477,11 +503,11 @@ export default function ProfilePage() {
       }).unwrap();
 
       setIsEditMode(false);
-      pushToast("Профиль успешно обновлен", "success");
+      pushToast(t("profilePage.settingsSaved"), "success");
     } catch (error) {
-      console.error("Не удалось сохранить настройки", error);
+      console.error(t("profilePage.settingsSaveFailed"), error);
       pushToast(
-        getApiErrorMessage(error, "Ошибка при сохранении профиля"),
+        getApiErrorMessage(error, t("profilePage.settingsSaveError")),
         "error"
       );
     }
@@ -505,7 +531,7 @@ export default function ProfilePage() {
     });
 
     pushToast(
-      "Предпросмотр фона обновлен, API для фона пока в разработке",
+      t("profilePage.backgroundPreviewUpdated"),
       "warning"
     );
     event.target.value = "";
@@ -516,11 +542,11 @@ export default function ProfilePage() {
       URL.revokeObjectURL(backgroundPreviewUrl);
       setBackgroundPreviewUrl(null);
     }
-    pushToast("Фон сброшен", "default");
+    pushToast(t("profilePage.backgroundReset"), "default");
   };
 
   const handleClearAvatar = () => {
-    pushToast("Очистка аватара пока в разработке", "warning");
+    pushToast(t("profilePage.avatarClearInDevelopment"), "warning");
   };
 
   const handleLogout = async () => {
@@ -530,24 +556,27 @@ export default function ProfilePage() {
 
   const handleEmailSubmit = () => {
     if (!emailForm.password || !emailForm.email.includes("@")) {
-      pushToast("Введите корректные данные для смены почты", "error");
+      pushToast(t("profilePage.emailChangeInvalid"), "error");
       return;
     }
     setActiveModal(null);
     setEmailForm({ password: "", email: "" });
-    pushToast("Почта успешно обновлена", "success");
+    pushToast(t("profilePage.emailChanged"), "success");
   };
 
   const handlePasswordSubmit = () => {
     if (!passwordForm.currentPassword) {
-      setPasswordForm((prev) => ({ ...prev, error: "Введите текущий пароль" }));
+      setPasswordForm((prev) => ({
+        ...prev,
+        error: t("profilePage.currentPasswordRequired"),
+      }));
       return;
     }
 
     if (passwordForm.nextPassword.length < 8) {
       setPasswordForm((prev) => ({
         ...prev,
-        error: "Минимум 8 символов в новом пароле",
+        error: t("profilePage.newPasswordMin"),
       }));
       return;
     }
@@ -555,7 +584,7 @@ export default function ProfilePage() {
     if (passwordForm.nextPassword !== passwordForm.repeatPassword) {
       setPasswordForm((prev) => ({
         ...prev,
-        error: "Новый пароль и повтор не совпадают",
+        error: t("profilePage.passwordRepeatMismatch"),
       }));
       return;
     }
@@ -567,13 +596,13 @@ export default function ProfilePage() {
       repeatPassword: "",
       error: "",
     });
-    pushToast("Пароль успешно обновлен", "success");
+    pushToast(t("profilePage.passwordChanged"), "success");
   };
 
   const handleDeleteSubmit = () => {
     setActiveModal(null);
     setDeletePassword("");
-    pushToast("Удаление аккаунта пока в разработке", "warning");
+    pushToast(t("profilePage.accountDeleteInDevelopment"), "warning");
   };
 
   const renderProfileModal = () => {
@@ -581,17 +610,17 @@ export default function ProfilePage() {
       return (
         <ProfileActionModal
           isOpen
-          title="Смена почты"
-          description="Для смены почты введите пароль и новый адрес."
+          title={t("profilePage.emailChangeTitle")}
+          description={t("profilePage.emailChangeDescription")}
           onClose={() => setActiveModal(null)}
           onConfirm={handleEmailSubmit}
-          confirmText="Сменить"
+          confirmText={t("profilePage.changeAction")}
           confirmDisabled={!emailForm.password || !emailForm.email}
         >
           <div className="ep-field">
-            <label className="ep-field__label">Пароль</label>
+            <label className="ep-field__label">{t("profilePage.passwordLabel")}</label>
             <Input.Password
-              placeholder="Пароль"
+              placeholder={t("profilePage.passwordLabel")}
               value={emailForm.password}
               onChange={(event) =>
                 setEmailForm((prev) => ({
@@ -619,10 +648,10 @@ export default function ProfilePage() {
             />
           </div>
           <div className="ep-field">
-            <label className="ep-field__label">Новая почта</label>
+            <label className="ep-field__label">{t("profilePage.newEmailLabel")}</label>
             <Input
               type="email"
-              placeholder="Новая почта"
+              placeholder={t("profilePage.newEmailPlaceholder")}
               value={emailForm.email}
               onChange={(event) =>
                 setEmailForm((prev) => ({ ...prev, email: event.target.value }))
@@ -638,8 +667,8 @@ export default function ProfilePage() {
       return (
         <ProfileActionModal
           isOpen
-          title="Смена пароля"
-          description="Введите текущий пароль и задайте новый. Новый пароль должен отличаться от предыдущего."
+          title={t("profilePage.passwordChangeTitle")}
+          description={t("profilePage.passwordChangeDescription")}
           onClose={() => {
             setActiveModal(null);
             setPasswordForm({
@@ -650,7 +679,7 @@ export default function ProfilePage() {
             });
           }}
           onConfirm={handlePasswordSubmit}
-          confirmText="Сменить"
+          confirmText={t("profilePage.changeAction")}
           confirmDisabled={
             !passwordForm.currentPassword ||
             !passwordForm.nextPassword ||
@@ -658,9 +687,9 @@ export default function ProfilePage() {
           }
         >
           <div className="ep-field">
-            <label className="ep-field__label">Текущий пароль</label>
+            <label className="ep-field__label">{t("profilePage.currentPasswordLabel")}</label>
             <Input.Password
-              placeholder="Пароль"
+              placeholder={t("profilePage.passwordLabel")}
               value={passwordForm.currentPassword}
               onChange={(event) =>
                 setPasswordForm((prev) => ({
@@ -695,9 +724,9 @@ export default function ProfilePage() {
             )}
           </div>
           <div className="ep-field">
-            <label className="ep-field__label">Новый пароль</label>
+            <label className="ep-field__label">{t("profilePage.newPasswordLabel")}</label>
             <Input.Password
-              placeholder="Новый пароль"
+              placeholder={t("profilePage.newPasswordLabel")}
               value={passwordForm.nextPassword}
               onChange={(event) =>
                 setPasswordForm((prev) => ({
@@ -722,13 +751,13 @@ export default function ProfilePage() {
               }
             />
             <span className="ep-field__helper">
-              Минимум 8 символов, 1 цифра и 1 специальный символ
+              {t("profilePage.passwordHint")}
             </span>
           </div>
           <div className="ep-field">
-            <label className="ep-field__label">Повторите новый пароль</label>
+            <label className="ep-field__label">{t("profilePage.repeatNewPasswordLabel")}</label>
             <Input.Password
-              placeholder="Повторите пароль"
+              placeholder={t("profilePage.repeatPasswordPlaceholder")}
               value={passwordForm.repeatPassword}
               onChange={(event) =>
                 setPasswordForm((prev) => ({
@@ -764,11 +793,11 @@ export default function ProfilePage() {
       return (
         <ProfileActionModal
           isOpen
-          title="Выйти из аккаунта?"
-          description="Вы завершите текущую сессию и вернетесь на экран входа"
+          title={t("profilePage.logoutModalTitle")}
+          description={t("profilePage.logoutModalDescription")}
           onClose={() => setActiveModal(null)}
           onConfirm={handleLogout}
-          confirmText="Выйти"
+          confirmText={t("profilePage.logoutAction")}
           confirmTone="danger"
         />
       );
@@ -778,18 +807,18 @@ export default function ProfilePage() {
       return (
         <ProfileActionModal
           isOpen
-          title="Удалить аккаунт?"
-          description="Это действие необратимо. Все данные, включая мероприятия, задачи и историю действий, будут удалены"
+          title={t("profilePage.deleteModalTitle")}
+          description={t("profilePage.deleteModalDescription")}
           onClose={() => setActiveModal(null)}
           onConfirm={handleDeleteSubmit}
-          confirmText="Удалить аккаунт"
+          confirmText={t("profilePage.deleteAction")}
           confirmTone="danger"
           confirmDisabled={!deletePassword}
         >
           <div className="ep-field">
-            <label className="ep-field__label">Пароль</label>
+            <label className="ep-field__label">{t("profilePage.passwordLabel")}</label>
             <Input.Password
-              placeholder="Пароль"
+              placeholder={t("profilePage.passwordLabel")}
               value={deletePassword}
               onChange={(event) => setDeletePassword(event.target.value)}
               className="ep-input ep-input--m"
@@ -818,6 +847,13 @@ export default function ProfilePage() {
     return null;
   };
 
+  const sortOptionLabels: Record<SortKey, string> = {
+    deadline: t("profilePage.sortByDeadline"),
+    status: t("profilePage.sortByStatus"),
+    event: t("profilePage.sortByEvent"),
+    title: t("profilePage.sortByTitle"),
+  };
+
   return (
     <AppShell
       pageWrapperClassName={styles.pageWrapper}
@@ -837,7 +873,7 @@ export default function ProfilePage() {
             {(fullName?.[0] ?? "—").toUpperCase()}
           </Avatar>
           <span className={styles.topTitle}>
-            {isForeignProfile ? fullName : "Вы"}
+            {isForeignProfile ? fullName : t("profilePage.you")}
           </span>
         </div>
 
@@ -847,7 +883,7 @@ export default function ProfilePage() {
               <img
                 className={styles.coverImage}
                 src={coverImageSrc}
-                alt="Обложка профиля"
+                alt={t("profilePage.profileCover")}
               />
             ) : (
               <div className={styles.coverPlaceholder} aria-hidden />
@@ -900,7 +936,7 @@ export default function ProfilePage() {
                         }}
                         disabled={isUploading}
                       >
-                        Загрузить
+                        {t("profilePage.upload")}
                       </button>
                       <button
                         className={styles.avatarMenuItem}
@@ -909,7 +945,7 @@ export default function ProfilePage() {
                           handleClearAvatar();
                         }}
                       >
-                        Очистить
+                        {t("common.actions.clear")}
                       </button>
                     </div>
                   )}
@@ -922,7 +958,11 @@ export default function ProfilePage() {
                 <h1 className={styles.fullName}>{fullName}</h1>
                 <p className={styles.role}>
                   {displayProfile?.profession ||
-                    mapPrivilege(ownProfile?.userPrivilege)}
+                    mapPrivilege(ownProfile?.userPrivilege, {
+                      admin: t("profilePage.admin"),
+                      organizer: t("profilePage.organizer"),
+                      employee: t("profilePage.employee"),
+                    })}
                 </p>
               </div>
 
@@ -932,7 +972,7 @@ export default function ProfilePage() {
                   className="ep-btn ep-btn--m ep-btn--filled-gray"
                   onClick={handleOpenSettings}
                 >
-                  Настройки
+                  {t("profilePage.accountSettings")}
                 </Button>
               )}
 
@@ -945,14 +985,14 @@ export default function ProfilePage() {
                     onClick={handleSaveSettings}
                     disabled={profileUpdating}
                   >
-                    Сохранить
+                    {t("common.actions.save")}
                   </Button>
                   <Button
                     type="text"
                     className="ep-btn ep-btn--m ep-btn--text"
                     onClick={handleCancelSettings}
                   >
-                    Отменить
+                    {t("common.actions.cancel")}
                   </Button>
                 </div>
               )}
@@ -960,33 +1000,33 @@ export default function ProfilePage() {
           </div>
 
           {loading ? (
-            <div className={styles.loading}>Загрузка профиля...</div>
+            <div className={styles.loading}>{t("profilePage.loading")}</div>
           ) : (
             <>
               {!isEditMode && (
                 <>
                   <section className={styles.section}>
-                    <h2 className={styles.sectionTitle}>Контакты</h2>
+                    <h2 className={styles.sectionTitle}>{t("profilePage.contacts")}</h2>
                     <div className={styles.contactList}>
                       <div className={styles.contactRow}>
                         <TelegramIcon />
                         <span className={styles.contactLabel}>Telegram</span>
                         <span className={styles.contactValue}>
-                          {displayProfile?.telegram || "Не указано"}
+                          {displayProfile?.telegram || t("profilePage.notSpecified")}
                         </span>
                       </div>
                       <div className={styles.contactRow}>
                         <TelephoneIcon />
-                        <span className={styles.contactLabel}>Телефон</span>
+                        <span className={styles.contactLabel}>{t("profile.phone")}</span>
                         <span className={styles.contactValue}>
-                          {displayProfile?.phoneNumber || "Не указано"}
+                          {displayProfile?.phoneNumber || t("profilePage.notSpecified")}
                         </span>
                       </div>
                       <div className={styles.contactRow}>
                         <EnvelopeIcon />
-                        <span className={styles.contactLabel}>Почта</span>
+                        <span className={styles.contactLabel}>{t("profilePage.emailTitle")}</span>
                         <span className={styles.contactValue}>
-                          {displayProfile?.email || "Не указано"}
+                          {displayProfile?.email || t("profilePage.notSpecified")}
                         </span>
                       </div>
                     </div>
@@ -994,7 +1034,9 @@ export default function ProfilePage() {
 
                   <section className={styles.section}>
                     <h2 className={styles.sectionTitle}>
-                      {isForeignProfile ? "Сейчас участвует" : "Вы участвуете"}
+                      {isForeignProfile
+                        ? t("profilePage.nowParticipates")
+                        : t("profilePage.youParticipate")}
                     </h2>
                     {eventCards.length > 0 ? (
                       <div className={styles.eventsList}>
@@ -1026,7 +1068,7 @@ export default function ProfilePage() {
                       </div>
                     ) : (
                       <p className={styles.emptyText}>
-                        Мероприятия появятся здесь
+                        {t("profilePage.eventsWillAppear")}
                       </p>
                     )}
                   </section>
@@ -1034,18 +1076,14 @@ export default function ProfilePage() {
                   <section className={styles.section}>
                     <div className={styles.tasksHeader}>
                       <h2 className={styles.sectionTitle}>
-                        Текущие задачи {profileTasks.length}
+                        {t("profilePage.currentTasks", { count: profileTasks.length })}
                       </h2>
                       <div className={styles.sortWrapper} ref={sortMenuRef}>
                         <button
                           className={styles.sortButton}
                           onClick={() => setSortMenuOpen((prev) => !prev)}
                         >
-                          {
-                            SORT_OPTIONS.find(
-                              (option) => option.key === sortKey
-                            )?.label
-                          }
+                          {sortOptionLabels[sortKey]}
                           <ChevronDownIcon
                             className={
                               sortMenuOpen ? styles.sortChevronOpen : undefined
@@ -1064,7 +1102,7 @@ export default function ProfilePage() {
                                   setSortMenuOpen(false);
                                 }}
                               >
-                                {option.label}
+                                {sortOptionLabels[option.key]}
                               </button>
                             ))}
                           </div>
@@ -1074,11 +1112,11 @@ export default function ProfilePage() {
 
                     <div className={styles.tasksTable}>
                       <div className={styles.tableHead}>
-                        <span>Задача</span>
-                        <span>Мероприятие</span>
-                        <span>Дедлайн</span>
-                        <span>Статус</span>
-                        <span>Приоритет</span>
+                        <span>{t("profilePage.task")}</span>
+                        <span>{t("profilePage.event")}</span>
+                        <span>{t("profilePage.deadline")}</span>
+                        <span>{t("profilePage.status")}</span>
+                        <span>{t("profilePage.priority")}</span>
                       </div>
 
                       {sortedTasks.map((task) => (
@@ -1092,7 +1130,7 @@ export default function ProfilePage() {
                             />
                             {task.event}
                           </span>
-                          <span>{formatDeadline(task.deadline)}</span>
+                          <span>{formatDeadline(task.deadline, language)}</span>
                           <span>
                             <Tag bordered={false} className={styles.statusChip}>
                               {task.status}
@@ -1116,13 +1154,13 @@ export default function ProfilePage() {
               {!isForeignProfile && isEditMode && (
                 <section className={styles.settingsSection}>
                   <h2 className={styles.sectionTitleLarge}>
-                    Настройки аккаунта
+                    {t("profilePage.accountSettings")}
                   </h2>
 
                   <div className={styles.settingsGrid}>
                     <div className={styles.nameRow}>
                       <div className="ep-field">
-                        <label className="ep-field__label">Имя</label>
+                        <label className="ep-field__label">{t("profilePage.firstNameLabel")}</label>
                         <Input
                           value={draft.firstName}
                           onChange={(event) =>
@@ -1142,7 +1180,7 @@ export default function ProfilePage() {
                         )}
                       </div>
                       <div className="ep-field">
-                        <label className="ep-field__label">Фамилия</label>
+                        <label className="ep-field__label">{t("profilePage.lastNameLabel")}</label>
                         <Input
                           value={draft.lastName}
                           onChange={(event) =>
@@ -1164,7 +1202,7 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="ep-field">
-                      <label className="ep-field__label">Должность</label>
+                      <label className="ep-field__label">{t("profilePage.professionLabel")}</label>
                       <Input
                         value={draft.profession}
                         onChange={(event) =>
@@ -1207,7 +1245,7 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="ep-field">
-                      <label className="ep-field__label">Телефон</label>
+                      <label className="ep-field__label">{t("profile.phone")}</label>
                       <Input
                         value={draft.phoneNumber}
                         prefix={<TelephoneIcon />}
@@ -1231,9 +1269,9 @@ export default function ProfilePage() {
 
                   <div className={styles.settingsRow}>
                     <div>
-                      <h3 className={styles.settingsRowTitle}>Уведомления</h3>
+                      <h3 className={styles.settingsRowTitle}>{t("profilePage.notificationsTitle")}</h3>
                       <p className={styles.settingsRowText}>
-                        Включите, чтобы получать уведомления там, где вам удобно
+                        {t("profilePage.notificationsDescription")}
                       </p>
                     </div>
                     <Switch
@@ -1246,7 +1284,7 @@ export default function ProfilePage() {
                   {notificationsEnabled && (
                     <div className={styles.notificationsChannels}>
                       <p className={styles.settingsRowTitle}>
-                        Способы получения уведомлений
+                        {t("profilePage.notificationChannels")}
                       </p>
                       <div className={styles.channelsList}>
                         <label className={styles.channelItem}>
@@ -1265,7 +1303,7 @@ export default function ProfilePage() {
                         </label>
                         <label className={styles.channelItem}>
                           <EnvelopeIcon />
-                          <span>Почта</span>
+                          <span>{t("profilePage.emailChannel")}</span>
                           <Checkbox
                             checked={notificationChannels.email}
                             className="ep-checkbox"
@@ -1298,9 +1336,9 @@ export default function ProfilePage() {
                   <div className={styles.accountActions}>
                     <div className={styles.accountActionRow}>
                       <div>
-                        <h3 className={styles.settingsRowTitle}>Почта</h3>
+                        <h3 className={styles.settingsRowTitle}>{t("profilePage.emailTitle")}</h3>
                         <p className={styles.settingsRowText}>
-                          {displayProfile?.email || "Не указано"}
+                          {displayProfile?.email || t("profilePage.notSpecified")}
                         </p>
                       </div>
                       <Button
@@ -1308,15 +1346,15 @@ export default function ProfilePage() {
                         className="ep-btn ep-btn--m ep-btn--filled-gray"
                         onClick={() => setActiveModal("email")}
                       >
-                        Сменить почту
+                        {t("profilePage.changeEmailAction")}
                       </Button>
                     </div>
 
                     <div className={styles.accountActionRow}>
                       <div>
-                        <h3 className={styles.settingsRowTitle}>Пароль</h3>
+                        <h3 className={styles.settingsRowTitle}>{t("profilePage.passwordTitle")}</h3>
                         <p className={styles.settingsRowText}>
-                          Отправим на почту ссылку для смены пароля
+                          {t("profilePage.passwordResetDescription")}
                         </p>
                       </div>
                       <Button
@@ -1324,17 +1362,17 @@ export default function ProfilePage() {
                         className="ep-btn ep-btn--m ep-btn--filled-gray"
                         onClick={() => setActiveModal("password")}
                       >
-                        Сменить пароль
+                        {t("profilePage.changePasswordAction")}
                       </Button>
                     </div>
 
                     <div className={styles.accountActionRow}>
                       <div>
                         <h3 className={styles.settingsRowTitle}>
-                          Выйти из аккаунта
+                          {t("profilePage.logoutTitle")}
                         </h3>
                         <p className={styles.settingsRowText}>
-                          Будет произведен выход на данном устройстве
+                          {t("profilePage.logoutDescription")}
                         </p>
                       </div>
                       <Button
@@ -1343,15 +1381,15 @@ export default function ProfilePage() {
                         className="ep-btn ep-btn--m ep-btn--text"
                         onClick={() => setActiveModal("logout")}
                       >
-                        Выйти
+                        {t("profilePage.logoutAction")}
                       </Button>
                     </div>
 
                     <div className={styles.accountActionRow}>
                       <div>
-                        <h3 className={styles.deleteTitle}>Удалить аккаунт</h3>
+                        <h3 className={styles.deleteTitle}>{t("profilePage.deleteAccount")}</h3>
                         <p className={styles.settingsRowText}>
-                          Аккаунт будет удален без возможности восстановления
+                          {t("profilePage.deleteDescription")}
                         </p>
                       </div>
                       <Button
@@ -1360,7 +1398,7 @@ export default function ProfilePage() {
                         className="ep-btn ep-btn--m ep-btn--text"
                         onClick={() => setActiveModal("delete")}
                       >
-                        Удалить аккаунт
+                        {t("profilePage.deleteAction")}
                       </Button>
                     </div>
                   </div>

@@ -2,6 +2,7 @@ import {forwardRef, useState, type KeyboardEvent} from 'react';
 import CheckIcon from '@/assets/img/icon-m/check2.svg?react';
 import XIcon from '@/assets/img/icon-m/x.svg?react';
 import styles from './EventNewNoteCard.module.scss';
+import {useI18n} from '@/i18n/I18nProvider';
 
 const NOTE_MAX_LENGTH = 120;
 
@@ -15,6 +16,7 @@ export const EventNewNoteCard = forwardRef<HTMLTextAreaElement, EventNewNoteCard
     {isSubmitting = false, onSubmit, onClose},
     ref
 ) {
+    const {t} = useI18n();
     const [draft, setDraft] = useState('');
 
     const trimmed = draft.trim();
@@ -45,10 +47,10 @@ export const EventNewNoteCard = forwardRef<HTMLTextAreaElement, EventNewNoteCard
                 className={styles.textarea}
                 value={draft}
                 disabled={isSubmitting}
-                placeholder="Новая заметка..."
+                placeholder={t('eventPage.newNote')}
                 maxLength={NOTE_MAX_LENGTH}
                 rows={4}
-                aria-label="Текст новой заметки"
+                aria-label={t('eventPage.newNoteText')}
                 onChange={(event) => setDraft(event.target.value.slice(0, NOTE_MAX_LENGTH))}
                 onKeyDown={handleKeyDown}
             />
@@ -62,8 +64,8 @@ export const EventNewNoteCard = forwardRef<HTMLTextAreaElement, EventNewNoteCard
                         className={styles.iconBtn}
                         disabled={isSubmitting}
                         onClick={dismiss}
-                        aria-label="Закрыть"
-                        title="Закрыть"
+                        aria-label={t('common.actions.close')}
+                        title={t('common.actions.close')}
                     >
                         <XIcon/>
                     </button>
@@ -72,8 +74,8 @@ export const EventNewNoteCard = forwardRef<HTMLTextAreaElement, EventNewNoteCard
                         className={styles.iconBtn}
                         disabled={!canSubmit}
                         onClick={() => void submit()}
-                        aria-label="Сохранить заметку"
-                        title="Сохранить (Ctrl+Enter)"
+                        aria-label={t('eventPage.saveNote')}
+                        title={`${t('common.actions.save')} (Ctrl+Enter)`}
                     >
                         <CheckIcon/>
                     </button>

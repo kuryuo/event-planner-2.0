@@ -5,6 +5,7 @@ import PenIcon from '@/assets/img/icon-m/pen.svg?react';
 import TrashIcon from '@/assets/img/icon-m/trash.svg?react';
 import {useClickOutside} from '@/hooks/ui/useClickOutside';
 import styles from './BoardColumnHeader.module.scss';
+import {useI18n} from '@/i18n/I18nProvider';
 
 export type BoardColumnInlineTitleMode = 'none' | 'initial' | 'rename';
 
@@ -41,6 +42,7 @@ const BoardColumnHeader = ({
     onCancelInlineRename,
     onCancelInitialColumnCreate,
 }: Props) => {
+    const {t} = useI18n();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [draft, setDraft] = useState('');
     const titleInputRef = useRef<HTMLInputElement | null>(null);
@@ -126,8 +128,8 @@ const BoardColumnHeader = ({
                         onChange={(event) => handleDraftChange(event.target.value)}
                         onKeyDown={(event) => void handleTitleKeyDown(event)}
                         onBlur={handleTitleBlur}
-                        placeholder="Название колонки"
-                        aria-label="Название колонки"
+                        placeholder={t('tasks.columnName')}
+                        aria-label={t('tasks.columnName')}
                     />
                 ) : (
                     <strong
@@ -151,8 +153,8 @@ const BoardColumnHeader = ({
                             type="button"
                             className={styles.iconButton}
                             onClick={onCreateTask}
-                            title="Создать задачу"
-                            aria-label="Создать задачу"
+                            title={t('common.actions.createTask')}
+                            aria-label={t('common.actions.createTask')}
                         >
                             <PlusIcon/>
                         </button>
@@ -163,8 +165,8 @@ const BoardColumnHeader = ({
                             type="button"
                             className={styles.iconButton}
                             onClick={() => setIsMenuOpen((prev) => !prev)}
-                            title="Действия колонки"
-                            aria-label="Действия колонки"
+                            title={t('tasks.columnActions')}
+                            aria-label={t('tasks.columnActions')}
                         >
                             <ThreeDotsVerticalIcon/>
                         </button>
@@ -180,7 +182,7 @@ const BoardColumnHeader = ({
                                     }}
                                 >
                                     <PenIcon/>
-                                    <span>Переименовать</span>
+                                    <span>{t('common.actions.rename')}</span>
                                 </button>
                                 <button
                                     type="button"
@@ -191,7 +193,7 @@ const BoardColumnHeader = ({
                                     }}
                                 >
                                     <TrashIcon/>
-                                    <span>Удалить</span>
+                                    <span>{t('common.actions.delete')}</span>
                                 </button>
                             </div>
                         )}

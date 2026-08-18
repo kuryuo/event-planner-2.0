@@ -4,6 +4,7 @@ A web application for planning, organizing, and managing events. It combines a c
 
 ## Useful links
 
+- [Hosting (Vercel)](https://vercel.com/kuryuos-projects/event-planner-2.0)
 - [Design in Figma](https://www.figma.com/design/j03utCeJszMWlgT3yTLo7k/Event-planner-V2.0?node-id=0-1&p=f&t=U1yDEXwC8CdvfNNl-0)
 
 ## Getting started
@@ -45,18 +46,18 @@ The app will be available at: `http://localhost:5173`.
 
 ## Tech stack
 
-* React 19
-* TypeScript
-* Vite
-* React Router v7
-* Redux Toolkit + RTK Query
-* Ant Design 6
-* Sass / SCSS
-* FullCalendar — calendar views
-* SignalR — real-time chat and notifications
-* @hello-pangea/dnd / @caldwell619/react-kanban — drag-and-drop task boards
-* date-fns — date formatting
-* emoji-picker-react — emoji support in chat
+- React 19
+- TypeScript
+- Vite
+- React Router v7
+- Redux Toolkit + RTK Query
+- Ant Design 6
+- Sass / SCSS
+- FullCalendar — calendar views
+- SignalR — real-time chat and notifications
+- @hello-pangea/dnd / @caldwell619/react-kanban — drag-and-drop task boards
+- date-fns — date formatting
+- emoji-picker-react — emoji support in chat
 
 ## Main features
 
@@ -126,3 +127,58 @@ To sign in and use the mocked data, use:
 ### Using the real backend
 
 To disable mocks and talk to the real API, set `VITE_ENABLE_MSW=false`.
+
+## UI screenshots
+
+The application supports:
+
+- **Light and dark themes**
+- **RU/EN language switch** (toggle in the sidebar)
+
+### Main page
+
+| Light                                          | Dark                                         |
+| ---------------------------------------------- | -------------------------------------------- |
+| ![Main Light](docs/screenshots/main-light.png) | ![Main Dark](docs/screenshots/main-dark.png) |
+
+### Authentication
+
+| Light                                                | Dark                                               |
+| ---------------------------------------------------- | -------------------------------------------------- |
+| ![Auth Light](docs/screenshots/auth-login-light.png) | ![Auth Dark](docs/screenshots/auth-login-dark.png) |
+
+### Event overview
+
+| Light                                                              | Dark                                                             |
+| ------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| ![Event Overview Light](docs/screenshots/event-overview-light.png) | ![Event Overview Dark](docs/screenshots/event-overview-dark.png) |
+
+### Event editor
+
+| Light                                                          | Dark                                                         |
+| -------------------------------------------------------------- | ------------------------------------------------------------ |
+| ![Event Editor Light](docs/screenshots/event-editor-light.png) | ![Event Editor Dark](docs/screenshots/event-editor-dark.png) |
+
+### Kanban
+
+| Light                                              | Dark                                             |
+| -------------------------------------------------- | ------------------------------------------------ |
+| ![Kanban Light](docs/screenshots/kanban-light.png) | ![Kanban Dark](docs/screenshots/kanban-dark.png) |
+
+### Documents
+
+| Light                                                    | Dark                                                   |
+| -------------------------------------------------------- | ------------------------------------------------------ |
+| ![Documents Light](docs/screenshots/documents-light.png) | ![Documents Dark](docs/screenshots/documents-dark.png) |
+
+### Chat
+
+| Light                                          | Dark                                         |
+| ---------------------------------------------- | -------------------------------------------- |
+| ![Chat Light](docs/screenshots/chat-light.png) | ![Chat Dark](docs/screenshots/chat-dark.png) |
+
+### Profile
+
+| Light                                                | Dark                                               |
+| ---------------------------------------------------- | -------------------------------------------------- |
+| ![Profile Light](docs/screenshots/profile-light.png) | ![Profile Dark](docs/screenshots/profile-dark.png) |

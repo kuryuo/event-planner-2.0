@@ -12,6 +12,7 @@ import {
   updateMockTask,
 } from "../db/board.db";
 import { requireMockAuth } from "../utils/requireMockAuth";
+import { mockT } from "../utils/mockI18n";
 
 interface ColumnBody {
   name?: string;
@@ -53,12 +54,12 @@ export const boardHandlers = [
         result: [
           {
             id: "mock-user-1",
-            displayName: "Ivan Ivanov",
+            displayName: mockT("board.user1", request),
             avatarUrl: null,
           },
           {
             id: "mock-user-2",
-            displayName: "Peter Petrov",
+            displayName: mockT("board.user2", request),
             avatarUrl: null,
           },
         ],
@@ -79,13 +80,13 @@ export const boardHandlers = [
         result: [
           {
             id: "mock-user-1",
-            displayName: "Ivan Ivanov",
+            displayName: mockT("board.user1", request),
             avatarUrl: null,
             role: "Organizer",
           },
           {
             id: "mock-user-2",
-            displayName: "Peter Petrov",
+            displayName: mockT("board.user2", request),
             avatarUrl: null,
             role: "Observer",
           },
@@ -100,7 +101,7 @@ export const boardHandlers = [
     return (
       authError ??
       HttpResponse.json({
-        result: getMockAssignedTasks(),
+        result: getMockAssignedTasks({ request }),
       })
     );
   }),
@@ -116,6 +117,7 @@ export const boardHandlers = [
           getMockBoard({
             eventId: String(params.eventId),
             mineOnly: true,
+            request,
           })
         )
       );
@@ -133,6 +135,7 @@ export const boardHandlers = [
           getMockBoard({
             eventId: String(params.eventId),
             mineOnly: true,
+            request,
           })
         )
       );
@@ -146,7 +149,9 @@ export const boardHandlers = [
 
       return (
         authError ??
-        HttpResponse.json(getMockBoard({ eventId: String(params.eventId) }))
+        HttpResponse.json(
+          getMockBoard({ eventId: String(params.eventId), request })
+        )
       );
     }
   ),
@@ -164,7 +169,7 @@ export const boardHandlers = [
 
       if (!body.name) {
         return HttpResponse.json(
-          { message: "Column name is required" },
+          { message: mockT("board.columnNameRequired", request) },
           { status: 400 }
         );
       }
@@ -196,7 +201,7 @@ export const boardHandlers = [
 
       return isUpdated
         ? new HttpResponse(null, { status: 204 })
-        : HttpResponse.json({ message: "Column not found" }, { status: 404 });
+        : HttpResponse.json({ message: mockT("board.columnNotFound", request) }, { status: 404 });
     }
   ),
 
@@ -216,7 +221,7 @@ export const boardHandlers = [
 
       return isDeleted
         ? new HttpResponse(null, { status: 204 })
-        : HttpResponse.json({ message: "Column not found" }, { status: 404 });
+        : HttpResponse.json({ message: mockT("board.columnNotFound", request) }, { status: 404 });
     }
   ),
 
@@ -238,7 +243,7 @@ export const boardHandlers = [
 
       return isCreated
         ? new HttpResponse(null, { status: 204 })
-        : HttpResponse.json({ message: "Column not found" }, { status: 404 });
+        : HttpResponse.json({ message: mockT("board.columnNotFound", request) }, { status: 404 });
     }
   ),
 
@@ -260,7 +265,7 @@ export const boardHandlers = [
 
       return isUpdated
         ? new HttpResponse(null, { status: 204 })
-        : HttpResponse.json({ message: "Task not found" }, { status: 404 });
+        : HttpResponse.json({ message: mockT("board.taskNotFound", request) }, { status: 404 });
     }
   ),
 
@@ -280,7 +285,7 @@ export const boardHandlers = [
 
       return isDeleted
         ? new HttpResponse(null, { status: 204 })
-        : HttpResponse.json({ message: "Task not found" }, { status: 404 });
+        : HttpResponse.json({ message: mockT("board.taskNotFound", request) }, { status: 404 });
     }
   ),
 
@@ -303,7 +308,7 @@ export const boardHandlers = [
       return isMoved
         ? new HttpResponse(null, { status: 204 })
         : HttpResponse.json(
-            { message: "Task or column not found" },
+            { message: mockT("board.taskOrColumnNotFound", request) },
             { status: 404 }
           );
     }

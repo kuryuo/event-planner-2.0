@@ -6,6 +6,7 @@ import {buildImageUrl} from "@/utils/buildImageUrl.ts";
 import type {Organizer} from "@/types/api/User.ts";
 import CloseIcon from "@/assets/img/icon-s/x.svg?react";
 import styles from "./Organizers.module.scss";
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface OrganizersProps {
     isOpen?: boolean;
@@ -15,6 +16,7 @@ interface OrganizersProps {
 }
 
 export default function Organizers({isOpen, onOpenChange, onSelectedChange, initialOrganizers}: OrganizersProps = {}) {
+    const {t} = useI18n();
     const [inputValue, setInputValue] = useState("");
     const [selectedOrganizers, setSelectedOrganizers] = useState<Organizer[]>(initialOrganizers || []);
     const {data: organizersData, isLoading} = useGetOrganizersQuery();
@@ -27,7 +29,7 @@ export default function Organizers({isOpen, onOpenChange, onSelectedChange, init
     }, [organizersData, selectedOrganizers]);
 
     const organizerOptions = availableOrganizers.map(organizer => {
-        const fullName = `${organizer.lastName || ''} ${organizer.firstName || ''} ${organizer.middleName || ''}`.trim() || 'Без имени';
+        const fullName = `${organizer.lastName || ''} ${organizer.firstName || ''} ${organizer.middleName || ''}`.trim() || t('common.labels.noName');
         return {
             label: fullName,
             description: organizer.city || undefined,
@@ -46,7 +48,7 @@ export default function Organizers({isOpen, onOpenChange, onSelectedChange, init
         const map = new Map<string, Organizer>();
         if (organizersData) {
             organizersData.forEach(organizer => {
-                const fullName = `${organizer.lastName || ''} ${organizer.firstName || ''} ${organizer.middleName || ''}`.trim() || 'Без имени';
+                const fullName = `${organizer.lastName || ''} ${organizer.firstName || ''} ${organizer.middleName || ''}`.trim() || t('common.labels.noName');
                 map.set(fullName, organizer);
             });
         }
@@ -81,7 +83,7 @@ export default function Organizers({isOpen, onOpenChange, onSelectedChange, init
         <div>
             <Select
                 className="ep-select"
-                placeholder="Выберите организатора"
+                placeholder={t('calendar.selectOrganizer')}
                 showSearch
                 value={undefined}
                 searchValue={inputValue}
@@ -102,7 +104,7 @@ export default function Organizers({isOpen, onOpenChange, onSelectedChange, init
             {selectedOrganizers.length > 0 && (
                 <div className={styles.selectedOrganizers}>
                     {selectedOrganizers.map(organizer => {
-                        const fullName = `${organizer.lastName || ''} ${organizer.firstName || ''} ${organizer.middleName || ''}`.trim() || 'Без имени';
+                        const fullName = `${organizer.lastName || ''} ${organizer.firstName || ''} ${organizer.middleName || ''}`.trim() || t('common.labels.noName');
                         return (
                             <div key={organizer.id} className={styles.selectedRow}>
                                 <Avatar className="ep-avatar" size={36} src={buildImageUrl(organizer.avatarUrl) || undefined}>
@@ -113,7 +115,7 @@ export default function Organizers({isOpen, onOpenChange, onSelectedChange, init
                                     type="button"
                                     className={styles.removeButton}
                                     onClick={() => handleRemoveOrganizer(organizer.id)}
-                                    aria-label="Удалить"
+                                    aria-label={t('common.actions.delete')}
                                 >
                                     <CloseIcon/>
                                 </button>

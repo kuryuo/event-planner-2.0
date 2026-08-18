@@ -4,6 +4,7 @@ import {useChips} from "@/hooks/ui/useChips.ts";
 import styles from "./Category.module.scss";
 import {useGetCategoriesQuery} from "@/services/api/categoryApi.ts";
 import {Tag} from "antd";
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface CategorySelectProps {
     label?: string;
@@ -25,6 +26,7 @@ export default function Tags({
                                       onSelectedChange,
                                       initialCategories
                                   }: CategorySelectProps) {
+    const {t} = useI18n();
     const {chips, inputValue, setInputValue, addChip, removeChip, setChips} = useChips(initialCategories || []);
     const [internalIsOpen, setInternalIsOpen] = useState(false);
     const {data: categoriesData, isLoading} = useGetCategoriesQuery();
@@ -77,10 +79,10 @@ export default function Tags({
 
     return (
         <div>
-            <div className={styles.label}>Теги</div>
+            <div className={styles.label}>{t('filters.tags')}</div>
             <Select
                 className="ep-select"
-                placeholder="Выберите тег"
+                placeholder={t('filters.selectTag')}
                 mode="multiple"
                 showSearch
                 value={chips}

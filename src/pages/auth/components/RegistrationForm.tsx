@@ -5,6 +5,7 @@ import {isValidEmail} from '@/utils/validation.ts';
 import {Input} from '@/ui/input/Input';
 import {FormField} from '@/ui/form-field/FormField';
 import {AuthLayout} from '@/pages/auth/components/AuthLayout';
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface RegistrationFormValues {
     firstName: string;
@@ -27,6 +28,7 @@ export default function RegistrationForm({
     error,
     onLoginClick,
 }: RegistrationFormProps) {
+    const {t} = useI18n();
     const {
         control,
         handleSubmit,
@@ -48,7 +50,7 @@ export default function RegistrationForm({
     });
 
     return (
-        <AuthLayout title="Регистрация">
+        <AuthLayout title={t('auth.register.title')}>
             <form onSubmit={submitHandler} className={styles.formInner}>
                 <div className={styles.fieldsWrapper}>
                     <div className={styles.nameRow}>
@@ -56,14 +58,14 @@ export default function RegistrationForm({
                             name="firstName"
                             control={control}
                             rules={{
-                                required: 'Имя обязательно',
-                                minLength: {value: 2, message: 'Минимум 2 символа'},
+                                required: t('auth.validation.firstNameRequired'),
+                                minLength: {value: 2, message: t('auth.validation.minTwoChars')},
                             }}
                             render={({field}) => (
                                 <FormField error={errors.firstName?.message}>
                                     <Input
                                         {...field}
-                                        placeholder="Имя"
+                                        placeholder={t('auth.fields.firstName')}
                                         autoComplete="given-name"
                                         status={errors.firstName ? 'error' : undefined}
                                     />
@@ -74,14 +76,14 @@ export default function RegistrationForm({
                             name="lastName"
                             control={control}
                             rules={{
-                                required: 'Фамилия обязательна',
-                                minLength: {value: 2, message: 'Минимум 2 символа'},
+                                required: t('auth.validation.lastNameRequired'),
+                                minLength: {value: 2, message: t('auth.validation.minTwoChars')},
                             }}
                             render={({field}) => (
                                 <FormField error={errors.lastName?.message}>
                                     <Input
                                         {...field}
-                                        placeholder="Фамилия"
+                                        placeholder={t('auth.fields.lastName')}
                                         autoComplete="family-name"
                                         status={errors.lastName ? 'error' : undefined}
                                     />
@@ -94,14 +96,14 @@ export default function RegistrationForm({
                         name="email"
                         control={control}
                         rules={{
-                            required: 'Email обязателен',
-                            validate: (value) => isValidEmail(value) || 'Введите корректный email',
+                            required: t('auth.validation.emailRequired'),
+                            validate: (value) => isValidEmail(value) || t('auth.validation.validEmail'),
                         }}
                         render={({field}) => (
                             <FormField error={errors.email?.message}>
                                 <Input
                                     {...field}
-                                    placeholder="Email"
+                                    placeholder={t('auth.fields.email')}
                                     type="email"
                                     autoComplete="email"
                                     status={errors.email ? 'error' : undefined}
@@ -114,14 +116,14 @@ export default function RegistrationForm({
                         name="password"
                         control={control}
                         rules={{
-                            required: 'Пароль обязателен',
-                            minLength: {value: 6, message: 'Минимум 6 символов'},
+                            required: t('auth.validation.passwordRequired'),
+                            minLength: {value: 6, message: t('auth.validation.passwordMin')},
                         }}
                         render={({field}) => (
                             <FormField error={errors.password?.message}>
                                 <Input.Password
                                     {...field}
-                                    placeholder="Пароль"
+                                    placeholder={t('auth.fields.password')}
                                     autoComplete="new-password"
                                     status={errors.password ? 'error' : undefined}
                                 />
@@ -133,14 +135,14 @@ export default function RegistrationForm({
                         name="passwordConfirm"
                         control={control}
                         rules={{
-                            required: 'Повторите пароль',
-                            validate: (value) => value === getValues('password') || 'Пароли не совпадают',
+                            required: t('auth.validation.repeatPasswordRequired'),
+                            validate: (value) => value === getValues('password') || t('auth.validation.passwordsMismatch'),
                         }}
                         render={({field}) => (
                             <FormField error={errors.passwordConfirm?.message}>
                                 <Input.Password
                                     {...field}
-                                    placeholder="Повторите пароль"
+                                    placeholder={t('auth.fields.repeatPassword')}
                                     autoComplete="new-password"
                                     status={errors.passwordConfirm ? 'error' : undefined}
                                 />
@@ -157,13 +159,13 @@ export default function RegistrationForm({
                     disabled={loading}
                     className={`ep-btn ep-btn--m ep-btn--filled-purple ${styles.submitButton}`}
                 >
-                    {loading ? 'Загрузка...' : 'Зарегистрироваться'}
+                    {loading ? t('auth.register.loading') : t('common.actions.register')}
                 </Button>
 
                 <div className={styles.linkWrapper}>
-                    <span className={styles.text}>Уже есть аккаунт? </span>
+                    <span className={styles.text}>{t('auth.register.hasAccount')} </span>
                     <button type="button" onClick={onLoginClick} className={styles.link}>
-                        Войти
+                        {t('common.actions.login')}
                     </button>
                 </div>
             </form>

@@ -3,6 +3,7 @@ import styles from "./AvatarMenu.module.scss";
 import {Button} from "antd";
 import PlusLgIcon from '@/assets/img/icon-l/plus-lg.svg?react';
 import TrashIcon from '@/assets/img/icon-m/trash.svg?react';
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface AvatarMenuProps {
     children: React.ReactNode;
@@ -11,6 +12,7 @@ interface AvatarMenuProps {
 }
 
 export default function AvatarMenu({children, onUpload, onClear}: AvatarMenuProps) {
+    const {t} = useI18n();
     const [open, setOpen] = useState(false);
 
     const handleEnter = () => setOpen(true);
@@ -35,7 +37,7 @@ export default function AvatarMenu({children, onUpload, onClear}: AvatarMenuProp
                         className={`ep-btn ep-btn--m ep-btn--text ${styles.button}`}
                         onClick={onUpload}
                     >
-                        Загрузить аватар
+                        {t('profile.uploadAvatar')}
                     </Button>
                     <Button
                         type="text"
@@ -43,7 +45,7 @@ export default function AvatarMenu({children, onUpload, onClear}: AvatarMenuProp
                         className={`ep-btn ep-btn--m ep-btn--text ${styles.button}`}
                         onClick={onClear}
                     >
-                        Очистить
+                        {t('common.actions.clear')}
                     </Button>
                 </div>
             )}

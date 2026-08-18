@@ -41,6 +41,7 @@ import {useChatSignalR} from '@/hooks/realtime/useChatSignalR.ts';
 import type {AppDispatch} from '@/store/store.ts';
 import {clearEventChatUnread} from '@/store/realtimeSlice.ts';
 import {Tag} from "antd";
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface EventChatProps {
     eventId: string;
@@ -67,19 +68,19 @@ interface ComposerFile {
 
 const MAX_ATTACHMENTS = 10;
 
-const formatTime = (value: string): string => {
+const formatTime = (value: string, language: 'ru' | 'en'): string => {
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) {
         return '--:--';
     }
 
-    return new Intl.DateTimeFormat('ru-RU', {
+    return new Intl.DateTimeFormat(language === 'ru' ? 'ru-RU' : 'en-US', {
         hour: '2-digit',
         minute: '2-digit',
     }).format(date);
 };
 
-const formatDateLabel = (value: string): string => {
+const formatDateLabel = (value: string, language: 'ru' | 'en', todayLabel: string): string => {
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) {
         return '';
@@ -88,18 +89,18 @@ const formatDateLabel = (value: string): string => {
     const today = new Date();
     const isToday = date.toDateString() === today.toDateString();
     if (isToday) {
-        return 'Сегодня';
+        return todayLabel;
     }
 
-    return new Intl.DateTimeFormat('ru-RU', {
+    return new Intl.DateTimeFormat(language === 'ru' ? 'ru-RU' : 'en-US', {
         day: 'numeric',
         month: 'long',
     }).format(date);
 };
 
-const formatBytes = (value?: number | null): string => {
+const formatBytes = (value: number | null | undefined, fileLabel: string): string => {
     if (!value || value <= 0) {
-        return 'Файл';
+        return fileLabel;
     }
 
     if (value < 1024 * 1024) {
@@ -134,14 +135,15 @@ const resolveAttachmentType = (
     return 'file';
 };
 
-const shortText = (text?: string | null): string => {
+const shortText = (text: string | null | undefined, fallback: string): string => {
     if (!text) {
-        return 'Вложение';
+        return fallback;
     }
     return text.length > 72 ? `${text.slice(0, 72)}...` : text;
 };
 
 export default function EventChat({eventId}: EventChatProps) {
+    const {t, language} = useI18n();
     const dispatch = useDispatch<AppDispatch>();
 
     useChatSignalR(eventId);
@@ -402,7 +404,7 @@ export default function EventChat({eventId}: EventChatProps) {
 
             clearComposer();
         } catch (error) {
-            console.error('Не удалось отправить сообщение:', error);
+            console.error(`${t('eventPage.chatUi.sendFailed')}:`, error);
         }
     };
 
@@ -425,15 +427,15 @@ export default function EventChat({eventId}: EventChatProps) {
         try {
             await navigator.clipboard.writeText(value);
         } catch (error) {
-            console.error('Не удалось скопировать текст:', error);
+            console.error(`${t('eventPage.chatUi.copyFailed')}:`, error);
         }
     };
 
     const handleReply = (message: ChatMessage) => {
         setReplyDraft({
             id: message.id,
-            authorName: message.authorName || 'Пользователь',
-            text: shortText(message.text),
+            authorName: message.authorName || t('eventPage.chatUi.userFallback'),
+            text: shortText(message.text, t('eventPage.chatUi.attachment')),
         });
         setEditingMessageId(null);
         setMenuState(null);
@@ -461,7 +463,7 @@ export default function EventChat({eventId}: EventChatProps) {
                 clearComposer();
             }
         } catch (error) {
-            console.error('Не удалось удалить сообщение:', error);
+            console.error(`${t('eventPage.chatUi.deleteFailed')}:`, error);
         }
     };
 
@@ -489,8 +491,8 @@ export default function EventChat({eventId}: EventChatProps) {
         if (message.replyToMessage?.id) {
             return {
                 id: message.replyToMessage.id,
-                authorName: message.replyToMessage.authorName || 'Пользователь',
-                text: shortText(message.replyToMessage.text),
+                authorName: message.replyToMessage.authorName || t('eventPage.chatUi.userFallback'),
+                text: shortText(message.replyToMessage.text, t('eventPage.chatUi.attachment')),
             };
         }
 
@@ -502,8 +504,8 @@ export default function EventChat({eventId}: EventChatProps) {
 
             return {
                 id: replied.id,
-                authorName: replied.authorName || 'Пользователь',
-                text: shortText(replied.text),
+                authorName: replied.authorName || t('eventPage.chatUi.userFallback'),
+                text: shortText(replied.text, t('eventPage.chatUi.attachment')),
             };
         }
 
@@ -541,8 +543,8 @@ export default function EventChat({eventId}: EventChatProps) {
             >
                 <span className={styles.fileIconWrap}><FileLinesIcon/></span>
                 <span className={styles.fileMeta}>
-                    <span>{attachment.fileName || 'Файл'}</span>
-                    <span>{formatBytes(attachment.size)}</span>
+                    <span>{attachment.fileName || t('eventPage.chatUi.file')}</span>
+                    <span>{formatBytes(attachment.size, t('eventPage.chatUi.file'))}</span>
                 </span>
                 <DownloadIcon className={styles.fileDownloadIcon}/>
             </a>
@@ -560,7 +562,7 @@ export default function EventChat({eventId}: EventChatProps) {
                 <div className={styles.messagesArea}>
                     <div ref={messagesContainerRef} className={styles.messagesScroll}>
                         {isLoading ? (
-                            <div className={styles.centerState}>Загрузка сообщений...</div>
+                            <div className={styles.centerState}>{t('eventPage.chatUi.loadingMessages')}</div>
                         ) : sortedMessages.length === 0 ? (
                             <div className={styles.emptyState}>
                                 <div
@@ -568,7 +570,7 @@ export default function EventChat({eventId}: EventChatProps) {
                                     style={{backgroundImage: `url(${pixelsArt})`}}
                                     aria-hidden
                                 />
-                                <p className={styles.emptyStateMessage}>Напишите первое сообщение</p>
+                                <p className={styles.emptyStateMessage}>{t('eventPage.chatUi.firstMessage')}</p>
                             </div>
                         ) : (
                             <>
@@ -578,8 +580,8 @@ export default function EventChat({eventId}: EventChatProps) {
                                         ? Boolean(profile?.id && sortedMessages[index - 1].authorId === profile.id)
                                         : null;
                                     const hasSideBreak = prevIsOwn !== null && prevIsOwn !== isOwn;
-                                    const currentDate = formatDateLabel(message.createdAt);
-                                    const prevDate = index > 0 ? formatDateLabel(sortedMessages[index - 1].createdAt) : null;
+                                    const currentDate = formatDateLabel(message.createdAt, language, t('eventPage.chatUi.today'));
+                                    const prevDate = index > 0 ? formatDateLabel(sortedMessages[index - 1].createdAt, language, t('eventPage.chatUi.today')) : null;
                                     const showDateDivider = Boolean(currentDate && currentDate !== prevDate);
                                     const replyPreview = resolveReplyPreview(message);
 
@@ -602,7 +604,7 @@ export default function EventChat({eventId}: EventChatProps) {
 
                                             {unreadMarkerId === message.id && (
                                                 <div className={styles.unreadDivider}>
-                                                    <span>Непрочитанные сообщения</span>
+                                                    <span>{t('eventPage.chatUi.unreadMessages')}</span>
                                                 </div>
                                             )}
 
@@ -623,7 +625,7 @@ export default function EventChat({eventId}: EventChatProps) {
                                                         size={24}
                                                         src={buildImageUrl(profile?.avatarUrl)}
                                                     >
-                                                        {(profile?.firstName?.[0] ?? "В").toUpperCase()}
+                                                        {(profile?.firstName?.[0] ?? "—").toUpperCase()}
                                                     </Avatar>
                                                 ) : (
                                                     <Avatar
@@ -631,7 +633,7 @@ export default function EventChat({eventId}: EventChatProps) {
                                                         size={24}
                                                         src={buildImageUrl(message.authorAvatarUrl)}
                                                     >
-                                                        {(message.authorName?.[0] ?? "П").toUpperCase()}
+                                                        {(message.authorName?.[0] ?? "—").toUpperCase()}
                                                     </Avatar>
                                                 )}
 
@@ -650,12 +652,12 @@ export default function EventChat({eventId}: EventChatProps) {
                                                         </div>
                                                     )}
 
-                                                    {!isOwn && <div className={styles.authorName}>{message.authorName || 'Пользователь'}</div>}
+                                                    {!isOwn && <div className={styles.authorName}>{message.authorName || t('eventPage.chatUi.userFallback')}</div>}
 
                                                     {message.text && (
                                                         <div className={styles.messageTextRow}>
                                                             <p className={styles.messageText}>{message.text}</p>
-                                                            <span className={styles.time}>{formatTime(message.createdAt)}</span>
+                                                            <span className={styles.time}>{formatTime(message.createdAt, language)}</span>
                                                         </div>
                                                     )}
 
@@ -675,8 +677,8 @@ export default function EventChat({eventId}: EventChatProps) {
 
                     {showOldBanner && (
                         <div className={styles.oldMessagesBanner}>
-                            <span>Вы просматриваете старые сообщения</span>
-                            <button onClick={handleJumpToBottom}>Перейти к последним сообщениям</button>
+                            <span>{t('eventPage.chatUi.oldMessagesBanner')}</span>
+                            <button onClick={handleJumpToBottom}>{t('eventPage.chatUi.jumpToLatest')}</button>
                         </div>
                     )}
 
@@ -723,7 +725,7 @@ export default function EventChat({eventId}: EventChatProps) {
                                         <span className={styles.fileIconWrap}><FileLinesIcon/></span>
                                         <span className={styles.fileMeta}>
                                             <span>{item.file.name}</span>
-                                            <span>{formatBytes(item.file.size)}</span>
+                                            <span>{formatBytes(item.file.size, t('eventPage.chatUi.file'))}</span>
                                         </span>
                                         <button
                                             className={styles.fileRemoveRowButton}
@@ -742,7 +744,7 @@ export default function EventChat({eventId}: EventChatProps) {
                                                     return next;
                                                 });
                                             }}
-                                            aria-label="Удалить файл"
+                                            aria-label={t('eventPage.chatUi.removeFile')}
                                         >
                                             <XIcon/>
                                         </button>
@@ -754,7 +756,7 @@ export default function EventChat({eventId}: EventChatProps) {
                         {editingMessageId && (
                             <div className={styles.editingBanner}>
                                 <PenIcon/>
-                                <span>Редактирование сообщения</span>
+                                <span>{t('eventPage.chatUi.editingMessage')}</span>
                                 <button onClick={() => setEditingMessageId(null)}><XIcon/></button>
                             </div>
                         )}
@@ -774,12 +776,12 @@ export default function EventChat({eventId}: EventChatProps) {
                         {isObserver ? (
                             <div className={styles.composerRow}>
                                 <span className={styles.observerComposerHint}>
-                                    Вы не можете писать сообщения, потому что Ваша роль «Наблюдатель»
+                                    {t('eventPage.chatUi.observerHint')}
                                 </span>
                             </div>
                         ) : (
                             <div className={styles.composerRow}>
-                                <button className={styles.iconButton} onClick={openFileDialog} aria-label="Прикрепить файл">
+                                <button className={styles.iconButton} onClick={openFileDialog} aria-label={t('eventPage.chatUi.attachFile')}>
                                     <Link45degIcon/>
                                 </button>
 
@@ -795,7 +797,7 @@ export default function EventChat({eventId}: EventChatProps) {
                                     className={styles.composerInput}
                                     value={text}
                                     onChange={(event) => setText(event.target.value)}
-                                    placeholder={editingMessageId ? 'Измените сообщение...' : 'Напишите сообщение...'}
+                                    placeholder={editingMessageId ? t('eventPage.chatUi.editMessagePlaceholder') : t('eventPage.chatUi.writeMessagePlaceholder')}
                                     onKeyDown={(event) => {
                                         if (event.key === 'Enter' && !event.shiftKey) {
                                             event.preventDefault();
@@ -821,7 +823,7 @@ export default function EventChat({eventId}: EventChatProps) {
                                         )}
                                         onClick={() => void handleSend()}
                                         disabled={isBusy || !canSend}
-                                        aria-label="Отправить"
+                                        aria-label={t('eventPage.chatUi.send')}
                                     >
                                         <SendIcon/>
                                     </button>
@@ -850,38 +852,38 @@ export default function EventChat({eventId}: EventChatProps) {
                 <button
                     className={styles.searchToggle}
                     onClick={() => setIsSearchOpen((prev) => !prev)}
-                    aria-label="Поиск в чате"
+                    aria-label={t('eventPage.chatUi.chatSearchAria')}
                 >
                     <SearchIcon/>
                 </button>
 
                 {isSearchOpen && (
                     <aside className={styles.searchPanel}>
-                        <h3>Поиск в чате</h3>
+                        <h3>{t('eventPage.chatUi.searchTitle')}</h3>
                         <Input
                             value={searchText}
                             onChange={(event) => setSearchText(event.target.value)}
-                            placeholder="Текст сообщения..."
+                            placeholder={t('eventPage.chatUi.searchPlaceholder')}
                             prefix={<SearchIcon/>}
                             className="ep-input ep-input--m"
                         />
 
-                        {isSearchLoading && <p className={styles.searchState}>Ищем сообщения...</p>}
+                        {isSearchLoading && <p className={styles.searchState}>{t('eventPage.chatUi.searching')}</p>}
 
                         {!isSearchLoading && !searchText.trim() && (
-                            <p className={styles.searchState}>Введите запрос, чтобы найти сообщения</p>
+                            <p className={styles.searchState}>{t('eventPage.chatUi.searchPrompt')}</p>
                         )}
 
                         {!isSearchLoading && searchText.trim() && searchResults.length === 0 && (
                             <div className={styles.searchEmpty}>
-                                <p>Ничего не найдено</p>
-                                <p>Попробуйте изменить запрос</p>
+                                <p>{t('eventPage.chatUi.nothingFound')}</p>
+                                <p>{t('eventPage.chatUi.tryAnotherQuery')}</p>
                             </div>
                         )}
 
                         {searchResults.length > 0 && (
                             <>
-                                <p className={styles.resultsCount}>Результаты ({searchResults.length})</p>
+                                <p className={styles.resultsCount}>{t('eventPage.chatUi.results')} ({searchResults.length})</p>
                                 <div className={styles.resultsList}>
                                     {searchResults.map((item) => (
                                         <button
@@ -891,12 +893,12 @@ export default function EventChat({eventId}: EventChatProps) {
                                         >
                                             <div className={styles.resultHeader}>
                                                 <Avatar className="ep-avatar" size={36}>
-                                                    {(item.authorName?.[0] ?? "П").toUpperCase()}
+                                                    {(item.authorName?.[0] ?? "—").toUpperCase()}
                                                 </Avatar>
-                                                <span>{item.authorName || 'Пользователь'}</span>
-                                                <span>{formatTime(item.createdAt)}</span>
+                                                <span>{item.authorName || t('eventPage.chatUi.userFallback')}</span>
+                                                <span>{formatTime(item.createdAt, language)}</span>
                                             </div>
-                                            <p>{shortText(item.text)}</p>
+                                            <p>{shortText(item.text, t('eventPage.chatUi.attachment'))}</p>
                                         </button>
                                     ))}
                                 </div>
@@ -914,19 +916,19 @@ export default function EventChat({eventId}: EventChatProps) {
                 >
                     <button onClick={() => handleReply(menuState.message)}>
                         <ArrowUpRightIcon/>
-                        Ответить
+                        {t('eventPage.chatUi.reply')}
                     </button>
 
                     {menuState.isOwn && (
                         <button onClick={() => handleEdit(menuState.message)}>
                             <PenIcon/>
-                            Редактировать
+                            {t('eventPage.chatUi.edit')}
                         </button>
                     )}
 
                     <button onClick={() => void handleCopyText(menuState.message.text)}>
                         <Check2Icon/>
-                        Копировать текст
+                        {t('eventPage.chatUi.copyText')}
                     </button>
 
                     {menuState.isOwn && (
@@ -935,7 +937,7 @@ export default function EventChat({eventId}: EventChatProps) {
                             setMenuState(null);
                         }}>
                             <TrashIcon/>
-                            Удалить
+                            {t('common.actions.delete')}
                         </button>
                     )}
                 </div>
@@ -943,14 +945,14 @@ export default function EventChat({eventId}: EventChatProps) {
 
             <ProfileActionModal
                 isOpen={Boolean(deleteCandidate)}
-                title="Удалить сообщение?"
+                title={t('eventPage.chatUi.deleteMessageTitle')}
                 onClose={() => setDeleteCandidate(null)}
                 onConfirm={() => void handleDelete()}
-                confirmText="Удалить"
+                confirmText={t('common.actions.delete')}
                 confirmTone="danger"
             />
 
-            {isFetching && <div className={styles.loadingOverlay}>Обновляем чат...</div>}
+            {isFetching && <div className={styles.loadingOverlay}>{t('eventPage.chatUi.refreshing')}</div>}
         </div>
     );
 }

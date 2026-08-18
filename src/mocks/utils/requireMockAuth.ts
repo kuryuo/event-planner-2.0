@@ -1,5 +1,6 @@
 import { HttpResponse } from "msw";
 import { MOCK_ACCESS_TOKEN } from "../factories/auth.factory";
+import { mockT } from "./mockI18n";
 
 interface RequireMockAuthParams {
   request: Request;
@@ -15,7 +16,7 @@ export const requireMockAuth = ({
   }
 
   return HttpResponse.json(
-    { message: "Authorization required" },
+    { message: mockT("auth.authorizationRequired", request) },
     { status: 401 }
   );
 };

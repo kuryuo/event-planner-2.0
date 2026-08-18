@@ -8,6 +8,7 @@ import {
   updateMockProfileAvatar,
 } from "../db/profile.db";
 import { requireMockAuth } from "../utils/requireMockAuth";
+import { mockT } from "../utils/mockI18n";
 
 export const profileHandlers = [
   http.get(`${API_BASE_URL}/api/users/me`, ({ request }) => {
@@ -17,7 +18,7 @@ export const profileHandlers = [
       return authError;
     }
 
-    return HttpResponse.json(getMockProfile());
+    return HttpResponse.json(getMockProfile(request));
   }),
 
   http.put(`${API_BASE_URL}/api/users/me`, async ({ request }) => {
@@ -44,7 +45,7 @@ export const profileHandlers = [
 
     if (!file || typeof file === "string") {
       return HttpResponse.json(
-        { message: "Avatar file is required" },
+        { message: mockT("profile.avatarRequired", request) },
         { status: 400 }
       );
     }
@@ -62,7 +63,7 @@ export const profileHandlers = [
     }
 
     return HttpResponse.json({
-      result: getMockProfileEvents(),
+      result: getMockProfileEvents(request),
     });
   }),
 ];

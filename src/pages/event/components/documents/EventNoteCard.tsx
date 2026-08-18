@@ -4,6 +4,7 @@ import XIcon from '@/assets/img/icon-m/x.svg?react';
 import type {EventNote} from '@/types/api/Event.ts';
 import {formatNoteRelativeTime} from '@/utils/formatNoteRelativeTime.ts';
 import styles from './EventNoteCard.module.scss';
+import {useI18n} from '@/i18n/I18nProvider';
 
 const NOTE_MAX_LENGTH = 120;
 
@@ -14,6 +15,7 @@ export interface EventNoteCardProps {
 }
 
 export const EventNoteCard = ({note, canEdit, onSave}: EventNoteCardProps) => {
+    const {t} = useI18n();
     const [isEditing, setIsEditing] = useState(false);
     const [draft, setDraft] = useState(note.text);
     const [isSaving, setIsSaving] = useState(false);
@@ -70,14 +72,14 @@ export const EventNoteCard = ({note, canEdit, onSave}: EventNoteCardProps) => {
 
     if (isEditing) {
         return (
-            <div className={`${styles.card} ${styles.cardEditing}`} role="group" aria-label="Редактирование заметки">
+            <div className={`${styles.card} ${styles.cardEditing}`} role="group" aria-label={t('eventPage.noteEdit')}>
                 <textarea
                     className={styles.textarea}
                     value={draft}
                     disabled={isSaving}
                     maxLength={NOTE_MAX_LENGTH}
                     rows={4}
-                    aria-label="Текст заметки"
+                    aria-label={t('eventPage.noteText')}
                     autoFocus
                     onChange={(event) => setDraft(event.target.value.slice(0, NOTE_MAX_LENGTH))}
                     onKeyDown={handleKeyDown}
@@ -94,8 +96,8 @@ export const EventNoteCard = ({note, canEdit, onSave}: EventNoteCardProps) => {
                             disabled={isSaving}
                             onMouseDown={(event) => event.preventDefault()}
                             onClick={cancelEdit}
-                            aria-label="Отменить"
-                            title="Отменить"
+                            aria-label={t('common.actions.cancel')}
+                            title={t('common.actions.cancel')}
                         >
                             <XIcon/>
                         </button>
@@ -105,8 +107,8 @@ export const EventNoteCard = ({note, canEdit, onSave}: EventNoteCardProps) => {
                             disabled={isSaving || !draft.trim()}
                             onMouseDown={(event) => event.preventDefault()}
                             onClick={() => void commitEdit()}
-                            aria-label="Сохранить"
-                            title="Сохранить (Ctrl+Enter)"
+                            aria-label={t('common.actions.save')}
+                            title={`${t('common.actions.save')} (Ctrl+Enter)`}
                         >
                             <CheckIcon/>
                         </button>
@@ -129,7 +131,7 @@ export const EventNoteCard = ({note, canEdit, onSave}: EventNoteCardProps) => {
         <div
             className={`${styles.card} ${styles.cardEditable}`}
             onDoubleClick={startEdit}
-            title="Двойной клик для редактирования"
+            title={t('eventPage.doubleClickToEdit')}
         >
             <p className={styles.text}>{note.text}</p>
             <span className={styles.time}>{formatNoteRelativeTime(note.createdAt)}</span>

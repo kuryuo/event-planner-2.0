@@ -24,7 +24,7 @@ export const AddDocumentMenu = ({
         {
             key: 'file',
             icon: <FileIcon className={styles.icon}/>,
-            label: 'Выбрать файл',
+            label: 'Choose file',
             onClick: () => {
                 fileInputRef.current?.click();
             },
@@ -32,7 +32,7 @@ export const AddDocumentMenu = ({
         {
             key: 'link',
             icon: <LinkIcon className={styles.icon}/>,
-            label: 'Добавить ссылку',
+            label: 'Add link',
             onClick: () => {
                 onAddLink?.();
                 setOpen(false);

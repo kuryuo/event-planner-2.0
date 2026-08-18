@@ -1,4 +1,5 @@
 import type {ParticipantRoleKind} from '@/types/api/Event.ts';
+import {translate} from '@/i18n/index';
 
 const PARTICIPANT_ROLES: ParticipantRoleKind[] = ['Organizer', 'Editor', 'Assistant', 'Observer'];
 
@@ -63,15 +64,15 @@ export const canNavigateToEventEditor = ({
 export const getParticipantRoleName = (role?: string | null): string => {
     switch (normalizeParticipantRole(role)) {
         case 'Organizer':
-            return 'Организатор';
+            return translate('event.roles.Organizer');
         case 'Editor':
-            return 'Редактор';
+            return translate('event.roles.Editor');
         case 'Assistant':
-            return 'Помощник';
+            return translate('event.roles.Assistant');
         case 'Observer':
-            return 'Наблюдатель';
+            return translate('event.roles.Observer');
         default:
-            return 'Без роли';
+            return translate('event.roles.none');
     }
 };
 

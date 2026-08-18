@@ -4,6 +4,7 @@ import {Avatar, Dropdown} from 'antd';
 import styles from './CardWithDropdown.module.scss';
 import ChevronUpIcon from '@/assets/img/icon-m/chevron-up.svg?react';
 import Menu from '../menu/Menu.tsx';
+import {useI18n} from '@/i18n/I18nProvider';
 
 export interface CardWithDropdownProps {
     size?: 'M' | 'S';
@@ -43,6 +44,7 @@ export function CardWithDropdown({
     disableRoleSelection = false,
 }: CardWithDropdownProps) {
     const [isSelectOpen, setIsSelectOpen] = useState(false);
+    const {t} = useI18n();
 
     const handleSelectToggle = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -114,7 +116,7 @@ export function CardWithDropdown({
                                             type="button"
                                             className={styles.chevronButton}
                                             onClick={handleSelectToggle}
-                                            aria-label="Открыть меню"
+                                            aria-label={t('common.labels.openMenu')}
                                         >
                                             <ChevronUpIcon
                                                 className={clsx(styles.chevronIcon, isSelectOpen && styles.rotated)}

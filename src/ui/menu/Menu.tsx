@@ -6,6 +6,7 @@ import styles from './Menu.module.scss';
 import {Input} from "antd";
 import Check2Icon from '@/assets/img/icon-m/check2.svg?react';
 import PlusLgIcon from '@/assets/img/icon-s/plus-lg.svg?react';
+import {useI18n} from '@/i18n/I18nProvider';
 
 export interface MenuOption {
     label?: string;
@@ -29,14 +30,16 @@ export default function Menu({
     options,
     onOptionClick,
     withSearch = false,
-    searchPlaceholder = 'Поиск...',
+    searchPlaceholder,
     withNewRoleInput = false,
     onNewRoleCreate,
     selectedValues = [],
     shape = 'rounded',
 }: AppMenuProps) {
+    const {t} = useI18n();
     const [searchQuery, setSearchQuery] = useState('');
     const [newRoleName, setNewRoleName] = useState('');
+    const resolvedSearchPlaceholder = searchPlaceholder ?? t('common.labels.searchPlaceholder');
 
     const filteredOptions = useMemo(() => {
         if (!withSearch || !searchQuery.trim()) {
@@ -113,7 +116,7 @@ export default function Menu({
                 <>
                     <div className={styles.searchWrapper}>
                         <Input
-                            placeholder={searchPlaceholder}
+                            placeholder={resolvedSearchPlaceholder}
                             value={searchQuery}
                             className="ep-input ep-input--m"
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
@@ -128,7 +131,7 @@ export default function Menu({
                 <>
                     <div className={styles.newRoleWrapper}>
                         <Input
-                            placeholder="новая роль"
+                            placeholder={t('common.labels.newRolePlaceholder')}
                             value={newRoleName}
                             className="ep-input ep-input--m"
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewRoleName(e.target.value)}

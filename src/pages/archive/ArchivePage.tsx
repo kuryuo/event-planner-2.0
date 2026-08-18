@@ -10,6 +10,7 @@ import type {UserEvent} from '@/types/api/Profile.ts';
 import pixelsArt from '@/assets/image/pixels.svg?url';
 import styles from './ArchivePage.module.scss';
 import {useGetArchivedEventsQuery} from '@/services/api/eventApi.ts';
+import {useI18n} from '@/i18n/I18nProvider';
 
 const isArchivedEvent = (event: UserEvent): boolean => {
     const status = (event.status ?? '').toLowerCase();
@@ -28,6 +29,7 @@ const isArchivedEvent = (event: UserEvent): boolean => {
 };
 
 export default function ArchivePage() {
+    const {t} = useI18n();
     const navigate = useNavigate();
     const {data: archivedResponse, isLoading, isError} = useGetArchivedEventsQuery({Count: 20, Offset: 0});
     const {data: profileEvents = []} = useGetProfileEventsQuery(undefined, {skip: !isError});
@@ -57,19 +59,19 @@ export default function ArchivePage() {
             <div className={styles.content}>
                 <div className={styles.headerCard}>
                     <div>
-                        <h1 className={styles.title}>Архив</h1>
-                        <p className={styles.subtitle}>Здесь хранятся все прошедшие и отмененные мероприятия</p>
+                        <h1 className={styles.title}>{t('archive.title')}</h1>
+                        <p className={styles.subtitle}>{t('archive.subtitle')}</p>
                     </div>
 
                     <div className={styles.searchRow}>
                         <Input
                             value={query}
                             onChange={(event) => setQuery(event.target.value)}
-                            placeholder="Название мероприятия..."
+                            placeholder={t('archive.eventNamePlaceholder')}
                             prefix={<SearchIcon/>}
                             className="ep-input ep-input--m"
                         />
-                        <button className={styles.filterButton} aria-label="Фильтры">
+                        <button className={styles.filterButton} aria-label={t('archive.filters')}>
                             <FilterIcon/>
                         </button>
                     </div>
@@ -78,7 +80,7 @@ export default function ArchivePage() {
                 <section className={styles.listCard}>
                     {isLoading ? (
                         <div className={styles.emptyState}>
-                            <p>Загружаем архив...</p>
+                            <p>{t('archive.loading')}</p>
                         </div>
                     ) : archivedEvents.length === 0 ? (
                         <div className={styles.emptyState}>
@@ -88,8 +90,8 @@ export default function ArchivePage() {
                                 aria-hidden
                             />
                             <div className={styles.emptyStateContent}>
-                                <p>Ничего не найдено</p>
-                                <p className={styles.emptyHint}>Попробуйте изменить запрос</p>
+                                <p>{t('archive.empty')}</p>
+                                <p className={styles.emptyHint}>{t('archive.emptyHint')}</p>
                             </div>
                         </div>
                     ) : (

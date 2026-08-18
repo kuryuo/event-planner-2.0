@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import styles from './ButtonCircle.module.scss';
 import PlusIcon from '@/assets/img/icon-l/plus-lg.svg?react';
+import {useI18n} from '@/i18n/I18nProvider';
 
 type CircleButtonVariant = 'purple' | 'gray' | 'green';
 
@@ -13,6 +14,8 @@ export default function CircleButton({
                                          variant = 'purple',
                                          onClick,
                                      }: CircleButtonProps) {
+    const {t} = useI18n();
+
     return (
         <button
             className={clsx(styles.button, {
@@ -21,7 +24,7 @@ export default function CircleButton({
                 [styles.green]: variant === 'green',
             })}
             onClick={onClick}
-            aria-label="Создать"
+            aria-label={t('common.actions.createNew')}
         >
             <PlusIcon className={styles.icon}/>
         </button>

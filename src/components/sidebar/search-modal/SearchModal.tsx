@@ -2,6 +2,7 @@ import {useEffect, useMemo, useState, type RefObject} from 'react';
 import {createPortal} from 'react-dom';
 import {format} from 'date-fns';
 import {ru} from 'date-fns/locale';
+import {enUS} from 'date-fns/locale';
 import {Divider} from "antd";
 import {Avatar} from "antd";
 import {Tag} from 'antd';
@@ -9,6 +10,7 @@ import {useGetOrganizersQuery} from '@/services/api/userApi';
 import {buildImageUrl} from '@/utils/buildImageUrl';
 import type {UserEvent} from '@/types/api/Profile';
 import styles from './SearchModal.module.scss';
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface SearchModalProps {
     isOpen: boolean;
@@ -104,6 +106,7 @@ export default function SearchModal({
     anchorRef,
     panelRef,
 }: SearchModalProps) {
+    const {t, language} = useI18n();
     const {data: organizers = []} = useGetOrganizersQuery();
     const searchQuery = query.trim();
     const hasQuery = Boolean(searchQuery);
@@ -114,7 +117,7 @@ export default function SearchModal({
         const mapped = events.map((event) => ({
             id: event.id,
             title: event.name,
-            date: format(new Date(event.startDate), 'd MMMM', {locale: ru}),
+            date: format(new Date(event.startDate), 'd MMMM', {locale: language === 'ru' ? ru : enUS}),
             avatarUrl: buildImageUrl(event.avatar),
             startDate: new Date(event.startDate),
         }));
@@ -137,7 +140,7 @@ export default function SearchModal({
     const people = useMemo(() => {
         const mapped = organizers.map((organizer) => ({
             id: organizer.id,
-            title: `${organizer.lastName || ''} ${organizer.firstName || ''} ${organizer.middleName || ''}`.trim() || 'Без имени',
+            title: `${organizer.lastName || ''} ${organizer.firstName || ''} ${organizer.middleName || ''}`.trim() || t('common.labels.noName'),
             subtitle: organizer.city || undefined,
             avatarUrl: buildImageUrl(organizer.avatarUrl),
         }));
@@ -194,7 +197,7 @@ export default function SearchModal({
         >
             <div className={styles.content}>
                 <div className={styles.section}>
-                    <span className={styles.sectionTitle}>Недавние</span>
+                    <span className={styles.sectionTitle}>{t('sidebar.recent')}</span>
                     {recentSearches.length > 0 ? (
                         <div className={styles.chips}>
                             {recentSearches.map((query) => (
@@ -219,12 +222,12 @@ export default function SearchModal({
                             ))}
                         </div>
                     ) : (
-                        <span className={styles.emptyText}>Нет недавних поисков</span>
+                        <span className={styles.emptyText}>{t('sidebar.noRecentSearches')}</span>
                     )}
                 </div>
 
                 <div className={styles.section}>
-                    <span className={styles.sectionTitle}>Мероприятия</span>
+                    <span className={styles.sectionTitle}>{t('sidebar.events')}</span>
                     {upcomingEvents.length > 0 ? (
                         <div className={styles.list}>
                             {upcomingEvents.map((event, index) => (
@@ -251,12 +254,12 @@ export default function SearchModal({
                             ))}
                         </div>
                     ) : (
-                        <span className={styles.emptyText}>Нет мероприятий</span>
+                        <span className={styles.emptyText}>{t('sidebar.noEvents')}</span>
                     )}
                 </div>
 
                 <div className={styles.section}>
-                    <span className={styles.sectionTitle}>Люди</span>
+                    <span className={styles.sectionTitle}>{t('sidebar.people')}</span>
                     {people.length > 0 ? (
                         <div className={styles.list}>
                             {people.map((person, index) => (
@@ -281,12 +284,12 @@ export default function SearchModal({
                             ))}
                         </div>
                     ) : (
-                        <span className={styles.emptyText}>Нет пользователей</span>
+                        <span className={styles.emptyText}>{t('sidebar.noUsers')}</span>
                     )}
                 </div>
 
                 <div className={styles.section}>
-                    <span className={styles.sectionTitle}>Архив</span>
+                    <span className={styles.sectionTitle}>{t('sidebar.archive')}</span>
                     {archivedEvents.length > 0 ? (
                         <div className={styles.list}>
                             {archivedEvents.map((event, index) => (
@@ -313,13 +316,13 @@ export default function SearchModal({
                             ))}
                         </div>
                     ) : (
-                        <span className={styles.emptyText}>Архив пуст</span>
+                        <span className={styles.emptyText}>{t('sidebar.archiveEmpty')}</span>
                     )}
                 </div>
 
                 {hasQuery && upcomingEvents.length === 0 && archivedEvents.length === 0 && people.length === 0 && (
                     <div className={styles.section}>
-                        <span className={styles.emptyText}>Ничего не найдено. Проверьте запрос или попробуйте другое слово.</span>
+                        <span className={styles.emptyText}>{t('sidebar.nothingFound')}</span>
                     </div>
                 )}
             </div>

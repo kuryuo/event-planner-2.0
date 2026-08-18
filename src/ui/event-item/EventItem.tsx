@@ -4,6 +4,7 @@ import BoxArrowUpIcon from '@/assets/img/icon-m/box-arrow-up-right.svg?react';
 import {useNavigate} from "react-router-dom";
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 import {Avatar} from "antd";
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface EventItemProps {
     eventId: string;
@@ -29,6 +30,7 @@ export default function EventItem({
     onUnsubscribe
 }: EventItemProps) {
     const navigate = useNavigate();
+    const {t} = useI18n();
 
     const handleButtonClick = () => {
         if (isSubscribed) {
@@ -66,7 +68,7 @@ export default function EventItem({
                         className={`ep-btn ep-btn--m ${isSubscribed ? "ep-btn--filled-gray" : "ep-btn--filled-purple"}`}
                         onClick={handleButtonClick}
                     >
-                        {isSubscribed ? "Я не пойду" : "Я пойду"}
+                        {isSubscribed ? t('common.actions.leaveEvent') : t('common.actions.joinEvent')}
                     </Button>
                 )}
                 <BoxArrowUpIcon className={styles.buttonIcon} onClick={handleIconClick} style={{cursor: 'pointer'}}/>

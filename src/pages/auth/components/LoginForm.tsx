@@ -6,6 +6,7 @@ import {Input} from '@/ui/input/Input';
 import {FormField} from '@/ui/form-field/FormField';
 import {AuthLayout} from '@/pages/auth/components/AuthLayout';
 import type {LoginPayload} from '@/types/api/Auth';
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface LoginFormValues {
     email: string;
@@ -28,6 +29,7 @@ export default function LoginForm({
     onRegisterClick,
     onRecoverPasswordClick,
 }: LoginFormProps) {
+    const {t} = useI18n();
     const {
         control,
         handleSubmit,
@@ -45,21 +47,21 @@ export default function LoginForm({
     });
 
     return (
-        <AuthLayout title="Вход">
+        <AuthLayout title={t('auth.login.title')}>
             <form onSubmit={submitHandler} className={styles.formInner}>
                 <div className={styles.fieldsWrapper}>
                     <Controller
                         name="email"
                         control={control}
                         rules={{
-                            required: 'Email обязателен',
-                            validate: (value) => isValidEmail(value) || 'Введите корректный email',
+                            required: t('auth.validation.emailRequired'),
+                            validate: (value) => isValidEmail(value) || t('auth.validation.validEmail'),
                         }}
                         render={({field}) => (
                             <FormField error={errors.email?.message}>
                                 <Input
                                     {...field}
-                                    placeholder="Email"
+                                    placeholder={t('auth.fields.email')}
                                     type="email"
                                     autoComplete="email"
                                     status={errors.email ? 'error' : undefined}
@@ -72,14 +74,14 @@ export default function LoginForm({
                         name="password"
                         control={control}
                         rules={{
-                            required: 'Пароль обязателен',
-                            minLength: {value: 6, message: 'Минимум 6 символов'},
+                            required: t('auth.validation.passwordRequired'),
+                            minLength: {value: 6, message: t('auth.validation.passwordMin')},
                         }}
                         render={({field}) => (
                             <FormField error={errors.password?.message}>
                                 <Input.Password
                                     {...field}
-                                    placeholder="Пароль"
+                                    placeholder={t('auth.fields.password')}
                                     autoComplete="current-password"
                                     status={errors.password ? 'error' : undefined}
                                 />
@@ -96,7 +98,7 @@ export default function LoginForm({
                                 className={`ep-checkbox ${styles.checkbox}`}
                                 onChange={(e) => field.onChange(e.target.checked)}
                             >
-                                <span className={styles.checkboxLabel}>Запомнить меня</span>
+                                <span className={styles.checkboxLabel}>{t('auth.login.rememberMe')}</span>
                             </Checkbox>
                         )}
                     />
@@ -110,20 +112,20 @@ export default function LoginForm({
                     disabled={loading}
                     className={`ep-btn ep-btn--m ep-btn--filled-purple ${styles.submitButton}`}
                 >
-                    {loading ? 'Вход...' : 'Войти'}
+                    {loading ? t('auth.login.loading') : t('common.actions.login')}
                 </Button>
 
                 <div className={styles.links}>
                     <div className={styles.linkWrapper}>
-                        <span className={styles.text}>Нет аккаунта? </span>
+                        <span className={styles.text}>{t('auth.login.noAccount')} </span>
                         <button type="button" onClick={onRegisterClick} className={styles.link}>
-                            Зарегистрироваться
+                            {t('common.actions.register')}
                         </button>
                     </div>
                     <div className={styles.linkWrapper}>
-                        <span className={styles.text}>Забыли пароль? </span>
+                        <span className={styles.text}>{t('auth.login.forgotPassword')} </span>
                         <button type="button" onClick={onRecoverPasswordClick} className={styles.link}>
-                            Восстановить пароль
+                            {t('common.actions.recoverPassword')}
                         </button>
                     </div>
                 </div>

@@ -8,8 +8,10 @@ import dayjs from "dayjs";
 import {useDateTime} from "@/hooks/api/useDateTime.ts";
 import {useClickOutside} from "@/hooks/ui/useClickOutside.ts";
 import styles from "./DateTimeSection.module.scss";
+import {useI18n} from '@/i18n/I18nProvider';
 
 export default function DateTimeSection() {
+    const {t} = useI18n();
     const {
         startDate,
         endDate,
@@ -52,7 +54,7 @@ export default function DateTimeSection() {
                 <div className={styles.wrapper} data-variant="date" ref={startDatePickerRef}>
                     <CalendarIcon className={styles.icon} onClick={toggleStartDatePicker}/>
                     <Input
-                        placeholder="Дата начала"
+                        placeholder={t('eventEditor.dateSection.startDate')}
                         value={formattedStartDate}
                         onClick={toggleStartDatePicker}
                         readOnly
@@ -82,7 +84,7 @@ export default function DateTimeSection() {
                 >
                     <TimePicker
                         className={styles.timePicker}
-                        placeholder="Время"
+                        placeholder={t('eventEditor.dateSection.time')}
                         value={startTime ? dayjs(startTime, "HH:mm") : null}
                         format="HH:mm"
                         minuteStep={5}
@@ -101,7 +103,7 @@ export default function DateTimeSection() {
                         checked={isTimeEnabled}
                         onChange={setIsTimeEnabled}
                     />
-                    <span className={styles.toggleLabel}>Указать время</span>
+                    <span className={styles.toggleLabel}>{t('eventEditor.dateSection.specifyTime')}</span>
                 </label>
 
                 <label className={styles.toggleRow}>
@@ -110,7 +112,7 @@ export default function DateTimeSection() {
                         checked={isEndDateEnabled}
                         onChange={setIsEndDateEnabled}
                     />
-                    <span className={styles.toggleLabel}>Дата окончания</span>
+                    <span className={styles.toggleLabel}>{t('eventEditor.dateSection.endDateEnabled')}</span>
                 </label>
             </div>
 
@@ -119,7 +121,7 @@ export default function DateTimeSection() {
                     <div className={styles.wrapper} data-variant="date" ref={endDatePickerRef}>
                         <CalendarIcon className={styles.icon} onClick={toggleEndDatePicker}/>
                         <Input
-                            placeholder="Дата окончания"
+                            placeholder={t('eventEditor.dateSection.endDate')}
                             value={formattedEndDate}
                             onClick={toggleEndDatePicker}
                             readOnly
@@ -149,7 +151,7 @@ export default function DateTimeSection() {
                     >
                         <TimePicker
                             className={styles.timePicker}
-                            placeholder="Время"
+                            placeholder={t('eventEditor.dateSection.time')}
                             value={endTime ? dayjs(endTime, "HH:mm") : null}
                             format="HH:mm"
                             minuteStep={5}

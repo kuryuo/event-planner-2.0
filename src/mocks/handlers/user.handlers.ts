@@ -12,6 +12,7 @@ import {
   createMockUser,
 } from "../factories/user.factory";
 import { requireMockAuth } from "../utils/requireMockAuth";
+import { mockT } from "../utils/mockI18n";
 
 const mockUsers: UserForeignProfile[] = [
   createMockUser(),
@@ -67,7 +68,27 @@ export const userHandlers = [
       return authError;
     }
 
-    return HttpResponse.json({ result: mockOrganizers });
+    return HttpResponse.json({
+      result: mockOrganizers.map((organizer) => ({
+        ...organizer,
+        firstName:
+          organizer.firstName === "Ivan"
+            ? mockT("user.ivan", request)
+            : organizer.firstName,
+        lastName:
+          organizer.lastName === "Ivanov"
+            ? mockT("user.ivanov", request)
+            : organizer.lastName,
+        middleName:
+          organizer.middleName === "Ivanovich"
+            ? mockT("user.ivanovich", request)
+            : organizer.middleName,
+        city:
+          organizer.city === "Moscow"
+            ? mockT("event.locationMoscow", request)
+            : organizer.city,
+      })),
+    });
   }),
 
   http.get(`${API_BASE_URL}/api/admin/users`, ({ request }) => {
@@ -94,7 +115,37 @@ export const userHandlers = [
     );
 
     return HttpResponse.json({
-      result: filteredUsers.slice(offset, offset + count),
+      result: filteredUsers.slice(offset, offset + count).map((user) => ({
+        ...user,
+        firstName:
+          user.firstName === "Ivan"
+            ? mockT("user.ivan", request)
+            : user.firstName === "Maria"
+              ? mockT("user.maria", request)
+              : user.firstName,
+        lastName:
+          user.lastName === "Ivanov"
+            ? mockT("user.ivanov", request)
+            : user.lastName === "Smirnova"
+              ? mockT("user.smirnova", request)
+              : user.lastName,
+        middleName:
+          user.middleName === "Ivanovich"
+            ? mockT("user.ivanovich", request)
+            : user.middleName === "Andreevna"
+              ? mockT("user.andreevna", request)
+              : user.middleName,
+        profession:
+          user.profession === "UI/UX designer"
+            ? mockT("user.professionUiUx", request)
+            : user.profession,
+        city:
+          user.city === "Moscow"
+            ? mockT("event.locationMoscow", request)
+            : user.city === "Kazan"
+              ? mockT("user.cityKazan", request)
+              : user.city,
+      })),
     });
   }),
 
@@ -106,7 +157,7 @@ export const userHandlers = [
     }
 
     return HttpResponse.json({
-      result: getMockProfileEvents(),
+      result: getMockProfileEvents(request),
     });
   }),
 
@@ -123,11 +174,41 @@ export const userHandlers = [
 
     if (!user) {
       return HttpResponse.json(
-        { message: "User not found" },
+        { message: mockT("user.notFound", request) },
         { status: 404 }
       );
     }
 
-    return HttpResponse.json(user);
+    return HttpResponse.json({
+      ...user,
+      firstName:
+        user.firstName === "Ivan"
+          ? mockT("user.ivan", request)
+          : user.firstName === "Maria"
+            ? mockT("user.maria", request)
+            : user.firstName,
+      lastName:
+        user.lastName === "Ivanov"
+          ? mockT("user.ivanov", request)
+          : user.lastName === "Smirnova"
+            ? mockT("user.smirnova", request)
+            : user.lastName,
+      middleName:
+        user.middleName === "Ivanovich"
+          ? mockT("user.ivanovich", request)
+          : user.middleName === "Andreevna"
+            ? mockT("user.andreevna", request)
+            : user.middleName,
+      profession:
+        user.profession === "UI/UX designer"
+          ? mockT("user.professionUiUx", request)
+          : user.profession,
+      city:
+        user.city === "Moscow"
+          ? mockT("event.locationMoscow", request)
+          : user.city === "Kazan"
+            ? mockT("user.cityKazan", request)
+            : user.city,
+    });
   }),
 ];

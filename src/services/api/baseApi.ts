@@ -11,6 +11,12 @@ const rawBaseQuery = fetchBaseQuery({
         if (token) {
             headers.set('Authorization', `Bearer ${token}`)
         }
+        if (typeof window !== 'undefined') {
+            const language = window.localStorage.getItem('app_language')
+            if (language === 'ru' || language === 'en') {
+                headers.set('Accept-Language', language)
+            }
+        }
         return headers
     },
 })

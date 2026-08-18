@@ -3,6 +3,7 @@ import type { EventRole, ParticipantRoleKind } from "@/types/api/Event";
 import { API_BASE_URL } from "../config";
 import { copyMockEventRecord, patchMockEventRecord } from "../db/event.db";
 import { requireMockAuth } from "../utils/requireMockAuth";
+import { mockT } from "../utils/mockI18n";
 
 interface EventPhoto {
   id: string;
@@ -139,7 +140,7 @@ export const eventMetaHandlers = [
 
       if (!file || typeof file === "string") {
         return HttpResponse.json(
-          { message: "File is required" },
+          { message: mockT("eventMeta.fileRequired", request) },
           { status: 400 }
         );
       }
@@ -194,7 +195,7 @@ export const eventMetaHandlers = [
 
       if (!avatar || typeof avatar === "string") {
         return HttpResponse.json(
-          { message: "Avatar is required" },
+          { message: mockT("eventMeta.avatarRequired", request) },
           { status: 400 }
         );
       }
@@ -206,7 +207,7 @@ export const eventMetaHandlers = [
 
       if (!event) {
         return HttpResponse.json(
-          { message: "Event not found" },
+          { message: mockT("event.errorNotFound", request) },
           { status: 404 }
         );
       }
@@ -250,7 +251,7 @@ export const eventMetaHandlers = [
 
       if (!roleName) {
         return HttpResponse.json(
-          { message: "Role name is required" },
+          { message: mockT("eventMeta.roleNameRequired", request) },
           { status: 400 }
         );
       }
@@ -298,7 +299,7 @@ export const eventMetaHandlers = [
       return event
         ? new HttpResponse(null, { status: 204 })
         : HttpResponse.json(
-            { message: "Event not found" },
+            { message: mockT("event.errorNotFound", request) },
             { status: 404 }
           );
     }
@@ -325,7 +326,7 @@ export const eventMetaHandlers = [
       return event
         ? new HttpResponse(null, { status: 204 })
         : HttpResponse.json(
-            { message: "Event not found" },
+            { message: mockT("event.errorNotFound", request) },
             { status: 404 }
           );
     }
@@ -345,7 +346,7 @@ export const eventMetaHandlers = [
 
       if (!name) {
         return HttpResponse.json(
-          { message: "Template name is required" },
+          { message: mockT("eventMeta.templateNameRequired", request) },
           { status: 400 }
         );
       }
@@ -358,7 +359,7 @@ export const eventMetaHandlers = [
       return event
         ? new HttpResponse(null, { status: 204 })
         : HttpResponse.json(
-            { message: "Event not found" },
+            { message: mockT("event.errorNotFound", request) },
             { status: 404 }
           );
     }

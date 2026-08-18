@@ -557,13 +557,21 @@
 }
 
 :global(.react-kanban-card) {
-  min-width: 0;
-  max-width: 100%;
-  width: 100%;
+  min-width: 326px;
+  max-width: 326px;
+  width: 326px;
   padding: 0;
   margin-bottom: 12px;
   background: transparent;
   box-sizing: border-box;
+  display: block;
+}
+
+:global(.react-kanban-card-skeleton),
+:global(.react-kanban-card-adder-form) {
+  min-width: 326px;
+  max-width: 326px;
+  width: 326px;
 }
 
 :global(.react-kanban-board .react-kanban-column) {
@@ -587,6 +595,9 @@
   height: calc(var(--kanban-columns-height) - 54px);
   min-height: calc(var(--kanban-columns-height) - 54px);
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 
 :global(.react-kanban-board) {

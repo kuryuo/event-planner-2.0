@@ -14,6 +14,7 @@ import {
 import styles from './NotificationsPage.module.scss';
 import {markAllChatAlertsRead, markChatAlertRead} from '@/store/realtimeSlice.ts';
 import BellIcon from '@/assets/image/bell.svg?react';
+import {useI18n} from '@/i18n/I18nProvider';
 
 type ViewNotification = {
     id: string;
@@ -26,50 +27,59 @@ type ViewNotification = {
     eventId?: string;
 };
 
-const shortMessage = (value?: string): string => {
-    if (!value) return 'Новое сообщение';
+const shortMessage = (value: string | undefined, fallback: string): string => {
+    if (!value) return fallback;
     return value.length > 120 ? `${value.slice(0, 120)}...` : value;
 };
 
-const resolveNotificationTitle = (type?: string | null, senderName?: string | null): string => {
+const resolveNotificationTitle = (
+    t: (key: string, params?: Record<string, string | number>) => string,
+    type?: string | null,
+    senderName?: string | null,
+): string => {
     const normalized = String(type ?? '').toLowerCase();
-    if (normalized === 'chatmessage') return `Новое сообщение${senderName ? ` от ${senderName}` : ''}`;
-    if (normalized === 'eventstart') return 'Скоро начало мероприятия';
-    if (normalized === 'bufferendingsoon') return 'Скоро завершится буферный период';
-    if (normalized === 'taskdeadline') return 'Срок задачи';
-    if (normalized === 'eventcancelled') return 'Мероприятие отменено';
-    if (normalized === 'eventpublished') return 'Мероприятие опубликовано';
-    return 'Уведомление';
+    if (normalized === 'chatmessage') return senderName ? t('notifications.newMessageFrom', {name: senderName}) : t('notifications.newMessage');
+    if (normalized === 'eventstart') return t('notifications.eventStartSoon');
+    if (normalized === 'bufferendingsoon') return t('notifications.bufferEndingSoon');
+    if (normalized === 'taskdeadline') return t('notifications.taskDeadline');
+    if (normalized === 'eventcancelled') return t('notifications.eventCancelled');
+    if (normalized === 'eventpublished') return t('notifications.eventPublished');
+    return t('notifications.title');
 };
 
-const formatRelativeTime = (value: string): string => {
+const formatRelativeTime = (
+    value: string,
+    language: 'ru' | 'en',
+    t: (key: string, params?: Record<string, string | number>) => string,
+): string => {
     const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return 'только что';
+    if (Number.isNaN(date.getTime())) return t('common.status.justNow');
 
     const diffMs = Date.now() - date.getTime();
     const minutes = Math.max(1, Math.floor(diffMs / 60000));
 
     if (minutes < 60) {
-        return `${minutes} мин назад`;
+        return t('common.relative.minutesAgo', {count: minutes});
     }
 
     const hours = Math.floor(minutes / 60);
     if (hours < 24) {
-        return `${hours} ч назад`;
+        return t('common.relative.hoursAgo', {count: hours});
     }
 
     const days = Math.floor(hours / 24);
     if (days < 7) {
-        return `${days} дн назад`;
+        return t('common.relative.daysAgo', {count: days});
     }
 
-    return new Intl.DateTimeFormat('ru-RU', {
+    return new Intl.DateTimeFormat(language === 'ru' ? 'ru-RU' : 'en-US', {
         day: '2-digit',
         month: '2-digit',
     }).format(date);
 };
 
 export default function NotificationsPage() {
+    const {t, language} = useI18n();
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const {data: notifications = [], isLoading} = useGetNotificationsQuery(
@@ -85,9 +95,9 @@ export default function NotificationsPage() {
     const mergedNotifications = useMemo<ViewNotification[]>(() => {
         const apiItems: ViewNotification[] = notifications.map((notification) => ({
             id: notification.id,
-            title: notification.title || resolveNotificationTitle(notification.type, notification.senderName),
+            title: notification.title || resolveNotificationTitle(t, notification.type, notification.senderName),
             text: notification.type?.toLowerCase() === 'chatmessage'
-                ? `${shortMessage(notification.messageText ?? notification.text)}${notification.communityName ? ` • ${notification.communityName}` : ''}`
+                ? `${shortMessage(notification.messageText ?? notification.text, t('notifications.newMessage'))}${notification.communityName ? ` • ${notification.communityName}` : ''}`
                 : notification.text,
             isRead: notification.isRead,
             createdAt: notification.createdAt,
@@ -97,8 +107,8 @@ export default function NotificationsPage() {
 
         const chatItems: ViewNotification[] = chatAlerts.map((alert) => ({
             id: alert.id,
-            title: alert.senderName ? `Новое сообщение от ${alert.senderName}` : 'Новое сообщение в чате',
-            text: `${shortMessage(alert.messageText)}${alert.eventName ? ` • ${alert.eventName}` : ''}`,
+            title: alert.senderName ? t('notifications.newMessageFrom', {name: alert.senderName}) : t('notifications.newChatMessage'),
+            text: `${shortMessage(alert.messageText, t('notifications.newMessage'))}${alert.eventName ? ` • ${alert.eventName}` : ''}`,
             isRead: alert.isRead,
             createdAt: alert.createdAt,
             isLocalChat: true,
@@ -106,7 +116,7 @@ export default function NotificationsPage() {
         }));
 
         return [...apiItems, ...chatItems];
-    }, [notifications, chatAlerts]);
+    }, [notifications, chatAlerts, t]);
 
     const unreadCount = useMemo(
         () => mergedNotifications.filter(item => !item.isRead).length,
@@ -143,7 +153,7 @@ export default function NotificationsPage() {
         try {
             await markRead([notification.id]).unwrap();
         } catch (error) {
-            console.error('Не удалось отметить уведомление прочитанным', error);
+            console.error(t('notifications.markReadFailed'), error);
         }
     };
 
@@ -151,7 +161,7 @@ export default function NotificationsPage() {
         try {
             await respondInvitation({invitationId, accept}).unwrap();
         } catch (error) {
-            console.error('Не удалось ответить на приглашение', error);
+            console.error(t('notifications.invitationRespondFailed'), error);
         }
     };
 
@@ -172,10 +182,10 @@ export default function NotificationsPage() {
             <div className={styles.contentArea}>
                 <div className={styles.content}>
                 <div className={styles.header}>
-                    <h2>Уведомления</h2>
+                    <h2>{t('notifications.title')}</h2>
                     <div className={styles.actions}>
                         <Button type="text" className="ep-btn ep-btn--m ep-btn--text" onClick={() => navigate(-1)}>
-                            Назад
+                            {t('common.actions.back')}
                         </Button>
                         <Button
                             type="default"
@@ -186,19 +196,19 @@ export default function NotificationsPage() {
                             }}
                             disabled={unreadCount === 0 || isMarkingAll}
                         >
-                            Прочитать все
+                            {t('common.actions.markAllRead')}
                         </Button>
                     </div>
                 </div>
 
                 {isLoading ? (
-                    <div className={styles.empty}>Загрузка уведомлений...</div>
+                    <div className={styles.empty}>{t('notifications.loading')}</div>
                 ) : sortedNotifications.length === 0 ? (
-                    <div className={styles.empty}>Уведомлений пока нет</div>
+                    <div className={styles.empty}>{t('notifications.empty')}</div>
                 ) : (
                     <div className={styles.list}>
                         {unreadNotifications.length > 0 && (
-                            <div className={styles.sectionTitle}>Новые</div>
+                            <div className={styles.sectionTitle}>{t('notifications.unreadSection')}</div>
                         )}
 
                         {unreadNotifications.map((notification) => {
@@ -228,7 +238,7 @@ export default function NotificationsPage() {
                                                 <span className={styles.statusDot} aria-hidden="true" />
                                             </div>
                                             <div className={styles.cardText}>{notification.text}</div>
-                                            <div className={styles.cardDate}>{formatRelativeTime(notification.createdAt)}</div>
+                                            <div className={styles.cardDate}>{formatRelativeTime(notification.createdAt, language, t)}</div>
                                         </div>
                                         <span className={styles.cardArrow} aria-hidden="true">→</span>
                                     </div>
@@ -240,14 +250,14 @@ export default function NotificationsPage() {
                                             onClick={() => handleRead(notification)}
                                             disabled={isMarkingRead}
                                         >
-                                            Отметить прочитанным
+                                            {t('common.actions.markAsRead')}
                                         </Button>
                                     </div>
 
                                     {invitation && (
                                         <div className={styles.invitationBlock}>
                                             <div className={styles.cardText}>
-                                                Приглашение на мероприятие {invitation.eventName || invitation.eventId}
+                                                {t('notifications.invitationToEvent', {name: invitation.eventName || invitation.eventId})}
                                             </div>
                                             <div className={styles.actions}>
                                                 <Button
@@ -256,7 +266,7 @@ export default function NotificationsPage() {
                                                     onClick={() => handleRespond(invitation.id, true)}
                                                     disabled={isResponding}
                                                 >
-                                                    Принять
+                                                    {t('common.actions.accept')}
                                                 </Button>
                                                 <Button
                                                     type="text"
@@ -265,7 +275,7 @@ export default function NotificationsPage() {
                                                     onClick={() => handleRespond(invitation.id, false)}
                                                     disabled={isResponding}
                                                 >
-                                                    Отклонить
+                                                    {t('common.actions.decline')}
                                                 </Button>
                                             </div>
                                         </div>
@@ -275,7 +285,7 @@ export default function NotificationsPage() {
                         })}
 
                         {readNotifications.length > 0 && (
-                            <div className={styles.sectionTitle}>Прочитанные</div>
+                            <div className={styles.sectionTitle}>{t('notifications.readSection')}</div>
                         )}
 
                         {readNotifications.map((notification) => (
@@ -299,7 +309,7 @@ export default function NotificationsPage() {
                                             <div className={styles.cardTitle}>{notification.title}</div>
                                         </div>
                                         <div className={styles.cardText}>{notification.text}</div>
-                                        <div className={styles.cardDate}>{formatRelativeTime(notification.createdAt)}</div>
+                                        <div className={styles.cardDate}>{formatRelativeTime(notification.createdAt, language, t)}</div>
                                     </div>
                                     <span className={styles.cardArrow} aria-hidden="true">→</span>
                                 </div>

@@ -7,6 +7,7 @@ import {Input} from '@/ui/input/Input';
 import {FormField} from '@/ui/form-field/FormField';
 import {AuthLayout} from '@/pages/auth/components/AuthLayout';
 import type {RecoverPayload} from '@/types/api/Auth';
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface RecoverPasswordFormProps {
     onSubmit: (data: RecoverPayload) => Promise<{success: boolean; error?: string}>;
@@ -21,6 +22,7 @@ export default function RecoverPasswordForm({
     error,
     onLoginClick,
 }: RecoverPasswordFormProps) {
+    const {t} = useI18n();
     const [isSent, setIsSent] = useState(false);
     const {
         control,
@@ -38,14 +40,14 @@ export default function RecoverPasswordForm({
     });
 
     return (
-        <AuthLayout title="Восстановление пароля">
+        <AuthLayout title={t('auth.recover.title')}>
             {isSent ? (
                 <div className={styles.formInner}>
                     <p className={styles.text}>
-                        Если аккаунт с таким email существует, мы отправили инструкции по восстановлению.
+                        {t('auth.recover.success')}
                     </p>
                     <button type="button" onClick={onLoginClick} className={styles.link}>
-                        Вернуться ко входу
+                        {t('common.actions.backToLogin')}
                     </button>
                 </div>
             ) : (
@@ -55,14 +57,14 @@ export default function RecoverPasswordForm({
                             name="email"
                             control={control}
                             rules={{
-                                required: 'Email обязателен',
-                                validate: (value) => isValidEmail(value) || 'Введите корректный email',
+                                required: t('auth.validation.emailRequired'),
+                                validate: (value) => isValidEmail(value) || t('auth.validation.validEmail'),
                             }}
                             render={({field}) => (
                                 <FormField error={errors.email?.message}>
                                     <Input
                                         {...field}
-                                        placeholder="Email"
+                                        placeholder={t('auth.fields.email')}
                                         type="email"
                                         autoComplete="email"
                                         status={errors.email ? 'error' : undefined}
@@ -79,12 +81,12 @@ export default function RecoverPasswordForm({
                         disabled={loading}
                         className={`ep-btn ep-btn--m ep-btn--filled-purple ${styles.submitButton}`}
                     >
-                        {loading ? 'Отправка...' : 'Отправить'}
+                        {loading ? t('auth.recover.loading') : t('common.actions.submit')}
                     </Button>
 
                     <div className={styles.linkWrapper}>
                         <button type="button" onClick={onLoginClick} className={styles.link}>
-                            Вернуться ко входу
+                            {t('common.actions.backToLogin')}
                         </button>
                     </div>
                 </form>

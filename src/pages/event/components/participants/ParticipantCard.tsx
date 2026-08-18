@@ -13,6 +13,7 @@ import {
 import styles from './ParticipantCard.module.scss';
 import {isOrganizerRole} from '@/utils/participantRole.ts';
 import {Tag} from "antd";
+import {useI18n} from '@/i18n/I18nProvider';
 
 const ROLE_MAP = {
     Организатор: 'Organizer',
@@ -26,15 +27,16 @@ const ROLE_MAP = {
 } as const;
 
 const ROLE_LABELS: Record<string, string> = {
-    Organizer: 'Организатор',
-    Editor: 'Редактор',
-    Assistant: 'Помощник',
-    Observer: 'Наблюдатель',
+    Organizer: 'participant.roles.organizer',
+    Editor: 'participant.roles.editor',
+    Assistant: 'participant.roles.assistant',
+    Observer: 'participant.roles.observer',
 };
 
-const toRoleLabel = (role?: string | null): string => {
-    if (!role) return 'Роль не назначена';
-    return ROLE_LABELS[role] || role;
+const toRoleLabel = (role: string | null | undefined, t: (key: string) => string): string => {
+    if (!role) return t('participant.roles.unassigned');
+    const key = ROLE_LABELS[role];
+    return key ? t(key) : role;
 };
 
 const toRoleValue = (role?: string | null): string => {
@@ -63,6 +65,7 @@ export default function ParticipantCard({
     showActions = true,
     canEditRoles = true,
 }: ParticipantCardProps) {
+    const {t} = useI18n();
     const [isRoleMenuOpen, setIsRoleMenuOpen] = useState(false);
 
     const {data: rolesData, isLoading: isLoadingRoles} = useGetEventRolesQuery(
@@ -75,13 +78,13 @@ export default function ParticipantCard({
     const roles = rolesData?.res || [];
 
     const currentRoleValue = toRoleValue(role);
-    const currentRoleLabel = toRoleLabel(role);
+    const currentRoleLabel = toRoleLabel(role, t);
     const roleOptions = useMemo(() => {
         return roles.map((roleItem) => ({
             value: roleItem.name,
-            label: toRoleLabel(roleItem.name),
+            label: toRoleLabel(roleItem.name, t),
         }));
-    }, [roles]);
+    }, [roles, t]);
 
     const handleRoleClick = async (roleName: string) => {
         if (roleName === currentRoleValue) {
@@ -96,7 +99,7 @@ export default function ParticipantCard({
         try {
             await assignRole({eventId, userId, participantRole}).unwrap();
         } catch (error) {
-            console.error('Ошибка при назначении роли:', error);
+            console.error('Failed to assign role:', error);
         }
     };
 
@@ -144,7 +147,7 @@ export default function ParticipantCard({
 
             <div className={styles.rightSection}>
                 {isOrganizer && (
-                    <div className={styles.ownerBadge} aria-label="Организатор">
+                    <div className={styles.ownerBadge} aria-label={t('participant.roles.organizer')}>
                         <OwnerIcon className={styles.ownerIcon}/>
                     </div>
                 )}
@@ -191,7 +194,7 @@ export default function ParticipantCard({
                 {showActions && !isOrganizer && (
                     <button
                         className={styles.menuButton}
-                        aria-label="Исключить участника"
+                        aria-label={t('eventPage.excludeParticipant')}
                         type="button"
                         onClick={() => onExclude?.()}
                     >

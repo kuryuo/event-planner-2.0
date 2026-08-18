@@ -4,6 +4,7 @@ import type {
   GetEventBoardResponse,
   MyAssignedTaskItem,
 } from "@/types/api/Event";
+import { mockT } from "../utils/mockI18n";
 
 interface MockBoardTask extends EventBoardTask {
   assignedUserId?: string;
@@ -136,12 +137,101 @@ const cloneColumns = (columns: MockBoardColumn[]): EventBoardColumn[] =>
     tasks: column.tasks.map((task) => ({ ...task })),
   }));
 
+const isAnyOf = ({
+  value,
+  variants,
+}: {
+  value: string | null | undefined;
+  variants: string[];
+}): boolean => variants.includes(value ?? "");
+
+const localizeColumnName = ({
+  name,
+  request,
+}: {
+  name: string;
+  request?: Request;
+}): string => {
+  if (isAnyOf({ value: name, variants: ["Planned", "Запланировано"] })) {
+    return mockT("board.columnPlanned", request);
+  }
+  if (isAnyOf({ value: name, variants: ["In progress", "В работе"] })) {
+    return mockT("board.columnInProgress", request);
+  }
+  if (isAnyOf({ value: name, variants: ["Done", "Готово"] })) {
+    return mockT("board.columnDone", request);
+  }
+  return name;
+};
+
+const localizeTask = ({
+  task,
+  request,
+}: {
+  task: EventBoardTask;
+  request?: Request;
+}): EventBoardTask => ({
+  ...task,
+  title:
+    isAnyOf({
+      value: task.title,
+      variants: ["Prepare the agenda", "Подготовить повестку"],
+    })
+      ? mockT("board.taskPrepareAgendaTitle", request)
+      : isAnyOf({
+          value: task.title,
+          variants: ["Order catering", "Заказать кейтеринг"],
+        })
+        ? mockT("board.taskOrderCateringTitle", request)
+        : isAnyOf({
+            value: task.title,
+            variants: ["Book the venue", "Забронировать площадку"],
+          })
+          ? mockT("board.taskBookVenueTitle", request)
+          : task.title,
+  description:
+    isAnyOf({
+      value: task.description,
+      variants: ["Align talks and schedule", "Согласовать выступления и расписание"],
+    })
+      ? mockT("board.taskPrepareAgendaDescription", request)
+      : isAnyOf({
+          value: task.description,
+          variants: ["Choose menu for 100 people", "Выбрать меню на 100 человек"],
+        })
+        ? mockT("board.taskOrderCateringDescription", request)
+        : task.description,
+  assigneeName:
+    isAnyOf({ value: task.assigneeName, variants: ["Ivan Ivanov", "Иван Иванов"] })
+      ? mockT("board.user1", request)
+      : isAnyOf({
+          value: task.assigneeName,
+          variants: ["Peter Petrov", "Пётр Петров"],
+        })
+        ? mockT("board.user2", request)
+        : task.assigneeName,
+  assignedUserName:
+    isAnyOf({
+      value: task.assignedUserName,
+      variants: ["Ivan Ivanov", "Иван Иванов"],
+    })
+      ? mockT("board.user1", request)
+      : isAnyOf({
+          value: task.assignedUserName,
+          variants: ["Peter Petrov", "Пётр Петров"],
+        })
+        ? mockT("board.user2", request)
+        : task.assignedUserName,
+});
+
 export const getMockBoard = ({
   eventId,
   mineOnly = false,
+  request,
 }: {
   eventId: string;
   mineOnly?: boolean;
+  request?: Request;
 }): GetEventBoardResponse => {
   const columns = getColumns({ eventId });
   const filteredColumns = mineOnly
@@ -153,26 +243,61 @@ export const getMockBoard = ({
       }))
     : columns;
 
-  return {
+  return localizeBoard({
+    request,
+    board: {
     result: {
       columns: cloneColumns(filteredColumns),
+    },
+  }});
+};
+
+const localizeBoard = ({
+  board,
+  request,
+}: {
+  board: GetEventBoardResponse;
+  request?: Request;
+}): GetEventBoardResponse => {
+  const columns = board.result?.columns ?? [];
+
+  return {
+    result: {
+      columns: columns.map((column) => ({
+        ...column,
+        name: localizeColumnName({ name: column.name ?? "", request }),
+        tasks: (column.tasks ?? []).map((task) =>
+          localizeTask({ task, request })
+        ),
+      })),
     },
   };
 };
 
-export const getMockAssignedTasks = (): MyAssignedTaskItem[] =>
+export const getMockAssignedTasks = ({ request }: { request?: Request } = {}): MyAssignedTaskItem[] =>
   Array.from(boards.entries()).flatMap(([eventId, columns]) =>
     columns.flatMap((column) =>
       column.tasks
         .filter(({ assignedUserId }) => assignedUserId === "mock-user-1")
         .map((task) => ({
-          ...task,
+          ...(localizeTask({ task, request }) as MyAssignedTaskItem),
           eventId,
-          eventName: "Frontend Meetup",
+          eventName: mockT("board.eventName", request),
           columnId: column.id,
-          status: column.name,
+          status: localizeColumnName({ name: column.name, request }),
           assigneeId: task.assignedUserId,
-          assigneeDisplayName: task.assigneeName,
+          assigneeDisplayName:
+            isAnyOf({
+              value: task.assigneeName,
+              variants: ["Ivan Ivanov", "Иван Иванов"],
+            })
+              ? mockT("board.user1", request)
+              : isAnyOf({
+                  value: task.assigneeName,
+                  variants: ["Peter Petrov", "Пётр Петров"],
+                })
+                ? mockT("board.user2", request)
+                : task.assigneeName,
         }))
     )
   );

@@ -31,6 +31,7 @@ import BoardTaskCard from "@/pages/tasks/components/board-task-card/BoardTaskCar
 import ProfileActionModal from "@/components/profile-action-modal/ProfileActionModal";
 import {Button as AntButton} from "antd";
 import {normalizeParticipantRole} from "@/utils/participantRole.ts";
+import {useI18n} from "@/i18n/I18nProvider";
 import {
   useCreateBoardColumnMutation,
   useCreateBoardTaskMutation,
@@ -108,7 +109,15 @@ interface RawBoardResponse {
 const asRecord = (value: unknown): Record<string, unknown> =>
   value && typeof value === "object" ? (value as Record<string, unknown>) : {};
 
-const toBoard = (payload: unknown): KanbanBoard<BoardCard> => {
+const toBoard = (
+  payload: unknown,
+  placeholders: {
+    columnTitle: string;
+    newTaskTitle: string;
+    unassignedAssignee: string;
+    defaultColumnStatus: string;
+  },
+): KanbanBoard<BoardCard> => {
   const payloadRec = asRecord(payload);
   const sourceRaw = (payloadRec.result ?? payload ?? {}) as unknown;
   const source = Array.isArray(sourceRaw)
@@ -126,7 +135,7 @@ const toBoard = (payload: unknown): KanbanBoard<BoardCard> => {
 
         return {
           id: String(colRec.id ?? `column-${columnIndex}`),
-          title: String(colRec.name ?? "Колонка"),
+          title: String(colRec.name ?? placeholders.columnTitle),
           cards: tasks.map((task: unknown, taskIndex: number) => {
             const taskRec = asRecord(task) as unknown as RawBoardTask;
             const comments = Array.isArray(taskRec.comments)
@@ -136,7 +145,7 @@ const toBoard = (payload: unknown): KanbanBoard<BoardCard> => {
             return {
               id: String(taskRec.id ?? `task-${taskIndex}`),
               taskId: String(taskRec.id ?? `task-${taskIndex}`),
-              title: String(taskRec.title ?? "Новая задача"),
+              title: String(taskRec.title ?? placeholders.newTaskTitle),
               description: String(taskRec.description ?? ""),
               dueDate: (taskRec.dueDate ?? taskRec.deadline ?? undefined) as
                 | string
@@ -145,7 +154,7 @@ const toBoard = (payload: unknown): KanbanBoard<BoardCard> => {
                 taskRec.assigneeDisplayName ??
                   taskRec.assigneeName ??
                   taskRec.assignedUserName ??
-                  "Не назначено"
+                  placeholders.unassignedAssignee
               ),
               assigneeAvatar: String(
                 taskRec.assigneeAvatarUrl ?? taskRec.assigneeAvatar ?? ""
@@ -163,7 +172,7 @@ const toBoard = (payload: unknown): KanbanBoard<BoardCard> => {
               commentsCount: Number(
                 taskRec.commentCount ?? taskRec.commentsCount ?? comments.length ?? 0
               ),
-              status: String(colRec.name ?? "Запланировано"),
+              status: String(colRec.name ?? placeholders.defaultColumnStatus),
               assigneeId: String(taskRec.assigneeId ?? taskRec.assignedUserId ?? "")
                 ? String(taskRec.assigneeId ?? taskRec.assignedUserId)
                 : undefined,
@@ -182,6 +191,7 @@ interface Props {
 }
 
 export default function EventKanbanTab({ eventId, participantRole, canManageTasks }: Props) {
+  const {t, language} = useI18n();
   const [searchValue, setSearchValue] = useState("");
   const [mockSort, setMockSort] = useState<
     "urgentFirst" | "newestFirst" | "oldestFirst" | "assigneeAsc"
@@ -287,7 +297,16 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
     return role === "Organizer" || role === "Editor";
   }, [canManageTasks, currentUserRole]);
 
-  const hydratedBoard = useMemo(() => toBoard(boardData), [boardData]);
+  const hydratedBoard = useMemo(
+    () =>
+      toBoard(boardData, {
+        columnTitle: t("eventPage.kanban.columnTitle"),
+        newTaskTitle: t("eventPage.kanban.newTaskTitle"),
+        unassignedAssignee: t("eventPage.kanban.unassignedAssignee"),
+        defaultColumnStatus: t("eventPage.kanban.columnTitle"),
+      }),
+    [boardData, t],
+  );
   const [boardState, setBoardState] = useState<KanbanBoard<BoardCard>>({
     columns: [],
   });
@@ -428,12 +447,12 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
 
   const sortLabel =
     mockSort === "urgentFirst"
-      ? "Сначала срочные"
+      ? t("eventPage.kanban.sort.urgentFirst")
       : mockSort === "newestFirst"
-      ? "Сначала новые"
-      : mockSort === "oldestFirst"
-      ? "Сначала старые"
-      : "Исполнитель: А -> Я";
+        ? t("eventPage.kanban.sort.newestFirst")
+        : mockSort === "oldestFirst"
+          ? t("eventPage.kanban.sort.oldestFirst")
+          : t("eventPage.kanban.sort.assigneeAsc");
 
   const handleMoveCard = async (
     card: BoardCard,
@@ -473,7 +492,12 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
       return;
     }
     const refreshed = await refetch();
-    const freshBoard = toBoard(refreshed.data);
+    const freshBoard = toBoard(refreshed.data, {
+      columnTitle: t("eventPage.kanban.columnTitle"),
+      newTaskTitle: t("eventPage.kanban.newTaskTitle"),
+      unassignedAssignee: t("eventPage.kanban.unassignedAssignee"),
+      defaultColumnStatus: t("eventPage.kanban.columnTitle"),
+    });
     const newcomer = freshBoard.columns.find(
       (col) => !beforeIds.has(String(col.id))
     );
@@ -510,7 +534,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
     } else {
       const firstColumnId = board.columns[0]?.id;
       if (!firstColumnId) {
-        window.alert("Сначала создайте колонку");
+        window.alert(t("eventPage.kanban.createColumnFirstAlert"));
         return;
       }
       await createTask({
@@ -572,28 +596,28 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
         const id = String(rec.id ?? "");
         if (!id) return null;
         const name = String(rec.name ?? rec.displayName ?? "").trim();
-        return { id, name: name || "Участник" };
+        return { id, name: name || t("eventPage.kanban.assignee") };
       })
       .filter(Boolean) as { id: string; name: string }[];
   }, [boardAssignees]);
   const selectedAssigneeName =
     assigneeOptions.find((user) => user.id === selectedAssigneeId)?.name ||
-    "Исполнитель";
+    t("eventPage.kanban.assignee");
   const selectedPriorityLabel =
     selectedPriority === "Urgent"
-      ? "Срочный"
+      ? t("eventPage.kanban.priorities.urgent")
       : selectedPriority === "High"
-      ? "Высокий"
+        ? t("eventPage.kanban.priorities.high")
       : selectedPriority === "Low"
-      ? "Низкий"
-      : "Средний";
+          ? t("eventPage.kanban.priorities.low")
+          : t("eventPage.kanban.priorities.medium");
   const deadlineLabel = taskDeadline
-    ? new Intl.DateTimeFormat("ru-RU", {
+    ? new Intl.DateTimeFormat(language === "ru" ? "ru-RU" : "en-US", {
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
       }).format(taskDeadline)
-    : "Дедлайн";
+    : t("eventPage.kanban.deadline");
 
   return (
     <section className={styles.surface}>
@@ -603,7 +627,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
             <SearchIcon />
             <input
               type="text"
-              placeholder="Задача..."
+                placeholder={t("eventPage.kanban.searchPlaceholder")}
               value={searchValue}
               onChange={(event) => setSearchValue(event.target.value)}
             />
@@ -615,7 +639,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
               onClick={() => setIsFilterOpen((prev) => !prev)}
             >
               <FilterIcon />
-              <span>Фильтры</span>
+              <span>{t("eventPage.kanban.filters")}</span>
               <ChevronDownIcon
                 className={isFilterOpen ? styles.chevronUp : ""}
               />
@@ -623,14 +647,14 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
 
             {isFilterOpen && (
               <div className={styles.filterMenu}>
-                <h4>Дедлайн</h4>
+                <h4>{t("eventPage.kanban.deadline")}</h4>
                 <label>
                   <Checkbox
                     checked={filterDeadlineOverdue}
                     className="ep-checkbox"
                     onChange={() => setFilterDeadlineOverdue((prev) => !prev)}
                   />
-                  Просрочен
+                  {t("eventPage.kanban.overdue")}
                 </label>
                 <label>
                   <Checkbox
@@ -638,7 +662,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                     className="ep-checkbox"
                     onChange={() => setFilterDeadlineToday((prev) => !prev)}
                   />
-                  Сегодня
+                  {t("eventPage.kanban.today")}
                 </label>
                 <label>
                   <Checkbox
@@ -646,7 +670,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                     className="ep-checkbox"
                     onChange={() => setFilterDeadlineTomorrow((prev) => !prev)}
                   />
-                  Завтра
+                  {t("eventPage.kanban.tomorrow")}
                 </label>
                 <label>
                   <Checkbox
@@ -654,13 +678,13 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                     className="ep-checkbox"
                     onChange={() => setFilterDeadlineThisWeek((prev) => !prev)}
                   />
-                  На этой неделе
+                  {t("eventPage.kanban.thisWeek")}
                 </label>
 
-                <h4>Исполнитель</h4>
+                <h4>{t("eventPage.kanban.assignee")}</h4>
                 {assigneeFacets.length === 0 ? (
                   <button type="button" className={styles.assigneeMock}>
-                    <span>Нет исполнителей</span>
+                    <span>{t("eventPage.kanban.noAssignees")}</span>
                     <ChevronDownIcon className={styles.assigneeChevron} />
                   </button>
                 ) : (
@@ -677,19 +701,19 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                           )
                         }
                       />
-                      {assignee.displayName || "Участник"}
+                      {assignee.displayName || t("eventPage.kanban.assignee")}
                     </label>
                   ))
                 )}
 
-                <h4>Приоритет</h4>
+                <h4>{t("eventPage.kanban.priority")}</h4>
                 <label>
                   <Checkbox
                     checked={filterPriorityUrgent}
                     className="ep-checkbox"
                     onChange={() => setFilterPriorityUrgent((prev) => !prev)}
                   />
-                  Срочный
+                  {t("eventPage.kanban.priorities.urgent")}
                 </label>
                 <label>
                   <Checkbox
@@ -697,7 +721,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                     className="ep-checkbox"
                     onChange={() => setFilterPriorityHigh((prev) => !prev)}
                   />
-                  Высокий
+                  {t("eventPage.kanban.priorities.high")}
                 </label>
                 <label>
                   <Checkbox
@@ -705,7 +729,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                     className="ep-checkbox"
                     onChange={() => setFilterPriorityMedium((prev) => !prev)}
                   />
-                  Средний
+                  {t("eventPage.kanban.priorities.medium")}
                 </label>
                 <label>
                   <Checkbox
@@ -713,7 +737,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                     className="ep-checkbox"
                     onChange={() => setFilterPriorityLow((prev) => !prev)}
                   />
-                  Низкий
+                  {t("eventPage.kanban.priorities.low")}
                 </label>
 
                 <div className={styles.onlyMyWrap}>
@@ -722,7 +746,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                     onChange={setOnlyMyTasks}
                     className="ep-switch"
                   />
-                  <span>Только мои задачи</span>
+                  <span>{t("eventPage.kanban.onlyMyTasks")}</span>
                 </div>
                 <button
                   type="button"
@@ -741,7 +765,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                     setSearchValue("");
                   }}
                 >
-                  <span>Сбросить фильтры</span>
+                  <span>{t("eventPage.kanban.resetFilters")}</span>
                 </button>
               </div>
             )}
@@ -768,7 +792,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                     setIsSortOpen(false);
                   }}
                 >
-                  Сначала срочные
+                  {t("eventPage.kanban.sort.urgentFirst")}
                 </button>
                 <button
                   type="button"
@@ -777,7 +801,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                     setIsSortOpen(false);
                   }}
                 >
-                  Сначала новые
+                  {t("eventPage.kanban.sort.newestFirst")}
                 </button>
                 <button
                   type="button"
@@ -786,7 +810,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                     setIsSortOpen(false);
                   }}
                 >
-                  Сначала старые
+                  {t("eventPage.kanban.sort.oldestFirst")}
                 </button>
                 <button
                   type="button"
@@ -795,7 +819,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                     setIsSortOpen(false);
                   }}
                 >
-                  Исполнитель: А -&gt; Я
+                  {t("eventPage.kanban.sort.assigneeAsc")}
                 </button>
               </div>
             )}
@@ -807,7 +831,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
               className="ep-btn ep-btn--s ep-btn--filled-green"
               onClick={handleCreateTaskGlobal}
             >
-              Создать задачу
+              {t("common.actions.createTask")}
             </AntButton>
           )}
         </div>
@@ -888,14 +912,16 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
 
       <ProfileActionModal
         isOpen={Boolean(columnToDelete)}
-        title={`Удалить колонку «${columnToDelete?.title ?? ""}»?`}
-        description={`Все вложенные задачи (${
-          columnToDelete?.cards.length ?? 0
-        }) также будут безвозвратно удалены`}
+        title={t("eventPage.kanban.delete.columnTitle", {
+          title: columnToDelete?.title ?? "",
+        })}
+        description={t("eventPage.kanban.delete.columnDescription", {
+          count: columnToDelete?.cards.length ?? 0,
+        })}
         onClose={() => setColumnToDelete(null)}
         onConfirm={confirmDeleteColumn}
-        confirmText="Удалить"
-        cancelText="Отменить"
+        confirmText={t("common.actions.delete")}
+        cancelText={t("common.actions.cancel")}
         confirmTone="danger"
       />
 
@@ -912,7 +938,11 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                 className={styles.createTaskTitle}
                 value={taskTitle}
                 onChange={(event) => setTaskTitle(event.target.value)}
-                placeholder={editingTask ? "Редактирование задачи" : "Название"}
+                placeholder={
+                  editingTask
+                    ? t("eventPage.kanban.panel.titleEdit")
+                    : t("eventPage.kanban.panel.titleCreate")
+                }
               />
               <button
                 type="button"
@@ -924,7 +954,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
             </div>
 
             <div className={styles.createTaskSection}>
-              <h4>Дедлайн</h4>
+              <h4>{t("eventPage.kanban.deadline")}</h4>
               <div className={styles.dropdownWrap} ref={deadlineRef}>
                 <button
                   type="button"
@@ -953,7 +983,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
             </div>
 
             <div className={styles.createTaskSection}>
-              <h4>Исполнитель</h4>
+              <h4>{t("eventPage.kanban.assignee")}</h4>
               <div className={styles.dropdownWrap} ref={assigneeRef}>
                 <button
                   type="button"
@@ -985,7 +1015,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
             </div>
 
             <div className={styles.createTaskSection}>
-              <h4>Приоритет</h4>
+              <h4>{t("eventPage.kanban.priority")}</h4>
               <div className={styles.dropdownWrap} ref={priorityRef}>
                 <button
                   type="button"
@@ -999,10 +1029,10 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                 {isPriorityOpen && (
                   <div className={styles.createTaskMenu}>
                     {[
-                      { key: "Urgent", label: "Срочный" },
-                      { key: "High", label: "Высокий" },
-                      { key: "Medium", label: "Средний" },
-                      { key: "Low", label: "Низкий" },
+                      { key: "Urgent", label: t("eventPage.kanban.priorities.urgent") },
+                      { key: "High", label: t("eventPage.kanban.priorities.high") },
+                      { key: "Medium", label: t("eventPage.kanban.priorities.medium") },
+                      { key: "Low", label: t("eventPage.kanban.priorities.low") },
                     ].map((item) => (
                       <button
                         key={item.key}
@@ -1025,7 +1055,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
 
             <div className={styles.createTaskSection}>
               <div className={styles.descriptionHead}>
-                <h4>Описание</h4>
+                <h4>{t("eventPage.kanban.panel.description")}</h4>
                 <span>{taskDescription.length}/200</span>
               </div>
               <textarea
@@ -1034,7 +1064,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                 onChange={(event) =>
                   setTaskDescription(event.target.value.slice(0, 200))
                 }
-                placeholder="Описание"
+                placeholder={t("eventPage.kanban.panel.description")}
               />
             </div>
 
@@ -1045,14 +1075,14 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                 onClick={handleSubmitTaskFromPanel}
                 disabled={!taskTitle.trim()}
               >
-                {editingTask ? "Сохранить" : "Создать"}
+                {editingTask ? t("eventPage.kanban.panel.save") : t("eventPage.kanban.panel.create")}
               </AntButton>
               <AntButton
                 type="text"
                 className="ep-btn ep-btn--s ep-btn--text"
                 onClick={() => setIsCreateTaskPanelOpen(false)}
               >
-                Отменить
+                {t("eventPage.kanban.panel.cancel")}
               </AntButton>
             </div>
           </aside>
@@ -1109,7 +1139,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                             setIsCreateTaskPanelOpen(true);
                           }}
                         >
-                          Редактировать
+                          {t("eventPage.kanban.panel.titleEdit")}
                         </button>
                         <button
                           type="button"
@@ -1119,7 +1149,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                             setIsTaskMenuOpen(false);
                           }}
                         >
-                          Удалить
+                          {t("common.actions.delete")}
                         </button>
                       </div>
                     )}
@@ -1137,30 +1167,38 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
 
             <div className={styles.taskMetaLine}>
               <StatusIcon className={styles.metaIcon} />
-              <span>Статус</span>
+              <span>{t("eventPage.kanban.details.status")}</span>
               <strong>{selectedTask.status}</strong>
             </div>
             <div className={styles.taskMetaLine}>
               <FlagIcon className={styles.metaIcon} />
-              <span>Приоритет</span>
-              <strong>{selectedTask.priority}</strong>
+              <span>{t("eventPage.kanban.details.priority")}</span>
+              <strong>
+                {selectedTask.priority === "Срочный"
+                  ? t("eventPage.kanban.priorities.urgent")
+                  : selectedTask.priority === "Высокий"
+                    ? t("eventPage.kanban.priorities.high")
+                    : selectedTask.priority === "Низкий"
+                      ? t("eventPage.kanban.priorities.low")
+                      : t("eventPage.kanban.priorities.medium")}
+              </strong>
             </div>
             <div className={styles.taskMetaLine}>
               <CalendarIcon className={styles.metaIcon} />
-              <span>Дедлайн</span>
+              <span>{t("eventPage.kanban.details.deadline")}</span>
               <strong>
                 {selectedTask.dueDate
-                  ? new Intl.DateTimeFormat("ru-RU", {
-                      day: "2-digit",
-                      month: "long",
-                      year: "numeric",
-                    }).format(new Date(selectedTask.dueDate))
-                  : "Без срока"}
+                  ? new Intl.DateTimeFormat(language === "ru" ? "ru-RU" : "en-US", {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                  }).format(new Date(selectedTask.dueDate))
+                  : t("eventPage.kanban.noDeadline")}
               </strong>
             </div>
             <div className={styles.taskMetaLine}>
               <PersonIcon className={styles.metaIcon} />
-              <span>Исполнитель</span>
+              <span>{t("eventPage.kanban.details.assignee")}</span>
               <strong className={styles.assignee}>
                 <Avatar
                   className="ep-avatar"
@@ -1176,9 +1214,9 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
             <div className={styles.taskDescription}>
               <div className={styles.taskDescriptionTitle}>
                 <TextLeftIcon className={styles.metaIcon} />
-                <span>Описание</span>
+                <span>{t("eventPage.kanban.details.description")}</span>
               </div>
-              <p>{selectedTask.description || "Описание отсутствует"}</p>
+              <p>{selectedTask.description || t("eventPage.kanban.noDescription")}</p>
             </div>
 
             <div className={styles.taskTabs}>
@@ -1187,14 +1225,14 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                 className={activeTaskTab === "comments" ? styles.tabActive : ""}
                 onClick={() => setActiveTaskTab("comments")}
               >
-                Комментарии
+                {t("eventPage.kanban.details.tabs.comments")}
               </button>
               <button
                 type="button"
                 className={activeTaskTab === "history" ? styles.tabActive : ""}
                 onClick={() => setActiveTaskTab("history")}
               >
-                История
+                {t("eventPage.kanban.details.tabs.history")}
               </button>
             </div>
 
@@ -1203,13 +1241,16 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                 ? taskComments.map((comment) => (
                     <article key={comment.id} className={styles.feedItem}>
                       <div className={styles.feedHead}>
-                        <strong>{comment.authorName || "Пользователь"}</strong>
+                        <strong>{comment.authorName || t("eventPage.kanban.details.userFallback")}</strong>
                         <span>
                           {comment.createdAt
-                            ? new Intl.DateTimeFormat("ru-RU", {
+                            ? new Intl.DateTimeFormat(
+                              language === "ru" ? "ru-RU" : "en-US",
+                              {
                                 hour: "2-digit",
                                 minute: "2-digit",
-                              }).format(new Date(comment.createdAt))
+                              },
+                            ).format(new Date(comment.createdAt))
                             : ""}
                         </span>
                       </div>
@@ -1219,20 +1260,23 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                 : taskHistory.map((item) => (
                     <article key={item.id} className={styles.feedItem}>
                       <div className={styles.feedHead}>
-                        <strong>{item.authorName || "Система"}</strong>
+                        <strong>{item.authorName || t("eventPage.kanban.details.systemFallback")}</strong>
                         <span>
                           {item.createdAt
-                            ? new Intl.DateTimeFormat("ru-RU", {
+                            ? new Intl.DateTimeFormat(
+                              language === "ru" ? "ru-RU" : "en-US",
+                              {
                                 day: "2-digit",
                                 month: "2-digit",
                                 hour: "2-digit",
                                 minute: "2-digit",
-                              }).format(new Date(item.createdAt))
+                              },
+                            ).format(new Date(item.createdAt))
                             : ""}
                         </span>
                       </div>
                       <p>
-                        {item.description || item.action || "Изменение задачи"}
+                        {item.description || item.action || t("eventPage.kanban.details.taskChangeFallback")}
                       </p>
                     </article>
                   ))}
@@ -1243,7 +1287,7 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
                 <input
                   value={commentText}
                   onChange={(event) => setCommentText(event.target.value)}
-                  placeholder="Комментарий..."
+                  placeholder={t("eventPage.kanban.details.commentPlaceholder")}
                 />
                 <button type="button">
                   <FaceSmileIcon />
@@ -1259,8 +1303,10 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
 
       <ProfileActionModal
         isOpen={Boolean(taskToDelete)}
-        title={`Удалить задачу «${taskToDelete?.title ?? ""}»?`}
-        description="Задача будет безвозвратно удалена"
+        title={t("eventPage.kanban.delete.taskTitle", {
+          title: taskToDelete?.title ?? "",
+        })}
+        description={t("eventPage.kanban.delete.taskDescription")}
         onClose={() => setTaskToDelete(null)}
         onConfirm={async () => {
           if (!taskToDelete) return;
@@ -1269,8 +1315,8 @@ export default function EventKanbanTab({ eventId, participantRole, canManageTask
           setSelectedTask(null);
           await refetch();
         }}
-        confirmText="Удалить"
-        cancelText="Отменить"
+        confirmText={t("common.actions.delete")}
+        cancelText={t("common.actions.cancel")}
         confirmTone="danger"
       />
     </section>

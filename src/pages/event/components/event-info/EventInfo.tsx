@@ -3,6 +3,7 @@ import {hexToAppColor} from "@/const";
 import type {VenueFormat} from '@/types/api/Event.ts';
 import {formatEventPlaceText} from '@/utils/eventPlace.ts';
 import {Tag} from "antd";
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface EventInfoProps {
     categories?: Array<{ text: string }>;
@@ -25,6 +26,7 @@ export default function EventInfo({
     color,
     visitorsCount,
 }: EventInfoProps) {
+    const {t} = useI18n();
 
     const appColor = hexToAppColor(color);
     const placeText = formatEventPlaceText({location, auditorium, venueFormat});
@@ -42,9 +44,9 @@ export default function EventInfo({
     return (
         <div className={styles.eventInfo}>
             <section className={styles.infoSection}>
-                <h3 className={styles.sectionTitle}>Основная информация</h3>
+                <h3 className={styles.sectionTitle}>{t('eventPage.mainInfo')}</h3>
                 <div className={styles.infoGrid}>
-                    <span className={styles.label}>Тип</span>
+                    <span className={styles.label}>{t('eventPage.type')}</span>
                     <span className={styles.value}>
                         <Tag
                             bordered={false}
@@ -54,17 +56,17 @@ export default function EventInfo({
                                 color: `var(--content-${appColor})`,
                             }}
                         >
-                            {categories?.[0]?.text || 'Событие'}
+                            {categories?.[0]?.text || t('eventPage.event')}
                         </Tag>
                     </span>
 
-                    <span className={styles.label}>Дата и время</span>
-                    <span className={styles.value}>{date || 'Не указано'}</span>
+                    <span className={styles.label}>{t('eventPage.dateTime')}</span>
+                    <span className={styles.value}>{date || t('eventPage.notSpecified')}</span>
 
-                    <span className={styles.label}>Место</span>
+                    <span className={styles.label}>{t('eventPage.place')}</span>
                     <span className={styles.value}>{placeText}</span>
 
-                    <span className={styles.label}>Теги</span>
+                    <span className={styles.label}>{t('eventPage.tags')}</span>
                     <span className={styles.value}>
                         <span className={styles.tagsRow}>
                             {(categories ?? []).map((category) => (
@@ -84,14 +86,14 @@ export default function EventInfo({
                         </span>
                     </span>
 
-                    <span className={styles.label}>Посетители</span>
+                    <span className={styles.label}>{t('eventPage.visitors')}</span>
                     <span className={styles.value}>{visitorsCount ?? '—'}</span>
                 </div>
             </section>
 
             <section className={styles.descriptionSection}>
-                <h3 className={styles.sectionTitle}>Описание</h3>
-                <p className={styles.descriptionText}>{description || 'Описание отсутствует'}</p>
+                <h3 className={styles.sectionTitle}>{t('eventPage.description')}</h3>
+                <p className={styles.descriptionText}>{description || t('eventPage.noDescription')}</p>
             </section>
         </div>
     );

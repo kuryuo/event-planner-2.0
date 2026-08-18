@@ -4,6 +4,7 @@ import {useNavigate} from 'react-router-dom';
 import {useGetOrganizersQuery} from '@/services/api/userApi.ts';
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 import EventListCard from './event-list-card/EventListCard';
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface Event {
     id: string;
@@ -23,6 +24,7 @@ interface EventsListProps {
 }
 
 export default function EventsList({events, currentMonth}: EventsListProps) {
+    const {t} = useI18n();
     const navigate = useNavigate();
     const {data: organizersData} = useGetOrganizersQuery();
     const organizersById = new Map((organizersData ?? []).map((o) => [o.id, o]));
@@ -39,14 +41,14 @@ export default function EventsList({events, currentMonth}: EventsListProps) {
         <div className={styles.eventsList}>
             {filteredEvents.length === 0 ? (
                 <div className={styles.emptyState}>
-                    Нет мероприятий в этом месяце
+                    {t('calendar.noEventsThisMonth')}
                 </div>
             ) : (
                 filteredEvents.map((event) => {
                     const organizer = organizersById.get(event.responsiblePersonId);
                     const organizerName = organizer
-                        ? `${organizer.lastName ?? ''} ${organizer.firstName ?? ''}`.trim() || 'Организатор'
-                        : 'Организатор';
+                        ? `${organizer.lastName ?? ''} ${organizer.firstName ?? ''}`.trim() || t('calendar.organizer')
+                        : t('calendar.organizer');
 
                     return (
                         <EventListCard

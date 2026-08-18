@@ -11,11 +11,13 @@ import dayjs from "dayjs";
 import {useClickOutside} from "@/hooks/ui/useClickOutside.ts";
 import {format} from "date-fns";
 import {ru} from "date-fns/locale";
+import {enUS} from "date-fns/locale";
 import type {Organizer} from "@/types/api/User.ts";
 import type {EventTypeKind, GetEventsPayload} from "@/types/api/Event.ts";
 import {useGetOrganizersQuery} from "@/services/api/userApi.ts";
 import {Divider, Switch} from "antd";
 import {Tag} from "antd";
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface FiltersProps {
     onClose?: () => void;
@@ -29,6 +31,7 @@ type DateRangeValue = {
 };
 
 export default function Filters({onClose, onApply, appliedFilters}: FiltersProps) {
+    const {t, language} = useI18n();
     const [formats, setFormats] = useState({
         inPerson: false,
         hybrid: false,
@@ -46,12 +49,12 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
     const {data: organizersData} = useGetOrganizersQuery();
 
     const typeChips: Array<{ label: string; value: EventTypeKind }> = [
-        {label: 'Хакатон', value: 'Hackathon'},
-        {label: 'Лекция', value: 'Lecture'},
+        {label: t('event.types.Hackathon'), value: 'Hackathon'},
+        {label: t('event.types.Lecture'), value: 'Lecture'},
         {label: 'ПП', value: 'PP'},
-        {label: 'Спецкурс', value: 'SpecialCourse'},
-        {label: 'Практика', value: 'Practice'},
-        {label: 'Карьерные мероприятия', value: 'CareerEvent'},
+        {label: t('event.types.SpecialCourse'), value: 'SpecialCourse'},
+        {label: t('event.types.Practice'), value: 'Practice'},
+        {label: t('event.types.CareerEvent'), value: 'CareerEvent'},
     ];
 
     const tagTextStyleS = {
@@ -78,10 +81,11 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
 
     const formatDateRange = (range: DateRangeValue | undefined): string => {
         if (!range?.from) return '';
+        const locale = language === 'ru' ? ru : enUS;
         if (!range.to) {
-            return format(range.from, 'd MMM yyyy', {locale: ru});
+            return format(range.from, 'd MMM yyyy', {locale});
         }
-        return `${format(range.from, 'd MMM', {locale: ru})} – ${format(range.to, 'd MMM yyyy', {locale: ru})}`;
+        return `${format(range.from, 'd MMM', {locale})} – ${format(range.to, 'd MMM yyyy', {locale})}`;
     };
 
     useClickOutside(datePickerRef, () => setShowDatePicker(false), showDatePicker);
@@ -190,12 +194,12 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
         <div className={styles.overlay} onClick={onClose}>
             <div className={styles.filters} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.header}>
-                    <span className={styles.title}>Фильтры</span>
+                    <span className={styles.title}>{t('filters.title')}</span>
                     <CloseIcon onClick={onClose} className={styles.closeIcon}/>
                 </div>
 
                 <div className={styles.dateSection}>
-                    <label className={styles.dateLabel}>Дата</label>
+                    <label className={styles.dateLabel}>{t('common.labels.date')}</label>
                     <div className={styles.dateWrapper} ref={datePickerRef}>
                         <CalendarIcon
                             className={styles.calendarIcon}
@@ -203,7 +207,7 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
                         />
                         <input
                             type="text"
-                            placeholder="Выберите период"
+                            placeholder={t('calendar.selectPeriod')}
                             className={styles.dateInput}
                             value={formatDateRange(dateRange)}
                             onClick={() => setShowDatePicker(!showDatePicker)}
@@ -240,7 +244,7 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
                 </div>
 
                 <div className={styles.formatSection}>
-                    <span className={styles.formatTitle}>Формат</span>
+                    <span className={styles.formatTitle}>{t('filters.format')}</span>
                     <div className={styles.formatList}>
                         {Object.keys(formats).map(key => (
                             <label key={key} className={styles.formatItem}>
@@ -251,10 +255,10 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
                                 />
                                 <span>
                                 {key === 'inPerson'
-                                    ? 'Очный'
+                                    ? t('filters.inPerson')
                                     : key === 'hybrid'
-                                        ? 'Гибридный'
-                                        : 'Онлайн'}
+                                        ? t('filters.hybrid')
+                                        : t('filters.online')}
                             </span>
                             </label>
                         ))}
@@ -262,7 +266,7 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
                 </div>
 
                 <div className={styles.typeSection}>
-                    <span className={styles.typeTitle}>Тип</span>
+                    <span className={styles.typeTitle}>{t('filters.type')}</span>
                     <div className={styles.typeChips}>
                         {typeChips.map((type) => (
                             selectedTypes.includes(type.value) ? (
@@ -324,7 +328,7 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
 
                 <div className={styles.switchRow}>
                     <label>
-                        <span>Мои мероприятия</span>
+                        <span>{t('filters.myEvents')}</span>
                         <Switch checked={myEvents} onChange={setMyEvents} className="ep-switch" />
                     </label>
                 </div>
@@ -335,7 +339,7 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
                         className={`ep-btn ep-btn--m ep-btn--filled-purple ${styles.actionButton}`}
                         onClick={handleApply}
                     >
-                        Применить
+                        {t('filters.apply')}
                     </Button>
 
                     <Button
@@ -343,7 +347,7 @@ export default function Filters({onClose, onApply, appliedFilters}: FiltersProps
                         className={`ep-btn ep-btn--m ep-btn--text ${styles.actionButton}`}
                         onClick={handleClear}
                     >
-                        Очистить
+                        {t('common.actions.clear')}
                     </Button>
                 </div>
             </div>

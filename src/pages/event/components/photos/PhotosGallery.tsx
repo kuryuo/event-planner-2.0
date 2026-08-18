@@ -11,6 +11,7 @@ import {useSelector} from "react-redux";
 import type {RootState} from "@/store/store.ts";
 import {useGetEventSubscribersQuery} from "@/services/api/eventApi.ts";
 import {normalizeParticipantRole} from "@/utils/participantRole.ts";
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface PhotosGalleryProps {
     eventId: string;
@@ -22,6 +23,7 @@ const isVideoPath = (path?: string): boolean => {
 };
 
 export default function PhotosGallery({eventId}: PhotosGalleryProps) {
+    const {t} = useI18n();
     const currentUserId = useSelector((state: RootState) => state.profile.profile?.id ?? '');
     const {data: subscribersData} = useGetEventSubscribersQuery(
         {eventId, count: 200, offset: 0},
@@ -60,12 +62,12 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
     if (isLoading) {
         return (
             <div className={styles.gallery}>
-                <div className={styles.loading}>Загрузка медиа...</div>
+                <div className={styles.loading}>{t('eventPage.media.loading')}</div>
             </div>
         );
     }
 
-    const uploadLabel = isUploading ? 'Загрузка...' : 'Загрузить фото и видео';
+    const uploadLabel = isUploading ? t('eventPage.media.uploading') : t('eventPage.media.uploadPhotosVideos');
 
     return (
         <>
@@ -89,7 +91,7 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
                                         className={`ep-btn ep-btn--m ${isSelectionMode ? "ep-btn--filled-purple" : "ep-btn--text"}`}
                                         onClick={handleSelectModeToggle}
                                     >
-                                        Выбрать
+                                        {t('eventPage.media.select')}
                                     </Button>
                                 </>
                             )}
@@ -104,7 +106,7 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
                                     onClick={handleDeleteSelected}
                                     disabled={isDeleting}
                                 >
-                                    {isDeleting ? 'Удаление...' : 'Удалить'}
+                                    {isDeleting ? t('eventPage.media.deleting') : t('eventPage.media.delete')}
                                 </Button>
                             </div>
                         )}
@@ -125,12 +127,12 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
                 {error || !hasPhotos ? (
                     <div className={styles.emptyState}>
                         <h3 className={styles.emptyTitle}>
-                            {canManageMedia ? 'Добавьте фото или видео' : 'Фото и видео отсутствуют'}
+                            {canManageMedia ? t('eventPage.media.addMediaTitle') : t('eventPage.media.noMediaTitle')}
                         </h3>
                         <p className={styles.emptyText}>
                             {canManageMedia
-                                ? 'Перетащите файлы сюда или нажмите на кнопку ниже'
-                                : 'Пока нет медиафайлов для просмотра'}
+                                ? t('eventPage.media.addMediaHint')
+                                : t('eventPage.media.noMediaHint')}
                         </p>
                         {canManageMedia && (
                             <Button
@@ -177,13 +179,13 @@ export default function PhotosGallery({eventId}: PhotosGalleryProps) {
                                                 muted
                                             />
                                             <div className={styles.videoBadge}>
-                                                <span>Видео</span>
+                                                <span>{t('eventPage.media.video')}</span>
                                             </div>
                                         </>
                                     ) : (
                                         <img
                                             src={imageUrl}
-                                            alt={`Фото ${index + 1}`}
+                                            alt={`${t('eventPage.media.photo')} ${index + 1}`}
                                             className={styles.photo}
                                             loading="lazy"
                                         />

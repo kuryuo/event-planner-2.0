@@ -8,6 +8,7 @@ import GeoAltIcon from '@/assets/img/icon-m/geo-alt.svg?react';
 import TelephoneIcon from '@/assets/img/icon-m/telephone.svg?react';
 import TelegramIcon from '@/assets/img/icon-m/telegram.svg?react';
 import {isValidAddress, isValidPhone, isValidTelegram} from '@/utils/validation.ts';
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface ProfileFormValues {
     firstName: string;
@@ -49,6 +50,7 @@ export default function ProfileForm({
     loading = false,
     initialData,
 }: ProfileFormProps) {
+    const {t} = useI18n();
     const {control, handleSubmit, reset, formState: {errors}} = useForm<ProfileFormValues>({
         mode: 'onBlur',
         defaultValues: toFormValues(initialData),
@@ -71,21 +73,21 @@ export default function ProfileForm({
     return (
         <div className={styles.formWrapper}>
             <div className={styles.section}>
-                <h3 className={styles.sectionTitle}>Личные данные</h3>
+                <h3 className={styles.sectionTitle}>{t('profile.personalData')}</h3>
                 <div className={styles.nameRow}>
                     <Controller
                         name="firstName"
                         control={control}
                         rules={{
-                            required: 'Имя обязательно',
-                            minLength: {value: 2, message: 'Минимум 2 символа'},
-                            maxLength: {value: 40, message: 'Максимум 40 символов'},
+                            required: t('auth.validation.firstNameRequired'),
+                            minLength: {value: 2, message: t('auth.validation.minTwoChars')},
+                            maxLength: {value: 40, message: t('profile.validation.max40')},
                         }}
                         render={({field}) => (
                             <FormField error={errors.firstName?.message}>
                                 <Input
                                     {...field}
-                                    placeholder="Имя"
+                                    placeholder={t('auth.fields.firstName')}
                                     status={errors.firstName ? 'error' : undefined}
                                 />
                             </FormField>
@@ -95,15 +97,15 @@ export default function ProfileForm({
                         name="lastName"
                         control={control}
                         rules={{
-                            required: 'Фамилия обязательна',
-                            minLength: {value: 2, message: 'Минимум 2 символа'},
-                            maxLength: {value: 50, message: 'Максимум 50 символов'},
+                            required: t('auth.validation.lastNameRequired'),
+                            minLength: {value: 2, message: t('auth.validation.minTwoChars')},
+                            maxLength: {value: 50, message: t('profile.validation.max50')},
                         }}
                         render={({field}) => (
                             <FormField error={errors.lastName?.message}>
                                 <Input
                                     {...field}
-                                    placeholder="Фамилия"
+                                    placeholder={t('auth.fields.lastName')}
                                     status={errors.lastName ? 'error' : undefined}
                                 />
                             </FormField>
@@ -114,15 +116,15 @@ export default function ProfileForm({
                     name="profession"
                     control={control}
                     rules={{
-                        required: 'Укажите должность',
-                        minLength: {value: 2, message: 'Минимум 2 символа'},
-                        maxLength: {value: 80, message: 'Максимум 80 символов'},
+                        required: t('profile.validation.professionRequired'),
+                        minLength: {value: 2, message: t('auth.validation.minTwoChars')},
+                        maxLength: {value: 80, message: t('profile.validation.max80')},
                     }}
                     render={({field}) => (
                         <FormField error={errors.profession?.message}>
                             <Input
                                 {...field}
-                                placeholder="Должность"
+                                placeholder={t('profile.profession')}
                                 status={errors.profession ? 'error' : undefined}
                             />
                         </FormField>
@@ -132,14 +134,14 @@ export default function ProfileForm({
                     name="city"
                     control={control}
                     rules={{
-                        required: 'Укажите адрес или город',
-                        validate: (value) => isValidAddress(value) || 'Введите корректный адрес',
+                        required: t('profile.validation.cityRequired'),
+                        validate: (value) => isValidAddress(value) || t('profile.validation.validAddress'),
                     }}
                     render={({field}) => (
                         <FormField error={errors.city?.message}>
                             <Input
                                 {...field}
-                                placeholder="Город"
+                                placeholder={t('profile.city')}
                                 prefix={<GeoAltIcon/>}
                                 status={errors.city ? 'error' : undefined}
                             />
@@ -151,19 +153,19 @@ export default function ProfileForm({
             <div className={styles.divider}></div>
 
             <div className={styles.section}>
-                <h3 className={styles.sectionTitle}>Контактные данные</h3>
+                <h3 className={styles.sectionTitle}>{t('profile.contactData')}</h3>
                 <Controller
                     name="phoneNumber"
                     control={control}
                     rules={{
-                        required: 'Укажите номер телефона',
-                        validate: (value) => isValidPhone(value) || 'Введите корректный телефон (+7XXXXXXXXXX)',
+                        required: t('profile.validation.phoneRequired'),
+                        validate: (value) => isValidPhone(value) || t('profile.validation.validPhone'),
                     }}
                     render={({field}) => (
                         <FormField error={errors.phoneNumber?.message}>
                             <Input
                                 {...field}
-                                placeholder="Телефон"
+                                placeholder={t('profile.phone')}
                                 type="tel"
                                 prefix={<TelephoneIcon/>}
                                 status={errors.phoneNumber ? 'error' : undefined}
@@ -175,8 +177,8 @@ export default function ProfileForm({
                     name="telegram"
                     control={control}
                     rules={{
-                        required: 'Укажите Telegram',
-                        validate: (value) => isValidTelegram(value) || 'Некорректный Telegram (@username)',
+                        required: t('profile.validation.telegramRequired'),
+                        validate: (value) => isValidTelegram(value) || t('profile.validation.validTelegram'),
                     }}
                     render={({field}) => (
                         <FormField error={errors.telegram?.message}>
@@ -198,7 +200,7 @@ export default function ProfileForm({
                     onClick={handleSubmit(submitForm)}
                     disabled={loading}
                 >
-                    Сохранить изменения
+                    {t('profile.saveChanges')}
                 </Button>
                 <Button
                     type="text"
@@ -206,7 +208,7 @@ export default function ProfileForm({
                     onClick={handleCancel}
                     disabled={loading}
                 >
-                    Отменить изменения
+                    {t('profile.cancelChanges')}
                 </Button>
             </div>
         </div>

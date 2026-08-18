@@ -4,6 +4,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import ruLocale from '@fullcalendar/core/locales/ru';
+import enGbLocale from '@fullcalendar/core/locales/en-gb';
 import CalendarHeader from '../header/CalendarHeader';
 import CalendarEvent from '../event/CalendarEvent';
 import styles from './CalendarBody.module.scss';
@@ -11,6 +12,7 @@ import {useEventsData} from '@/hooks/api/useEventsData.ts';
 import type {EventClickArg, EventApi} from "@fullcalendar/core";
 import {useNavigate} from "react-router-dom";
 import type {GetEventsPayload} from '@/types/api/Event.ts';
+import {useI18n} from '@/i18n/I18nProvider';
 
 import {SLOT_LABEL_FORMAT, CALENDAR_SLOT_TIMES, CALENDAR_OPTIONS, hexToAppColor} from '@/const';
 
@@ -53,6 +55,7 @@ interface CalendarBodyProps {
 
 export default function CalendarBody({calendarRef, currentView, filters}: CalendarBodyProps) {
     const navigate = useNavigate();
+    const {language} = useI18n();
     const {calendarEvents} = useEventsData(filters);
 
     const eventsForCalendar = useMemo(() => {
@@ -88,7 +91,7 @@ export default function CalendarBody({calendarRef, currentView, filters}: Calend
                 ref={calendarRef}
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                 initialView={currentView}
-                locale={ruLocale}
+                locale={language === 'ru' ? ruLocale : enGbLocale}
                 headerToolbar={false}
                 slotMinTime={CALENDAR_SLOT_TIMES.min}
                 slotMaxTime={CALENDAR_SLOT_TIMES.max}

@@ -6,6 +6,7 @@ import ViewStacked from '@/assets/img/icon-m/view-stacked.svg?react';
 import Calendar from '@/assets/img/icon-m/calendar.svg?react'
 import Filter from '@/assets/img/icon-m/filter.svg?react';
 import {formatCalendarLabel} from '@/utils/date';
+import {useI18n} from '@/i18n/I18nProvider';
 
 type CalendarView = 'dayGridMonth' | 'timeGridWeek';
 
@@ -30,14 +31,15 @@ export default function CalendarToolbar({
                                             onFilterClick,
                                             showingList
                                         }: CalendarToolbarProps) {
+    const {language, t} = useI18n();
 
     return (
         <div className={styles.customToolbar}>
             <div className={styles.leftPart}>
                 <span className={styles.navLabel}>
                     {showingList 
-                        ? currentDate.toLocaleString('ru-RU', {month: 'long', year: 'numeric'}).replace(/^./, str => str.toUpperCase())
-                        : formatCalendarLabel(currentDate, currentView)
+                        ? currentDate.toLocaleString(language === 'ru' ? 'ru-RU' : 'en-US', {month: 'long', year: 'numeric'}).replace(/^./, str => str.toUpperCase())
+                        : formatCalendarLabel(currentDate, currentView, language)
                     }
                 </span>
                 <button className={styles.navBtn} onClick={onPrev}>
@@ -59,11 +61,11 @@ export default function CalendarToolbar({
                         <div className={styles.slider}/>
                         <div className={clsx(styles.toolbarBtn, currentView === 'dayGridMonth' && styles.active)}
                              onClick={() => onViewChange('dayGridMonth')}>
-                            Месяц
+                            {t('calendar.month')}
                         </div>
                         <div className={clsx(styles.toolbarBtn, currentView === 'timeGridWeek' && styles.active)}
                              onClick={() => onViewChange('timeGridWeek')}>
-                            Неделя
+                            {t('calendar.week')}
                         </div>
                     </div>
                 )}

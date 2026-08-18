@@ -4,8 +4,10 @@ import styles from "./EventEditorPage.module.scss";
 import {useSearchParams} from "react-router-dom";
 import {useEventEditor} from "@/hooks/ui/useEventEditor.ts";
 import {useGetEventByIdQuery} from "@/services/api/eventApi.ts";
+import {useI18n} from '@/i18n/I18nProvider';
 
 export default function EventEditorPage() {
+    const {t} = useI18n();
     const [searchParams] = useSearchParams();
     const eventId = searchParams.get('id');
     
@@ -17,7 +19,7 @@ export default function EventEditorPage() {
     const {handleSubmit, isLoading, error} = useEventEditor(eventId ?? undefined);
 
     if (isLoadingEvent) {
-        return <div>Загрузка...</div>;
+        return <div>{t('eventEditor.loading')}</div>;
     }
 
     return (

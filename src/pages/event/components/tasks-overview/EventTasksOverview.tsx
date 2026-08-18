@@ -4,6 +4,7 @@ import {useGetEventBoardQuery} from '@/services/api/eventApi.ts';
 import BoardTaskCard, {type BoardTaskCardPriority} from '@/pages/tasks/components/board-task-card/BoardTaskCard.tsx';
 import {buildImageUrl} from '@/utils/buildImageUrl.ts';
 import styles from './EventTasksOverview.module.scss';
+import {useI18n} from '@/i18n/I18nProvider';
 
 interface EventTasksOverviewProps {
     eventId: string;
@@ -39,6 +40,7 @@ const isDoneColumn = (name?: string | null): boolean => {
 };
 
 export default function EventTasksOverview({eventId, onOpenBoard}: EventTasksOverviewProps) {
+    const {t} = useI18n();
     const {data, isLoading} = useGetEventBoardQuery({eventId}, {
         skip: !eventId,
         refetchOnFocus: true,
@@ -63,13 +65,13 @@ export default function EventTasksOverview({eventId, onOpenBoard}: EventTasksOve
                 const rawAvatar = task?.assigneeAvatarUrl ?? task?.assigneeAvatar ?? null;
                 flattened.push({
                     id,
-                    title: task?.title || 'Название задачи',
-                    description: task?.description || 'Описание отсутствует',
+                    title: task?.title || t('eventPage.tasksOverview.title'),
+                    description: task?.description || t('eventPage.kanban.noDescription'),
                     assigneeName: String(
                         task?.assigneeDisplayName
                         ?? task?.assigneeName
                         ?? task?.assignedUserName
-                        ?? 'Не назначено',
+                        ?? t('eventPage.kanban.unassignedAssignee'),
                     ),
                     assigneeAvatar: buildImageUrl(rawAvatar),
                     dueDate: task?.dueDate ?? task?.deadline ?? undefined,
@@ -91,29 +93,29 @@ export default function EventTasksOverview({eventId, onOpenBoard}: EventTasksOve
     return (
         <aside className={styles.panel}>
             <div className={styles.headerRow}>
-                <h3 className={styles.title}>Задачи</h3>
+                <h3 className={styles.title}>{t('eventPage.tasksOverview.title')}</h3>
                 {totalCount > 0 && (
                     <button className={styles.linkButton} onClick={onOpenBoard} type="button">
-                        Смотреть все
+                        {t('eventPage.tasksOverview.viewAll')}
                     </button>
                 )}
             </div>
 
             {isLoading ? (
-                <div className={styles.emptyState}>Загрузка задач...</div>
+                <div className={styles.emptyState}>{t('eventPage.tasksOverview.loading')}</div>
             ) : totalCount === 0 ? (
                 <div className={styles.emptyState}>
                     <FileLinesIcon className={styles.emptyIcon}/>
-                    <p className={styles.emptyText}>Пока нет задач</p>
+                    <p className={styles.emptyText}>{t('eventPage.tasksOverview.emptyText')}</p>
                     <button className={styles.boardButton} type="button" onClick={onOpenBoard}>
-                        Перейти на доску
+                        {t('eventPage.tasksOverview.goBoard')}
                     </button>
                 </div>
             ) : (
                 <>
                     <div className={styles.progressBlock}>
                         <div className={styles.progressHeader}>
-                            <span>Выполнено</span>
+                            <span>{t('eventPage.tasksOverview.completed')}</span>
                             <span>{completedCount}/{totalCount}</span>
                         </div>
                         <div className={styles.progressTrack}>

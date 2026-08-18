@@ -9,6 +9,7 @@ import dayjs from "dayjs";
 import {useClickOutside} from '@/hooks/ui/useClickOutside';
 import styles from './TaskInlineCreator.module.scss';
 import {Avatar} from "antd";
+import {useI18n} from '@/i18n/I18nProvider';
 
 type Assignee = {
     id: string;
@@ -23,6 +24,7 @@ type Props = {
 };
 
 export default function TaskInlineCreator({users, onSubmit, onClose}: Props) {
+    const {t, language} = useI18n();
     const [isUsersOpen, setIsUsersOpen] = useState(false);
     const [isDateOpen, setIsDateOpen] = useState(false);
     const form = useForm<{ title: string; query: string; assignedUserId: string; dueDate?: Date }>({
@@ -49,13 +51,13 @@ export default function TaskInlineCreator({users, onSubmit, onClose}: Props) {
     }, [query, users]);
 
     const formattedDueDate = useMemo(() => {
-        if (!dueDate) return 'Дата';
-        return new Intl.DateTimeFormat('ru-RU', {
+        if (!dueDate) return t('tasks.dueDate');
+        return new Intl.DateTimeFormat(language === 'ru' ? 'ru-RU' : 'en-US', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',
         }).format(dueDate);
-    }, [dueDate]);
+    }, [dueDate, language, t]);
 
     return (
         <div className={styles.wrap} ref={wrapRef}>
@@ -63,7 +65,7 @@ export default function TaskInlineCreator({users, onSubmit, onClose}: Props) {
                 className={styles.input}
                 value={title}
                 onChange={(event) => form.setValue('title', event.target.value)}
-                placeholder="Задача"
+                placeholder={t('tasks.task')}
             />
 
             <div className={styles.bottomRow}>
@@ -86,7 +88,7 @@ export default function TaskInlineCreator({users, onSubmit, onClose}: Props) {
                                     <input
                                         value={query}
                                         onChange={(event) => form.setValue('query', event.target.value)}
-                                        placeholder="Поиск..."
+                                        placeholder={t('tasks.search')}
                                     />
                                 </label>
                                 <div className={styles.options}>
@@ -144,7 +146,7 @@ export default function TaskInlineCreator({users, onSubmit, onClose}: Props) {
                     <Check2Icon/>
                 </button>
             </div>
-            {selectedUser && <div className={styles.selected}>Ответственный: {selectedUser.name}</div>}
+            {selectedUser && <div className={styles.selected}>{t('common.labels.responsible')}: {selectedUser.name}</div>}
         </div>
     );
 }
