@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+    <rect width="1200" height="600" fill="#1677ff"/>
+    <circle cx="240" cy="300" r="130" fill="#ffffff" opacity=".15"/>
+    <circle cx="960" cy="300" r="190" fill="#ffffff" opacity=".1"/>
+    <text x="600" y="320" text-anchor="middle" fill="#ffffff" font-size="72" font-family="Arial">Event Planner</text>
+</svg>

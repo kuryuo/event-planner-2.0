@@ -107,3 +107,22 @@ Archived or finished events switch to a read-focused layout (overview, documents
 
 - **SignalR hubs**: Live updates for notifications and event chat without refreshing the page.
 - **Session path restore**: Current route is kept in `sessionStorage` so navigation state can be restored within the session.
+
+## Mock mode (MSW)
+
+During development the frontend can be run fully with mocked REST APIs via **MSW**.
+
+1. Mock mode is enabled when `VITE_ENABLE_MSW` is not set to `false` (see `src/config/runtime.ts`).
+2. SignalR real-time connections are disabled in mock mode (see `src/hooks/realtime/*`).
+3. Mock handlers and in-memory data are located in `src/mocks/` (handlers + db + factories).
+
+### Demo credentials
+
+To sign in and use the mocked data, use:
+
+- Email: `demo@example.com`
+- Password: `demo123`
+
+### Using the real backend
+
+To disable mocks and talk to the real API, set `VITE_ENABLE_MSW=false`.
